@@ -1,0 +1,30 @@
+{
+  "applinks": {
+      "details": [
+           {
+             "appIDs": [ "6503405536.com.olympsis.client" ],
+             "components": [
+               {
+                  "/": "/events/*",
+                  "comment": "Matches any URL with a path that starts with /events/."
+               },
+               {
+                  "/": "/privacy-policy",
+				  "exclude": true,
+                  "comment": "Matches any URL with a path that starts with /privacy-policy."
+               },
+               {
+                  "/": "/terms-of-use",
+				  "exclude": true,
+                  "comment": "Matches any URL with a path that starts with /terms-of-use."
+               },
+               {
+                  "/": "/contact",
+				  "exclude": true,
+                  "comment": "Matches any URL with a path that starts with /contact."
+               }
+             ]
+           }
+       ]
+   }
+}

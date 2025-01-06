@@ -1,1 +1,5 @@
-<!-- Group View -->
+<template>
+    <div>
+        Group ID
+    </div>
+</template>

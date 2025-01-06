@@ -1,5 +1,5 @@
 <template>
     <div>
-        Event ID
+        Terms of Use
     </div>
 </template>

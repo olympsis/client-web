@@ -1,5 +1,5 @@
 <template>
     <div>
-        Event ID
+        Chat Rooms
     </div>
 </template>

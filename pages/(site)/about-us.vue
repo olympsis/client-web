@@ -1,5 +1,5 @@
 <template>
     <div>
-        Event ID
+        About US
     </div>
 </template>

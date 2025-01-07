@@ -6,23 +6,22 @@ import {
 import { ref, type Ref } from 'vue';
 import { defineStore } from 'pinia'
 import { useRouter } from 'vue-router';
-import { Club } from '../data/models/ClubModels';
-import { LOADING_STATE } from '../data/GlobalData';
-import { Event } from '../data/models/EventModels';
-import { Venue } from '../data/models/VenueModels';
-import { UserData } from '../data/models/UserModels';
-import { UserService } from '../data/services/UserService';
-import { VenueService } from '../data/services/VenueService';
-import { EventService } from '../data/services/EventService';
-import { GroupSelection, Location } from '../data/models/GenericModels';
-import { AUTH_STATUS, GROUP_TYPE } from '../data/models/Enums';
-import { Organization } from '../data/models/OrganizationModels';
-import { LocationManager } from '../data/managers/LocationManager';
-import { AuthService } from '@/data/services/AuthService';
-import { ClubService } from '@/data/services/ClubService';
 import { useModelStore } from './model-store';
-import { ChatService } from '@/data/services/ChatService';
-import type { ChatRoom } from '@/data/models/ChatModels';
+import { Club } from '~/data/models/ClubModels';
+import { Event } from '~/data/models/EventModels';
+import { Venue } from '~/data/models/VenueModels';
+import { UserData } from '~/data/models/UserModels';
+import type { ChatRoom } from '~/data/models/ChatModels';
+import { ChatService } from '~/data/services/ChatService';
+import { AuthService } from '~/data/services/AuthService';
+import { ClubService } from '~/data/services/ClubService';
+import { UserService } from '~/data/services/UserService';
+import { VenueService } from '~/data/services/VenueService';
+import { EventService } from '~/data/services/EventService';
+import { Organization } from '../data/models/OrganizationModels';
+import { AUTH_STATUS, GROUP_TYPE, VIEW_STATE } from '~/data/Enums';
+import { LocationManager } from '../data/managers/LocationManager';
+import { GroupSelection, Location } from '../data/models/GenericModels';
 import { AuthenticationFacade } from '@/data/facades/AuthenticationFacade';
 
 export const useSessionStore = defineStore('session-store', () => {
@@ -54,7 +53,7 @@ export const useSessionStore = defineStore('session-store', () => {
 
     var lastKnownLocation: Ref<Location | undefined> = ref(undefined);
     var authStatus: Ref<AUTH_STATUS> = ref(AUTH_STATUS.unknown);
-    var loadingState: Ref<LOADING_STATE> = ref(LOADING_STATE.PENDING);
+    var loadingState: Ref<VIEW_STATE> = ref(VIEW_STATE.PENDING);
 
     var mapkitToken: Ref<string | undefined> = ref(undefined);
     var mapKitServerToken: Ref<string | undefined> = ref(undefined); 
@@ -83,7 +82,7 @@ export const useSessionStore = defineStore('session-store', () => {
                         }) => {
                             session.$patch({
                                 authStatus: AUTH_STATUS.authenticated,
-                                loadingState: LOADING_STATE.SUCCESS,
+                                loadingState: VIEW_STATE.SUCCESS,
                                 user: response.user,
                                 groups: response.selections,
                                 selectedGroup: response.selectedGroup,
@@ -99,7 +98,7 @@ export const useSessionStore = defineStore('session-store', () => {
                     console.error(error);
                     session.$patch({
                         authStatus: AUTH_STATUS.unauthenticated,
-                        loadingState: LOADING_STATE.FAILED
+                        loadingState: VIEW_STATE.FAILED
                     });
                 }
             } else {
@@ -108,7 +107,7 @@ export const useSessionStore = defineStore('session-store', () => {
                 unsubscribe();
                 session.$patch({
                     authStatus: AUTH_STATUS.unauthenticated,
-                    loadingState: LOADING_STATE.SUCCESS
+                    loadingState: VIEW_STATE.SUCCESS
                 });
                 
             }
@@ -118,7 +117,7 @@ export const useSessionStore = defineStore('session-store', () => {
             unsubscribe();
             session.$patch({
                 authStatus: AUTH_STATUS.unknown,
-                loadingState: LOADING_STATE.FAILED
+                loadingState: VIEW_STATE.FAILED
             });
             console.error(`Failed to check user status. Error: ${error}`);
         });

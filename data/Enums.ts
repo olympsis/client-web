@@ -275,6 +275,13 @@ enum VIEW_SIZE {
     LARGE
 }
 
+enum VIEW_STATE {
+    PENDING,
+    LOADING,
+    SUCCESS,
+    FAILED
+}
+
 export {
     AUTH_STATUS,
     APPLICATION_STATUS,
@@ -310,4 +317,5 @@ export {
     sportsInternalImages,
 
     VIEW_SIZE,
+    VIEW_STATE
 }

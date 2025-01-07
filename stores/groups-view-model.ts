@@ -1,13 +1,13 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
+import { VIEW_STATE } from "~/data/Enums";
 import { Post } from "../data/models/PostModels";
 import { useSessionStore } from "./session-store";
-import { LOADING_STATE } from "../data/GlobalData";
 import { PostService } from "../data/services/PostService";
 import { GroupSelection } from "../data/models/GenericModels";
 
 export const useGroupsViewModel = defineStore('groups-view-model', () => {
-    var state = ref(LOADING_STATE.LOADING);
+    var state = ref(VIEW_STATE.LOADING);
     
     var sessionStore = useSessionStore();
     var postService = new PostService();
@@ -19,22 +19,22 @@ export const useGroupsViewModel = defineStore('groups-view-model', () => {
     var clubApplications: any[] = [];
 
     function load() {
-        state.value = LOADING_STATE.LOADING;
+        state.value = VIEW_STATE.LOADING;
         if (sessionStore.selectedGroup) {
             if (posts.value.length == 0) {
                 loadNextPosts()
                 .then((_posts) => {
                     posts.value = _posts;
-                    state.value = LOADING_STATE.SUCCESS;
+                    state.value = VIEW_STATE.SUCCESS;
                     return
                 })
                 .catch((error) => {
                     console.error('Failed to load groups view model: ' + error);
-                    state.value = LOADING_STATE.FAILED;
+                    state.value = VIEW_STATE.FAILED;
                     return
                 })
             } else {
-                state.value = LOADING_STATE.SUCCESS;
+                state.value = VIEW_STATE.SUCCESS;
             }
         } else {
             // Wait half a second for the session store to propagate the changes
@@ -59,22 +59,22 @@ export const useGroupsViewModel = defineStore('groups-view-model', () => {
     }
 
     function changeSelectedGroup(group: GroupSelection) {
-        state.value = LOADING_STATE.LOADING
+        state.value = VIEW_STATE.LOADING
         sessionStore.selectedGroup = group
         loadNextPosts()
             .then((_posts) => {
                 if (sessionStore.selectedGroup) {
                     posts.value = _posts;
                 } else {
-                    state.value = LOADING_STATE.FAILED
+                    state.value = VIEW_STATE.FAILED
                     return
                 }
-                state.value = LOADING_STATE.SUCCESS
+                state.value = VIEW_STATE.SUCCESS
                 return
             })
             .catch((error) => {
                 console.error('Failed to load posts: ' + error)
-                state.value = LOADING_STATE.FAILED
+                state.value = VIEW_STATE.FAILED
             });
     }
 

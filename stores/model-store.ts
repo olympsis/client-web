@@ -1,18 +1,18 @@
-import type { Model } from "@/data/models/GenericModels";
 
 import { defineStore } from "pinia";
-import { Club } from "@/data/models/ClubModels";
-import { Post } from "@/data/models/PostModels";
-import { Event } from "@/data/models/EventModels";
-import { Venue } from "@/data/models/VenueModels";
-import { UserData } from "@/data/models/UserModels";
-import { UserService } from "@/data/services/UserService";
-import { PostService } from "@/data/services/PostService";
-import { ClubService } from "@/data/services/ClubService";
-import { VenueService } from "@/data/services/VenueService";
-import { EventService } from "@/data/services/EventService";
-import { Organization } from "@/data/models/OrganizationModels";
-import { OrganizationService } from "../services/OrganizationService";
+import { Club } from "~/data/models/ClubModels";
+import { Post } from "~/data/models/PostModels";
+import { Event } from "~/data/models/EventModels";
+import { Venue } from "~/data/models/VenueModels";
+import { UserData } from "~/data/models/UserModels";
+import type { Model } from "~/data/models/GenericModels";
+import { UserService } from "~/data/services/UserService";
+import { PostService } from "~/data/services/PostService";
+import { ClubService } from "~/data/services/ClubService";
+import { VenueService } from "~/data/services/VenueService";
+import { EventService } from "~/data/services/EventService";
+import { Organization } from "~/data/models/OrganizationModels";
+import { OrganizationService } from "~/data/services/OrganizationService";
 
 export enum MODEL_STORE_ERROR {
     FAILED_TO_FIND_MODEL=0,

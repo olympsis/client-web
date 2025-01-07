@@ -8,8 +8,8 @@ export class LocaleService {
     private http: Courrier;
 
     constructor() {
-        const url = process.env.API ?? '';
-        this.http = new Courrier(Scheme.HTTPS, url);
+        const config = useRuntimeConfig();
+        this.http = new Courrier(Scheme.HTTPS, config.public.API);
     }
 
     async getCountries(): Promise<Array<Country> | undefined> {

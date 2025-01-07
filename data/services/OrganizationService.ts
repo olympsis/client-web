@@ -7,8 +7,8 @@ export class OrganizationService {
     private http: Courrier;
 
     constructor() {
-        const url = process.env.API ?? '';
-        this.http = new Courrier(Scheme.HTTPS, url);
+        const config = useRuntimeConfig();
+        this.http = new Courrier(Scheme.HTTPS, config.public.API);
     }
 
     async getOrganization(id: string) : Promise<Organization | undefined> {

@@ -1,6 +1,6 @@
 import { 
-    getAuth, 
-    onAuthStateChanged, 
+    onAuthStateChanged,
+    type Auth, 
 } from 'firebase/auth';
 
 import { ref, type Ref } from 'vue';
@@ -67,8 +67,10 @@ export const useSessionStore = defineStore('session-store', () => {
     ]);
     
     function checkAuthorizationStatus() {
+        const nuxtApp = useNuxtApp();
+        const auth = nuxtApp.$auth as Auth;
         const session = useSessionStore();
-        const unsubscribe = onAuthStateChanged(getAuth(), async (_user) => {
+        const unsubscribe = auth.onAuthStateChanged(async (_user) => {
             if (_user) { // We only load data if there is no user data in memory and we get user update
                 try {
                     load()
@@ -109,7 +111,6 @@ export const useSessionStore = defineStore('session-store', () => {
                     authStatus: AUTH_STATUS.unauthenticated,
                     loadingState: VIEW_STATE.SUCCESS
                 });
-                
             }
         }, (error) => {
             // We will most likely need to restart/reload the page.

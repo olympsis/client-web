@@ -5,7 +5,8 @@ import {
     GoogleAuthProvider, 
     getAdditionalUserInfo,
     reauthenticateWithPopup,
-    type AuthError
+    type AuthError,
+    type Auth
 } from "firebase/auth";
 
 import type { UserDTO } from "../models/UserModels";
@@ -13,7 +14,7 @@ import type { UserDTO } from "../models/UserModels";
 import { AuthRequest } from "../models/AuthModels";
 import { AuthService } from "../services/AuthService";
 import { UserService } from "../services/UserService";
-import { getAnalytics, logEvent } from "firebase/analytics";
+import { getAnalytics, logEvent, type Analytics } from "firebase/analytics";
 
 type AuthFacadeResponse = {
     fullName: string
@@ -24,7 +25,10 @@ type AuthFacadeResponse = {
 
 class AuthenticationFacade {
 
-    private analytics = getAnalytics();
+    private nuxtApp = useNuxtApp();
+    private auth = this.nuxtApp.$auth as Auth;
+    private analytics = this.nuxtApp.$analytics as Analytics;
+
     private authService = new AuthService();
     private userService = new UserService();
 
@@ -33,11 +37,10 @@ class AuthenticationFacade {
      * @returns AuthFacadeResponse Object that contains the data needed from the auth services
      */
     async signInWithApple(): Promise<AuthFacadeResponse | null> {
-        const auth = getAuth();
         const provider = new OAuthProvider('apple.com');
 
         try {
-            const result: any = await signInWithPopup(auth, provider);
+            const result: any = await signInWithPopup(this.auth, provider);
             const user = result.user;
             const additional = getAdditionalUserInfo(result);
     
@@ -74,12 +77,11 @@ class AuthenticationFacade {
      * @returns AuthFacadeResponse Object that contains the data needed from the auth services
      */
     async signInWithGoogle(): Promise<AuthFacadeResponse | null> {
-        const auth = getAuth();
         const provider = new GoogleAuthProvider();
         provider.setCustomParameters({ prompt: 'select_account' });
 
         try {
-            const result: any = await signInWithPopup(auth, provider);
+            const result: any = await signInWithPopup(this.auth, provider);
             const user = result.user;
             const additional = getAdditionalUserInfo(result);
     
@@ -132,8 +134,7 @@ class AuthenticationFacade {
      */
     async signOut(): Promise<boolean> {
         try {
-            const auth = getAuth();
-            await auth.signOut()
+            await this.auth.signOut()
             logEvent(this.analytics, 'signout');
             return true;
         } catch (error) {
@@ -147,8 +148,7 @@ class AuthenticationFacade {
      * @returns boolean indicating success status
      */
     async deleteAccount(): Promise<boolean> {
-        const auth = getAuth();
-        const user = auth.currentUser;
+        const user = this.auth.currentUser;
         if (!user) {
             throw new Error('No user is currently signed in');
         }

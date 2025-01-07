@@ -7,8 +7,8 @@ export class VenueService {
     private http: Courrier;
 
     constructor() {
-        const url = process.env.API ?? '';
-        this.http = new Courrier(Scheme.HTTPS, url);
+        const config = useRuntimeConfig();
+        this.http = new Courrier(Scheme.HTTPS, config.public.API);
     }
 
     async getVenues(lat: number, long: number, radius: number, sports: string): Promise<VenuesResponse | undefined> {

@@ -1,5 +1,5 @@
 <template>
     <div>
-        Events
+        Group Search ID
     </div>
 </template>

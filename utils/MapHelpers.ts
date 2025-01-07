@@ -80,6 +80,7 @@ async function getMapkitServerToken() : Promise<string> {
  * @returns a string promise containing the token
  */
 async function createMapsAuthToken(options: TokenOptions): Promise<string> {
+    const config = useRuntimeConfig();
     const { teamId, keyId, privateKey, expiresIn } = options;
 
     // Get the current time and expiration time in terms of seconds since UNIX Epoch
@@ -98,7 +99,7 @@ async function createMapsAuthToken(options: TokenOptions): Promise<string> {
     const payload = {
         iat: issuedAt,  // Issued at time (seconds since UNIX Epoch)
         exp: expiration, // Expiration time (seconds since UNIX Epoch)
-        origin: process.env.MAPKIT_ORIGIN ?? '*'
+        origin: config.public.MAPKIT_ORIGINs
     };
     const cleanedKey = privateKey.replace(/\\n/g, '\n');
     // Sign the token using the private key
@@ -118,14 +119,15 @@ async function createMapsAuthToken(options: TokenOptions): Promise<string> {
  * @returns returns the auth token string needed to get the maps token.
  */
 async function generateMapkitAuthToken() : Promise<string> {
+    const config = useRuntimeConfig();
     const session = useSessionStore();
     if (session.mapkitToken) {
         return session.mapkitToken;
     } else {
         const options: TokenOptions = {
-            keyId: process.env.KEY_ID ?? '',
-            teamId: process.env.TEAM_ID ?? '',
-            privateKey: process.env.MAPKIT_KEY ?? ''.trim(),
+            keyId: config.public.APL_KEY_ID,
+            teamId: config.public.APL_TEAM_ID,
+            privateKey: config.public.MAPKIT_KEY.trim(),
             expiresIn: 3600
         }
         const token = await createMapsAuthToken(options);

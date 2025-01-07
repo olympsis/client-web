@@ -1,0 +1,313 @@
+
+enum APPLICATION_STATUS {
+    PENDING = 'pending',
+    APPROVED = 'approved',
+    REJECTED = 'rejected',
+}
+
+enum AUTH_STATUS {
+    unknown,
+    new_user,
+    not_finished,
+    authenticated,
+    returning_user,
+    unauthenticated
+}
+
+/**
+ * EVENT ENUMS
+ */
+
+enum EVENT_PENDING_STATE {
+    RSVP='rsvp',
+    WAITLIST='waitlist',
+    CANCEL='cancel',
+}
+
+enum EVENT_RSVP_STATUS {
+    MAYBE = 'maybe',
+    YES = 'yes'
+}
+function eventRSVPToNumber(rsvp: EVENT_RSVP_STATUS): number {
+    switch (rsvp) {
+        default:
+            return 0;
+        case EVENT_RSVP_STATUS.YES:
+            return 1;
+    }
+}
+function numberToEventRSVP(rsvp: number): EVENT_RSVP_STATUS {
+    switch (rsvp) {
+        default:
+            return EVENT_RSVP_STATUS.MAYBE;
+        case 1:
+            return EVENT_RSVP_STATUS.YES;
+    }
+}
+
+enum EVENT_SKILL_LEVEL {
+    ANY_LEVEL='any level',
+    AMATEUR='amateur',
+    INTERMEDIATE='intermediate',
+    EXPERT='expert'
+}
+function eventSkillLevelToNumber(level: EVENT_SKILL_LEVEL): number {
+    switch (level) {
+        case EVENT_SKILL_LEVEL.ANY_LEVEL:
+            return 0;
+        case EVENT_SKILL_LEVEL.AMATEUR:
+            return 1;
+        case EVENT_SKILL_LEVEL.INTERMEDIATE:
+            return 2;
+        case EVENT_SKILL_LEVEL.EXPERT:
+            return 3;
+        default:
+            return 0;
+    }
+}
+function numberToEventSkillLevel(level: number): EVENT_SKILL_LEVEL {
+    switch (level) {
+        default:
+            return EVENT_SKILL_LEVEL.ANY_LEVEL;
+        case 1:
+            return EVENT_SKILL_LEVEL.AMATEUR;
+        case 2:
+            return EVENT_SKILL_LEVEL.INTERMEDIATE;
+        case 3:
+            return EVENT_SKILL_LEVEL.EXPERT;
+    }
+}
+
+enum EVENT_STATE {
+    PENDING,
+    LIVE,
+    COMPLETED,
+}
+
+enum EVENT_TYPE {
+    REGULAR = 'regular',
+    COMPETITIVE = 'competitive'
+}
+function eventTypeToNumber(type: EVENT_TYPE): number {
+    switch (type) {
+        default:
+            return 0;
+        case EVENT_TYPE.COMPETITIVE:
+            return 1;
+    }
+}
+function numberToEventType(type: number): EVENT_TYPE {
+    switch (type) {
+        default:
+            return EVENT_TYPE.REGULAR;
+        case 1:
+            return EVENT_TYPE.COMPETITIVE;
+            
+    }
+}
+
+enum EVENT_VISIBILITY {
+    PUBLIC = 'public',
+    GROUPS = 'groups',
+    PRIVATE = 'private'
+}
+function eventVisibilityToNumber(visibility: EVENT_VISIBILITY): number {
+    switch (visibility) {
+        default:
+            return 0;
+        case EVENT_VISIBILITY.GROUPS:
+            return 1;
+        case EVENT_VISIBILITY.PRIVATE:
+            return 2;
+    }
+}
+function numberToEventVisibility(visibility: number): EVENT_VISIBILITY {
+    switch (visibility) {
+        default: 
+            return EVENT_VISIBILITY.PUBLIC;
+        case 1:
+            return EVENT_VISIBILITY.GROUPS;
+        case 2:
+            return EVENT_VISIBILITY.PRIVATE;
+    }
+}
+
+enum GROUP_TYPE {
+    CLUB = "club",
+    ORGANIZATION = "organization"
+}
+
+enum GROUP_VISIBILITY {
+    PUBLIC='public',
+    PRIVATE='private'
+}
+
+/**
+ * CHAT ENUMS
+ */
+enum CHAT_ROOM_TYPE {
+    GROUP = 'group',
+    DIRECT = 'direct'
+}
+
+enum CHAT_MESSAGE_TYPE {
+    TEXT = 'text',
+    IMAGE = 'image',
+    EVENT = 'event',
+    VENUE = 'venue'
+}
+
+/**
+ * Platform supported sports
+ */
+enum SPORTS {
+    RUNNING='running',
+    SOCCER='soccer',
+    TENNIS='tennis',
+    GOLF='golf',
+    VOLLEYBALL='volleyball',
+    BASKETBALL='basketball',
+    CYCLING='cycling',
+    PICKLEBALL='pickleball',
+    BADMINTON='badminton',
+    PING_PONG='ping-pong',
+    WEIGHTS='weights',
+    CLIMBING='climbing',
+    HIKING='hiking',
+    FOOTBALL='football',
+    SPIKE='spike',
+    RACQUETBALL='racquetball',
+    SKIING='skiing',
+    SNOWBOARDING='snowboarding'
+}
+
+/**
+ * Takes the enum and returns a display variant of the sport
+ * 
+ * @param sport enum of sport type
+ * @returns return the proper name of the sport
+ */
+function sportToString(sport: SPORTS) : string {
+    switch (sport) {
+        case SPORTS.RUNNING:
+            return 'Running';
+        case SPORTS.SOCCER:
+            return 'Soccer';
+        case SPORTS.TENNIS:
+            return 'Tennis';
+        case SPORTS.GOLF:
+            return 'Golf';
+        case SPORTS.VOLLEYBALL:
+            return 'Volleyball';
+        case SPORTS.BASKETBALL:
+            return 'Basketball';
+        case SPORTS.CYCLING:
+            return 'Cycling';
+        case SPORTS.PICKLEBALL:
+            return 'Pickleball';
+        case SPORTS.BADMINTON:
+            return 'Badminton';
+        case SPORTS.PING_PONG:
+            return 'Ping Pong';
+        case SPORTS.WEIGHTS:
+            return 'Weights';
+        case SPORTS.CLIMBING:
+            return 'Climbing';
+        case SPORTS.HIKING:
+            return 'Hiking';
+        case SPORTS.FOOTBALL:
+            return 'Football';
+        case SPORTS.SPIKE:
+            return 'Spike';
+        case SPORTS.RACQUETBALL:
+            return 'Racquetball';
+        case SPORTS.SKIING:
+            return 'Skiing';
+        case SPORTS.SNOWBOARDING:
+            return 'Snowboarding';
+    }
+}
+
+function sportsInternalImages(sport: SPORTS) : string[] {
+    switch (sport) {
+        case SPORTS.BADMINTON:
+            return [];
+        case SPORTS.BASKETBALL:
+            return ['event-images/basketball-0.jpg', 'event-images/basketball-1.jpg', 'event-images/basketball-2.jpg'];
+        case SPORTS.CLIMBING:
+            return ['event-images/climbing-0.jpg', 'event-images/climbing-1.jpg', 'event-images/climbing-2.jpg'];
+        case SPORTS.CYCLING:
+            return ['event-images/cycling-0.jpg', 'event-images/cycling-1.jpg'];
+        case SPORTS.FOOTBALL:
+            return ['event-images/football-0.jpg'];
+        case SPORTS.GOLF:
+            return ['event-images/golf-0.jpg', 'event-images/golf-1.jpg', 'event-images/golf-2.jpg'];
+        case SPORTS.HIKING:
+            return ['event-images/hiking-0.jpg', 'event-images/hiking-1.jpg'];
+        case SPORTS.PICKLEBALL:
+            return ['event-images/pickleball-0.jpg', 'event-images/pickleball-1.jpg', 'event-images/pickleball-2.jpg'];
+        case SPORTS.PING_PONG:
+            return [];
+        case SPORTS.RACQUETBALL:
+            return ['event-images/racquetball-0.jpg'];
+        case SPORTS.RUNNING:
+            return ['event-images/running-0.jpg', 'event-images/running-1.jpg'];
+        case SPORTS.SKIING:
+            return [];
+        case SPORTS.SOCCER:
+            return ['event-images/soccer-0.jpg', 'event-images/soccer-1.jpg', 'event-images/soccer-2.jpg'];
+        case SPORTS.SNOWBOARDING:
+            return [];
+        case SPORTS.SPIKE:
+            return ['event-images/spike-0.jpg'];
+        case SPORTS.TENNIS:
+            return ['event-images/tennis-0.jpg', 'event-images/tennis-1.jpg', 'event-images/tennis-2.jpg'];
+        case SPORTS.VOLLEYBALL:
+            return ['event-images/volleyball-0.jpg', 'event-images/volleyball-1.jpg', 'event-images/volleyball-2.jpg'];
+        case SPORTS.WEIGHTS:
+            return ['event-images/weights-0.jpg', 'event-images/weights-1.jpg'];
+    }
+}
+
+enum VIEW_SIZE {
+    MOBILE,
+    MEDIUM,
+    LARGE
+}
+
+export {
+    AUTH_STATUS,
+    APPLICATION_STATUS,
+
+    CHAT_ROOM_TYPE,
+    CHAT_MESSAGE_TYPE,
+    
+    EVENT_PENDING_STATE,
+    
+    EVENT_RSVP_STATUS,
+    eventRSVPToNumber,
+    numberToEventRSVP,
+    
+    EVENT_SKILL_LEVEL,
+    eventSkillLevelToNumber,
+    numberToEventSkillLevel,
+    
+    EVENT_STATE,
+
+    EVENT_TYPE,
+    eventTypeToNumber,
+    numberToEventType,
+    
+    EVENT_VISIBILITY,
+    eventVisibilityToNumber,
+    numberToEventVisibility,
+    
+    GROUP_TYPE,
+    GROUP_VISIBILITY,
+
+    SPORTS,
+    sportToString,
+    sportsInternalImages,
+
+    VIEW_SIZE,
+}

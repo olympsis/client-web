@@ -1,0 +1,657 @@
+import { Club } from "./ClubModels";
+import { v4 as uuidv4 } from 'uuid';
+import { Event } from "./EventModels";
+import { UserSnippet } from "./UserModels";
+import { Organization } from "./OrganizationModels";
+import { numberToEventRSVP, type EVENT_RSVP_STATUS, type GROUP_TYPE } from "../Enums";
+
+class Model {
+    id: string | undefined
+}
+
+class GeoJSON {
+    type: string | undefined;
+    coordinates: number[] | undefined;
+
+    static decode<GeoJSON>(data: { [key: string]: any }): GeoJSON {
+        const object = Object();
+
+        if (data) {
+            if (data['type']) {
+                object['type'] = data['type'];
+            }
+            if (data['coordinates']) {
+                object['coordinates'] = data['coordinates'];
+            }
+        }
+
+        Object.setPrototypeOf(object, GeoJSON.prototype);
+        return object;
+    }
+}
+
+interface GeoJSON {
+    encode(): { [key: string]: any; };
+}
+
+GeoJSON.prototype.encode = function(): { [key: string]: any } {
+    const data: { [key: string]: any } = {};
+
+    if (this.type) {
+        data['type'] = this.type;
+    }
+    if (this.coordinates) {
+        data['coordinates'] = this.coordinates;
+    }
+
+    return data;
+}
+
+class Ownership {
+    name: string | undefined;
+    type: string | undefined;
+
+    static decode<Ownership>(data: { [key: string]: any }): Ownership {
+        const object = Object();
+
+        if (data) {
+            if (data['name']) {
+                object['name'] = data['name'];
+            }
+            if (data['type']) {
+                object['type'] = data['type'];
+            }
+        }
+
+        Object.setPrototypeOf(object, Ownership.prototype);
+        return object;
+    }
+}
+
+class Organizer {
+    type: string | undefined;
+    id: string | undefined;
+
+    constructor(
+        type: string | undefined,
+        id: string | undefined
+    ) {
+        this.type = type;
+        this.id = id;
+    }
+
+    static decode<Organizer>(data: { [key: string]: any }): Organizer {
+        const object = Object();
+
+        if (data) {
+            if (data['type']) {
+                object['type'] = data['type'];
+            }
+            if (data['id']) {
+                object['id'] = data['id'];
+            }
+        }
+
+        Object.setPrototypeOf(object, Organizer.prototype);
+        return object;
+    }
+}
+
+interface Organizer {
+    encode(): { [key: string]: any; }
+}
+
+Organizer.prototype.encode = function(): { [key: string]: any } {
+    const data: { [key: string]: any } = {};
+
+    if (this.type) {
+        data['type'] = this.type;
+    }
+    if (this.id) {
+        data['id'] = this.id;
+    }
+
+    return data;
+}
+
+class VenueDescriptor {
+    type: string | undefined;
+    id: string | undefined;
+    name: string | undefined;
+    city: string | undefined;
+    state: string | undefined;
+    country: string | undefined;
+    location?: GeoJSON;
+
+    constructor(
+        type: string | undefined,
+        id: string | undefined,
+        name: string | undefined,
+        city: string | undefined,
+        state: string | undefined,
+        country: string | undefined,
+        latitude: number | undefined,
+        longitude: number | undefined
+    ){
+        this.type = type;
+        this.id = id;
+        this.name = name;
+        this.city = city;
+        this.state = state;
+        this.country = country;
+        this.location = GeoJSON.decode({
+            'type': 'Point',
+            'coordinates': [longitude, latitude]
+        })
+    }
+
+    static decode<VenueDescriptor>(data: { [key: string]: any }): VenueDescriptor {
+        const object = Object();
+
+        if (data) {
+            if (data['type']) {
+                object['type'] = data['type'];
+            }
+            if (data['id']) {
+                object['id'] = data['id'];
+            }
+            if (data['name']) {
+                object['name'] = data['name'];
+            }
+            if (data['city']) {
+                object['city'] = data['city'];
+            }
+            if (data['state']) {
+                object['state'] = data['state'];
+            }
+            if (data['country']) {
+                object['country'] = data['country'];
+            }
+            if (data['location']) {
+                object['location'] = GeoJSON.decode(data['location']);
+            }
+        }
+
+        Object.setPrototypeOf(object, VenueDescriptor.prototype);
+        return object;
+    }
+
+    public encode(): { [key: string]: any } {
+        const data: { [key: string]: any } = {};
+    
+        if (this.type) {
+            data['type'] = this.type;
+        }
+        if (this.id) {
+            data['id'] = this.id;
+        }
+        if (this.name) {
+            data['name'] = this.name;
+        }
+        if (this.city) {
+            data['city'] = this.city;
+        }
+        if (this.state) {
+            data['state'] = this.state;
+        }
+        if (this.country) {
+            data['country'] = this.country;
+        }
+        if (this.location) {
+            data['location'] = this.location.encode();
+        }
+    
+        return data;
+    }
+}
+
+// interface VenueDescriptor {
+//     encode(): { [key: string]: string }
+// }
+
+class Participant {
+    id: string | undefined;
+    user: UserSnippet | undefined;
+    status: EVENT_RSVP_STATUS | undefined;
+    createdAt: number | undefined;
+
+    constructor(
+        user: UserSnippet | undefined,
+        status: EVENT_RSVP_STATUS | undefined,
+        createdAt: number | undefined
+    ) {
+        this.id = uuidv4();
+        this.user = user;
+        this.status = status;
+        this.createdAt = createdAt;
+    }
+
+    static decode<Participant>(data: { [key: string]: any }): Participant {
+        const object = Object();
+
+        if (data) {
+            if (data['id']) {
+                object['id'] = data['id'];
+            }
+            if (data['user']) {
+                object['user'] = UserSnippet.decode(data['user']);
+            }
+            if (data['status']) {
+                object['status'] = numberToEventRSVP(data['status']);
+            }
+            if (data['created_at']) {
+                object['createdAt'] = data['created_at'];
+            }
+        }
+
+        Object.setPrototypeOf(object, Participant.prototype);
+        return object;
+    }
+}
+
+interface ParticipantDao {
+    encode(): { [key: string]: string }
+}
+
+class ParticipantDao {
+    id: string | undefined
+    uuid: string | undefined
+    status: string | undefined
+    createdAt: string | undefined
+
+    constructor(
+        id: string | undefined,
+        uuid: string | undefined,
+        status: string | undefined,
+        createdAt: string | undefined,
+    ) {
+        this.id = id
+        this.uuid = uuid
+        this.status = status
+        this.createdAt = createdAt
+    }
+
+    static decode<ParticipantDao>(data: { [key: string]: any }): ParticipantDao {
+        const object = Object();
+
+        if (data) {
+            if (data['id']) {
+                object['id'] = data['id'];
+            }
+            if (data['uuid']) {
+                object['uuid'] = data['uuid'];
+            }
+            if (data['status']) {
+                object['status'] = data['status'];
+            }
+            if (data['created_at']) {
+                object['createdAt'] = data['created_at'];
+            }
+        }
+
+        Object.setPrototypeOf(object, ParticipantDao.prototype);
+        return object;
+    }
+}
+
+ParticipantDao.prototype.encode = function(): { [key: string]: any } {
+    const data: { [key: string]: any } = {};
+
+    if (this.id) {
+        data['id'] = this.id;
+    }
+    if (this.uuid) {
+        data['uuid'] = this.uuid;
+    }
+    if (this.status) {
+        data['status'] = this.status;
+    }
+    if (this.createdAt) {
+        data['created_at'] = this.createdAt;
+    }
+
+    return data;
+}
+
+interface Like {
+    // Define the properties of Like here
+}
+  
+interface Comment {
+    // Define the properties of Comment here
+}
+  
+class Member {
+    id: string | undefined;
+    role: string | undefined;
+    user: UserSnippet | undefined;
+    joinedAt: number | undefined;
+
+    constructor(
+        id: string | undefined,
+        role: string | undefined,
+        user: UserSnippet | undefined,
+        joinedAt: number | undefined
+    ){
+        this.id = id;
+        this.role = role;
+        this.user = user;
+        this.joinedAt = joinedAt;
+    }
+
+    static decode<Member>(data: { [key: string]: any }): Member {
+        const object = Object();
+
+        if (data) {
+            if (data['id']) {
+                object['id'] = data['id'];
+            }
+            if (data['role']) {
+                object['role'] = data['role'];
+            }
+            if (data['user']) {
+                object['user'] = UserSnippet.decode(data['user']);
+            }
+            if (data['joined_at']) {
+                object['joinedAt'] = data['joined_at'];
+            }
+        }
+
+        Object.setPrototypeOf(object, Member.prototype);
+        return object;
+    }
+}
+
+class MemberDao {
+    id: string | undefined;
+    role: string | undefined;
+    uuid: string | undefined;
+
+    static decode<Member>(data: { [key: string]: any }): Member {
+        const object = Object();
+
+        if (data) {
+            if (data['id']) {
+                object['id'] = data['id'];
+            }
+            if (data['role']) {
+                object['role'] = data['role'];
+            }
+            if (data['uuid']) {
+                object['uuid'] = data['uuid'];
+            }
+        }
+
+        Object.setPrototypeOf(object, MemberDao.prototype);
+        return object;
+    }
+}
+
+interface MemberDao {
+    encode(): { [key: string]: string }
+}
+
+MemberDao.prototype.encode = function(): { [key: string]: any } {
+    const data: { [key: string]: any } = {};
+
+    if (this.id) {
+        data['id'] = this.id;
+    }
+    if (this.role) {
+        data['role'] = this.role;
+    }
+    if (this.uuid) {
+        data['uuid'] = this.uuid;
+    }
+
+    return data;
+}
+
+class Invitation {
+    id: string | undefined;
+    type: string | undefined;
+    sender: UserSnippet | undefined;
+    status: string | undefined;
+    club: Club | undefined;
+    event: Event | undefined;
+    organization: Organization | undefined;
+    createdAt: number | undefined;
+
+    static decode<Invitation>(data: { [key: string]: any }): Invitation {
+        const object = Object();
+
+        if (data) {
+            if (data['id']) {
+                object['id'] = data['id'];
+            }
+            if (data['type']) {
+                object['type'] = data['type'];
+            }
+            if (data['sender']) {
+                object['sender'] = UserSnippet.decode(data['sender']);
+            }
+            if (data['status']) {
+                object['status'] = data['status'];
+            }
+            if (data['club']) {
+                object['club'] = Club.decode(data['club']);
+            }
+            if (data['event']) {
+                object['event'] = Event.decode(data['event']);
+            }
+            if (data['organization']) {
+                object['organization'] = Organization.decode(data['organization']);
+            }
+            if (data['created_at']) {
+                object['createdAt'] = data['created_at'];
+            }
+        }
+
+        Object.setPrototypeOf(object, Invitation.prototype);
+        return object;
+    }
+}
+
+class InvitationDao {
+    id: string | undefined;
+    type: string | undefined;
+    sender: string | undefined;
+    status: string | undefined;
+    recipient: string | undefined;
+    subjectId: string | undefined;
+}
+
+interface InvitationDao {
+    encode(): { [key: string]: string }
+}
+
+InvitationDao.prototype.encode = function(): { [key: string]: any } {
+    const data: { [key: string]: any } = {};
+
+    if (this.id) {
+        data['id'] = this.id;
+    }
+    if (this.type) {
+        data['type'] = this.type;
+    }
+    if (this.sender) {
+        data['sender'] = this.sender;
+    }
+    if (this.status) {
+        data['status'] = this.status;
+    }
+    if (this.recipient) {
+        data['recipient'] = this.recipient;
+    }
+    if (this.subjectId) {
+        data['subject_id'] = this.subjectId;
+    }
+
+    return data;
+}
+
+class GroupSelection {
+    id: string
+    type: GROUP_TYPE
+    club: Club | undefined
+    organization: Organization | undefined
+  
+    constructor(type: GROUP_TYPE, club: Club | undefined, organization: Organization | undefined) {
+      this.id = uuidv4()
+      this.type = type
+      this.club = club
+      this.organization = organization
+    }
+  }
+  
+enum PermissionState {
+    Authorized = "granted",
+    UnAuthorized = "denied",
+    Request = "prompt",
+    NotSupported = "not_supported"
+}
+
+class Location {
+    latitude: number
+    longitude: number
+    locality: string | undefined
+    administrativeArea: string | undefined
+    administrativeAreaCode: string | undefined
+    postCode: string | undefined
+    country: string | undefined
+    countryCode: string | undefined
+
+    constructor(
+        lat: number,
+        long: number,
+        locale?: string,
+        adminArea?: string,
+        adminAreaCode?: string,
+        postCode?: string,
+        country?: string,
+        countryCode?: string
+    ) {
+        this.latitude = lat;
+        this.longitude = long;
+        this.locality = locale;
+        this.administrativeArea = adminArea;
+        this.administrativeAreaCode = adminAreaCode;
+        this.postCode = postCode;
+        this.country = country;
+        this.countryCode = countryCode;
+    }
+}
+
+class ImageUploadResponse {
+    url: string | undefined;
+    score: number | undefined;
+    reason: string | undefined;
+
+    constructor(
+        url: string | undefined,
+        score: number | undefined,
+        reason: string | undefined
+    ){
+       this.url = url;
+       this.score = score;
+       this.reason = reason;
+    }
+
+    static decode<ImageUploadResponse>(data: { [key: string]: any }): ImageUploadResponse {
+        const object = Object();
+
+        if (data) {
+            if (data['url']) {
+                object['url'] = data['url'];
+            }
+
+            object['number'] = data['number'] ?? 0;
+
+            if (data['reason']) {
+                object['reason'] = data['reason'];
+            }
+        }
+
+        Object.setPrototypeOf(object, ImageUploadResponse.prototype);
+        return object;
+    }
+}
+
+class Country {
+    id: string
+    name: string
+
+    constructor(
+        id: string,
+        name: string
+    ) {
+        this.id = id;
+        this.name = name;
+    }
+}
+
+class AdministrativeArea {
+    id: string
+    name: string
+    code: string
+    countryID: string
+
+    constructor(
+        id: string,
+        name: string,
+        code: string,
+        countryID: string
+    ) {
+        this.id = id;
+        this.name = name;
+        this.code = code;
+        this.countryID = countryID;
+    }
+}
+
+class SubAdministrativeArea {
+    id: string
+    name: string
+    adminAreaID: string
+
+    constructor(
+        id: string,
+        name: string,
+        adminAreaID: string
+    ) {
+        this.id = id;
+        this.name = name;
+        this.adminAreaID = adminAreaID;
+    }
+}
+
+export {
+    Model,
+    Member,
+    MemberDao,
+
+    Invitation,
+    InvitationDao,
+
+    Participant,
+    ParticipantDao,
+
+    GeoJSON,
+    Ownership,
+    Organizer,
+    VenueDescriptor,
+
+    Location,
+    PermissionState,
+    GroupSelection,
+    ImageUploadResponse,
+
+    Country,
+    AdministrativeArea,
+    SubAdministrativeArea
+}
+
+export type {
+    Like,
+    Comment
+}

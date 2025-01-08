@@ -15,6 +15,13 @@
   
 <script setup lang="ts">
 import TopBar from '~/components/site/TopBar/TopBar.vue';
+
+useSeoMeta({
+    title: 'Contact Us | Olympsis',
+    ogTitle: 'Contact Us | Olympsis',
+    description: 'We would love to hear from you! Reach out to us on any of our social media platforms.',
+    ogDescription: 'We would love to hear from you! Reach out to us on any of our social media accounts.'
+});
 </script>
 
 <style scoped>

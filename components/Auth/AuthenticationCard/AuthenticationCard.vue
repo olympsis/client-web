@@ -5,7 +5,7 @@
         </div>
         <h1>Olympsis</h1>
         <h2>
-            Organize sports together. Join groups, find locations, and get active.
+            Organize sports together. Join groups, find locations, and get active!
         </h2>
         <div class="auth-buttons">
             <button id="apple-button" @click="signInWithApple">

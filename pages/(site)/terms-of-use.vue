@@ -116,6 +116,13 @@
 
 <script setup lang="ts">
 import TopBar from '~/components/site/TopBar/TopBar.vue';
+
+useSeoMeta({
+    title: 'Terms of Use | Olympsis',
+    ogTitle: 'Terms of Use | Olympsis',
+    description: 'The rules to follow on our platforms.',
+    ogDescription: 'The rules to follow on our platforms.'
+});
 </script>
 
 <style scoped>

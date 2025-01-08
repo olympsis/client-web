@@ -95,6 +95,13 @@
 
 <script setup lang="ts">
 import TopBar from '~/components/site/TopBar/TopBar.vue';
+
+useSeoMeta({
+    title: 'Privacy Policy | Olympsis',
+    ogTitle: 'Privacy Policy | Olympsis',
+    description: 'We care about your privacy!',
+    ogDescription: 'We care about your privacy!'
+});
 </script>
 
 <style scoped>

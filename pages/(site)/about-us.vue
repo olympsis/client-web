@@ -15,6 +15,13 @@
 
 <script setup lang="ts">
 import TopBar from '~/components/site/TopBar/TopBar.vue';
+
+useSeoMeta({
+    title: 'About Us | Olympsis',
+    ogTitle: 'About Us | Olympsis',
+    description: 'Who are we and what we are building.',
+    ogDescription: 'Who we are and what we are building.'
+});
 </script>
 
 <style scoped>

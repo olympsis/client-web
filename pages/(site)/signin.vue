@@ -70,6 +70,14 @@ async function handleAuthCompletion(event: any) {
       createState.value = VIEW_STATE.PENDING;
   }
 }
+
+useSeoMeta({
+    title: 'Olympsis',
+    ogTitle: 'Olympsis',
+    description: 'Join Olympsis to find sports events around you!',
+    ogDescription: 'Join Olympsis to find sports events around you!'
+});
+
 </script>
 
 <style scoped>

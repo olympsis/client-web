@@ -1,5 +1,5 @@
 <template>
-	<NavigationBar/>
+	<TopBar/>
 	<main id="main">
 		<h2 class="header"> What is Olympsis? </h2>
 		<div class="content-container">
@@ -14,7 +14,7 @@
 </template>
 
 <script setup lang="ts">
-import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
+import TopBar from '~/components/site/TopBar/TopBar.vue';
 </script>
 
 <style scoped>

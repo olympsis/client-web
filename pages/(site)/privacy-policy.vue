@@ -1,5 +1,5 @@
 <template>
-    <NavigationBar />
+    <TopBar/>
     <main id="main">
         <h1 class="header">Privacy Policy</h1>
         
@@ -94,7 +94,7 @@
 </template>
 
 <script setup lang="ts">
-import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
+import TopBar from '~/components/site/TopBar/TopBar.vue';
 </script>
 
 <style scoped>

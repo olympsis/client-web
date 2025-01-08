@@ -1,11 +1,11 @@
 <template>
-    <div class="bar-container">
+    <header id="navigation-bar">
         <RouterLink to="/signin" class="name" @click="hideMenu">Olympsis</RouterLink>
 
         <div class="menu" :class="{ 'full_menu': isOpen }" :v-show="isOpen">
             <RouterLink id="link" to="/privacy-policy" active-class="selected-link" class="link" @click="hideMenu"> Privacy Policy </RouterLink>
             <RouterLink id="link2" to="/terms-of-use" active-class="selected-link" class="link" @click="hideMenu"> Terms of Use </RouterLink>
-            <RouterLink id="link2" to="/contact" active-class="selected-link" class="link" @click="hideMenu"> Contact Us </RouterLink>
+            <RouterLink id="link2" to="/contact-us" active-class="selected-link" class="link" @click="hideMenu"> Contact Us </RouterLink>
             <RouterLink v-if="isOpen" to="/signin" active-class="selected" class="button" @click="hideMenu"> Signin </RouterLink>
         </div>
 
@@ -15,7 +15,7 @@
             <span class="hamburger__top-bun"></span>
             <span class="hamburger__bottom-bun"></span>
         </div>
-    </div>
+    </header>
 </template>
 
 <script setup lang="ts">
@@ -34,9 +34,9 @@ function hideMenu() {
 </script>
 
 <style scoped>
-@import '@assets/main.css';
+@import '@/assets/css/main.css';
 
-.bar-container {
+#navigation-bar {
     width: 100%;
     min-height: 60px;
     max-height: 60px;

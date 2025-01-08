@@ -1,0 +1,222 @@
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 100;
+  font-display: swap;
+  src: url('../../public/fonts/Roboto/Roboto-Thin.ttf') format("truetype");
+}
+
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url('../../public/fonts/Roboto/Roboto-Light.ttf') format("truetype");
+}
+
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../../public/fonts/Roboto/Roboto-Regular.ttf') format("truetype");
+}
+
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../../public/fonts/Roboto/Roboto-Bold.ttf') format("truetype");
+}
+
+:root {
+	color-scheme: light dark;
+
+	--primary-brand-color: #262E57;
+	--secondary-brand-color: #C32B42;
+	--tertiary-brand-color: #F7A007;
+	--quaternary-brand-color: #A5E9E8;
+
+	--primary-background-color: #E8E7E3;
+	--secondary-background-color: #F3F2EF;
+	--tertiary-background-color: #FFFFFF;
+
+	--primary-label-color: #000000;
+
+	--button-border-radius: 10px;
+	--dialog-max-width: 35rem;
+
+	--destructive-button-color: #8c1d1d;
+
+	--olympsis-red: #D50020;
+	--olympsis-gray: #767676;
+	--olympsis-green: #298C6E;
+
+	--border-radius: 10px;
+	--card-border-radius: 10px;
+	--button-border-radius: 10px;
+
+	.dialog {
+		z-index: 10;
+        width: 100%;
+		height: 100%;
+
+		.scrim {
+			backdrop-filter: blur(10px);
+		}
+	}
+
+	dialog[open] {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+  	scroll-behavior: smooth;
+}
+
+@media(prefers-color-scheme: dark) {
+  :root {
+    --primary-background-color: #1E1E1E;
+    --secondary-background-color: #2D2D2D;
+    --tertiary-background-color: #383838;
+
+    --primary-label-color: #FFFFFF;
+  }
+}
+
+*,
+*::before,
+*::after {
+  	margin: 0;
+}
+
+html,
+body {
+	margin: 0;
+    padding: 0;
+    overflow: hidden;
+	max-height: 100vh;
+    max-height: 100dvh;
+	font-family: 'Helvetica Nue', 'Arial', 'Roboto', sans-serif;
+}
+
+* {
+  	box-sizing: border-box;
+}
+
+a:any-link {
+  	text-decoration-line: none;
+}
+
+a:any-link:active {
+  	cursor: auto;
+}
+
+.skeleton {
+  	animation: skeleton-loading 1s linear infinite alternate;
+}
+
+.skeleton-secondary {
+  	animation: skeleton-secondary-loading 1s linear infinite alternate;
+}
+
+@keyframes skeleton-loading {
+	0% {
+		background-color: var(--tertiary-background-color);
+	}
+	100% {
+		background-color: var(--secondary-background-color);
+	}
+}
+
+.bar-loader {
+	width: 7rem;
+	height: 1rem;
+	background: repeating-linear-gradient(-45deg, var(--primary-brand-color) 0 15px,#0000 0 20px) left/200% 100%;
+	animation: l3 2s infinite linear;
+
+	&.destructive {
+		background: repeating-linear-gradient(-45deg, white 0 15px,#0000 0 20px) left/200% 100%;
+	}
+}
+@keyframes l3 {
+	100% {background-position: right}
+}
+
+.event-status-loader {
+	flex: 1;
+    height: 1rem;
+    --c: #ffffff 0 15px, transparent 0 20px;
+    background: 
+        repeating-linear-gradient(135deg, var(--c)) left top,
+        repeating-linear-gradient(45deg, var(--c)) left bottom;
+    background-size: 200% 50%;
+    background-repeat: no-repeat;
+    animation: l4 2s infinite linear;
+}
+
+@keyframes l4 {
+    100% {
+        background-position: right top, right bottom;
+    }
+}
+
+.spinner-loader {
+	width: 50px;
+	aspect-ratio: 1;
+	border-radius: 50%;
+	position: relative;
+	border: 8px solid #0000;
+	border-right-color: white;
+	animation: l24 1s infinite linear;
+}
+.spinner-loader:before,
+.spinner-loader:after {
+	content: "";
+	position: absolute;
+	inset: -8px;
+	border-radius: 50%;
+	border: inherit;
+	animation: inherit;
+	animation-duration: 2s;
+}
+.spinner-loader:after {
+	animation-duration: 4s;
+}
+@keyframes l24 {
+	100% {transform: rotate(1turn)}
+}
+
+.dots-loader {
+	width: 60px;
+	height: 20px;
+	position: relative;
+	background-image: 
+	  radial-gradient(circle closest-side, #fff 90%, transparent),
+	  radial-gradient(circle closest-side, #fff 90%, transparent),
+	  radial-gradient(circle closest-side, #fff 90%, transparent);
+	background-repeat: no-repeat;
+	background-position: 0% 50%, 50% 50%, 100% 50%;
+	background-size: calc(100%/3) 50%;
+	animation: dotsLoad 1s infinite linear;
+}
+  
+@keyframes dotsLoad {
+	20% {
+		background-position: 0% 0%, 50% 50%, 100% 50%;
+	}
+	40% {
+		background-position: 0% 100%, 50% 0%, 100% 50%;
+	}
+	60% {
+		background-position: 0% 50%, 50% 100%, 100% 0%;
+	}
+	80% {
+		background-position: 0% 50%, 50% 50%, 100% 100%;
+	}
+	100% {
+		background-position: 0% 50%, 50% 50%, 100% 50%;
+	}
+}

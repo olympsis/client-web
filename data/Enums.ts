@@ -15,6 +15,28 @@ enum AUTH_STATUS {
 }
 
 /**
+ * CHAT ENUMS
+ */
+enum CHAT_ROOM_TYPE {
+    GROUP = 'group',
+    DIRECT = 'direct'
+}
+
+enum CHAT_MESSAGE_TYPE {
+    TEXT = 'text',
+    IMAGE = 'image',
+    EVENT = 'event',
+    VENUE = 'venue'
+}
+
+enum CROP_SHAPE {
+    SQUARE='square',
+    LANDSCAPE='landscape',
+    PORTRAIT='portrait',
+    CIRCLE='circle'
+};
+
+/**
  * EVENT ENUMS
  */
 
@@ -140,21 +162,6 @@ enum GROUP_TYPE {
 enum GROUP_VISIBILITY {
     PUBLIC='public',
     PRIVATE='private'
-}
-
-/**
- * CHAT ENUMS
- */
-enum CHAT_ROOM_TYPE {
-    GROUP = 'group',
-    DIRECT = 'direct'
-}
-
-enum CHAT_MESSAGE_TYPE {
-    TEXT = 'text',
-    IMAGE = 'image',
-    EVENT = 'event',
-    VENUE = 'venue'
 }
 
 /**
@@ -288,6 +295,7 @@ export {
 
     CHAT_ROOM_TYPE,
     CHAT_MESSAGE_TYPE,
+    CROP_SHAPE,
     
     EVENT_PENDING_STATE,
     

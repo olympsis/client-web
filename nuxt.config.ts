@@ -3,23 +3,26 @@ export default defineNuxtConfig({
 	ssr: false,
 	compatibilityDate: '2024-11-01',
 	devtools: { enabled: true },
+	css: [
+		'~/assets/css/main.css'
+	],
 	modules: [
 		'@pinia/nuxt',
+		'@nuxtjs/storybook',
+		'@primevue/nuxt-module',
 	],
-	
 	build: {
 		transpile: ['malakbel']
 	},
-
 	runtimeConfig: {
-		
+					
 		public: {
 			API: process.env.API ?? '',
 
 			APP_ID: process.env.APP_ID ?? '',
 			APL_KEY_ID: process.env.APL_KEY_ID ?? '',
 			APL_TEAM_ID: process.env.APL_TEAM_ID ?? '',
-	
+
 			MAPKIT_ORIGIN: process.env.MAPKIT_ORIGIN ?? '',
 			MAPKIT_KEY: process.env.MAPKIT_KEY ?? '',
 

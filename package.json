@@ -10,14 +10,21 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@nuxtjs/storybook": "^8.3.3",
     "@pinia/nuxt": "^0.9.0",
+    "@primevue/themes": "^4.2.5",
     "firebase": "^11.1.0",
     "jose": "^5.9.6",
     "malakbel": "^0.1.9",
     "nuxt": "^3.15.1",
     "pinia": "^2.3.0",
+    "primevue": "^4.2.5",
     "uuid": "^11.0.4",
     "vue": "latest",
+    "vue-advanced-cropper": "^2.8.9",
     "vue-router": "latest"
+  },
+  "devDependencies": {
+    "@primevue/nuxt-module": "^4.2.5"
   }
 }

@@ -1,9 +1,9 @@
 <template>
     <header id="navigation-bar">
-        <RouterLink to="/" id="logo"/>
+        <RouterLink to="/home" id="logo"/>
        
         <div id="web-routes" class="routes">
-            <RouterLink to="/" activeClass="route-selected" class="route">
+            <RouterLink to="/home" activeClass="route-selected" class="route">
                 <div class="home"/>
             </RouterLink>
 
@@ -15,13 +15,13 @@
                 <div class="events" />
             </RouterLink>
 
-            <RouterLink to="/chats" activeClass="route-selected" class="route">
+            <RouterLink to="/rooms" activeClass="route-selected" class="route">
                 <div class="chats" />
             </RouterLink>
         </div>
 
         <div id="mobile-routes" class="routes">
-            <RouterLink to="/" activeClass="route-selected" class="route">
+            <RouterLink to="/home" activeClass="route-selected" class="route">
                 <div class="home"/>
             </RouterLink>
 
@@ -33,7 +33,7 @@
                 <div class="events" />
             </RouterLink>
 
-            <RouterLink to="/chats" activeClass="route-selected" class="route">
+            <RouterLink to="/rooms" activeClass="route-selected" class="route">
                 <div class="chats" />
             </RouterLink>
 

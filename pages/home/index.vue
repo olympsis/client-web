@@ -1,11 +1,12 @@
 <template>
-    <div class="grid-container">
+    <NavigationBar/>
+    <main id="home-view">
         <div id="header">
             <h1>Olympsis</h1>
 
             <div id="trailing">
                 <button @click="">
-                    <img class="notifications" src="@assets/icons/bell/bell.white.svg"/>
+                    <img class="notifications" src="@/assets/icons/bell/bell.white.svg"/>
                 </button>
             </div>
         </div>
@@ -13,7 +14,7 @@
         <FieldListPeek :venues="venues" :state="state" class="fields"/>
         <NavigationCard :state="state" class="nav-card" />
         <AnnouncementsGallery class="announcements"/>
-    </div>
+    </main>
 </template>
 
 <script setup lang="ts">
@@ -25,6 +26,7 @@ import { useModelStore } from '@/stores/model-store';
 import { useSessionStore } from '@/stores/session-store';
 
 import WelcomeCard from '@/components/Home/WelcomeCard/WelcomeCard.vue';
+import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
 import NavigationCard from '@/components/NavigationCard/NavigationCard.vue';
 import FieldListPeek from '@/components/Venues/VenueListPeek/VenueListPeek.vue';
 import AnnouncementsGallery from '@/components/Home/AnnouncementsGallery/AnnouncementsGallery.vue';
@@ -62,7 +64,7 @@ useSeoMeta({
 
 <style scoped>
 
-.grid-container {
+#home-view {
     gap: 2rem;
     display: grid;
     margin: 0 auto;

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div v-if="state !== LOADING_STATE.LOADING" class="fields">
+        <div v-if="state !== VIEW_STATE.LOADING" class="fields">
             <div class="header">
                 <h2>Nearby Venues</h2>
                 <h3>View All</h3>
@@ -8,7 +8,7 @@
             <VenueListItem v-if="venues.length > 0" :venue="venues[0]"/>
             <div v-if="venues.length === 0" class="no-fields"> No venues nearby 😔 </div>
         </div>
-        <div v-if="state === LOADING_STATE.LOADING" class="fields">
+        <div v-if="state === VIEW_STATE.LOADING" class="fields">
             <div class="header">
                 <h2>Nearby Fields</h2>
                 <h3>View All</h3>
@@ -23,13 +23,13 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import Skeleton from 'primevue/skeleton';
-import { LOADING_STATE } from '@data/GlobalData';
-import { Venue } from '@data/models/VenueModels';
+import { VIEW_STATE } from '@/data/Enums';
+import { Venue } from '@/data/models/VenueModels';
 import VenueListItem from '../VenueListItem/VenueListItem.vue';
 
 const props = defineProps<{
     venues: Venue[],
-    state: LOADING_STATE
+    state: VIEW_STATE
 }>()
 
 const venues = computed<Venue[]>(() => {

@@ -12,8 +12,8 @@
             </div>
             
             <picture @click="openMaps" >
-                <source srcset="@assets/car.white.svg" media="(prefers-color-scheme: dark)">
-                <img src="@assets/car.svg" class="directions">
+                <source srcset="@/assets/icons/car/car.white.svg" media="(prefers-color-scheme: dark)">
+                <img src="@/assets/icons/car/car.svg" class="directions">
             </picture>
         </div>
     </div>

@@ -9,8 +9,8 @@
             <div class="actions">
                 <button class="button" type="button" @click="closeModal">
                     <picture>
-                        <source srcset="@assets/xmark.white.svg" media="(prefers-color-scheme: dark)"/>
-                        <img src="@assets/xmark.svg" class="image">
+                        <source srcset="@/assets/icons/xmark/xmark.white.svg" media="(prefers-color-scheme: dark)"/>
+                        <img src="@/assets/icons/xmark/xmark.svg" class="image">
                     </picture>
                 </button>
             </div>
@@ -36,27 +36,27 @@
             <!-- Venue Actions -->
             <div class="actions">
                 <div class="action directions" @click="openMaps">
-                    <img src="@assets/car.white.svg">
+                    <img src="@/assets/icons/car/car.white.svg">
                     <p>Directions</p>
                 </div>
                 <div class="action type">
                     <picture>
-                        <source srcset="@assets/globe.white.svg" media="(prefers-color-scheme: dark)">
-                        <img src="@assets/globe.svg">
+                        <source srcset="@/assets/icons/globe/globe.white.svg" media="(prefers-color-scheme: dark)">
+                        <img src="@/assets/icons/globe/globe.svg">
                     </picture>
                     <p>{{ venueVisibility }}</p>
                 </div>
                 <div class="action new-event">
                     <picture>
-                        <source srcset="@assets/plus.white.svg" media="(prefers-color-scheme: dark)">
-                        <img src="@assets/plus.svg">
+                        <source srcset="@/assets/icons/plus/plus.white.svg" media="(prefers-color-scheme: dark)">
+                        <img src="@/assets/icons/plus/plus.svg">
                     </picture>
                     <p>Event</p>
                 </div>
                 <div class="action more">
                     <picture>
-                        <source srcset="@assets/ellipsis.white.svg" media="(prefers-color-scheme: dark)">
-                        <img src="@assets/ellipsis.svg">
+                        <source srcset="@/assets/icons/ellipsis/ellipsis.white.svg" media="(prefers-color-scheme: dark)">
+                        <img src="@/assets/icons/ellipsis/ellipsis.svg">
                     </picture>
                     <p>More</p>
                 </div>

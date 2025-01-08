@@ -5,8 +5,8 @@
 
             <button class="button" @click="$emit('close')">
                 <picture class="centered">
-                    <source srcset="@assets/icons/xmark/xmark.white.svg" media="(prefers-color-scheme: dark)">
-                    <img src="@assets/icons/xmark/xmark.svg">
+                    <source srcset="@/assets/icons/xmark/xmark.white.svg" media="(prefers-color-scheme: dark)">
+                    <img src="@/assets/icons/xmark/xmark.svg">
                 </picture>
             </button>
         </div>

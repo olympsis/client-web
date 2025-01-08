@@ -1,6 +1,6 @@
 <template>
     <div id="event-date-button" @click="handleInputClick">
-        <img src="@assets/icons/calendar/calendar.edit.fill.white.svg">
+        <img src="@/assets/icons/calendar/calendar.edit.fill.white.svg">
         <input id="input" class="input" ref="input-ref" type="date" v-model.lazy="model">
     </div>
 </template>

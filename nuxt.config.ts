@@ -47,5 +47,12 @@ export default defineNuxtConfig({
 		// We need this for SEO
 		'/events/**': { ssr: true },
 		'/groups/search/**': { ssr: true }
+	},
+	app: {
+		head: {
+			link: [
+				{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+			]
+		}
 	}
 });

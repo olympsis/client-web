@@ -5,8 +5,8 @@
 
             <button class="button" @click="$emit('close')">
                 <picture class="centered">
-                    <source srcset="@assets/icons/xmark/xmark.white.svg" media="(prefers-color-scheme: dark)">
-                    <img src="@assets/icons/xmark/xmark.svg">
+                    <source srcset="@/assets/icons/xmark/xmark.white.svg" media="(prefers-color-scheme: dark)">
+                    <img src="@/assets/icons/xmark/xmark.svg">
                 </picture>
             </button>
         </div>
@@ -16,7 +16,6 @@
                     <UserIcon 
                         :size="3"
                         :user="participant.user"
-                        :class="{ 'yes': participant.status === 'yes', 'maybe': participant.status === 'maybe' }"
                     />
                     <div>{{ participant.user?.username }}</div>
                 </div>
@@ -30,8 +29,8 @@
 </template>
 
 <script setup lang="ts">
-import UserIcon from '@/components/UserIcon/UserIcon.vue';
 import { Event } from '@/data/models/EventModels';
+import UserIcon from '@/components/UserIcon/UserIcon.vue';
 
 const props = defineProps({
     event: { type: Event, required: true }

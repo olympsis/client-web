@@ -32,12 +32,12 @@
                     <img v-if="getGroupLogoURL(group)" :src="getGroupLogoURL(group)"/>
                     <div v-else class="template">
                         <picture v-if="group.type === GROUP_TYPE.CLUB">
-                            <source srcset="@assets/icons/group/group.fill.white.svg" media="(prefers-color-scheme: dark)"/>
-                            <img src="@assets/icons/group/group.fill.svg"/> 
+                            <source srcset="@/assets/icons/group/group.fill.white.svg" media="(prefers-color-scheme: dark)"/>
+                            <img src="@/assets/icons/group/group.fill.svg"/> 
                         </picture>
                         <picture v-else>
-                            <source srcset="@assets/icons/building/building.white.svg" media="(prefers-color-scheme: dark)"/>
-                            <img src="@assets/icons/building/building.svg"/> 
+                            <source srcset="@/assets/icons/building/building.white.svg" media="(prefers-color-scheme: dark)"/>
+                            <img src="@/assets/icons/building/building.svg"/> 
                         </picture>
                     </div>
                 </div>
@@ -73,160 +73,6 @@ const model = defineModel<GroupSelection[]>({ default: [] });
 
 const sessionStore = useSessionStore();
 const availableGroups: ComputedRef<GroupSelection[]> = computed(() => {
-    // Start For Storybook Testing
-    // const club: Club = Club.decode({
-    //     id: "slc-fc",
-    //     parent: {
-    //         id: "us-ysa-soccer",
-    //         name: "US Youth Soccer Association",
-    //         description:
-    //         "The US Youth Soccer Association is the national governing body for youth soccer in the United States.",
-    //         city: "Salt Lake City",
-    //         state: "UT",
-    //         country: "USA",
-    //     },
-    //     name: "SLC FC",
-    //     description:
-    //         "SLC FC is a youth soccer club based in Salt Lake City, Utah. We provide a positive and competitive environment for players to develop their skills and love for the game.",
-    //     sport: "Soccer",
-    //     city: "Salt Lake City",
-    //     state: "UT",
-    //     country: "USA",
-    //     imageURL: "https://example.com/slcfc-logo.png",
-    //     imageGallery: [
-    //         "https://example.com/slcfc-team1.jpg",
-    //         "https://example.com/slcfc-team2.jpg",
-    //         "https://example.com/slcfc-field.jpg",
-    //     ],
-    //     visibility: "public",
-    //     members: [
-    //         {
-    //         id: "john.doe",
-    //         name: "John Doe",
-    //         role: "player",
-    //         },
-    //         {
-    //         id: "jane.smith",
-    //         name: "Jane Smith",
-    //         role: "coach",
-    //         },
-    //     ],
-    //     rules: [
-    //         "Respect your teammates, coaches, and opponents.",
-    //         "Always give your best effort.",
-    //         "Have fun and enjoy the game!",
-    //     ],
-    //     pinnedPostId: "announcement-123",
-    //     createdAt: 1619827200000,
-    // });
-
-    // const club2: Club = Club.decode({
-    //     id: "mfc-utah",
-    //     parent: {
-    //         id: "us-ysa-soccer",
-    //         name: "US Youth Soccer Association",
-    //         description:
-    //         "The US Youth Soccer Association is the national governing body for youth soccer in the United States.",
-    //         city: "Salt Lake City",
-    //         state: "UT",
-    //         country: "USA",
-    //     },
-    //     name: "MFC",
-    //     description:
-    //         "MFC (Murray Football Club) is a youth soccer organization based in Murray, Utah. Our mission is to provide a supportive environment for players to develop their skills and passion for the game.",
-    //     sport: "Soccer",
-    //     city: "Murray",
-    //     state: "UT",
-    //     country: "USA",
-    //     imageURL: "https://example.com/mfc-logo.png",
-    //     imageGallery: [
-    //         "https://example.com/mfc-team1.jpg",
-    //         "https://example.com/mfc-team2.jpg",
-    //         "https://example.com/mfc-field.jpg",
-    //     ],
-    //     visibility: "public",
-    //     members: [
-    //         {
-    //         id: "alex.rodriguez",
-    //         name: "Alex Rodriguez",
-    //         role: "player",
-    //         },
-    //         {
-    //         id: "sarah.wilson",
-    //         name: "Sarah Wilson",
-    //         role: "coach",
-    //         },
-    //     ],
-    //     rules: [
-    //         "Respect your teammates, coaches, and opponents.",
-    //         "Always give your best effort on and off the field.",
-    //         "Have fun and enjoy the beautiful game!",
-    //     ],
-    //     pinnedPostId: "announcement-456",
-    //     createdAt: 1619827200000,
-    // });
-
-    // const org: Organization = Organization.decode({
-    //     id: "us-ysa-soccer",
-    //     name: "US Youth Soccer Association",
-    //     description:
-    //         "The US Youth Soccer Association is the national governing body for youth soccer in the United States.",
-    //     sport: "Soccer",
-    //     city: "Salt Lake City",
-    //     state: "UT",
-    //     country: "USA",
-    //     imageURL: "https://example.com/usysasoccer-logo.png",
-    //     imageGallery: [
-    //         "https://example.com/usysasoccer-event1.jpg",
-    //         "https://example.com/usysasoccer-event2.jpg",
-    //         "https://example.com/usysasoccer-team.jpg",
-    //     ],
-    //     members: [
-    //         {
-    //         id: "john.smith",
-    //         name: "John Smith",
-    //         role: "president",
-    //         },
-    //         {
-    //         id: "jane.doe",
-    //         name: "Jane Doe",
-    //         role: "vice-president",
-    //         },
-    //     ],
-    //     pinnedPostId: "announcement-789",
-    //     children: [
-    //         {
-    //         id: "slc-fc",
-    //         name: "SLC FC",
-    //         description:
-    //             "SLC FC is a youth soccer club based in Salt Lake City, Utah.",
-    //         sport: "Soccer",
-    //         city: "Salt Lake City",
-    //         state: "UT",
-    //         country: "USA",
-    //         },
-    //         {
-    //         id: "mfc-utah",
-    //         name: "MFC",
-    //         description:
-    //             "MFC (Murray Football Club) is a youth soccer organization based in Murray, Utah.",
-    //         sport: "Soccer",
-    //         city: "Murray",
-    //         state: "UT",
-    //         country: "USA",
-    //         },
-    //     ],
-    //     createdAt: 1483228800000,
-    // });
-
-    // const groups = [
-    //     new GroupSelection(GROUP_TYPE.CLUB, club, undefined),
-    //     new GroupSelection(GROUP_TYPE.CLUB, club2, undefined),
-    //     new GroupSelection(GROUP_TYPE.ORGANIZATION, undefined, org)
-    // ]
-    // return groups;
-    // End of Storybook Testing Info
-
     return sessionStore.groups;
 });
 

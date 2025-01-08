@@ -152,7 +152,7 @@ useSeoMeta({
 }
 
 @media (max-width: 1280px) {
-    .grid-container {
+    #home-view {
         grid-template-areas:
         'header header'
         'welcome fields'
@@ -169,7 +169,7 @@ useSeoMeta({
 }
 
 @media (max-width: 940px) {
-    .grid-container {
+    #home-view {
         grid-template-areas:
         'header'
         'welcome'

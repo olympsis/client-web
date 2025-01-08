@@ -36,8 +36,8 @@
                             <div id="selected-venues">
                                 <div v-for="venue in model" class="selected-venue">
                                     <picture id="remove-button" @click="removeVenue(venue)">
-                                        <source srcset="@assets/icons/xmark/xmark.white.svg" media="(prefers-color-scheme: dark)"/>
-                                        <img src="@assets/icons/xmark/xmark.svg"/>
+                                        <source srcset="@/assets/icons/xmark/xmark.white.svg" media="(prefers-color-scheme: dark)"/>
+                                        <img src="@/assets/icons/xmark/xmark.svg"/>
                                     </picture>
                                     <div class="name">{{ venue.name }}</div>
                                     <div class="location">{{ `${venue.city}, ${venue.state}` }}</div>
@@ -46,8 +46,8 @@
 
                             <div id="add-button" @click="isSearching = true">
                                 <picture>
-                                    <source srcset="@assets/icons/add/add.white.svg" media="(prefers-color-scheme: dark)"/>
-                                    <img src="@assets/icons/add/add.svg"/>
+                                    <source srcset="@/assets/icons/add/add.white.svg" media="(prefers-color-scheme: dark)"/>
+                                    <img src="@/assets/icons/add/add.svg"/>
                                 </picture>
                                 Add a Venue
                             </div>

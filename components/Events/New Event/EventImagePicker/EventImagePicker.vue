@@ -14,14 +14,14 @@
         />
         <div v-if="!uploadedMediaURL" id="upload-button" class="image-card" @click="handleFileImageSelection">
             <picture>
-                <source srcset="@assets/icons/add/add.white.svg" media="(prefers-color-scheme: dark)"/>
-                <img src="@assets/icons/add/add.svg"/>
+                <source srcset="@/assets/icons/add/add.white.svg" media="(prefers-color-scheme: dark)"/>
+                <img src="@/assets/icons/add/add.svg"/>
             </picture>
             Upload
         </div>
         
         <div v-if="uploadedMediaURL" id="preview" class="event-image" @click="uploadedMediaURL ? selectAnImage(uploadedMediaURL) : () => {}">
-            <img src="@assets/icons/xmark/xmark.white.svg" class="close-button" @click="removeUploadedFile">
+            <img src="@/assets/icons/xmark/xmark.white.svg" class="close-button" @click="removeUploadedFile">
             <img :src="uploadedMediaURL" :class="{ selected: selectedImage == uploadedMediaURL, 'image-card': true }">
         </div>
 

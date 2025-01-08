@@ -10,8 +10,8 @@
         </div>
         <div v-else class="icon"  :style="{ width: `${size}rem`, height: `${size}rem`}">
             <picture>
-                <source srcset="@assets/person.white.svg" media="(prefers-color-scheme: dark)"/>
-                <img :style="{ width: `${size/2}rem`, height: `${size/2}rem`}" src="@assets/person.svg" class="action-button">
+                <source srcset="@/assets/icons/person/person.white.svg" media="(prefers-color-scheme: dark)"/>
+                <img :style="{ width: `${size/2}rem`, height: `${size/2}rem`}" src="@/assets/icons/person/person.svg" class="action-button">
             </picture>
         </div>
     </div>

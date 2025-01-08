@@ -1,8 +1,8 @@
 <template>
     <div id="search-bar">
         <picture>
-            <source srcset="@assets/icons/search/search.white.svg" media="(prefers-color-scheme: dark)">
-            <img src="@assets/icons/search/search.svg">
+            <source srcset="@/assets/icons/search/search.white.svg" media="(prefers-color-scheme: dark)">
+            <img src="@/assets/icons/search/search.svg">
         </picture>
         <input type="text" v-model="model">
     </div>

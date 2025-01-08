@@ -5,7 +5,7 @@
             <!-- rsvp -->
             <div v-if="pendingState === EVENT_PENDING_STATE.RSVP" id="rsvp" class="action">
                 <div v-if="state === VIEW_STATE.PENDING" class="body">
-                    <img class="icon" src="@assets/icons/mail/mail.white.svg"/>
+                    <img class="icon" src="@/assets/icons/mail/mail.white.svg"/>
                     <div> RSVP </div>
                 </div>
                 <div v-if="state === VIEW_STATE.LOADING" class="body spinner-loader"/>
@@ -14,7 +14,7 @@
             <!-- waitlist -->
             <div v-if="pendingState === EVENT_PENDING_STATE.WAITLIST" id="waitlist" class="action">
                 <div v-if="state === VIEW_STATE.PENDING" class="body">
-                    <img class="icon" src="@assets/icons/hourglass/hourglass.white.svg"/>
+                    <img class="icon" src="@/assets/icons/hourglass/hourglass.white.svg"/>
                     <div> Waitlist </div>
                 </div>
                 <div v-if="state === VIEW_STATE.LOADING" class="body spinner-loader"/>
@@ -23,7 +23,7 @@
             <!-- cancel -->
             <div v-if="pendingState === EVENT_PENDING_STATE.CANCEL" id="cancel" class="action">
                 <div v-if="state === VIEW_STATE.PENDING" class="body">
-                    <img class="icon" src="@assets/icons/xmark/xmark.white.svg"/>
+                    <img class="icon" src="@/assets/icons/xmark/xmark.white.svg"/>
                     <div> Cancel </div>
                 </div>
                 <div v-if="state === VIEW_STATE.LOADING" class="body spinner-loader"/>
@@ -32,13 +32,13 @@
 
         <!-- Live Button -->
         <div v-if="eventState === EVENT_STATE.LIVE" id="live" class="action">
-            <img class="icon" src="@assets/icons/circle/circle.fill.white.svg">
+            <img class="icon" src="@/assets/icons/circle/circle.fill.white.svg">
             <div> Live </div>
         </div>
 
         <!-- Completed Button -->
         <div v-if="eventState === EVENT_STATE.COMPLETED" id="completed" class="action">
-            <img class="icon" src="@assets/icons/block/block.white.svg">
+            <img class="icon" src="@/assets/icons/block/block.white.svg">
             <div> Ended </div>
         </div>
     </button>
@@ -47,10 +47,10 @@
 <script setup lang="ts">
 
 import { computed } from 'vue';
+import { VIEW_STATE } from '@/data/Enums';
 import { Event } from '@/data/models/EventModels';
 import { useSessionStore } from '@/stores/session-store';
-import { VIEW_STATE } from '@/data/GlobalData';
-import { EVENT_PENDING_STATE, EVENT_STATE } from '@/data/models/Enums';
+import { EVENT_PENDING_STATE, EVENT_STATE } from '@/data/Enums';
 
 const session = useSessionStore();
 

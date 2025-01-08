@@ -1,9 +1,9 @@
 <template>
     <button id="event-type-button" @click="toggle">
-        <img class="event-type-leading" v-if="model === EVENT_TYPE.REGULAR" src="@assets/icons/hexagon/hexagon.white.svg"/>
-        <img class="event-type-leading" v-else src="@assets/icons/trophy/trophy.white.svg"/>
+        <img class="event-type-leading" v-if="model === EVENT_TYPE.REGULAR" src="@/assets/icons/hexagon/hexagon.white.svg"/>
+        <img class="event-type-leading" v-else src="@/assets/icons/trophy/trophy.white.svg"/>
         {{ model.valueOf() }}
-        <img class="event-type-trailing" src="@assets/icons/chevron/chevron.down.white.svg">
+        <img class="event-type-trailing" src="@/assets/icons/chevron/chevron.down.white.svg">
     </button>
 
     <OverlayPanel 

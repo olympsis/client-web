@@ -1,10 +1,10 @@
 <template>
     <button id="event-visibility-button" @click="toggle">
-        <img class="event-visibility-leading" v-if="model === EVENT_VISIBILITY.PUBLIC" src="@assets/icons/globe/globe.white.svg"/>
-        <img class="event-visibility-leading" v-if="model === EVENT_VISIBILITY.GROUPS" src="@assets/icons/group/group.fill.white.svg"/>
-        <img class="event-visibility-leading" v-if="model === EVENT_VISIBILITY.PRIVATE" src="@assets/icons/trophy/trophy.white.svg"/>
+        <img class="event-visibility-leading" v-if="model === EVENT_VISIBILITY.PUBLIC" src="@/assets/icons/globe/globe.white.svg"/>
+        <img class="event-visibility-leading" v-if="model === EVENT_VISIBILITY.GROUPS" src="@/assets/icons/group/group.fill.white.svg"/>
+        <img class="event-visibility-leading" v-if="model === EVENT_VISIBILITY.PRIVATE" src="@/assets/icons/trophy/trophy.white.svg"/>
         {{ model.valueOf() }}
-        <img class="event-visibility-trailing" src="@assets/icons/chevron/chevron.down.white.svg">
+        <img class="event-visibility-trailing" src="@/assets/icons/chevron/chevron.down.white.svg">
     </button>
 
     <OverlayPanel 

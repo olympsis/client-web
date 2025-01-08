@@ -5,16 +5,16 @@
 
             <button class="button" @click="$emit('close')">
                 <picture class="centered">
-                    <source srcset="@assets/icons/xmark/xmark.white.svg" media="(prefers-color-scheme: dark)">
-                    <img src="@assets/icons/xmark/xmark.svg">
+                    <source srcset="@/assets/icons/xmark/xmark.white.svg" media="(prefers-color-scheme: dark)">
+                    <img src="@/assets/icons/xmark/xmark.svg">
                 </picture>
             </button>
         </div>
 
         <div id="actions">
-            <MenuButton text="Share event" icon="/icons/share/share.svg" @click="showCopiedToast"/>
-            <MenuButton text="Report event" icon="/icons/bug/bug.svg"/>
-            <MenuButton v-if="eventState !== EVENT_STATE.COMPLETED && isAuthorized" text="Delete event" icon="/icons/trash/trash.svg" :is-destructive="true" v-bind:state="deleteButtonState"/>
+            <ShareMenuButton text="Share event" @click="showCopiedToast"/>
+            <ReportMenuButton text="Report event"/>
+            <TrashMenuButton v-if="eventState !== EVENT_STATE.COMPLETED && isAuthorized" text="Delete event" :is-destructive="true" v-bind:state="deleteButtonState"/>
         </div>
 
         <Toast/>
@@ -24,14 +24,15 @@
 <script setup lang="ts">
 import Toast from 'primevue/toast';
 import { computed, ref } from 'vue';
-
+import { VIEW_STATE } from '@/data/Enums';
+import { EVENT_STATE } from '@/data/Enums';
 import { useToast } from 'primevue/usetoast';
 import { Event } from '@/data/models/EventModels';
-import { VIEW_STATE } from '@/data/Enums';
-import MenuButton from '@/components/Buttons/MenuButton/MenuButton.vue';
-import EventStatusButton from '@/components/Buttons/EventStatusButton/EventStatusButton.vue';
 import { useSessionStore } from '@/stores/session-store';
-import { EVENT_STATE } from '@/data/Enums';
+
+import ShareMenuButton from '~/components/Buttons/MenuButton/ShareMenuButton.vue';
+import TrashMenuButton from '~/components/Buttons/MenuButton/TrashMenuButton.vue';
+import ReportMenuButton from '~/components/Buttons/MenuButton/ReportMenuButton.vue';
 
 const toast = useToast();
 

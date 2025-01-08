@@ -1,8 +1,8 @@
 <template>
     <button id="event-skill-button" @click="toggle">
-        <img class="event-skill-leading" src="@assets/icons/star/star.white.svg"/>
+        <img class="event-skill-leading" src="@/assets/icons/star/star.white.svg"/>
         {{ model.valueOf() }}
-        <img class="event-skill-trailing" src="@assets/icons/chevron/chevron.down.white.svg">
+        <img class="event-skill-trailing" src="@/assets/icons/chevron/chevron.down.white.svg">
     </button>
 
     <OverlayPanel 

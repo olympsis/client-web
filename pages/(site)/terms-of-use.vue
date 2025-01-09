@@ -112,10 +112,12 @@
             If you have any questions or concerns about these Terms, please contact us at [contact@olympsis.com].
         </h4>
     </main>
+    <BottomBar/>
 </template>
 
 <script setup lang="ts">
 import TopBar from '~/components/site/TopBar/TopBar.vue';
+import BottomBar from '~/components/site/BottomBar/BottomBar.vue';
 
 useSeoMeta({
     title: 'Terms of Use | Olympsis',

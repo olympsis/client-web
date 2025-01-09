@@ -14,6 +14,7 @@
         />
     </Transition>
   </main>
+  <BottomBar/>
 </template>
 
 <script setup lang="ts">
@@ -24,6 +25,7 @@ import { useSessionStore } from '~/stores/session-store';
 import { AuthenticationFacade } from '~/data/facades/AuthenticationFacade';
 
 import TopBar from '~/components/site/TopBar/TopBar.vue';
+import BottomBar from '~/components/site/BottomBar/BottomBar.vue';
 import CreateUserCard from '~/components/Auth/CreateUserCard/CreateUserCard.vue';
 import AuthenticationCard from '~/components/Auth/AuthenticationCard/AuthenticationCard.vue';
 

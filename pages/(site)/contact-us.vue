@@ -11,10 +11,12 @@
 			<a href="https://twitter.com/olympsis"><img src="@/assets/images/twitter.png"/></a>
 		</div>
 	</main>
+  <BottomBar/>
 </template>
   
 <script setup lang="ts">
 import TopBar from '~/components/site/TopBar/TopBar.vue';
+import BottomBar from '~/components/site/BottomBar/BottomBar.vue';
 
 useSeoMeta({
     title: 'Contact Us | Olympsis',

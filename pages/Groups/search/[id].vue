@@ -174,47 +174,43 @@ function apply() {
         });
 }
 
-async function getClub(id: string) {
-    try {
-        club.value =  await modelStore.getClubByID(id)
-        viewState.value = VIEW_STATE.SUCCESS;
-
-        const config = useRuntimeConfig();
-        useHead({
-            htmlAttrs: {
-                lang: "en"
-            },
-        });
-        useSeoMeta({
-            title: () => groupName.value,
-            description: () => groupAbout.value,
-
-            ogUrl: () => `https://olympsis.com/search/${groupID.value}`,
-            ogTitle: () => groupName.value,
-            ogImage: () => generateImageURL(groupLogoURL.value ?? ''),
-            ogDescription: () => groupAbout.value,
-
-            twitterSite: '@olympsis',
-            twitterTitle: () => groupName.value,
-            twitterCard: 'summary_large_image',
-            twitterImage: () => generateImageURL(groupLogoURL.value ?? ''),
-            twitterDescription: () => groupAbout.value,
-
-            appleItunesApp: {
-                appId: config.public.APP_ID,
-                appArgument: `/search/${groupID.value}`
-            }
-        });
-    } catch (error) {
-        viewState.value = VIEW_STATE.FAILURE;
-        console.error(`Failed to get club data. Error: ${error}`);
-    }
-}
-
-await useAsyncData(
+const { data } = await useAsyncData(
     `groups/search/${groupID.value}`,
-    () => getClub(groupID.value)
+    async() => await service.getClub(groupID.value),
+    {
+        server: true,
+        lazy: false,
+        immediate: true,
+    }
 )
+
+watchEffect(() => {
+    if (data.value) {
+        club.value = data.value;
+    }
+});
+
+const config = useRuntimeConfig();
+useSeoMeta({
+    title: () => groupName.value,
+    description: () => groupAbout.value,
+
+    ogUrl: () => `https://olympsis.com/search/${groupID.value}`,
+    ogTitle: () => groupName.value,
+    ogImage: () => generateImageURL(groupLogoURL.value ?? ''),
+    ogDescription: () => groupAbout.value,
+
+    twitterSite: '@olympsis',
+    twitterTitle: () => groupName.value,
+    twitterCard: 'summary_large_image',
+    twitterImage: () => generateImageURL(groupLogoURL.value ?? ''),
+    twitterDescription: () => groupAbout.value,
+
+    appleItunesApp: {
+        appId: config.public.APP_ID,
+        appArgument: `/search/${groupID.value}`
+    }
+});
 </script>
 
 <style scoped>

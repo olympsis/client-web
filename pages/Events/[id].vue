@@ -845,33 +845,6 @@ async function loadEventData(id: string | undefined) {
     venues.value = venuesArr;
     state.value = VIEW_STATE.SUCCESS;
     failed.value = false;
-
-    const config = useRuntimeConfig();
-    useHead({
-        htmlAttrs: {
-            lang: "en"
-        },
-    });
-    useSeoMeta({
-        title: () => eventTitle.value,
-        description: () => eventBody.value,
-
-        ogUrl: () => `https://olympsis.com/events/${eventID.value}`,
-        ogTitle: () => eventTitle.value,
-        ogImage: () => eventImageURL.value,
-        ogDescription: () => eventBody.value,
-
-        twitterSite: '@olympsis',
-        twitterTitle: () => eventTitle.value,
-        twitterCard: 'summary_large_image',
-        twitterImage: () => eventImageURL.value,
-        twitterDescription: () => eventBody.value,
-
-        appleItunesApp: {
-            appId: config.public.APP_ID,
-            appArgument: `/events/${eventID.value}`
-        }
-    });
 }
 
 function handleEventSharing() {
@@ -929,8 +902,35 @@ onMounted(() => {
 
 await useAsyncData(
     `events/${eventID.value}`,
-    () => loadEventData(eventID.value)
+    async() => await loadEventData(eventID.value),
+    {
+        server: true,
+        lazy: false,
+        immediate: true,
+    }
 )
+
+const config = useRuntimeConfig();
+useSeoMeta({
+    title: () => eventTitle.value,
+    description: () => eventBody.value,
+
+    ogUrl: () => `https://olympsis.com/events/${eventID.value}`,
+    ogTitle: () => eventTitle.value,
+    ogImage: () => eventImageURL.value,
+    ogDescription: () => eventBody.value,
+
+    twitterSite: '@olympsis',
+    twitterTitle: () => eventTitle.value,
+    twitterCard: 'summary_large_image',
+    twitterImage: () => eventImageURL.value,
+    twitterDescription: () => eventBody.value,
+
+    appleItunesApp: {
+        appId: config.public.APP_ID,
+        appArgument: `/events/${eventID.value}`
+    }
+});
 
 </script>
 

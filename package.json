@@ -14,6 +14,7 @@
     "@pinia/nuxt": "^0.9.0",
     "@primevue/themes": "^4.2.5",
     "@vercel/analytics": "^1.4.1",
+    "@vercel/speed-insights": "^1.1.0",
     "firebase": "^11.1.0",
     "jose": "^5.9.6",
     "malakbel": "^0.1.9",

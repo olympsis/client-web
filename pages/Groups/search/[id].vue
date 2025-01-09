@@ -179,6 +179,9 @@ useSeoMeta({
     title: () => groupName.value,
     description: () => groupAbout.value,
 
+    ogType: 'website',
+    ogLocale: 'en_US',
+    ogSiteName: 'Olympsis',
     ogUrl: () => `https://olympsis.com/search/${groupID.value}`,
     ogTitle: () => groupName.value,
     ogImage: () => generateImageURL(groupLogoURL.value ?? ''),

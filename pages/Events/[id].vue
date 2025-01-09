@@ -897,7 +897,10 @@ const config = useRuntimeConfig();
 useSeoMeta({
     title: () => eventTitle.value,
     description: () => eventBody.value,
-
+    
+    ogType: 'website',
+    ogLocale: 'en_US',
+    ogSiteName: 'Olympsis',
     ogUrl: () => `https://olympsis.com/events/${eventID.value}`,
     ogTitle: () => eventTitle.value,
     ogImage: () => eventImageURL.value,

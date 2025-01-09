@@ -893,23 +893,6 @@ function showCopiedToast() {
     toast.add({ severity: 'secondary', summary: 'Link Copied', detail: 'You\'ve copied the link to this event', life: 3000 });
 }
 
-onMounted(() => {
-    if (session.authStatus !== AUTH_STATUS.authenticated) {
-        const analytics = getAnalytics();
-        logEvent(analytics, 'guest_user_visit', { page: 'event_detail' });
-    }
-});
-
-await useAsyncData(
-    `events/${eventID.value}`,
-    async() => await loadEventData(eventID.value),
-    {
-        server: true,
-        lazy: false,
-        immediate: true,
-    }
-)
-
 const config = useRuntimeConfig();
 useSeoMeta({
     title: () => eventTitle.value,
@@ -929,6 +912,23 @@ useSeoMeta({
     appleItunesApp: {
         appId: config.public.APP_ID,
         appArgument: `/events/${eventID.value}`
+    }
+});
+
+await useAsyncData(
+    `events/${eventID.value}`,
+    async() => await loadEventData(eventID.value),
+    {
+        server: true,
+        lazy: false,
+        immediate: true,
+    }
+)
+
+onMounted(() => {
+    if (session.authStatus !== AUTH_STATUS.authenticated) {
+        const analytics = getAnalytics();
+        logEvent(analytics, 'guest_user_visit', { page: 'event_detail' });
     }
 });
 

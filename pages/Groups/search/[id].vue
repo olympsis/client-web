@@ -174,22 +174,6 @@ function apply() {
         });
 }
 
-const { data } = await useAsyncData(
-    `groups/search/${groupID.value}`,
-    async() => await service.getClub(groupID.value),
-    {
-        server: true,
-        lazy: false,
-        immediate: true,
-    }
-)
-
-watchEffect(() => {
-    if (data.value) {
-        club.value = data.value;
-    }
-});
-
 const config = useRuntimeConfig();
 useSeoMeta({
     title: () => groupName.value,
@@ -209,6 +193,22 @@ useSeoMeta({
     appleItunesApp: {
         appId: config.public.APP_ID,
         appArgument: `/search/${groupID.value}`
+    }
+});
+
+const { data } = await useAsyncData(
+    `groups/search/${groupID.value}`,
+    async() => await service.getClub(groupID.value),
+    {
+        server: true,
+        lazy: false,
+        immediate: true,
+    }
+)
+
+watchEffect(() => {
+    if (data.value) {
+        club.value = data.value;
     }
 });
 </script>

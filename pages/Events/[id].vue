@@ -921,14 +921,16 @@ function showCopiedToast() {
 }
 
 onMounted(() => {
-    loadEventData(eventID.value)
-        .then(() => {
-            if (session.authStatus !== AUTH_STATUS.authenticated) {
-                const analytics = getAnalytics();
-                logEvent(analytics, 'guest_user_visit', { page: 'event_detail' });
-            }
-        });
+    if (session.authStatus !== AUTH_STATUS.authenticated) {
+        const analytics = getAnalytics();
+        logEvent(analytics, 'guest_user_visit', { page: 'event_detail' });
+    }
 });
+
+await useAsyncData(
+    `events/${eventID.value}`,
+    () => loadEventData(eventID.value)
+)
 
 </script>
 

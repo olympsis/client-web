@@ -211,9 +211,10 @@ async function getClub(id: string) {
     }
 }
 
-onMounted(() => {
-    getClub(groupID.value)
-});
+await useAsyncData(
+    `groups/search/${groupID.value}`,
+    () => getClub(groupID.value)
+)
 </script>
 
 <style scoped>

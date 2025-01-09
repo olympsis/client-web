@@ -2,8 +2,8 @@
     <div id="chat-list-item">
         <div id="chat-header">
             <picture>
-                <source srcset="@assets/icons/dashboard/dashboard.white.svg" media="(prefers-color-scheme: dark)">
-                <img src="@assets/icons/dashboard/dashboard.svg"/>
+                <source srcset="@/assets/icons/dashboard/dashboard.white.svg" media="(prefers-color-scheme: dark)">
+                <img src="@/assets/icons/dashboard/dashboard.svg"/>
             </picture>
         </div>
         <div id="chat-body">

@@ -3,8 +3,8 @@
         <div class="header">
             <div class="button" @click="closeModal">
                 <picture>
-                    <source srcset="@assets/xmark.white.svg" media="(prefers-color-scheme: dark)">
-                    <img src="@assets/xmark.svg">
+                    <source srcset="@/assets/icons/xmark/xmark.white.svg" media="(prefers-color-scheme: dark)">
+                    <img src="@/assets/icons/xmark/xmark.svg">
                 </picture>
             </div>
 
@@ -12,8 +12,8 @@
 
             <div class="button" :style="{ 'margin-left': 'auto' }">
                 <picture>
-                    <source srcset="@assets/chevron.right.white.svg" media="(prefers-color-scheme: dark)">
-                    <img src="@assets/chevron.right.svg">
+                    <source srcset="@/assets/icons/chevron/chevron.right.white.svg" media="(prefers-color-scheme: dark)">
+                    <img src="@/assets/icons/chevron/chevron.right.svg">
                 </picture>
             </div>
         </div>

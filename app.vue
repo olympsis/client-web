@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+	<Analytics />
 	<LoadingView v-if="isLoading"/>
 	<FailedView v-if="hasFailed"/>
     <NuxtPage/>
@@ -7,6 +8,7 @@
 </template>
 
 <script setup lang="ts">
+import { Analytics } from '@vercel/analytics/nuxt';
 import { AUTH_STATUS, VIEW_STATE } from './data/Enums';
 
 import FailedView from './components/AppState/FailedView/FailedView.vue';

@@ -9,15 +9,15 @@
     <!-- View Actions -->
     <div id="actions">
         <div class="action">
-            <img src="@assets/gear.white.svg" :style="{ width: '1.4rem', height: '1.4rem' }">
+            <img src="@/assets/icons/gear/gear.white.svg" :style="{ width: '1.4rem', height: '1.4rem' }">
         </div>
  
         <div class="action" @click="showNewEventModal">
-            <img src="@assets/plus.white.svg" :style="{ width: '1.5rem', height: '1.5rem' }">
+            <img src="@/assets/icons/plus/plus.white.svg" :style="{ width: '1.5rem', height: '1.5rem' }">
         </div>
 
         <div class="action" @click="toggleEventsModal">
-            <img src="@assets/menu.white.svg" :style="{ width: '1.4rem', height: '1.4rem' }">
+            <img src="@/assets/icons/menu/menu.white.svg" :style="{ width: '1.4rem', height: '1.4rem' }">
         </div>
     </div>
 

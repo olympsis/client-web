@@ -1,7 +1,7 @@
 <template>
     <div class="container">
         <div v-if="hasEvents" class="pill"></div>
-        <img v-if="imageFailed" src="@assets/image.white.svg" class="failed">
+        <img v-if="imageFailed" src="@/assets/icons/image/image.white.svg" class="failed">
         <img v-else :src="imageURL" :onerror="handleFailedImage"/>
     </div>
 </template>

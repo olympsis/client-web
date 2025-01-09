@@ -87,13 +87,13 @@ function handleDeleteGroup() {
                                 emit('success');
                             }, 200);
                         } else {
-                            state.value = VIEW_STATE.FAILED;
+                            state.value = VIEW_STATE.FAILURE;
                             emit('close');
                         }
                     })
                     .catch((error) => {
                         console.error(`Failed to delete organization: ${props.group.organization?.id}.  Error: ${error}`);
-                        state.value = VIEW_STATE.FAILED;
+                        state.value = VIEW_STATE.FAILURE;
                         emit('close');
                     });
             }

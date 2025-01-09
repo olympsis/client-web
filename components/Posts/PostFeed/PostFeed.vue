@@ -16,7 +16,7 @@
         <!-- Failed Post List -->
         <div 
             class="failed" 
-            v-if="state === VIEW_STATE.FAILED"
+            v-if="state === VIEW_STATE.FAILURE"
             :style="{ 'display': 'flex', 'align-items': 'center', 'margin': '5rem 0rem' }"
         >
             <a style="margin: 0rem auto; color: var(--primary-label-color);"> Failed to get posts </a>

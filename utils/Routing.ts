@@ -3,35 +3,32 @@ import type { RouteLocationNormalizedGeneric } from "vue-router";
 
 function handleAuthorizationStatus(subscription: () => void, state: any, to: RouteLocationNormalizedGeneric) {
 	subscription();
-	if (to.fullPath === '/' || to.fullPath === '/signin') {
-		return handleHomeRoutes(state, to);
-	} else if (to.fullPath.includes('/groups')) {
-		return handleGroupsRoutes(state, to);
-	} else if (to.fullPath.includes('/events')) {
-		return handleEventRoutes(state, to);
-	} else {
-		return navigateTo(to);
-	}
+	return handleRoutes(state, to);
 }
 
 function handleRoutes(state: any, to: RouteLocationNormalizedGeneric) {
-	if (to.fullPath === '/' || to.fullPath === '/signin') {
+	if (to.fullPath.includes('/signin') || 
+		to.fullPath.includes('/home')
+	){
 		return handleHomeRoutes(state, to);
 	} else if (to.fullPath.includes('/groups')) {
 		return handleGroupsRoutes(state, to);
 	} else if (to.fullPath.includes('/events')) {
 		return handleEventRoutes(state, to);
-	} else {
-		return;
+	} else if (to.fullPath.includes('/profile')) {
+		return handleProfileRoutes(state, to);
 	}
 }
 
 function handleHomeRoutes(status: any, to: RouteLocationNormalizedGeneric) {
-	if (status.authStatus !== AUTH_STATUS.authenticated) {
-		return navigateTo('/signin');
+	if (status.authStatus === AUTH_STATUS.authenticated) {
+		if (to.fullPath.includes('/signin')) {
+			return navigateTo('/home');
+		}	
 	} else {
-        if (to.fullPath === '/' || to.fullPath === '/signin') return navigateTo('/home');
-		return;
+		if (to.fullPath.includes('/home')) {
+			return navigateTo('signin');
+		}
 	}
 }
 
@@ -42,18 +39,15 @@ function handleGroupsRoutes(sessionStore: any, to: RouteLocationNormalizedGeneri
 }
 
 function handleEventRoutes(status: any, to: RouteLocationNormalizedGeneric) {
-    
-	// We want non users to have access to this page
-	if (to.fullPath.match(/\/events\/(\d+)/)) {
-		return;
+    if (status.authStatus !== AUTH_STATUS.authenticated && !to.fullPath.match(/\/events\/(\d+)/)) {
+		return navigateTo('/signin');
     }
+}
 
-	// We still want to route unauthorized users to the auth page
-    if (to.fullPath === '/events') {
-		if (status.authStatus !== AUTH_STATUS.authenticated) {
-			return navigateTo('/signin');
-		}
-    }
+function handleProfileRoutes(status: any, to: RouteLocationNormalizedGeneric) {
+	if (status.authStatus !== AUTH_STATUS.authenticated) {
+		return navigateTo('/signin');
+	}
 }
 
 export {

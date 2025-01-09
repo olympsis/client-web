@@ -1,6 +1,6 @@
 <template>
   <TopBar/>
-  <main id="main">
+  <main id="signin">
     <AuthenticationCard 
         v-if="!isSignedUp" 
         @apple="handleSignInWithApple" 
@@ -36,25 +36,33 @@ const isSignedUp: Ref<boolean> = ref(false);
 const createState = ref(VIEW_STATE.PENDING);
 
 async function handleSignInWithApple() {
-  const response = await authenticator.signInWithApple();
-  if (response) { 
-      if (response?.isNewUser) { 
-          isSignedUp.value = true;
-      } else {
-          session.checkAuthorizationStatus();
-      }
-  }
+	const response = await authenticator.signInWithApple();
+	if (response) { 
+		if (response?.isNewUser) { 
+			isSignedUp.value = true;
+		} else {
+			session.checkAuthorizationStatus();
+			const handler = session.$subscribe((_, state) => {
+				handler();
+				navigateTo('/home');
+			});
+		}
+	}
 }
 
 async function handleSignInWithGoogle() {
-  const response = await authenticator.signInWithGoogle();
-  if (response) { 
-      if (response?.isNewUser) { 
-          isSignedUp.value = true;
-      } else {
-          session.checkAuthorizationStatus();
-      }
-  }
+	const response = await authenticator.signInWithGoogle();
+	if (response) { 
+		if (response?.isNewUser) { 
+			isSignedUp.value = true;
+		} else {
+			session.checkAuthorizationStatus();
+			const handler = session.$subscribe((_, state) => {
+				handler();
+				navigateTo('/home');
+			});
+		}
+	}
 }
 
 async function handleAuthCompletion(event: any) {
@@ -83,28 +91,28 @@ useSeoMeta({
 </script>
 
 <style scoped>
-#main {
-display: flex;
-flex-grow: 1;
-height: 100%;
-width: 100%;
-flex-direction: column;
-background-size: cover;
-background-position: center;
-background-repeat: no-repeat;
-background-image: url('~/assets/images/sports.webp');
+#signin {
+	display: flex;
+	flex-grow: 1;
+	height: 100%;
+	width: 100%;
+	flex-direction: column;
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+	background-image: url('~/assets/images/sports.webp');
 }
 
 #create-user-card {
-  margin: auto;
+	margin: auto;
 }
 
 @media screen and (max-width: 599px) {
-#main {
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-image: url('~/assets/images/sports-small.webp');
-}
+	#main {
+		background-size: cover;
+		background-position: center;
+		background-repeat: no-repeat;
+		background-image: url('~/assets/images/sports-small.webp');
+	}
 }
 </style>

@@ -56,13 +56,13 @@ import { useSessionStore } from '~/stores/session-store';
 
 import ProfileButton from '~/components/ProfileButton/ProfileButton.vue';
 
+const isOpen = ref(false);
 const session = useSessionStore();
 
 const userImageURL = computed(() => {
     return session.user?.imageURL ? generateImageURL(session.user.imageURL) : undefined;
 });
 
-var isOpen = ref(false);
 
 function toggleMenu() {
     isOpen.value = !isOpen.value;
@@ -85,9 +85,9 @@ function hideMenu() {
     max-height: 60px;
     min-height: 60px;
     position: sticky;
-    position: -webkit-sticky;
     padding: 0rem 1rem;
     align-items: center;
+    position: -webkit-sticky;
     justify-content: space-between;
     background-color: var(--primary-brand-color);
 
@@ -123,6 +123,8 @@ function hideMenu() {
 
 @media (max-width: 940px) {
     #navigation-bar {
+        display: flex;
+        justify-content: space-between;
 
         #web-routes {
             display: none;

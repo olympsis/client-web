@@ -66,7 +66,7 @@ function handleApplicationResponse(status: string) {
                 }
             })
             .catch(() => {
-                buttonState.value = VIEW_STATE.FAILED;
+                buttonState.value = VIEW_STATE.FAILURE;
             });
     } else {
         console.error('Failed to find application ID or the selected group ID.');

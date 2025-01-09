@@ -1,7 +1,7 @@
 <template>
 	<TopBar/>
 	<main id="main">
-		<h2 class="header"> What is Olympsis? </h2>
+		<h2 class="header">What is Olympsis?</h2>
 		<div class="content-container">
 			<p class="text">Olympsis is a dynamic social platform that serves as a thriving hub for athletes and sports enthusiasts alike. At its core, Olympsis is all about fostering a supportive community where individuals from diverse athletic backgrounds can unite to play sports and collaboratively strive towards their fitness and sporting goals. Whether you're a seasoned athlete or just starting your sporting journey, Olympsis provides a welcoming space where you can connect with like-minded individuals, share your expertise, and receive valuable guidance and encouragement.</p>
 			<img class="image" src="@/assets/images/Basketball.webp"/>

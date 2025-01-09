@@ -286,7 +286,7 @@ enum VIEW_STATE {
     PENDING,
     LOADING,
     SUCCESS,
-    FAILED
+    FAILURE
 }
 
 export {

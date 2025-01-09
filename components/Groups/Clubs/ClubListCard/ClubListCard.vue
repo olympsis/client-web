@@ -109,11 +109,11 @@ function apply() {
                 if (hasApplied) {
                     buttonState.value = VIEW_STATE.SUCCESS;
                 } else {
-                    buttonState.value = VIEW_STATE.FAILED;
+                    buttonState.value = VIEW_STATE.FAILURE;
                 }
             })
             .catch(() => {
-                buttonState.value = VIEW_STATE.FAILED;
+                buttonState.value = VIEW_STATE.FAILURE;
             });
     }
 }

@@ -45,7 +45,7 @@
                 </li>
             </ul>
 
-            <div v-if="state === VIEW_STATE.FAILED" id="failed-events">
+            <div v-if="state === VIEW_STATE.FAILURE" id="failed-events">
                 <h3>Failed to get events</h3>
                 <button @click="retryFetchEvents">Try Again?</button>
             </div>
@@ -147,7 +147,7 @@ onMounted(() => {
         })
         .catch((error) => {
             console.error('Failed to get events. Error: ', error);
-            state.value = VIEW_STATE.FAILED;
+            state.value = VIEW_STATE.FAILURE;
         });
 });
 
@@ -213,7 +213,7 @@ function fetchCompletedEvents() {
         })
         .catch((error) => {
             console.error('Failed to get events. Error: ', error);
-            state.value = VIEW_STATE.FAILED;
+            state.value = VIEW_STATE.FAILURE;
         });
 }
 
@@ -225,7 +225,7 @@ function retryFetchEvents() {
         })
         .catch((error) => {
             console.error('Failed to get events. Error: ', error);
-            state.value = VIEW_STATE.FAILED;
+            state.value = VIEW_STATE.FAILURE;
         });
 }
 

@@ -7,7 +7,7 @@
         <div v-else id="button-loading">
             <div v-if="state === VIEW_STATE.LOADING" class="bar-loader" :class="{ destructive: props.isDestructive }"></div>
             <div v-if="state === VIEW_STATE.SUCCESS" class="text">{{ successText }}</div>
-            <div v-if="state === VIEW_STATE.FAILED" class="text">{{ failureText }}</div>
+            <div v-if="state === VIEW_STATE.FAILURE" class="text">{{ failureText }}</div>
         </div>
     </div>
 </template>

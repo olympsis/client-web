@@ -202,14 +202,14 @@ function createNewGroup() {
                             }
                         })
                         .catch((error: any) => {
-                            state.value = VIEW_STATE.FAILED;
+                            state.value = VIEW_STATE.FAILURE;
                             console.error(`Failed to create group. Error ${error}`);
                         });
                 }
             }
         }
     } catch {
-        state.value = VIEW_STATE.FAILED;
+        state.value = VIEW_STATE.FAILURE;
         setTimeout(() => {
             state.value = VIEW_STATE.PENDING;
         }, 500);

@@ -38,7 +38,10 @@ export default defineNuxtConfig({
 
 	routeRules: {
 		// Sites routes
-		'/auth': { prerender: true },
+		'/': {
+			redirect: '/home'
+		},
+		'/signin': { prerender: true },
 		'/about-us': { prerender: true },
 		'/contact-us': { prerender: true },
 		'/terms-of-use': { prerender: true },

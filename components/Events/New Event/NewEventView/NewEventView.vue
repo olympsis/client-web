@@ -237,7 +237,7 @@ function createNewEvent() {
                     }
                 })
                 .catch((error: any) => {
-                    state.value = VIEW_STATE.FAILED;
+                    state.value = VIEW_STATE.FAILURE;
                     console.error('Failed to create event. Error: ', error);
                     setTimeout(() => {
                         state.value = VIEW_STATE.PENDING;

@@ -175,7 +175,7 @@ async function handleSend() {
         sendState.value = VIEW_STATE.SUCCESS;
     } catch (error) {
         console.error('Error sending message:', error);
-        sendState.value = VIEW_STATE.FAILED;
+        sendState.value = VIEW_STATE.FAILURE;
     }
 }
 

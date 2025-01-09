@@ -1,25 +1,37 @@
 <template>
   <div id="app">
-    <div id="splash" v-if="appState == VIEW_STATE.LOADING || appState == VIEW_STATE.PENDING">
-        <LoadingView/>
-    </div>
-    <NuxtPage v-if="appState == VIEW_STATE.SUCCESS"/>
+	<LoadingView v-if="isLoading"/>
+	<FailedView v-if="hasFailed"/>
+    <NuxtPage/>
   </div>
 </template>
 
 <script setup lang="ts">
 import { AUTH_STATUS, VIEW_STATE } from './data/Enums';
 
+import FailedView from './components/AppState/FailedView/FailedView.vue';
+import LoadingView from '~/components/AppState/LoadingView/LoadingView.vue';
 
+const route = useRoute();
 const router = useRouter();
 const session = useSessionStore();
 
 const appState: Ref<VIEW_STATE> = ref(VIEW_STATE.LOADING);
 const authState: Ref<AUTH_STATUS> = ref(AUTH_STATUS.unauthenticated);
 
-session.$subscribe((_, state) => {
-    handleStateChanges(state);
+const isLoading = computed<boolean>(() => {
+	// if (route.fullPath === '/signin') { debugger; }
+	return session.loadingState === VIEW_STATE.LOADING || session.loadingState == VIEW_STATE.PENDING;
 });
+
+const hasFailed = computed<boolean>(() => {
+	return session.loadingState === VIEW_STATE.FAILURE;
+});
+
+
+// session.$subscribe((_, state) => {
+//     handleStateChanges(state);
+// });
 
 /**
  * We want to react to authentication state updates and app state updates.
@@ -44,15 +56,9 @@ session.$subscribe((_, state) => {
 	const route = router.currentRoute.value.path;
 	if (authState.value === AUTH_STATUS.authenticated && appState.value === VIEW_STATE.SUCCESS) {
 		if (route === '/signin') {
-			// router.push('/home');
+			router.push('/home');
 		}
-	} 
-	// else if (authState.value === AUTH_STATUS.unauthenticated && appState.value === VIEW_STATE.SUCCESS) {
-	// 	// TODO: I need to handle routing better and listening to auth changes as well
-	// 	if (!window.location.href.match(/\/events\/[a-f0-9]{24}/i) || !window.location.href.match(/\/groups\/search\/[a-f0-9]{24}/i)) {
-	// 		router.push('/signin');
-	// 	}
-	// }
+	}
 }
 </script>
 

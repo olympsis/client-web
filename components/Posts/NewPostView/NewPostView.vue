@@ -124,7 +124,7 @@ async function createPost() {
     if (newPost) {
         emit('created', { newPost });
     } else {
-        state.value = VIEW_STATE.FAILED;
+        state.value = VIEW_STATE.FAILURE;
     }
 }
 

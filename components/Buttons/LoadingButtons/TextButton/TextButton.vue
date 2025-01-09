@@ -9,7 +9,7 @@
         <div v-if="state === VIEW_STATE.SUCCESS" id="text-button-success">
             <div id="content">{{ successText }}</div>
         </div>
-        <div v-if="state === VIEW_STATE.FAILED" id="text-button-failed">
+        <div v-if="state === VIEW_STATE.FAILURE" id="text-button-failed">
             <div id="content">{{ failureText }}</div>
         </div>
     </div>

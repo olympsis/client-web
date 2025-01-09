@@ -166,11 +166,11 @@ function apply() {
             if (hasApplied) {
                 actionState.value = VIEW_STATE.SUCCESS;
             } else {
-                actionState.value = VIEW_STATE.FAILED;
+                actionState.value = VIEW_STATE.FAILURE;
             }
         })
         .catch(() => {
-            actionState.value = VIEW_STATE.FAILED;
+            actionState.value = VIEW_STATE.FAILURE;
         });
 }
 
@@ -206,7 +206,7 @@ async function getClub(id: string) {
             }
         });
     } catch (error) {
-        viewState.value = VIEW_STATE.FAILED;
+        viewState.value = VIEW_STATE.FAILURE;
         console.error(`Failed to get club data. Error: ${error}`);
     }
 }

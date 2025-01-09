@@ -11,7 +11,7 @@
                 <input type="text" id="username" autocomplete="off" autofocus v-model="username"/>
                 <div class="indicator">
                     <img v-if="state == VIEW_STATE.SUCCESS" src="@/assets/icons/check/check.svg">
-                    <img v-if="state == VIEW_STATE.FAILED"src="@/assets/icons/xmark/xmark.red.svg">
+                    <img v-if="state == VIEW_STATE.FAILURE"src="@/assets/icons/xmark/xmark.red.svg">
                     <div v-if="state == VIEW_STATE.LOADING" class="spinner" />
                 </div>
             </div>
@@ -67,7 +67,7 @@ watch(username, (newValue, _) => {
         debounceTimer = setTimeout(() => {
             checkUsernameAvailability()
                 .catch(() => {
-                    state.value = VIEW_STATE.FAILED;
+                    state.value = VIEW_STATE.FAILURE;
                 })
                 .then(() => {
                     debounceTimer = null;
@@ -77,7 +77,7 @@ watch(username, (newValue, _) => {
         if (debounceTimer !== null) {
             clearTimeout(debounceTimer);
         }
-        state.value = VIEW_STATE.FAILED;
+        state.value = VIEW_STATE.FAILURE;
     }
 });
 
@@ -100,7 +100,7 @@ async function checkUsernameAvailability() {
     if (isAvailable) {
         state.value = VIEW_STATE.SUCCESS;
     } else {
-        state.value = VIEW_STATE.FAILED;
+        state.value = VIEW_STATE.FAILURE;
     }
 }
 

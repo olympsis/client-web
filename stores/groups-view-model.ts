@@ -30,7 +30,7 @@ export const useGroupsViewModel = defineStore('groups-view-model', () => {
                 })
                 .catch((error) => {
                     console.error('Failed to load groups view model: ' + error);
-                    state.value = VIEW_STATE.FAILED;
+                    state.value = VIEW_STATE.FAILURE;
                     return
                 })
             } else {
@@ -66,7 +66,7 @@ export const useGroupsViewModel = defineStore('groups-view-model', () => {
                 if (sessionStore.selectedGroup) {
                     posts.value = _posts;
                 } else {
-                    state.value = VIEW_STATE.FAILED
+                    state.value = VIEW_STATE.FAILURE
                     return
                 }
                 state.value = VIEW_STATE.SUCCESS
@@ -74,7 +74,7 @@ export const useGroupsViewModel = defineStore('groups-view-model', () => {
             })
             .catch((error) => {
                 console.error('Failed to load posts: ' + error)
-                state.value = VIEW_STATE.FAILED
+                state.value = VIEW_STATE.FAILURE
             });
     }
 

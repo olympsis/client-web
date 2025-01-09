@@ -1,15 +1,15 @@
 <template>
     <header id="navigation-bar">
-        <RouterLink to="/signin" class="name" @click="hideMenu">Olympsis</RouterLink>
+        <NuxtLink to="/signin" class="name" @click="hideMenu">Olympsis</NuxtLink>
 
         <div class="menu" :class="{ 'full_menu': isOpen }" :v-show="isOpen">
-            <RouterLink id="link" to="/privacy-policy" active-class="selected-link" class="link" @click="hideMenu"> Privacy Policy </RouterLink>
-            <RouterLink id="link2" to="/terms-of-use" active-class="selected-link" class="link" @click="hideMenu"> Terms of Use </RouterLink>
-            <RouterLink id="link2" to="/contact-us" active-class="selected-link" class="link" @click="hideMenu"> Contact Us </RouterLink>
-            <RouterLink v-if="isOpen" to="/signin" active-class="selected" class="button" @click="hideMenu"> Signin </RouterLink>
+            <NuxtLink id="link" to="/privacy-policy" active-class="selected-link" class="link" @click="hideMenu"> Privacy Policy </NuxtLink>
+            <NuxtLink id="link2" to="/terms-of-use" active-class="selected-link" class="link" @click="hideMenu"> Terms of Use </NuxtLink>
+            <NuxtLink id="link2" to="/contact-us" active-class="selected-link" class="link" @click="hideMenu"> Contact Us </NuxtLink>
+            <div v-if="isOpen" @click="handlePrimaryButton" :class="{ selected: route.fullPath === '/signin' }" class="button">{{ primaryText }}</div>
         </div>
 
-        <RouterLink id="signin" to="/signin" active-class="selected" class="button"> Signin </RouterLink>
+        <div id="signin" @click="handlePrimaryButton" :class="{ selected: route.fullPath === '/signin' }" class="button">{{ primaryText }}</div>
 
         <div class="hamburger" :class="{ 'open': isOpen }" @click="toggleMenu">
             <span class="hamburger__top-bun"></span>
@@ -20,8 +20,21 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { AUTH_STATUS } from '~/data/Enums';
 
 const isOpen = ref(false);
+const route = useRoute();
+const router = useRouter();
+const session = useSessionStore();
+
+const isAuthenticated = computed<boolean>(() => {
+    return session.authStatus === AUTH_STATUS.authenticated;
+});
+
+const primaryText = computed<string>(() => {
+    if (isAuthenticated.value) return 'App';
+    return 'Signin';
+});
 
 function toggleMenu() {
     isOpen.value = !isOpen.value;
@@ -29,6 +42,15 @@ function toggleMenu() {
 
 function hideMenu() {
     isOpen.value = false;
+}
+
+function handlePrimaryButton() {
+    hideMenu();
+    if (!isAuthenticated.value) { 
+        router.push('/signin'); 
+    } else {
+        router.push('/home');
+    }
 }
 
 </script>
@@ -42,7 +64,7 @@ function hideMenu() {
     max-height: 60px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     background-color: var(--primary-brand-color);
 }
 
@@ -77,9 +99,10 @@ function hideMenu() {
 
 .button {
     color: white;
+    cursor: pointer;
     margin: 0rem 1rem;
-    padding: 0.3rem 1rem;
     border-radius: 10px;
+    padding: 0.3rem 1rem;
     border: 2px solid white;
 }
 

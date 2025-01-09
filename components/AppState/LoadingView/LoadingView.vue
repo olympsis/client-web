@@ -7,9 +7,11 @@
 
 <style scoped>
 #loading {
+    z-index: 100;
     width: 100vw;
-    height: 100dvh;
     display: flex;
+    height: 100dvh;
+    position: absolute;
     align-items: center;
     flex-direction: column;
     justify-content: center;

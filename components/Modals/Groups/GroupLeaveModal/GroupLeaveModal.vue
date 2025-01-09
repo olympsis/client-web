@@ -92,14 +92,14 @@ function handleLeaveGroup() {
                                 state.value = VIEW_STATE.PENDING;
                             }, 200);
                         } else {
-                            state.value = VIEW_STATE.FAILED;
+                            state.value = VIEW_STATE.FAILURE;
                             emit('close');
                             state.value = VIEW_STATE.PENDING;
                         }
                     })
                     .catch((error) => {
                         console.error(`Failed to leave organization: ${props.group.organization?.id}.  Error: ${error}`);
-                        state.value = VIEW_STATE.FAILED;
+                        state.value = VIEW_STATE.FAILURE;
                         emit('close');
                         state.value = VIEW_STATE.PENDING;
                     });

@@ -100,7 +100,7 @@ export const useSessionStore = defineStore('session-store', () => {
                     console.error(error);
                     session.$patch({
                         authStatus: AUTH_STATUS.unauthenticated,
-                        loadingState: VIEW_STATE.FAILED
+                        loadingState: VIEW_STATE.FAILURE
                     });
                 }
             } else {
@@ -118,7 +118,7 @@ export const useSessionStore = defineStore('session-store', () => {
             unsubscribe();
             session.$patch({
                 authStatus: AUTH_STATUS.unknown,
-                loadingState: VIEW_STATE.FAILED
+                loadingState: VIEW_STATE.FAILURE
             });
             console.error(`Failed to check user status. Error: ${error}`);
         });
@@ -192,10 +192,12 @@ export const useSessionStore = defineStore('session-store', () => {
 
     async function logout() {
         await authenticator.signOut();
+        await navigateTo('/signin');
     }
 
-    async function deleteAccount(): Promise<boolean> {
-        return await authenticator.deleteAccount();
+    async function deleteAccount() {
+        await authenticator.deleteAccount();
+        await navigateTo('signin');
     }
 
     return {

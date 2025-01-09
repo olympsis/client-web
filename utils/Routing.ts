@@ -3,7 +3,7 @@ import type { RouteLocationNormalizedGeneric } from "vue-router";
 
 function handleAuthorizationStatus(subscription: () => void, state: any, to: RouteLocationNormalizedGeneric) {
 	subscription();
-	if (to.fullPath === '/') {
+	if (to.fullPath === '/' || to.fullPath === '/signin') {
 		return handleHomeRoutes(state, to);
 	} else if (to.fullPath.includes('/groups')) {
 		return handleGroupsRoutes(state, to);
@@ -15,7 +15,7 @@ function handleAuthorizationStatus(subscription: () => void, state: any, to: Rou
 }
 
 function handleRoutes(state: any, to: RouteLocationNormalizedGeneric) {
-	if (to.fullPath === '/') {
+	if (to.fullPath === '/' || to.fullPath === '/signin') {
 		return handleHomeRoutes(state, to);
 	} else if (to.fullPath.includes('/groups')) {
 		return handleGroupsRoutes(state, to);
@@ -30,7 +30,7 @@ function handleHomeRoutes(status: any, to: RouteLocationNormalizedGeneric) {
 	if (status.authStatus !== AUTH_STATUS.authenticated) {
 		return navigateTo('/signin');
 	} else {
-        if (to.fullPath === '/') return navigateTo('/home');
+        if (to.fullPath === '/' || to.fullPath === '/signin') return navigateTo('/home');
 		return;
 	}
 }

@@ -1,14 +1,14 @@
 <template>
-    <div class="container">
-        <img src="@assets/logo.simple.white.png">
+    <div id="loading">
+        <img src="@/assets/images/logo.simple.white.png">
         <h1>Olympsis</h1>
     </div>
 </template>
 
 <style scoped>
-.container {
-    width: 100%;
-    height: 100%;
+#loading {
+    width: 100vw;
+    height: 100dvh;
     display: flex;
     align-items: center;
     flex-direction: column;

@@ -20,6 +20,7 @@ export default defineNuxtRouteMiddleware((to, from) => {
             const subscription = session.$subscribe((_, state) => {
                 return handleAuthorizationStatus(subscription, state, to);
             });
+
         } else {
             return handleRoutes(session, to);
         }

@@ -8,6 +8,7 @@ export default defineNuxtConfig({
 	],
 	modules: [
 		'@pinia/nuxt',
+		'@nuxtjs/robots',
 		'@nuxtjs/storybook',
 		'@primevue/nuxt-module',
 	],
@@ -57,5 +58,10 @@ export default defineNuxtConfig({
 				{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
 			]
 		}
+	},
+
+	robots: {
+		blockAiBots: true,
+		blockNonSeoBots: true
 	}
 });

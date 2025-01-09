@@ -894,7 +894,7 @@ function showCopiedToast() {
 }
 
 const config = useRuntimeConfig();
-useSeoMeta({
+useServerSeoMeta({
     title: () => eventTitle.value,
     description: () => eventBody.value,
     

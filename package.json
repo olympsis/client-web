@@ -10,6 +10,7 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@nuxtjs/robots": "^5.1.0",
     "@nuxtjs/storybook": "^8.3.3",
     "@pinia/nuxt": "^0.9.0",
     "@primevue/themes": "^4.2.5",

@@ -175,14 +175,14 @@ function apply() {
 }
 
 const config = useRuntimeConfig();
-useSeoMeta({
+useServerSeoMeta({
     title: () => groupName.value,
     description: () => groupAbout.value,
 
     ogType: 'website',
     ogLocale: 'en_US',
     ogSiteName: 'Olympsis',
-    ogUrl: () => `https://olympsis.com/search/${groupID.value}`,
+    ogUrl: () => `https://olympsis.com/groups/search/${groupID.value}`,
     ogTitle: () => groupName.value,
     ogImage: () => generateImageURL(groupLogoURL.value ?? ''),
     ogDescription: () => groupAbout.value,

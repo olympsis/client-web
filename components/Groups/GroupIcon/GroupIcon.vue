@@ -3,12 +3,12 @@
         <img v-if="image" class="image" :style="{ width: `${size}rem`, height: `${size}rem`}" :src="logo" />
         <div v-else class="icon">
             <picture v-if="type === 'club'">
-                <source srcset="@assets/group.fill.white.svg" media="(prefers-color-scheme: dark)"/>
-                <img src="@assets/group.fill.svg" class="action-button">
+                <source srcset="@/assets/icons/group/group.fill.white.svg" media="(prefers-color-scheme: dark)"/>
+                <img src="@/assets/icons/group/group.fill.svg" class="action-button">
             </picture>
             <picture v-else>
-                <source srcset="@assets/building.fill.white.svg" media="(prefers-color-scheme: dark)"/>
-                <img src="@assets/building.fill.svg" class="action-button">
+                <source srcset="@/assets/icons/building/building.white.svg" media="(prefers-color-scheme: dark)"/>
+                <img src="@/assets/icons/building/building.svg" class="action-button">
             </picture>
         </div>
     </div>

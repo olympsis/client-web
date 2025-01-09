@@ -1,9 +1,9 @@
 <template>
     <button id="group-visibility-button" @click="toggle">
-        <img class="group-visibility-leading" v-if="model === GROUP_VISIBILITY.PUBLIC" src="@assets/icons/globe/globe.white.svg"/>
-        <img class="group-visibility-leading" v-if="model === GROUP_VISIBILITY.PRIVATE" src="@assets/icons/trophy/trophy.white.svg"/>
+        <img class="group-visibility-leading" v-if="model === GROUP_VISIBILITY.PUBLIC" src="@/assets/icons/globe/globe.white.svg"/>
+        <img class="group-visibility-leading" v-if="model === GROUP_VISIBILITY.PRIVATE" src="@/assets/icons/trophy/trophy.white.svg"/>
         {{ model.valueOf() }}
-        <img class="group-visibility-trailing" src="@assets/icons/chevron/chevron.down.white.svg">
+        <img class="group-visibility-trailing" src="@/assets/icons/chevron/chevron.down.white.svg">
     </button>
 
     <OverlayPanel 

@@ -3,8 +3,8 @@
         <!-- Banner Image & Placeholder -->
         <div id="banner" v-if="bannerURL === ''" @click="handleFileImageSelection('banner')">
             <picture class="default-img">
-                <source srcset="@assets/icons/picture/picture.fill.white.svg" media="(prefers-color-scheme: dark)">
-                <img src="@assets/icons/picture/picture.fill.svg">
+                <source srcset="@/assets/icons/picture/picture.fill.white.svg" media="(prefers-color-scheme: dark)">
+                <img src="@/assets/icons/picture/picture.fill.svg">
             </picture>
         </div>
         <img id="banner" v-else :src="bannerURL"  @click="handleFileImageSelection('banner')"/>
@@ -12,8 +12,8 @@
         <!-- Logo Image & Placeholder -->
         <div id="logo" v-if="logoURL === ''"  @click="handleFileImageSelection('logo')">
             <picture class="default-img">
-                <source srcset="@assets/icons/picture/picture.fill.white.svg" media="(prefers-color-scheme: dark)">
-                <img src="@assets/icons/picture/picture.fill.svg">
+                <source srcset="@/assets/icons/picture/picture.fill.white.svg" media="(prefers-color-scheme: dark)">
+                <img src="@/assets/icons/picture/picture.fill.svg">
             </picture>
         </div>
         <img id="logo" v-else :src="logoURL"  @click="handleFileImageSelection('logo')"/> 

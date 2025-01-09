@@ -4,13 +4,13 @@
         <img id="banner" :src="banner" @error="bannerFailed = true" v-if="!bannerFailed && banner !== undefined"/>
 
         <picture id="default-logo" v-if="logoFailed || logo === undefined">
-            <source srcset="@assets/icons/group/group.fill.white.svg" media="(prefers-color-scheme: dark)">
-            <img src="@assets/icons/group/group.fill.svg"/>
+            <source srcset="@/assets/icons/group/group.fill.white.svg" media="(prefers-color-scheme: dark)">
+            <img src="@/assets/icons/group/group.fill.svg"/>
         </picture>
 
         <picture id="default-banner" v-if="bannerFailed || banner === undefined">
-            <source srcset="@assets/icons/picture/picture.fill.white.svg" media="(prefers-color-scheme: dark)">
-            <img src="@assets/icons/picture/picture.fill.svg"/>
+            <source srcset="@/assets/icons/picture/picture.fill.white.svg" media="(prefers-color-scheme: dark)">
+            <img src="@/assets/icons/picture/picture.fill.svg"/>
         </picture>
     </div>
 </template>

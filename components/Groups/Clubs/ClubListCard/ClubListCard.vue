@@ -5,8 +5,8 @@
         <div id="club-header">
             <img :src="imageURL" v-if="!imageFailed && imageURL !== undefined" @error="imageFailed = true">
             <picture id="default-img" v-if="imageFailed || imageURL === undefined">
-                <source srcset="@assets/icons/group/group.fill.white.svg" media="(prefers-color-scheme: dark)">
-                <img src="@assets/icons/group/group.fill.svg">
+                <source srcset="@/assets/icons/group/group.fill.white.svg" media="(prefers-color-scheme: dark)">
+                <img src="@/assets/icons/group/group.fill.svg">
             </picture>
             <div id="club-info">
                 <h1>{{ name }}</h1>
@@ -98,7 +98,7 @@ const body = computed(() => {
 
 function navigateToClubDetails() {
     if (!props.club.id) return;
-    router.push(`/groups/detail/${props.club.id}`);
+    router.push(`/groups/search/${props.club.id}`);
 }
 
 function apply() {

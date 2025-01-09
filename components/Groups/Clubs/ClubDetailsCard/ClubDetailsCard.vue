@@ -4,8 +4,8 @@
             <h1 class="title">{{ title }}</h1>
             <button class="button" @click="$emit('close')">
                 <picture>
-                    <source srcset="@assets/xmark.white.svg" media="(prefers-color-scheme: dark)">
-                    <img src="@assets/xmark.svg">
+                    <source srcset="@/assets/icons/xmark/xmark.white.svg" media="(prefers-color-scheme: dark)">
+                    <img src="@/assets/icons/xmark/xmark.svg">
                 </picture>
             </button>
         </div>
@@ -15,26 +15,26 @@
                 <img id="banner" :src="banner" @error="bannerFailed = true" v-if="!bannerFailed && banner !== undefined"/>
 
                 <picture id="default-logo" v-if="logoFailed || logo === undefined">
-                    <source srcset="@assets/icons/group/group.fill.white.svg" media="(prefers-color-scheme: dark)">
-                    <img src="@assets/icons/group/group.fill.svg"/>
+                    <source srcset="@/assets/icons/group/group.fill.white.svg" media="(prefers-color-scheme: dark)">
+                    <img src="@/assets/icons/group/group.fill.svg"/>
                 </picture>
 
                 <picture id="default-banner" v-if="bannerFailed || banner === undefined">
-                    <source srcset="@assets/icons/picture/picture.fill.white.svg" media="(prefers-color-scheme: dark)">
-                    <img src="@assets/icons/picture/picture.fill.svg"/>
+                    <source srcset="@/assets/icons/picture/picture.fill.white.svg" media="(prefers-color-scheme: dark)">
+                    <img src="@/assets/icons/picture/picture.fill.svg"/>
                 </picture>
             </div>
 
             <div id="club-membership-info">
                 <div id="visibility">
                     <picture v-if="visibility == 'public'">
-                        <source srcset="@assets/icons/globe/globe.white.svg" media="(prefers-color-scheme: dark)">
-                        <img src="@assets/icons/globe/globe.svg"/>
+                        <source srcset="@/assets/icons/globe/globe.white.svg" media="(prefers-color-scheme: dark)">
+                        <img src="@/assets/icons/globe/globe.svg"/>
                     </picture>
 
                     <picture v-if="visibility == 'private'">
-                        <source srcset="@assets/icons/lock/lock.white.svg" media="(prefers-color-scheme: dark)">
-                        <img src="@assets/icons/lock/lock.svg"/>
+                        <source srcset="@/assets/icons/lock/lock.white.svg" media="(prefers-color-scheme: dark)">
+                        <img src="@/assets/icons/lock/lock.svg"/>
                     </picture>
 
                     {{ visibility }}

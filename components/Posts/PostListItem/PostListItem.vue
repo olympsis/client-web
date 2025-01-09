@@ -10,8 +10,8 @@
             <!-- Options Button -->
             <button type="button" @click="toggle" class="button">
                 <picture>
-                    <source srcset="@assets/ellipsis.white.svg" media="(prefers-color-scheme: dark)"/>
-                    <img src="@assets/ellipsis.svg" class="button-image">
+                    <source srcset="@/assets/icons/ellipsis/ellipsis.white.svg" media="(prefers-color-scheme: dark)"/>
+                    <img src="@/assets/icons/ellipsis/ellipsis.svg" class="button-image">
                 </picture>
             </button>
             <Menu ref="menu" id="overlay_menu" :model="items" :popup="true"></Menu>
@@ -21,8 +21,8 @@
         <img v-if="post.images && !imagesFailed" :src="generateImageURL(post.images[0]) ?? undefined" class="image" @error="onImageError"/>
         <div v-if="imagesFailed" class="failed-image">
             <picture>
-                <source srcset="@assets/image.white.svg" media="(prefers-color-scheme: dark)"/>
-                <img src="@assets/image.svg" class="button-image">
+                <source srcset="@/assets/icons/image/image.white.svg" media="(prefers-color-scheme: dark)"/>
+                <img src="@/assets/icons/image/image.svg" class="button-image">
             </picture>
         </div>
         
@@ -36,17 +36,17 @@
                 <!-- Like Button -->
                 <button class="button like" @click="likePost">
                     <picture v-if="!isLiked">
-                        <source srcset="@assets/heart.white.svg" media="(prefers-color-scheme: dark)"/>
-                        <img src="@assets/heart.svg" class="button-image">
+                        <source srcset="@/assets/icons/heart/heart.white.svg" media="(prefers-color-scheme: dark)"/>
+                        <img src="@/assets/icons/heart/heart.svg" class="button-image">
                     </picture>
-                    <img src="@assets/heart.filled.svg" class="button-image" v-else >
+                    <img src="@/assets/icons/heart/heart.fill.red.svg" class="button-image" v-else >
                 </button>
 
                 <!-- Comment Button -->
                 <button class="button comment">
                     <picture>
-                        <source srcset="@assets/icons/comment/comment.white.svg" media="(prefers-color-scheme: dark)"/>
-                        <img src="@assets/icons/comment/comment.svg" class="button-image">
+                        <source srcset="@/assets/icons/comment/comment.white.svg" media="(prefers-color-scheme: dark)"/>
+                        <img src="@/assets/icons/comment/comment.svg" class="button-image">
                     </picture>
                 </button>
             </div>

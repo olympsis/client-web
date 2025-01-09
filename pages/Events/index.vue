@@ -1,5 +1,6 @@
 <template>
-    <div id="events">
+    <NavigationBar/>
+    <main id="events">
         <div id="header">
             <h1>Events</h1>
 
@@ -59,7 +60,7 @@
         <dialog id="event-settings-modal" ref="event-settings-modal" class="dialog">
 
         </dialog>
-    </div>
+    </main>
 </template>
 
 <script setup lang="ts">
@@ -73,8 +74,8 @@ import { computed, onMounted, ref, useTemplateRef, watch } from 'vue';
 
 // TESTING DATA
 import { sampleEvents } from '@/data/dev-data/sample-events';
-
 import SearchBar from '@/components/SearchBar/SearchBar.vue';
+import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
 import EventListItem from '@/components/Events/EventListItem/EventListItem.vue';
 import NewEventCard from '@/components/Events/New Event/NewEventView/NewEventView.vue';
 import EventDateButton from '@/components/Buttons/EventDateButton/EventDateButton.vue';

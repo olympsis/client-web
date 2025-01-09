@@ -25,7 +25,7 @@
             <textarea type="text" placeholder="Write a caption" v-model="postBody" class="text-large"/>
             <div id="actions">
                 <button id="image-button" @click="handleFileImageSelection">
-                    <img src="@assets/icons/picture/picture.fill.white.svg">
+                    <img src="@/assets/icons/picture/picture.fill.white.svg">
                 </button>
             </div>
         </div>

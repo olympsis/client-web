@@ -1,9 +1,9 @@
 <template>
     <button id="group-type-button" @click="toggle">
-        <img class="group-type-leading" v-if="model === GROUP_TYPE.CLUB" src="@assets/icons/group/group.fill.white.svg"/>
-        <img class="group-type-leading" v-else src="@assets/icons/building/building.white.svg"/>
+        <img class="group-type-leading" v-if="model === GROUP_TYPE.CLUB" src="@/assets/icons/group/group.fill.white.svg"/>
+        <img class="group-type-leading" v-else src="@/assets/icons/building/building.white.svg"/>
         {{ model.valueOf() }}
-        <img class="group-type-trailing" src="@assets/icons/chevron/chevron.down.white.svg">
+        <img class="group-type-trailing" src="@/assets/icons/chevron/chevron.down.white.svg">
     </button>
 
     <OverlayPanel 

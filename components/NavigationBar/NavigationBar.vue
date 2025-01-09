@@ -122,7 +122,7 @@ function hideMenu() {
 }
 
 @media (max-width: 940px) {
-    .container {
+    #navigation-bar {
 
         #web-routes {
             display: none;

@@ -17,7 +17,7 @@
 import { ref } from 'vue';
 import { VIEW_STATE } from '~/data/Enums';
 import { UserDTO } from '~/data/models/UserModels';
-import { AuthenticationFacade, type AuthFacadeResponse } from '@/data/facades/AuthenticationFacade';
+import { AuthenticationFacade } from '@/data/facades/AuthenticationFacade';
 
 import CreateUserCard from '../CreateUserCard/CreateUserCard.vue';
 import AuthenticationCard from '../AuthenticationCard/AuthenticationCard.vue';

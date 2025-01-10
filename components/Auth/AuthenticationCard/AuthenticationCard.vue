@@ -42,7 +42,6 @@ function signInWithApple() {
 function signInWithGoogle() {
     emits('google');
 }
-
 </script>
 
 <style scoped>

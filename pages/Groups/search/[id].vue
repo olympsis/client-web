@@ -3,7 +3,7 @@
     <main id="group-detail">
         <div id="left">
             <div id="header">
-                <button class="button" :style="{ marginRight: '1rem' }" @click="router.push('/groups/search')">
+                <button class="button" :style="{ marginRight: '1rem' }" @click="handleBackNavigation">
                     <picture class="centered">
                         <source srcset="@/assets/icons/chevron/chevron.left.white.svg" media="(prefers-color-scheme: dark)">
                         <img src="@/assets/icons/chevron/chevron.left.svg"/>
@@ -66,6 +66,11 @@
                 <p>{{ groupHistory }}</p>
             </div>
         </div>
+
+        <!-- Auth Modal -->
+        <dialog id="auth-modal" ref="auth-modal" class="dialog">
+            <AuthModal class="auth-card" @cancel="hideAuthModal" @user-authenticated="handleNewUserAuthentication"/>
+        </dialog>
     </main>
 </template>
 
@@ -81,6 +86,7 @@ import { AUTH_STATUS, VIEW_STATE } from '@/data/Enums';
 import { useSessionStore } from '@/stores/session-store';
 import { ClubService } from '@/data/services/ClubService';
 
+import AuthModal from '~/components/Auth/AuthModal/AuthModal.vue';
 import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
 import GroupMembersPeek from '@/components/Groups/GroupMembersPeek/GroupMembersPeek.vue';
 import GroupLogoAndBanner from '@/components/Groups/GroupLogoAndBanner/GroupLogoAndBanner.vue';
@@ -91,10 +97,12 @@ const route = useRoute();
 const router = useRouter();
 const session = useSessionStore();
 const service = new ClubService();
+const modelStore = useModelStore();
 
 const club = ref<Club | undefined>(undefined);
 const viewState = ref<VIEW_STATE>(VIEW_STATE.PENDING);
 const actionState = ref<VIEW_STATE>(VIEW_STATE.PENDING);
+const authModal = useTemplateRef<HTMLDialogElement>('auth-modal');
 
 /**
  * COMPUTED VARIABLES
@@ -148,12 +156,33 @@ const groupMembersString = computed<string>(() => {
     return club.value.members.length > 1 ? `${club.value.members.length} members` : `${club.value.members.length} member`;
 });
 
+function showAuthModal() {
+    if (authModal.value) {
+        authModal.value.show()
+    } else {
+        console.error('Failed to find reference to Auth Modal');
+    }
+}
+
+function hideAuthModal() {
+    if (authModal.value) {
+        authModal.value.close()
+    } else {
+        console.error('Failed to find reference to Auth Modal');
+    }
+}
+
 function handleGroupSharing() {
     navigator.clipboard.writeText(window.location.href);
     toast.add({ severity: 'secondary', summary: 'Link Copied', detail: 'You\'ve copied the link to this event', life: 3000 });
 }
 
 function apply() {
+    if (!isAuthenticated.value) {
+        showAuthModal();
+        return;
+    }
+
     if (viewState.value === VIEW_STATE.LOADING) return;
     if (actionState.value === VIEW_STATE.LOADING) return;
     actionState.value = VIEW_STATE.LOADING;
@@ -169,6 +198,19 @@ function apply() {
         .catch(() => {
             actionState.value = VIEW_STATE.FAILURE;
         });
+}
+
+function handleBackNavigation(){
+    if (!isAuthenticated.value) {
+        router.push('/signin');
+    } else {
+        router.push('/groups/search')
+    }
+}
+
+function handleNewUserAuthentication() {
+    session.checkAuthorizationStatus();
+    hideAuthModal();
 }
 
 async function getClub(id: string) {
@@ -210,12 +252,16 @@ const { data } = await useAsyncData(
         lazy: false,
         immediate: true,
     }
-)
-
+);
 watchEffect(() => {
     if (!data.value) return;
     club.value = Club.decode(data.value);
+
+    if (club.value) {
+        modelStore.setClub(club.value);
+    }
 });
+
 </script>
 
 <style scoped>
@@ -318,6 +364,19 @@ watchEffect(() => {
                 background-color: var(--secondary-background-color);
             }
         }
+    }
+}
+
+#auth-modal {
+    top: 0;
+    border: unset;
+    background: transparent;
+    backdrop-filter: blur(5px);
+
+    .auth-card {
+        border-radius: 20px;
+        max-width: 25rem !important;
+        box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
     }
 }
 

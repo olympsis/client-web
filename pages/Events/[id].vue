@@ -8,7 +8,7 @@
                 <div id="event-detail-left-section">
                     <!-- Event Header -->
                     <div id="header">
-                        <button class="button" :style="{ marginRight: '1rem' }" @click="router.push('/events')">
+                        <button class="button" :style="{ marginRight: '1rem' }" @click="handleBackNavigation">
                             <picture class="centered">
                                 <source srcset="@/assets/icons/chevron/chevron.left.white.svg" media="(prefers-color-scheme: dark)">
                                 <img src="@/assets/icons/chevron/chevron.left.svg"/>
@@ -105,7 +105,7 @@
             <div id="event-detail-mobile">
                 <!-- Event Header -->
                 <div id="header">
-                    <button class="button" :style="{ marginRight: '1rem' }" @click="router.push('/events')">
+                    <button class="button" :style="{ marginRight: '1rem' }" @click="handleBackNavigation">
                         <picture class="centered">
                             <source srcset="@/assets/icons/chevron/chevron.left.white.svg" media="(prefers-color-scheme: dark)">
                             <img src="@/assets/icons/chevron/chevron.left.svg"/>
@@ -787,6 +787,14 @@ function showCopiedToast() {
     toast.add({ severity: 'secondary', summary: 'Link Copied', detail: 'You\'ve copied the link to this event', life: 3000 });
 }
 
+function handleBackNavigation() {
+    if (!isAuthenticated.value) {
+        router.push('/signin');
+    } else {
+        router.push('/events');
+    }
+}
+
 async function loadEventData(id: string) {
     let promises: any[] = [];
     let clubsArr: Club[] = [];
@@ -886,6 +894,29 @@ watch(data, (newData) => {
     clubs.value = newData.clubs.map((c) => Club.decode(c));
     orgs.value = newData.orgs.map((o) => Organization.decode(o));
     venues.value = newData.venues.map((v) => Venue.decode(v));
+
+    // Commit new models to model store
+    if (event.value) {
+        modelStore.setEvent(event.value);
+    }
+
+    if (clubs.value) {
+        clubs.value.forEach((c) => {
+            modelStore.setClub(c);
+        });
+    }
+
+    if (orgs.value) {
+        orgs.value.forEach((o) => {
+            modelStore.setOrganization(o);
+        });
+    }
+    
+    if (venues.value) {
+        venues.value.forEach((v) => {
+            modelStore.setVenue(v);
+        })
+    }
 }, { immediate: true });
 
 onMounted(() => {

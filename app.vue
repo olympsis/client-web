@@ -11,7 +11,7 @@
 <script setup lang="ts">
 import { VIEW_STATE } from './data/Enums';
 import { Analytics } from '@vercel/analytics/nuxt';
-import { SpeedInsights } from "@vercel/speed-insights/nuxt"
+import { SpeedInsights } from "@vercel/speed-insights/nuxt";
 
 import FailedView from './components/AppState/FailedView/FailedView.vue';
 import LoadingView from '~/components/AppState/LoadingView/LoadingView.vue';

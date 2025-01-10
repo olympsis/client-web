@@ -34,10 +34,7 @@ export class VenueService {
 
     async getVenue(id: string) : Promise<Venue | undefined> {
 
-        let token = await getAuth().currentUser?.getIdToken() ?? ""
         let headers = new Map<string, string>()
-        headers.set("Authorization", token)
-
         const endpoint = new Endpoint(`/v1/venues/${id}`);
 
         const [status, _headers, body] = await this.http.request(Method.GET, endpoint, undefined, headers);

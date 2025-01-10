@@ -1,6 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-	ssr: false,
+	ssr: true,
 	compatibilityDate: '2024-11-01',
 	devtools: { enabled: true },
 	css: [
@@ -40,7 +40,7 @@ export default defineNuxtConfig({
 	routeRules: {
 		// Sites routes
 		'/': {
-			redirect: '/home'
+			redirect: '/signin'
 		},
 		'/signin': { prerender: true },
 		'/about-us': { prerender: true },
@@ -49,8 +49,8 @@ export default defineNuxtConfig({
 		'/privacy-policy': { prerender: true },
 
 		// We need this for SEO
-		'/events/**': { ssr: true },
-		'/groups/search/**': { ssr: true }
+		// '/events/**': { ssr: true },
+		// '/groups/search/**': { ssr: true }
 	},
 	app: {
 		head: {

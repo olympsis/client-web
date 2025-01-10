@@ -23,6 +23,7 @@ import { AUTH_STATUS, GROUP_TYPE, VIEW_STATE } from '~/data/Enums';
 import { LocationManager } from '../data/managers/LocationManager';
 import { GroupSelection, Location } from '../data/models/GenericModels';
 import { AuthenticationFacade } from '@/data/facades/AuthenticationFacade';
+import { OrganizationService } from '~/data/services/OrganizationService';
 
 export const useSessionStore = defineStore('session-store', () => {
 
@@ -34,6 +35,7 @@ export const useSessionStore = defineStore('session-store', () => {
     var authService = new AuthService();
     var userService = new UserService();
     var clubService = new ClubService();
+    var orgService = new OrganizationService();
     var venueService = new VenueService();
     var eventService = new EventService();
     var chatService = new ChatService();
@@ -225,6 +227,7 @@ export const useSessionStore = defineStore('session-store', () => {
         authService,
         userService,
         clubService,
+        orgService,
         eventService,
         venueService,
         chatService,

@@ -28,7 +28,7 @@ const hasFailed = computed<boolean>(() => {
 
 useHead({
 	htmlAttrs: {
-		lang: "en",
+		lang: "en"
 	}
 });
 </script>

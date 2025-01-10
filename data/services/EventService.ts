@@ -77,11 +77,7 @@ export class EventService {
     }
 
     async getEvent(id: string) : Promise<Event> {
-        let token = await getAuth().currentUser?.getIdToken() ?? ""
-
         let headers = new Map<string, string>()
-        headers.set('Authorization', token)
-
         const endpoint = new Endpoint(`/v1/events/${id}`);
         const [status, _headers, body] = await this.http.request(Method.GET, endpoint, undefined, headers);
         if (status == 200) {

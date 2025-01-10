@@ -175,7 +175,7 @@ function apply() {
 }
 
 const config = useRuntimeConfig();
-useServerSeoMeta({
+useSeoMeta({
     title: () => groupName.value,
     description: () => groupAbout.value,
 

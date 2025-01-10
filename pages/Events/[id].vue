@@ -259,6 +259,7 @@ import EllipsisBlockButton from '~/components/Buttons/BlockImageButton/EllipsisB
 import EventPrimaryButton from '@/components/Buttons/EventPrimaryButton/EventPrimaryButton.vue';
 import EventDetailSettingsModal from '@/components/Modals/Events/EventDetailSettingsModal/EventDetailSettingsModal.vue';
 import EventParticipantsListModal from '@/components/Modals/Events/EventParticipantsListModal/EventParticipantsListModal.vue';
+import { EventService } from '~/data/services/EventService';
 
 const toast = useToast();
 const route = useRoute();
@@ -272,7 +273,7 @@ const orgs: Ref<Array<Organization>> = ref([]);
 
 const state= ref<VIEW_STATE>(VIEW_STATE.PENDING);
 const primaryState = ref<VIEW_STATE>(VIEW_STATE.PENDING);
-const failed: Ref<boolean | undefined> = ref(undefined);
+const failed: Ref<boolean | undefined> = ref(false);
             
 const event: Ref<Event | undefined> = ref(undefined);
 const timeElapsed: Ref<string> = ref('');
@@ -740,113 +741,6 @@ function handleCloseSettingsModal() {
     }
 }
 
-function eventTimeTick() {
-    const formatDuration = (ms: number): string => {
-        const seconds = Math.floor((ms / 1000) % 60);
-        const minutes = Math.floor((ms / (1000 * 60)) % 60);
-        const hours = Math.floor(ms / (1000 * 60 * 60));
-
-        // If less than 1 hour, show mm:ss + 'm'
-        if (hours < 1) {
-        return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}m`;
-        }
-        
-        // If 1 hour or more, show hr:mm + 'h'
-        return `${hours}:${minutes.toString().padStart(2, '0')}h`;
-    };
-
-    const startTime = event.value?.startTime ?? 0;
-    const start = new Date(startTime).getTime();
-    const diff = Date.now() - start;
-    timeElapsed.value = formatDuration(diff);
-}
-
-async function loadEventData(id: string | undefined) {
-    let clubsArr: Club[] = [];
-    let orgsArr: Organization[] = [];
-    let venuesArr: Venue[] = [];
-
-    state.value = VIEW_STATE.LOADING;
-
-    let promises: any[] = [];
-
-    // Fetch event info
-    if (id) {
-        // Try to find event in memory
-        const local = session.events.find((e) => e.id == id);
-        if (local) {
-            event.value = local
-        } else {
-            // Get the event remotely
-            try {
-                const remote = await session.eventService.getEvent(id);
-                if (remote) {
-                    event.value = remote;
-                    modelStore.setEvent(remote);
-                } else {
-                    failed.value = true;
-                    return;
-                }
-            } catch {
-                failed.value = true;
-                return;
-            }
-        }
-
-    } else {
-        router.push('/events');
-        return;
-    }
-
-    if (event.value?.organizers) {
-        event.value?.organizers.forEach(async (o) => {
-            switch (o.type) {
-                case GROUP_TYPE.CLUB:
-                    if (o.id) {
-                        promises.push(modelStore.getClubByID(o.id));
-                    }
-                    break;
-                case GROUP_TYPE.ORGANIZATION:
-                    if (o.id) {
-                        promises.push(modelStore.getOrganizationByID(o.id));
-                    }
-                    break;
-            }
-        })
-    }
-
-    if (event.value?.venues) {
-        event.value?.venues.forEach(async (v) => {
-            if (v.id) {
-                promises.push(modelStore.getVenueByID(v.id));
-            }
-        });
-    }
-
-    await Promise.allSettled(promises)
-        .then((results) => {
-            results.forEach((p) => {
-                if (p.status === 'fulfilled') {
-                    if (Object.getPrototypeOf(p.value) === Club.prototype) {
-                        clubsArr.push(p.value);
-                    } else if (Object.getPrototypeOf(p.value) === Organization.prototype) {
-                        orgsArr.push(p.value);
-                    } else if (Object.getPrototypeOf(p.value) === Venue.prototype) {
-                        venuesArr.push(p.value);
-                    }
-                } else {
-                    console.debug('%c Failed to fetch model on event load.', 'color: red;')
-                }
-            })
-        })
-
-    clubs.value = clubsArr;
-    orgs.value = orgsArr;
-    venues.value = venuesArr;
-    state.value = VIEW_STATE.SUCCESS;
-    failed.value = false;
-}
-
 function handleEventSharing() {
     navigator.clipboard.writeText(window.location.href);
     showCopiedToast()
@@ -893,8 +787,66 @@ function showCopiedToast() {
     toast.add({ severity: 'secondary', summary: 'Link Copied', detail: 'You\'ve copied the link to this event', life: 3000 });
 }
 
+async function loadEventData(id: string) {
+    let promises: any[] = [];
+    let clubsArr: Club[] = [];
+    let venuesArr: Venue[] = [];
+    let orgsArr: Organization[] = [];
+
+    const _event = await session.eventService.getEvent(id);
+    
+    if (_event.organizers) {
+        _event.organizers.forEach(async (o) => {
+            switch (o.type) {
+                case GROUP_TYPE.CLUB:
+                    if (o.id) {
+                        promises.push(session.clubService.getClub(o.id));
+                    }
+                    break;
+                case GROUP_TYPE.ORGANIZATION:
+                    if (o.id) {
+                        promises.push(session.orgService.getOrganization(o.id));
+                    }
+                    break;
+            }
+        })
+    }
+
+    if (_event.venues) {
+        _event.venues.forEach(async (v) => {
+            if (v.id) {
+                promises.push(session.venueService.getVenue(v.id));
+            }
+        });
+    }
+
+    await Promise.allSettled(promises)
+        .then((results) => {
+            results.forEach((p) => {
+                if (p.status === 'fulfilled') {
+                    if (Object.getPrototypeOf(p.value) === Club.prototype) {
+                        clubsArr.push(p.value);
+                    } else if (Object.getPrototypeOf(p.value) === Organization.prototype) {
+                        orgsArr.push(p.value);
+                    } else if (Object.getPrototypeOf(p.value) === Venue.prototype) {
+                        venuesArr.push(p.value);
+                    }
+                } else {
+                    console.debug('%c Failed to fetch model on event load.', 'color: red;')
+                }
+            })
+        });
+
+    event.value = _event;
+    clubs.value = clubsArr;
+    orgs.value = orgsArr;
+    venues.value = venuesArr;
+
+    // return { event: _event, clubs: clubsArr, orgs: orgsArr, venues: venuesArr };
+}
+
 const config = useRuntimeConfig();
-useServerSeoMeta({
+useSeoMeta({
     title: () => eventTitle.value,
     description: () => eventBody.value,
     
@@ -918,15 +870,24 @@ useServerSeoMeta({
     }
 });
 
-await useAsyncData(
+const { data } = await useAsyncData(
     `events/${eventID.value}`,
-    async() => await loadEventData(eventID.value),
+    () => loadEventData(eventID.value),
     {
         server: true,
         lazy: false,
         immediate: true,
     }
-)
+);
+
+// watchEffect(() => {
+//     if (data.value) {
+//         event.value = data.value.event;
+//         clubs.value = data.value.clubs;
+//         orgs.value = data.value.orgs;
+//         venues.value = data.value.venues;
+//     }
+// });
 
 onMounted(() => {
     if (session.authStatus !== AUTH_STATUS.authenticated) {

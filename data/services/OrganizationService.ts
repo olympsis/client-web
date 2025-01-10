@@ -12,11 +12,7 @@ export class OrganizationService {
     }
 
     async getOrganization(id: string) : Promise<Organization | undefined> {
-        const auth = getAuth();
-        let token = await auth.currentUser?.getIdToken() ?? ""
-
         let headers = new Map<string, string>();
-        headers.set('Authorization', token);
 
         const endpoint = new Endpoint(`/v1/organizations/${id}`);
         const [status, _headers, body] = await this.http.request(Method.GET, endpoint, undefined, headers);

@@ -12,11 +12,7 @@ export class ClubService {
     }
 
     async getClub(id: string) : Promise<Club | undefined> {
-        const auth = getAuth();
-        let token = await auth.currentUser?.getIdToken() ?? ""
-
         let headers = new Map<string, string>();
-        headers.set('Authorization', token);
 
         const endpoint = new Endpoint(`/v1/clubs/${id}`);
         const [status, _headers, body] = await this.http.request(Method.GET, endpoint, undefined, headers);

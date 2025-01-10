@@ -71,13 +71,12 @@
 
 <script setup lang="ts">
 
-import { computed, onMounted, ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useToast } from 'primevue/usetoast';
 import { Club } from '@/data/models/ClubModels';
 import { useRoute, useRouter } from 'vue-router';
 import { formatRelativeTime } from '@/utils/Time';
 import { Member } from '@/data/models/GenericModels';
-import { useModelStore } from '@/stores/model-store';
 import { AUTH_STATUS, VIEW_STATE } from '@/data/Enums';
 import { useSessionStore } from '@/stores/session-store';
 import { ClubService } from '@/data/services/ClubService';
@@ -92,12 +91,10 @@ const route = useRoute();
 const router = useRouter();
 const session = useSessionStore();
 const service = new ClubService();
-const modelStore = useModelStore();
 
 const club = ref<Club | undefined>(undefined);
 const viewState = ref<VIEW_STATE>(VIEW_STATE.PENDING);
 const actionState = ref<VIEW_STATE>(VIEW_STATE.PENDING);
-const locationState = ref<VIEW_STATE>(VIEW_STATE.PENDING);
 
 /**
  * COMPUTED VARIABLES
@@ -174,6 +171,12 @@ function apply() {
         });
 }
 
+async function getClub(id: string) {
+    const _club = await service.getClub(id);
+    if (!_club) return;
+    return _club.encode();
+}
+
 const config = useRuntimeConfig();
 useSeoMeta({
     title: () => groupName.value,
@@ -201,7 +204,7 @@ useSeoMeta({
 
 const { data } = await useAsyncData(
     `groups/search/${groupID.value}`,
-    async() => await service.getClub(groupID.value),
+    () => getClub(groupID.value),
     {
         server: true,
         lazy: false,
@@ -210,9 +213,8 @@ const { data } = await useAsyncData(
 )
 
 watchEffect(() => {
-    if (data.value) {
-        club.value = data.value;
-    }
+    if (!data.value) return;
+    club.value = Club.decode(data.value);
 });
 </script>
 

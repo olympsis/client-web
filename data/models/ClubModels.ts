@@ -65,7 +65,8 @@ class Club extends Codable<Club> {
             if (data['id']) {
                 object['id'] = data['id'];
             }
-            if (data['parent']) {
+            // TODO: Temp fix for server returning an empty object
+            if (data['parent'] && Object.keys(data['parent']).length !== 0) {
                 object['parent'] = OrganizationDao.decode(data['parent']);
             }
             if (data['name']) {

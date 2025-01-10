@@ -880,21 +880,20 @@ const { data } = await useAsyncData(
     }
 );
 
+watch(data, (newData) => {
+    if (!newData) return;
+    event.value = Event.decode(newData.event);
+    clubs.value = newData.clubs.map((c) => Club.decode(c));
+    orgs.value = newData.orgs.map((o) => Organization.decode(o));
+    venues.value = newData.venues.map((v) => Venue.decode(v));
+}, { immediate: true });
+
 onMounted(() => {
     if (session.authStatus !== AUTH_STATUS.authenticated) {
         const analytics = getAnalytics();
         logEvent(analytics, 'guest_user_visit', { page: 'event_detail' });
     }
 });
-
-watchEffect(() => {
-    if (!data.value) return;
-    event.value = Event.decode(data.value.event);
-    clubs.value = data.value.clubs.map((c) => Club.decode(c));
-    orgs.value = data.value.orgs.map((o) => Organization.decode(o));
-    venues.value = data.value.venues.map((v) => Venue.decode(v));
-});
-
 </script>
 
 <style scoped>

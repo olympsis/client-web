@@ -144,7 +144,7 @@ class Organization extends Codable<Organization> {
     }
 }
 
-class OrganizationDao {
+class OrganizationDao extends Codable<OrganizationDao> {
     id: string | undefined;
     name: string | undefined;
     description: string | undefined;
@@ -170,6 +170,7 @@ class OrganizationDao {
         members: MemberDao[] | undefined,
         pinnedPostId: string | undefined
     ) {
+        super();
         this.id = id;
         this.name = name;
         this.description = description;
@@ -183,7 +184,7 @@ class OrganizationDao {
         this.pinnedPostId = pinnedPostId;
     }
 
-    static decode<OrganizationDao>(data: { [key: string]: any }): OrganizationDao {
+    static override decode<OrganizationDao>(data: { [key: string]: any }): OrganizationDao {
         const object = Object();
 
         if (data) {
@@ -224,50 +225,46 @@ class OrganizationDao {
 
         return object as OrganizationDao;
     }
-}
 
-interface OrganizationDao {
-    encode(): { [key: string]: any }
-}
-
-OrganizationDao.prototype.encode = function(): { [key: string]: any } {
-    const data: { [key: string]: any } = {};
-
-    if (this.id) {
-        data['id'] = this.id;
+    override encode(): { [key: string]: any; } {
+        const data: { [key: string]: any; } = {};
+        
+        if (this.id) {
+            data['id'] = this.id;
+        }
+        if (this.name) {
+            data['name'] = this.name;
+        }
+        if (this.description) {
+            data['description'] = this.description;
+        }
+        if (this.sports) {
+            data['sports'] = this.sports;
+        }
+        if (this.city) {
+            data['city'] = this.city;
+        }
+        if (this.state) {
+            data['state'] = this.state;
+        }
+        if (this.country) {
+            data['country'] = this.country;
+        }
+        if (this.logo) {
+            data['logo'] = this.logo;
+        }
+        if (this.banner) {
+            data['banner'] = this.banner;
+        }
+        if (this.members) {
+            data['members'] = this.members.map(member => member.encode());
+        }
+        if (this.pinnedPostId) {
+            data['pinned_post_id'] = this.pinnedPostId;
+        }
+    
+        return data;
     }
-    if (this.name) {
-        data['name'] = this.name;
-    }
-    if (this.description) {
-        data['description'] = this.description;
-    }
-    if (this.sports) {
-        data['sports'] = this.sports;
-    }
-    if (this.city) {
-        data['city'] = this.city;
-    }
-    if (this.state) {
-        data['state'] = this.state;
-    }
-    if (this.country) {
-        data['country'] = this.country;
-    }
-    if (this.logo) {
-        data['logo'] = this.logo;
-    }
-    if (this.banner) {
-        data['banner'] = this.banner;
-    }
-    if (this.members) {
-        data['members'] = this.members.map((member: MemberDao) => member.encode());
-    }
-    if (this.pinnedPostId) {
-        data['pinned_post_id'] = this.pinnedPostId;
-    }
-
-    return data;
 }
 
 export {

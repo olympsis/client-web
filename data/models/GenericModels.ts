@@ -4,16 +4,17 @@ import { Event } from "./EventModels";
 import { UserSnippet } from "./UserModels";
 import { Organization } from "./OrganizationModels";
 import { numberToEventRSVP, type EVENT_RSVP_STATUS, type GROUP_TYPE } from "../Enums";
+import { Codable } from "./Models";
 
 class Model {
     id: string | undefined
 }
 
-class GeoJSON {
+class GeoJSON extends Codable<GeoJSON> {
     type: string | undefined;
     coordinates: number[] | undefined;
 
-    static decode<GeoJSON>(data: { [key: string]: any }): GeoJSON {
+    static override decode<GeoJSON>(data: { [key: string]: any }): GeoJSON {
         const object = Object();
 
         if (data) {
@@ -28,30 +29,26 @@ class GeoJSON {
         Object.setPrototypeOf(object, GeoJSON.prototype);
         return object;
     }
-}
 
-interface GeoJSON {
-    encode(): { [key: string]: any; };
-}
-
-GeoJSON.prototype.encode = function(): { [key: string]: any } {
-    const data: { [key: string]: any } = {};
-
-    if (this.type) {
-        data['type'] = this.type;
+    override encode(): { [key: string]: any } {
+        const data: { [key: string]: any } = {};
+    
+        if (this.type) {
+            data['type'] = this.type;
+        }
+        if (this.coordinates) {
+            data['coordinates'] = this.coordinates;
+        }
+    
+        return data;
     }
-    if (this.coordinates) {
-        data['coordinates'] = this.coordinates;
-    }
-
-    return data;
 }
 
-class Ownership {
+class Ownership extends Codable<Ownership> {
     name: string | undefined;
     type: string | undefined;
 
-    static decode<Ownership>(data: { [key: string]: any }): Ownership {
+    static override decode<Ownership>(data: { [key: string]: any }): Ownership {
         const object = Object();
 
         if (data) {
@@ -65,6 +62,20 @@ class Ownership {
 
         Object.setPrototypeOf(object, Ownership.prototype);
         return object;
+    }
+
+    override encode(): { [key: string]: any } {
+        const data: { [key: string]: any } = {};
+
+        if (this.name) {
+            data['name'] = this.name;
+        }
+
+        if (this.type) {
+            data['type'] = this.type;
+        }
+
+        return data;
     }
 }
 
@@ -321,7 +332,7 @@ interface Comment {
     // Define the properties of Comment here
 }
   
-class Member {
+class Member extends Codable<Member> {
     id: string | undefined;
     role: string | undefined;
     user: UserSnippet | undefined;
@@ -333,13 +344,14 @@ class Member {
         user: UserSnippet | undefined,
         joinedAt: number | undefined
     ){
+        super();
         this.id = id;
         this.role = role;
         this.user = user;
         this.joinedAt = joinedAt;
     }
 
-    static decode<Member>(data: { [key: string]: any }): Member {
+    static override decode<Member>(data: { [key: string]: any }): Member {
         const object = Object();
 
         if (data) {
@@ -359,6 +371,25 @@ class Member {
 
         Object.setPrototypeOf(object, Member.prototype);
         return object;
+    }
+
+    override encode(): { [key: string]: any; } {
+        const data: { [key: string]: any; } = {};
+        
+        if (this.id) {
+            data['id'] = this.id;
+        }
+        if (this.role) {
+            data['role'] = this.role;
+        }
+        if (this.user) {
+            data['user'] = this.user.encode();
+        }
+        if (this.joinedAt) {
+            data['joined_at'] = this.joinedAt;
+        }
+    
+        return data;
     }
 }
 

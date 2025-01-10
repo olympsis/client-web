@@ -1,6 +1,7 @@
 import { Ownership, GeoJSON } from "./GenericModels";
+import { Codable } from "./Models";
 
-class Venue {
+class Venue extends Codable<Venue> {
     id: string | undefined;
     name: string | undefined;
     owner: Ownership | undefined;
@@ -13,7 +14,7 @@ class Venue {
     state: string | undefined;
     country: string | undefined;
 
-    static decode<Venue>(data: { [key: string]: any }): Venue {
+    static override decode<Venue>(data: { [key: string]: any }): Venue {
         const object = Object();
 
         if (data) {
@@ -52,13 +53,59 @@ class Venue {
         Object.setPrototypeOf(object, Venue.prototype);
         return object;
     }
+
+    override encode(): { [key: string]: any } {
+        const data: { [key: string]: any } = {};
+
+        if (this.id) {
+            data['id'] = this.id;
+        }
+
+        if (this.name) {
+            data['name'] = this.name;
+        }
+
+        if (this.owner) {
+            data['owner'] = this.owner.encode();
+        }
+
+        if (this.description) {
+            data['description'] = this.description;
+        }
+
+        if (this.sports) {
+            data['sports'] = this.sports;
+        }
+
+        if (this.images) {
+            data['images'] = this.images;
+        }
+
+        if (this.location) {
+            data['location'] = this.location.encode();
+        }
+
+        if (this.city) {
+            data['city'] = this.city;
+        }
+
+        if (this.state) {
+            data['state'] = this.state;
+        }
+
+        if (this.country) {
+            data['country'] = this.country;
+        }
+
+        return data;
+    }
 }
 
-class VenuesResponse {
+class VenuesResponse extends Codable<VenuesResponse> {
     venues: Venue[] | undefined;
     totalVenues: number | undefined;
 
-    static decode<VenuesResponse>(data: { [key: string]: any }): VenuesResponse {
+    static override decode<VenuesResponse>(data: { [key: string]: any }): VenuesResponse {
         const object = Object();
 
         if (data) {

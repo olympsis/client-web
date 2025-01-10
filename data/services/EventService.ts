@@ -88,6 +88,19 @@ export class EventService {
         throw ('NOT IMPLEMENTED - Failed to get event from server.');
     }
 
+    async getEventAsJSON(id: string): Promise<string> {
+        let headers = new Map<string, string>()
+        const endpoint = new Endpoint(`/v1/events/${id}`);
+        const [status, _headers, body] = await this.http.request(Method.GET, endpoint, undefined, headers);
+        if (status == 200) {
+            if (body) {
+                return JSON.stringify(body);
+            }
+        }
+
+        throw ('NOT IMPLEMENTED - Failed to get event from server.');
+    }
+
     async getNearbyData(latitude: number, longitude: number, radius: number, sports: string): Promise<({ venues: Venue[], events: Event[] })> {
         let token = await getAuth().currentUser?.getIdToken() ?? ""
         

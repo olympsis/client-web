@@ -1,6 +1,6 @@
-import { type Encodable, Decodable } from "./Models";
+import { Codable } from "./Models";
 
-class ChatGroup extends Decodable<ChatGroup> {
+class ChatGroup extends Codable<ChatGroup> {
     id: string;
     type: string;
 
@@ -28,7 +28,7 @@ class ChatGroup extends Decodable<ChatGroup> {
     }
 }
 
-class ChatRoom extends Decodable<ChatRoom> {
+class ChatRoom extends Codable<ChatRoom> {
     id: string;
     group: ChatGroup;
     name: string;
@@ -76,7 +76,7 @@ class ChatRoom extends Decodable<ChatRoom> {
     }
 }
 
-class ChatRoomDTO implements Encodable {
+class ChatRoomDTO extends Codable<ChatRoomDTO> {
     name: string | undefined;
     type: string | undefined;
 
@@ -84,11 +84,12 @@ class ChatRoomDTO implements Encodable {
         name: string | undefined,
         type: string | undefined,
     ){
+        super();
         this.name = name;
         this.type = type;
     }
 
-    encode(): { [key: string]: any } {
+    override encode(): { [key: string]: any } {
         const data: { [key: string]: any } = {};
         
         if (this.name) {
@@ -102,7 +103,7 @@ class ChatRoomDTO implements Encodable {
     };
 }
 
-class ChatRoomsResponse extends Decodable<ChatRoomsResponse> {
+class ChatRoomsResponse extends Codable<ChatRoomsResponse> {
     totalRooms: number;
     rooms: ChatRoom[];
 
@@ -130,7 +131,7 @@ class ChatRoomsResponse extends Decodable<ChatRoomsResponse> {
     }
 }
 
-class ChatMember extends Decodable<ChatMember> {
+class ChatMember extends Codable<ChatMember> {
     id: string;
     uuid: string;
     status: string;
@@ -168,7 +169,7 @@ class ChatMember extends Decodable<ChatMember> {
     }
 }
 
-class ChatMessage extends Decodable<ChatMessage> {
+class ChatMessage extends Codable<ChatMessage> {
     id: string;
     sender: string;
     type: string;
@@ -211,7 +212,7 @@ class ChatMessage extends Decodable<ChatMessage> {
     }
 }
 
-class ChatMessageDTO implements Encodable {
+class ChatMessageDTO extends Codable<ChatMessageDTO> {
     sender: string | undefined;
     type: string | undefined;
     body: string | undefined;
@@ -221,12 +222,13 @@ class ChatMessageDTO implements Encodable {
         type: string | undefined,
         body: string | undefined
     ){
+        super();
         this.sender = sender;
         this.type = type;
         this.body = body;
     }
 
-    encode(): { [key: string]: any } {
+    override encode(): { [key: string]: any } {
         const data: { [key: string]: any } = {};
         
         if (this.sender) {

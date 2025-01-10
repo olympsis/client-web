@@ -26,6 +26,19 @@ export class OrganizationService {
         return undefined;
     }
 
+    async getOrganizationAsJSON(id: string): Promise<string> {
+        const endpoint = new Endpoint(`/v1/organizations/${id}`);
+        const [status, _headers, body] = await this.http.request(Method.GET, endpoint, undefined, undefined);
+
+        if (status == 200) {
+            if (body) {
+                return JSON.stringify(body);
+            }
+        }
+
+        throw (`ERROR NOT IMPLEMENTED YET - STATUS(${status})`);
+    }
+
     async getOrganizations(state: string, country: string) {
         throw('NOT IMPLEMENTED')
     }

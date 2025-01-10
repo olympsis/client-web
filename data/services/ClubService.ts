@@ -13,7 +13,6 @@ export class ClubService {
 
     async getClub(id: string) : Promise<Club | undefined> {
         let headers = new Map<string, string>();
-
         const endpoint = new Endpoint(`/v1/clubs/${id}`);
         const [status, _headers, body] = await this.http.request(Method.GET, endpoint, undefined, headers);
 
@@ -24,6 +23,19 @@ export class ClubService {
         }
 
         return undefined;
+    }
+
+    async getClubAsJSON(id: string): Promise<string> {
+        const endpoint = new Endpoint(`/v1/clubs/${id}`);
+        const [status, _headers, body] = await this.http.request(Method.GET, endpoint, undefined, undefined);
+
+        if (status == 200) {
+            if (body) {
+                JSON.stringify(body);
+            }
+        }
+
+        throw (`ERROR NOT IMPLEMENTED YET - STATUS(${status})`);
     }
 
     async getClubs(state: string, country: string) : Promise<ClubsResponse | undefined> {

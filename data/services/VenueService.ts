@@ -46,5 +46,18 @@ export class VenueService {
 
         return undefined;
     }
+
+    async getVenueAsJSON(id: string) : Promise<string> {
+        const endpoint = new Endpoint(`/v1/venues/${id}`);
+
+        const [status, _headers, body] = await this.http.request(Method.GET, endpoint, undefined, undefined);
+        if (status === 200) {
+            if (body) {
+                return JSON.stringify(body);
+            }
+        }
+
+        throw (`ERROR NOT IMPLEMENTED YET - STATUS(${status})`);
+    }
 }
 

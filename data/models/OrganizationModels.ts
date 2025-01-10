@@ -1,7 +1,8 @@
 import { ClubDao } from './ClubModels';
 import { Member, MemberDao } from './GenericModels';
+import { Codable } from './Models';
 
-class Organization {
+class Organization extends Codable<Organization> {
     id: string | undefined;
     name: string | undefined;
     description: string | undefined;
@@ -31,6 +32,7 @@ class Organization {
         children?: ClubDao[],
         createdAt?: number
     ) {
+        super();
         this.id = id;
         this.name = name;
         this.description = description;
@@ -46,7 +48,7 @@ class Organization {
         this.createdAt = createdAt;
     }
 
-    static decode<Organization>(data: { [key: string]: any }): Organization {
+    static override decode<Organization>(data: { [key: string]: any }): Organization {
         const object = Object();
 
         if (data) {
@@ -93,6 +95,52 @@ class Organization {
 
         Object.setPrototypeOf(object, Organization.prototype);
         return object;
+    }
+
+    override encode(): { [key: string]: any; } {
+        const data: { [key: string]: any; } = {};
+        
+        if (this.id) {
+            data['id'] = this.id;
+        }
+        if (this.name) {
+            data['name'] = this.name;
+        }
+        if (this.description) {
+            data['description'] = this.description;
+        }
+        if (this.sports) {
+            data['sports'] = this.sports;
+        }
+        if (this.city) {
+            data['city'] = this.city;
+        }
+        if (this.state) {
+            data['state'] = this.state;
+        }
+        if (this.country) {
+            data['country'] = this.country;
+        }
+        if (this.logo) {
+            data['logo'] = this.logo;
+        }
+        if (this.banner) {
+            data['banner'] = this.banner;
+        }
+        if (this.members) {
+            data['members'] = this.members.map(member => member.encode());
+        }
+        if (this.pinnedPostId) {
+            data['pinned_post_id'] = this.pinnedPostId;
+        }
+        if (this.children) {
+            data['children'] = this.children.map(child => child.encode());
+        }
+        if (this.createdAt) {
+            data['created_at'] = this.createdAt;
+        }
+    
+        return data;
     }
 }
 

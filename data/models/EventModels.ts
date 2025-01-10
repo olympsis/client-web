@@ -1,4 +1,5 @@
 import { Club } from "./ClubModels";
+import { Codable } from "./Models";
 import { Venue } from "./VenueModels";
 import { UserSnippet } from "./UserModels";  
 import { Organization } from "./OrganizationModels";
@@ -15,7 +16,7 @@ import {
     numberToEventVisibility, 
 } from "../Enums";
   
-class Event {
+class Event extends Codable<Event> {
     id: string;
     type: EVENT_TYPE;
     poster: UserSnippet | undefined;
@@ -55,6 +56,7 @@ class Event {
         externalLink: string | undefined,
         createdAt: number,
     ){
+        super();
         this.id = id;
         this.type = type;
         this.poster = poster;
@@ -75,7 +77,7 @@ class Event {
         this.createdAt = createdAt;
     }
   
-    static decode<Event>(data: { [key: string]: any }): Event {
+    static override decode<Event>(data: { [key: string]: any }): Event {
         const object = Object();
 
         if (data) {
@@ -103,6 +105,61 @@ class Event {
 
         Object.setPrototypeOf(object, Event.prototype);
         return object;
+    }
+
+    override encode(): { [key: string]: any; } {
+        const data: { [key: string]: any } = {};
+
+        if (this.type) {
+            data['type'] = eventTypeToNumber(this.type);
+        }
+        if (this.poster) {
+            data['poster'] = this.poster.encode();
+        }
+        if (this.organizers) {
+            data['organizers'] = this.organizers.map((org: Organizer) => org.encode());
+        }
+        if (this.venues) {
+            data['venues'] = this.venues.map((v) => v.encode());
+        }
+        if (this.imageURL) {
+            data['image_url'] = this.imageURL;
+        }
+        if (this.title) {
+            data['title'] = this.title;
+        }
+        if (this.body) {
+            data['body'] = this.body;
+        }
+        if (this.sports) {
+            data['sports'] = this.sports.map((s) => s.valueOf());
+        }
+        if (this.level !== undefined) {
+            data['level'] = eventSkillLevelToNumber(this.level);
+        }
+        if (this.startTime) {
+            data['start_time'] = this.startTime;
+        }
+        if (this.stopTime) {
+            data['stop_time'] = this.stopTime;
+        }
+        if (this.minParticipants) {
+            data['min_participants'] = this.minParticipants;
+        }
+        if (this.maxParticipants) {
+            data['max_participants'] = this.maxParticipants;
+        }
+        if (this.visibility) {
+            data['visibility'] = eventVisibilityToNumber(this.visibility);
+        }
+        if (this.externalLink) {
+            data['external_link'] = this.externalLink;
+        }
+        if (this.createdAt) {
+            data['created_at'] = this.createdAt;
+        }
+
+        return data;
     }
 
     public timeToString(): string {

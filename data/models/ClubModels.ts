@@ -1,8 +1,9 @@
 import { UserData } from './UserModels';
 import { Member, MemberDao } from './GenericModels';
 import { OrganizationDao } from './OrganizationModels';
+import { Codable } from './Models';
 
-class Club {
+class Club extends Codable<Club> {
     id: string | undefined;
     parent: OrganizationDao | undefined;
     name: string | undefined;
@@ -38,6 +39,7 @@ class Club {
         pinnedPostId?: string,
         createdAt?: number
     ) {
+        super();
         this.id = id;
         this.parent = parent;
         this.name = name;
@@ -56,7 +58,7 @@ class Club {
         this.createdAt = createdAt;
     }
 
-    static decode<Club>(data: { [key: string]: any }): Club {
+    static override decode<Club>(data: { [key: string]: any }): Club {
         const object = Object();
 
         if (data) {
@@ -113,6 +115,61 @@ class Club {
         Object.setPrototypeOf(object, Club.prototype);
 
         return object;
+    }
+
+    override encode(): { [key: string]: any; } {
+        const data: { [key: string]: any; } = {};
+    
+        if (this.id) {
+            data['id'] = this.id;
+        }
+        if (this.parent) {
+            data['parent'] = this.parent.encode();
+        }
+        if (this.name) {
+            data['name'] = this.name;
+        }
+        if (this.description) {
+            data['description'] = this.description;
+        }
+        if (this.sports) {
+            data['sports'] = this.sports;
+        }
+        if (this.city) {
+            data['city'] = this.city;
+        }
+        if (this.state) {
+            data['state'] = this.state;
+        }
+        if (this.country) {
+            data['country'] = this.country;
+        }
+        if (this.logo) {
+            data['logo'] = this.logo;
+        }
+        if (this.banner) {
+            data['banner'] = this.banner;
+        }
+        if (this.visibility) {
+            data['visibility'] = this.visibility;
+        }
+        if (this.members) {
+            data['members'] = this.members.map(member => member.encode());
+        }
+        if (this.tags) {
+            data['tags'] = this.tags;
+        }
+        if (this.rules) {
+            data['rules'] = this.rules;
+        }
+        if (this.pinnedPostId) {
+            data['pinned_post_id'] = this.pinnedPostId;
+        }
+        if (this.createdAt) {
+            data['created_at'] = this.createdAt;
+        }
+    
+        return data;
     }
 }
 

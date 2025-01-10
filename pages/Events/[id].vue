@@ -837,12 +837,12 @@ async function loadEventData(id: string) {
             })
         });
 
-    event.value = _event;
-    clubs.value = clubsArr;
-    orgs.value = orgsArr;
-    venues.value = venuesArr;
-
-    // return { event: _event, clubs: clubsArr, orgs: orgsArr, venues: venuesArr };
+    return { 
+        event: _event.encode(), 
+        clubs: clubsArr.map((c) => c.encode()), 
+        orgs: orgsArr.map((o) => o.encode()), 
+        venues: venuesArr.map((o) => o.encode()) 
+    };
 }
 
 const config = useRuntimeConfig();
@@ -880,20 +880,19 @@ const { data } = await useAsyncData(
     }
 );
 
-// watchEffect(() => {
-//     if (data.value) {
-//         event.value = data.value.event;
-//         clubs.value = data.value.clubs;
-//         orgs.value = data.value.orgs;
-//         venues.value = data.value.venues;
-//     }
-// });
-
 onMounted(() => {
     if (session.authStatus !== AUTH_STATUS.authenticated) {
         const analytics = getAnalytics();
         logEvent(analytics, 'guest_user_visit', { page: 'event_detail' });
     }
+});
+
+watchEffect(() => {
+    if (!data.value) return;
+    event.value = Event.decode(data.value.event);
+    clubs.value = data.value.clubs.map((c) => Club.decode(c));
+    orgs.value = data.value.orgs.map((o) => Organization.decode(o));
+    venues.value = data.value.venues.map((v) => Venue.decode(v));
 });
 
 </script>

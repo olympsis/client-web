@@ -1,5 +1,6 @@
 import { Club } from './ClubModels';
 import { Invitation } from './GenericModels';
+import { Codable } from './Models';
 import { Organization } from './OrganizationModels';
 
 class UserData {
@@ -149,7 +150,7 @@ class UserDTO {
     }
 }
 
-class UserSnippet {
+class UserSnippet extends Codable<UserSnippet> {
     uuid: string | undefined;
     username: string | undefined;
     imageURL: string | undefined;
@@ -159,12 +160,13 @@ class UserSnippet {
         username: string | undefined,
         imageURL: string | undefined
     ){
+        super();
         this.uuid = uuid;
         this.username = username;
         this.imageURL = imageURL;
     }
 
-    static decode<UserSnippet>(data: { [key: string]: any }): UserSnippet {
+    static override decode<UserSnippet>(data: { [key: string]: any }): UserSnippet {
         const object = Object()
         
         if (data) {
@@ -183,6 +185,22 @@ class UserSnippet {
 
         Object.setPrototypeOf(object, UserSnippet.prototype);
         return object
+    }
+
+    override encode(): { [key: string]: any; } {
+        let data: { [key: string]: any } = {}
+
+        data['uuid'] = this.uuid;
+        
+        if (this.username) {
+            data['username'] = this.username;
+        }
+        
+        if (this.imageURL) {
+            data['image_url'] = this.imageURL;
+        }
+
+        return data;
     }
 }
 

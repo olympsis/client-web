@@ -33,7 +33,7 @@ function handleHomeRoutes(status: any, to: RouteLocationNormalizedGeneric) {
 }
 
 function handleGroupsRoutes(sessionStore: any, to: RouteLocationNormalizedGeneric) {
-	if (sessionStore.groups.length == 0 && !to.fullPath.match(/\/groups\/search\/(\d+)/)) {
+	if (to.fullPath !== '/groups/search' && sessionStore.groups.length == 0 && !to.fullPath.match(/\/groups\/search\/(\d+)/)) {
 		return navigateTo('/groups/search');
 	}
 }

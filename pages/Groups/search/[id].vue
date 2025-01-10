@@ -225,7 +225,7 @@ watchEffect(() => {
     justify-content: space-around;
 
     #left {
-        width: 30rem;
+        max-width: 30rem;
 
         #header {
             margin: 1rem 0rem;
@@ -312,6 +312,7 @@ watchEffect(() => {
                 display: flex;
                 align-items: center;
                 border-radius: 10px;
+                margin-right: 1.5rem;
                 justify-content: center;
                 color: var(--olympsis-gray);
                 background-color: var(--secondary-background-color);
@@ -326,6 +327,20 @@ watchEffect(() => {
         align-items: center;
         flex-direction: column;
         justify-content: unset;
+    }
+}
+
+@media (max-width: 500px) {
+    #group-detail {
+        #left {
+            max-width: calc(100vw - 1rem);
+        }
+
+        #right {
+            max-width: calc(100vw - 1rem);
+
+            margin-bottom: 10rem;
+        }
     }
 }
 </style>

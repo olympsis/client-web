@@ -57,7 +57,7 @@
                 <h2>Location</h2>
                 <p>{{ groupLocation }}</p>
                 <div id="map-view" v-if="!mapURL">
-                    Failed to load map
+                    {{ mapStateString }}
                 </div>
                 <img id="map-view" v-else :src="mapURL">
             </div>
@@ -102,6 +102,8 @@ const modelStore = useModelStore();
 
 const club = ref<Club | undefined>(undefined);
 const mapURL = ref<string | undefined> (undefined);
+
+const mapState = ref<VIEW_STATE>(VIEW_STATE.PENDING);
 const viewState = ref<VIEW_STATE>(VIEW_STATE.PENDING);
 const actionState = ref<VIEW_STATE>(VIEW_STATE.PENDING);
 const authModal = useTemplateRef<HTMLDialogElement>('auth-modal');
@@ -112,6 +114,15 @@ const authModal = useTemplateRef<HTMLDialogElement>('auth-modal');
 
 const isAuthenticated = computed<boolean>(() => {
     return session.authStatus === AUTH_STATUS.authenticated;
+});
+
+const mapStateString = computed<string>(() => {
+    switch (mapState.value) {
+        case VIEW_STATE.FAILURE:
+            return 'Failed to load map';
+        default:
+            return 'Loading Map..';
+        }
 });
 
 const groupID = computed<string>(() => {
@@ -157,6 +168,10 @@ const groupMembersString = computed<string>(() => {
     if (!club.value?.members) return 'Unknown';
     return club.value.members.length > 1 ? `${club.value.members.length} members` : `${club.value.members.length} member`;
 });
+
+/**
+ * FUNCTIONS
+ */
 
 function showAuthModal() {
     if (authModal.value) {
@@ -268,9 +283,15 @@ onMounted(() => {
     if (mapURL.value) return;
     const city = club.value?.city ?? '';
     const state = club.value?.state ?? '';
+
+    mapState.value = VIEW_STATE.LOADING;
     getMapSnapshot([city, state])
         .then((blob) => {
             mapURL.value = URL.createObjectURL(blob);
+            mapState.value = VIEW_STATE.SUCCESS;
+        })
+        .catch(() => {
+            mapState.value = VIEW_STATE.FAILURE;
         });
 });
 
@@ -369,6 +390,7 @@ onMounted(() => {
                 width: 95%;
                 display: flex;
                 margin: 0 auto;
+                min-height: 19rem;
                 align-items: center;
                 border-radius: 10px;
                 justify-content: center;

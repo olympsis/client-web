@@ -191,7 +191,7 @@ function hideAuthModal() {
 
 function handleGroupSharing() {
     navigator.clipboard.writeText(window.location.href);
-    toast.add({ severity: 'secondary', summary: 'Link Copied', detail: 'You\'ve copied the link to this event', life: 3000 });
+    toast.add({ severity: 'secondary', summary: 'Link Copied', detail: 'You\'ve copied the link to this group!', life: 3000 });
 }
 
 function apply() {

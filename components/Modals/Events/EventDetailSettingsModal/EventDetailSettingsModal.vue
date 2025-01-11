@@ -16,13 +16,10 @@
             <ReportMenuButton text="Report event"/>
             <TrashMenuButton v-if="eventState !== EVENT_STATE.COMPLETED && isAuthorized" text="Delete event" :is-destructive="true" v-bind:state="deleteButtonState"/>
         </div>
-
-        <Toast/>
     </div>
 </template>
 
 <script setup lang="ts">
-import Toast from 'primevue/toast';
 import { computed, ref } from 'vue';
 import { VIEW_STATE } from '@/data/Enums';
 import { EVENT_STATE } from '@/data/Enums';

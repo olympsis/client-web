@@ -988,18 +988,6 @@ onMounted(() => {
             #header {
                 margin: 1rem 0rem;
 
-                .button {
-                    all: unset;
-                    cursor: pointer;
-                    padding: 0.5rem;
-                    border-radius: 10px;
-                    background-color: var(--secondary-background-color);
-
-                    &:hover {
-                        transform: scale(1.1);
-                    }
-                }
-
                 .centered {
                     display: flex;
                     align-items: center;
@@ -1152,18 +1140,6 @@ onMounted(() => {
 
                     h1 {
                         margin: auto;
-                    }
-
-                    .button {
-                        all: unset;
-                        cursor: pointer;
-                        padding: 0.5rem;
-                        border-radius: 10px;
-                        background-color: var(--secondary-background-color);
-
-                        &:hover {
-                            transform: scale(1.1);
-                        }
                     }
 
                     .centered {
@@ -1351,6 +1327,19 @@ onMounted(() => {
 
 h1 {
     color: var(--primary-label-color);
+}
+
+.button {
+    all: unset;
+    cursor: pointer;
+    padding: 0.5rem;
+    height: fit-content;
+    border-radius: 10px;
+    background-color: var(--secondary-background-color);
+
+    &:hover {
+        transform: scale(1.1);
+    }
 }
 
 .difficulty {

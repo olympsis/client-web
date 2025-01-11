@@ -10,14 +10,6 @@
         <!-- Next Event Card -->
         <NextEventCard :event="nextEvent" class="event" @create-event="handleShowNewEventModal"/>
 
-        <!-- Chats Card -->
-        <div class="chats">
-            <h2>Chats</h2>
-            <div class="list">
-
-            </div>
-        </div>
-
         <!-- Navigation Card -->
         <NavigationCard class="nav-card" :state="state"/>
 
@@ -91,8 +83,6 @@
         <dialog id="new-event-modal" ref="new-event-modal" class="dialog">
             <NewEventCard @close="handleHideNewEventModal"/>
         </dialog>
-
-        <Toast position="top-right" group="tr" />
     </main>
 </template>
 
@@ -106,8 +96,6 @@ import { useSessionStore } from '@/stores/session-store';
 import { useGroupsViewModel } from '@/stores/groups-view-model';
 
 import Menu from 'primevue/menu';
-import Toast from 'primevue/toast';
-
 import PostFeed from '@/components/Posts/PostFeed/PostFeed.vue';
 import GroupIcon from '@/components/Groups/GroupIcon/GroupIcon.vue';
 import NewPostView from '@/components/Posts/NewPostView/NewPostView.vue';
@@ -215,8 +203,9 @@ function handleHideNewEventModal() {
     }
 }
 
-function handleGroupSharing() {
-    navigator.clipboard.writeText(`https://olympsis.com/groups/search/${selectedGroup.value?.club?.id ?? selectedGroup.value?.organization?.id}`);
+async function handleGroupSharing() {
+    const groupID = selectedGroup.value?.club?.id ?? selectedGroup.value?.organization?.id ?? '';
+    await navigator.clipboard.writeText(`https://olympsis.com/groups/search/${groupID}`);
     toast.add({ severity: 'secondary', summary: 'Link Copied', detail: 'You\'ve copied the link to this group!', life: 3000 });
 }
 

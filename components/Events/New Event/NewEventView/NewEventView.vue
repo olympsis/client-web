@@ -14,9 +14,9 @@
             <!-- Config -->
             <div id="event-type-config">
                 <EventTypePicker v-model:model-value="eventType"/>
-                <div class="spacer"/>
+                
                 <EventVisibilityPicker v-model:model-value="eventVisibility"/>
-                <div class="spacer"/>
+                
                 <EventSkillLevelPicker v-model:model-value="eventSkillLevel"/>
             </div>
 
@@ -203,7 +203,6 @@ const eventGroups: Ref<GroupSelection[]> = ref([]);
 const eventStartDate: Ref<Date> = ref(new Date());
 const eventEndDate: Ref<Date> = ref(new Date(eventStartDate.value.getTime() + (60 * 60 * 1000)));
  
-
 function createNewEvent() {
     state.value = VIEW_STATE.LOADING;
 
@@ -290,9 +289,11 @@ function createNewEvent() {
     }
 
     #event-type-config {
-        display: flex;
         margin: 1rem;
-        
+        display: flex;
+        max-width: 22rem;
+        justify-content: space-between;
+
         .spacer {
             margin: 0rem 0.5rem;
         }

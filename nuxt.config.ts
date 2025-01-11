@@ -1,4 +1,5 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
+import Aura from '@primevue/themes/aura';
+
 export default defineNuxtConfig({
 	compatibilityDate: '2025-01-01',
 	devtools: { enabled: true },
@@ -77,5 +78,13 @@ export default defineNuxtConfig({
 	robots: {
 		blockAiBots: true,
 		blockNonSeoBots: true
-	}
+	},
+
+	primevue: {
+        options: {
+            theme: {
+                preset: Aura
+            }
+        }
+    }
 });

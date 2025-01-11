@@ -12,7 +12,6 @@ export default defineNuxtRouteMiddleware((to, from) => {
     // Check for auth on the client side
     if (import.meta.client) {
         const session = useSessionStore();
-        session.checkAuthorizationStatus();
         
         if (session.authStatus === AUTH_STATUS.unknown) {
             session.checkAuthorizationStatus();

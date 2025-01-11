@@ -4,6 +4,7 @@
         "applinks",
         "appspot",
         "autodocs",
+        "dismissable",
         "firebaseapp",
         "firestore",
         "jsrsasign",

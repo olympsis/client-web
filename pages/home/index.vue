@@ -5,15 +5,33 @@
             <h1>Olympsis</h1>
 
             <div id="trailing">
-                <button @click="">
-                    <img class="notifications" src="@/assets/icons/bell/bell.white.svg"/>
+                <button id="notifications-button" @click="toggleNotificationsPopover">
+                    <img class="notifications" alt="notifications button image" src="@/assets/icons/bell/bell.white.svg"/>
                 </button>
             </div>
         </div>
+
         <WelcomeCard :name="name" :state="state" class="welcome-card"/>
         <FieldListPeek :venues="venues" :state="state" class="fields"/>
         <NavigationCard :state="state" class="nav-card" />
         <AnnouncementsGallery class="announcements"/>
+
+        <Popover 
+            ref="notifications-popover" 
+            id="notifications-popover" 
+            :dismissable="true"
+            :pt="{
+                root: () => ({
+                    style: {
+                        
+                    }
+                })
+            }"
+        >
+            <div id="notifications">
+                <p>No Notifications</p>
+            </div>
+        </Popover>
     </main>
 </template>
 
@@ -25,16 +43,18 @@ import { Venue } from '@/data/models/VenueModels';
 import { useModelStore } from '@/stores/model-store';
 import { useSessionStore } from '@/stores/session-store';
 
+import Popover from 'primevue/popover';
 import WelcomeCard from '@/components/Home/WelcomeCard/WelcomeCard.vue';
 import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
 import NavigationCard from '@/components/NavigationCard/NavigationCard.vue';
 import FieldListPeek from '@/components/Venues/VenueListPeek/VenueListPeek.vue';
 import AnnouncementsGallery from '@/components/Home/AnnouncementsGallery/AnnouncementsGallery.vue';
 
-
 const router = useRouter();
 const modelStore = useModelStore();
 const sessionStore = useSessionStore();
+
+const notificationsPopoverRef = useTemplateRef('notifications-popover');
 
 const state = computed<VIEW_STATE>(() => {
     return sessionStore.loadingState;
@@ -51,7 +71,11 @@ const name = computed<string>(() => {
         return ` ${user.firstName}`
     }
     return ''
-})
+});
+
+function toggleNotificationsPopover(event: any) {
+    notificationsPopoverRef.value?.toggle(event);
+}
 
 useSeoMeta({
     title: 'Olympsis',
@@ -194,5 +218,17 @@ useSeoMeta({
             margin-bottom: unset;
         }
     }
+}
+
+#notifications {
+    width: 20rem;
+    display: flex;
+    padding: 1rem;
+    min-height: 25rem;
+    border-radius: 10px;
+    align-items: center;
+    justify-content: center;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+    background-color: var(--secondary-background-color);
 }
 </style>

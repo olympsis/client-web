@@ -100,6 +100,7 @@ export class LocationManager {
      */
     public async listenToLocationUpdates() {
         const store = useModelStore();
+		const config = useRuntimeConfig();
         const session = useSessionStore();
 
         if (navigator.geolocation) {
@@ -142,11 +143,12 @@ export class LocationManager {
 							hasLocation: hasPermissions === 'granted' || hasPermissions === 'prompt'
 						});
 					}
-
+					if (config.public.MODE !== 'dev') return;
                     console.log(
                       `LOCATION SERVICES: (UPDATE) \n long: ${latitude} \n lat: ${longitude} \n acc: ${accuracy} meters`
                     );
                   } catch (error: any) {
+						if (config.public.MODE !== 'dev') return;
                         switch (error.code) {
                             case 1:
                                 console.log('LOCATION SERVICES: Unable to get location. Permission denied.');
@@ -167,10 +169,12 @@ export class LocationManager {
                         });
                 }
             } else {
+				if (config.public.MODE !== 'dev') return;
                 console.log('LOCATION SERVICES: Unable to get location. Permission denied.');
             }
         } else {
-          console.error("LOCATION SERVICES: Geolocation is not supported by this browser.");
+			if (config.public.MODE !== 'dev') return;
+          	console.error("LOCATION SERVICES: Geolocation is not supported by this browser.");
         }
     }
 
@@ -211,8 +215,10 @@ export class LocationManager {
 			);
 			this.lastKnownLocation = data;
 		} catch (error) {
+			const config = useRuntimeConfig();
 			// If we fail to get location then we fall back on generic location
 			this.lastKnownLocation = this.genericFallBackLocation;
+			if (config.public.MODE !== 'dev') return;
 			console.debug('Failed to reverse geocode location. Error: ' + error)
 		}
     }

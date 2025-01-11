@@ -17,6 +17,8 @@ export default defineNuxtConfig({
 	runtimeConfig: {
 					
 		public: {
+			MODE: process.env.mode ?? 'dev',
+			
 			API: process.env.API ?? '',
 
 			APP_ID: process.env.APP_ID ?? '',

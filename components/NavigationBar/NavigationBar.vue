@@ -1,50 +1,50 @@
 <template>
     <header id="navigation-bar">
-        <RouterLink to="/home" id="logo"/>
+        <NuxtLink to="/home" id="logo"/>
        
         <div id="web-routes" class="routes">
-            <RouterLink to="/home" activeClass="route-selected" class="route">
+            <NuxtLink to="/home" activeClass="route-selected" class="route">
                 <div class="home"/>
-            </RouterLink>
+            </NuxtLink>
 
-            <RouterLink to="/groups" activeClass="route-selected" class="route">
+            <NuxtLink to="/groups" activeClass="route-selected" class="route">
                 <div class="group" />
-            </RouterLink>
+            </NuxtLink>
 
-            <RouterLink to="/events" activeClass="route-selected" class="route">
+            <NuxtLink to="/events" activeClass="route-selected" class="route">
                 <div class="events" />
-            </RouterLink>
+            </NuxtLink>
 
-            <!-- <RouterLink to="/rooms" activeClass="route-selected" class="route">
+            <!-- <NuxtLink to="/rooms" activeClass="route-selected" class="route">
                 <div class="chats" />
-            </RouterLink> -->
+            </NuxtLink> -->
         </div>
 
         <div id="mobile-routes" class="routes">
-            <RouterLink to="/home" activeClass="route-selected" class="route">
+            <NuxtLink to="/home" activeClass="route-selected" class="route">
                 <div class="home"/>
-            </RouterLink>
+            </NuxtLink>
 
-            <RouterLink to="/groups" activeClass="route-selected" class="route">
+            <NuxtLink to="/groups" activeClass="route-selected" class="route">
                 <div class="group" />
-            </RouterLink>
+            </NuxtLink>
 
-            <RouterLink to="/events" activeClass="route-selected" class="route">
+            <NuxtLink to="/events" activeClass="route-selected" class="route">
                 <div class="events" />
-            </RouterLink>
+            </NuxtLink>
 
-            <!-- <RouterLink to="/rooms" activeClass="route-selected" class="route">
+            <!-- <NuxtLink to="/rooms" activeClass="route-selected" class="route">
                 <div class="chats" />
-            </RouterLink> -->
+            </NuxtLink> -->
 
-            <RouterLink to="/profile" class="profile">
+            <NuxtLink to="/profile" class="profile">
                 <ProfileButton :imageURL="userImageURL"/>
-            </RouterLink>
+            </NuxtLink>
         </div>
 
-        <RouterLink id="web-profile" to="/profile" class="profile">
+        <NuxtLink id="web-profile" to="/profile" class="profile">
             <ProfileButton :imageURL="userImageURL"/>
-        </RouterLink>
+        </NuxtLink>
     </header>
 </template>
 

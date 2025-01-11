@@ -75,6 +75,13 @@ async function fetchApplications() {
 
 fetchApplications();
 
+useSeoMeta({
+    title: () => 'Group Applications | Olympsis',
+    ogTitle: () => 'Group Applications | Olympsis',
+    description: 'Join groups around the sports you love!',
+    ogDescription: 'Join groups around the sports you love'
+});
+
 </script>
 
 <style scoped>

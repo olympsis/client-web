@@ -15,9 +15,9 @@
                 <div class="events" />
             </RouterLink>
 
-            <RouterLink to="/rooms" activeClass="route-selected" class="route">
+            <!-- <RouterLink to="/rooms" activeClass="route-selected" class="route">
                 <div class="chats" />
-            </RouterLink>
+            </RouterLink> -->
         </div>
 
         <div id="mobile-routes" class="routes">
@@ -33,9 +33,9 @@
                 <div class="events" />
             </RouterLink>
 
-            <RouterLink to="/rooms" activeClass="route-selected" class="route">
+            <!-- <RouterLink to="/rooms" activeClass="route-selected" class="route">
                 <div class="chats" />
-            </RouterLink>
+            </RouterLink> -->
 
             <RouterLink to="/profile" class="profile">
                 <ProfileButton :imageURL="userImageURL"/>

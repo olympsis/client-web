@@ -89,11 +89,6 @@ import NewGroupCard from '@/components/Groups/New Group/NewGroupCard/NewGroupCar
 import ClubListCardTemplate from '@/components/Groups/Clubs/ClubListCardTemplate/ClubListCardTemplate.vue';
 
 
-useHead({
-    title: 'Groups | Olympsis',
-    meta: []
-});
-
 const router = useRouter();
 const modelStore = useModelStore();
 const sessionStore = useSessionStore();
@@ -191,6 +186,13 @@ function handleCloseNewGroupDialog(event: { newGroup: GroupSelection }) {
         console.error('Failed to find reference to new group dialog html component.')
     }
 }
+
+useSeoMeta({
+    title: () => 'Groups| Olympsis',
+    ogTitle: () => 'Groups | Olympsis',
+    description: 'Join groups around the sports you love!',
+    ogDescription: 'Join groups around the sports you love'
+});
 
 </script>
 

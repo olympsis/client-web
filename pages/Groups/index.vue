@@ -189,9 +189,9 @@ const members = computed(() => {
     return (selectedGroup.value?.club?.members ?? selectedGroup.value?.organization?.members) ?? [];
 });
 
-const groupName = computed(() => {
+const groupName = computed<string>(() => {
     const group = sessionStore.selectedGroup?.club ?? sessionStore.selectedGroup?.organization;
-    return group?.name;
+    return group?.name ?? 'Group';
 });
 
 function handleSelectedGroupChanged(event: any) {
@@ -225,9 +225,11 @@ function handleNewPost(event: any) {
     postCardModalRef.value?.close();
 }
 
-useHead({
-    title: `${selectedGroup.value?.club?.name ?? selectedGroup.value?.organization?.name} | Olympsis`,
-    meta: []
+useSeoMeta({
+    title: () => `${groupName.value} | Olympsis`,
+    ogTitle: () => `${groupName.value} | Olympsis`,
+    description: 'Join groups around the sports you love!',
+    ogDescription: 'Join groups around the sports you love'
 });
 
 </script>

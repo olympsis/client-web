@@ -39,11 +39,6 @@ import UserIcon from '@/components/UserIcon/UserIcon.vue';
 import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
 import NavigationCard from '@/components/NavigationCard/NavigationCard.vue';
 
-useHead({
-    title: 'Profile | Olympsis',
-    meta: []
-});
-
 const sessionStore = useSessionStore();
 
 const user = computed(() => {
@@ -64,6 +59,13 @@ function handleLogout() {
 function handleDelete() {
     sessionStore.deleteAccount();
 }
+
+useSeoMeta({
+    title: () => 'Profile | Olympsis',
+    ogTitle: () => 'Profile | Olympsis',
+    description: 'Join groups around the sports you love!',
+    ogDescription: 'Join groups around the sports you love'
+});
 
 </script>
 
@@ -252,10 +254,6 @@ function handleDelete() {
                 width: 22rem;
                 height: 2.5rem;
             }
-        }
-
-        .nav-card {
-            
         }
 
         #navigation-card{

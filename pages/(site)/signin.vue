@@ -44,7 +44,7 @@ async function handleSignInWithApple() {
 			session.checkAuthorizationStatus();
 			const handler = session.$subscribe((_, state) => {
 				handler();
-				navigateTo('/home');
+				navigateTo('/groups/search');
 			});
 		}
 	}
@@ -59,7 +59,7 @@ async function handleSignInWithGoogle() {
 			session.checkAuthorizationStatus();
 			const handler = session.$subscribe((_, state) => {
 				handler();
-				navigateTo('/home');
+				navigateTo('/groups/search');
 			});
 		}
 	}
@@ -81,11 +81,15 @@ async function handleAuthCompletion(event: any) {
   }
 }
 
+const config = useRuntimeConfig();
 useSeoMeta({
     title: 'Olympsis',
     ogTitle: 'Olympsis',
     description: 'Join Olympsis to find sports events around you!',
-    ogDescription: 'Join Olympsis to find sports events around you!'
+    ogDescription: 'Join Olympsis to find sports events around you!',
+	appleItunesApp: {
+        appId: config.public.APP_ID
+    }
 });
 
 </script>

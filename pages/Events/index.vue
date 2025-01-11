@@ -229,6 +229,13 @@ function retryFetchEvents() {
         });
 }
 
+useSeoMeta({
+    title: 'Events | Olympsis',
+    ogTitle: 'Events | Olympsis',
+    description: 'Find sports events near you!',
+    ogDescription: 'Find sports events near you!'
+});
+
 </script>
 
 <style scoped>

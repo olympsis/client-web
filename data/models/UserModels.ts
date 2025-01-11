@@ -3,7 +3,7 @@ import { Invitation } from './GenericModels';
 import { Codable } from './Models';
 import { Organization } from './OrganizationModels';
 
-class UserData {
+class UserData extends Codable<UserData> {
     uuid: string | undefined;
     username: string | undefined;
     firstName: string | undefined;
@@ -17,7 +17,7 @@ class UserData {
     sports: string[] | undefined;
     deviceToken: string | undefined;
     
-    static decode<UserData>(data: { [key: string]: any }): UserData {
+    static override decode<UserData>(data: { [key: string]: any }): UserData {
         const object = Object();
 
         if (data) {

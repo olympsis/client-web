@@ -319,6 +319,13 @@ function handleLeaveGroup() {
     sessionStore.removeGroup(selectedGroup.value?.id ?? '');
 }
 
+useSeoMeta({
+    title: () => 'Group Settings | Olympsis',
+    ogTitle: () => 'Group Settings | Olympsis',
+    description: 'Join groups around the sports you love!',
+    ogDescription: 'Join groups around the sports you love'
+});
+
 </script>
 
 <style scoped>

@@ -29,6 +29,13 @@ import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
 const router = useRouter();
 const reports: Ref<any[]> = ref([]);
 
+useSeoMeta({
+    title: () => 'Group Reports | Olympsis',
+    ogTitle: () => 'Group Reports | Olympsis',
+    description: 'Join groups around the sports you love!',
+    ogDescription: 'Join groups around the sports you love'
+});
+
 </script>
 
 <style scoped>

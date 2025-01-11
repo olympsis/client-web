@@ -4,7 +4,7 @@
     </div>
 
     <!-- Popup -->
-    <OverlayPanel
+    <Popover
         ref="op" 
         id="event-organizers-popup" 
         :dismissable="true"
@@ -44,16 +44,16 @@
                 {{ getGroupName(group) }}
             </div>
         </ScrollPanel>
-    </OverlayPanel>
+    </Popover>
 </template>
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import type { ComputedRef } from 'vue';
 import { GROUP_TYPE } from '~/data/Enums';
+import Popover from 'primevue/popover';
 import ScrollPanel from 'primevue/scrollpanel';
 import { Club } from '~/data/models/ClubModels';
-import OverlayPanel from 'primevue/overlaypanel';
 import { generateImageURL } from '~/utils/Image';
 import { useSessionStore } from '~/stores/session-store';
 import { GroupSelection } from '~/data/models/GenericModels';

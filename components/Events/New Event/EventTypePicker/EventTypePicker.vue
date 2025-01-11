@@ -6,7 +6,7 @@
         <img class="event-type-trailing" src="@/assets/icons/chevron/chevron.down.white.svg">
     </button>
 
-    <OverlayPanel 
+    <Popover 
         ref="op" 
         id="event-type-popup" 
         :dismissable="true" 
@@ -34,14 +34,14 @@
                 <p class="body">A structured event where individuals or teams compete to determine a winner or to gain a prize. Tournaments, brackets etc...</p>
             </div>
         </div>
-    </OverlayPanel>
+    </Popover>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import type { Ref } from 'vue';
+
+import Popover from 'primevue/popover';
 import { EVENT_TYPE } from '~/data/Enums';
-import OverlayPanel from 'primevue/overlaypanel';
 
 const op = ref();
 const model = defineModel({ default: EVENT_TYPE.REGULAR })

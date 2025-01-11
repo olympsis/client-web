@@ -27,7 +27,9 @@ export class NewEventManager {
         description: string,
         organizers: GroupSelection[],
         venues: VenueDescriptor[],
-        eventImage: string
+        eventImage: string,
+        eventStartTime: Date,
+        eventEndTime: Date
     ) : NEW_EVENT_ERROR | null {
         if (organizers.length === 0) {
             return NEW_EVENT_ERROR.NO_ORGANIZERS;
@@ -40,6 +42,9 @@ export class NewEventManager {
         }
         if (venues.length === 0) {
             return NEW_EVENT_ERROR.NO_VENUES;
+        }
+        if (eventStartTime.getTime() > eventEndTime.getTime()) {
+            return NEW_EVENT_ERROR.INVALID_END_DATE;
         }
         if (eventImage === '') {
             return NEW_EVENT_ERROR.NO_IMAGE;

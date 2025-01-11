@@ -50,7 +50,7 @@
             </div>
 
             <!-- Description -->
-            <div id="event-description" :class="{ 'event-section': true, required: newEventError === NEW_EVENT_ERROR.NO_DESCRIPTION }">
+            <div id="event-description" :class="{ 'event-section': true }">
                 <div :class="{ 
                     label: newEventError !== NEW_EVENT_ERROR.NO_DESCRIPTION, 
                     error: newEventError === NEW_EVENT_ERROR.NO_DESCRIPTION 
@@ -60,7 +60,7 @@
             </div>
 
             <!-- Venues Picker -->
-            <div id="event-venue-picker" :class="{ 'event-section': true, required: newEventError === NEW_EVENT_ERROR.NO_VENUES }">
+            <div id="event-venue-picker" :class="{ 'event-section': true }">
                 <div :class="{ 
                     label: newEventError !== NEW_EVENT_ERROR.NO_VENUES, 
                     error: newEventError === NEW_EVENT_ERROR.NO_VENUES 
@@ -70,10 +70,16 @@
             </div>
 
             <!-- Start Date -->
-            <div id="event-start-date-picker" :class="{ 'event-section': true, required: newEventError === NEW_EVENT_ERROR.INVALID_START_DATE }">
-                <div class="label"> Start Date/Time <div class="asterisk">*</div> </div>
+            <div id="event-start-date-picker" :class="{ 'event-section': true }">
+                <div 
+                    :class="{
+                        label: newEventError !== NEW_EVENT_ERROR.INVALID_START_DATE,
+                        error: newEventError === NEW_EVENT_ERROR.INVALID_START_DATE 
+                    }"
+                > Start Date/Time <div class="asterisk">*</div> </div>
                 <div class="sub-label"> When does this event start? </div>
-                <Calendar 
+                <DatePicker 
+                    class="date-picker"
                     v-model="eventStartDate" 
                     showTime hourFormat="12" 
                     :pt="{
@@ -102,10 +108,16 @@
             </div>
 
             <!-- End Date -->
-            <div id="event-end-date-picker" :class="{ 'event-section': true, required: newEventError === NEW_EVENT_ERROR.INVALID_END_DATE }">
-                <div class="label"> End Date/Time </div>
-                <div class="sub-label"> When does this event end? (Optional) </div>
-                <Calendar 
+            <div id="event-end-date-picker" :class="{ 'event-section': true }">
+                <div
+                    :class="{
+                        label: newEventError !== NEW_EVENT_ERROR.INVALID_END_DATE,
+                        error: newEventError === NEW_EVENT_ERROR.INVALID_END_DATE 
+                    }
+                "> End Date/Time<div class="asterisk">*</div>  </div>
+                <div class="sub-label"> When does this event end? </div>
+                <DatePicker 
+                    class="date-picker"
                     v-model="eventEndDate" 
                     showTime hourFormat="12" 
                     :pt="{
@@ -155,7 +167,7 @@ import { GroupSelection, VenueDescriptor } from '~/data/models/GenericModels';
 import { EVENT_SKILL_LEVEL, EVENT_TYPE, EVENT_VISIBILITY } from '~/data/Enums';
 import { NEW_EVENT_ERROR, NewEventManager } from '~/data/managers/NewEventManager';
 
-import Calendar from 'primevue/calendar';
+import DatePicker from 'primevue/datepicker';
 import EventTypePicker from '../EventTypePicker/EventTypePicker.vue';
 import EventImagePicker from '../EventImagePicker/EventImagePicker.vue';
 import EventVenuesPicker from '../EventVenuesPicker/EventVenuesPicker.vue';
@@ -189,7 +201,7 @@ const eventDescription: Ref<string> = ref('');
 const eventGroups: Ref<GroupSelection[]> = ref([]);
 
 const eventStartDate: Ref<Date> = ref(new Date());
-const eventEndDate: Ref<Date | undefined> = ref(undefined);
+const eventEndDate: Ref<Date> = ref(new Date(eventStartDate.value.getTime() + (60 * 60 * 1000)));
  
 
 function createNewEvent() {
@@ -200,7 +212,9 @@ function createNewEvent() {
         eventDescription.value,
         eventGroups.value,
         eventVenues.value,
-        eventImage.value
+        eventImage.value,
+        eventStartDate.value,
+        eventEndDate.value
     );
     
     if (isInvalid != null) {
@@ -361,5 +375,11 @@ function createNewEvent() {
     #action-wrapper {
         margin: 2.5rem 2rem;
     }
+}
+
+.date-picker {
+    padding: 0.5rem;
+    border-radius: 10px;
+    background-color: var(--tertiary-background-color);
 }
 </style>

@@ -6,7 +6,7 @@
         <img class="group-type-trailing" src="@/assets/icons/chevron/chevron.down.white.svg">
     </button>
 
-    <OverlayPanel 
+    <Popover 
         ref="op" 
         id="group-type-popup" 
         :dismissable="true" 
@@ -34,13 +34,14 @@
                 <p class="body">An organization is a generic structure for various clubs that share a common goal or owner.</p>
             </div>
         </div>
-    </OverlayPanel>
+    </Popover>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
 import { GROUP_TYPE } from '~/data/Enums';
-import OverlayPanel from 'primevue/overlaypanel';
+
+import Popover from 'primevue/popover';
 
 const op = ref();
 const model = defineModel({ default: GROUP_TYPE.CLUB })

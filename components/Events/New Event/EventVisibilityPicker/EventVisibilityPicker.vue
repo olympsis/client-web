@@ -7,7 +7,7 @@
         <img class="event-visibility-trailing" src="@/assets/icons/chevron/chevron.down.white.svg">
     </button>
 
-    <OverlayPanel 
+    <Popover 
         ref="op" 
         id="event-visibility-popup" 
         :dismissable="true" 
@@ -47,13 +47,14 @@
                 <p class="body">An Event that is only visible to those who have been invited  to RSVP and to those who have already RSVP’ed. </p>
             </div>
         </div>
-    </OverlayPanel>
+    </Popover>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
 import { EVENT_VISIBILITY } from '~/data/Enums';
-import OverlayPanel from 'primevue/overlaypanel';
+
+import Popover from 'primevue/popover';
 
 const op = ref();
 const model = defineModel({ default: EVENT_VISIBILITY.PUBLIC })

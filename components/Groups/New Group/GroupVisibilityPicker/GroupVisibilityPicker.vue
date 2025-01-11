@@ -6,7 +6,7 @@
         <img class="group-visibility-trailing" src="@/assets/icons/chevron/chevron.down.white.svg">
     </button>
 
-    <OverlayPanel 
+    <Popover 
         ref="op" 
         id="group-visibility-popup" 
         :dismissable="true" 
@@ -35,13 +35,14 @@
                 <p class="body">Only users that are invited to join or apply can see this group and interact with it.</p>
             </div>
         </div>
-    </OverlayPanel>
+    </Popover>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
 import { GROUP_VISIBILITY } from '~/data/Enums';
-import OverlayPanel from 'primevue/overlaypanel';
+
+import Popover from 'primevue/popover';
 
 const op = ref();
 const model = defineModel({ default: GROUP_VISIBILITY.PUBLIC })

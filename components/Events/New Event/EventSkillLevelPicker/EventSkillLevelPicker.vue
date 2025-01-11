@@ -5,7 +5,7 @@
         <img class="event-skill-trailing" src="@/assets/icons/chevron/chevron.down.white.svg">
     </button>
 
-    <OverlayPanel 
+    <Popover 
         ref="op" 
         id="event-skill-popup" 
         :dismissable="true" 
@@ -56,13 +56,14 @@
                 <p class="body">Only athletes at an expert’s skill level are invited to join this event.</p>
             </div>
         </div>
-    </OverlayPanel>
+    </Popover>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
 import { EVENT_SKILL_LEVEL } from '~/data/Enums';
-import OverlayPanel from 'primevue/overlaypanel';
+
+import Popover from 'primevue/popover';
 
 const op = ref();
 const model = defineModel({ default: EVENT_SKILL_LEVEL.ANY_LEVEL })

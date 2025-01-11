@@ -110,8 +110,10 @@ useSeoMeta({
         color: var(--primary-label-color);
 
         .holder {
-            width: 40rem;
+            width: 100%;
             height: 20rem;
+            min-width: 25rem;
+            max-width: 40rem;
             margin: 1rem 0rem;
             border-radius: 10px;
             background-color: var(--secondary-background-color);
@@ -123,8 +125,10 @@ useSeoMeta({
         grid-area: trophies;
         color: var(--primary-label-color);
         .holder {
-            width: 40rem;
+            width: 100%;
             height: 20rem;
+            min-width: 25rem;
+            max-width: 40rem;
             margin: 1rem 0rem;
             border-radius: 10px;
             background-color: var(--secondary-background-color);
@@ -186,6 +190,7 @@ useSeoMeta({
         padding-top: 4rem;
         padding-left: 3rem;
         padding-right: 3rem;
+        grid-template-columns: 25rem auto;
     }
 
     .actions {
@@ -194,8 +199,8 @@ useSeoMeta({
         }
     }
 }
-
-@media (max-width: 1180px) {
+/* @media (max-width: 1180px) { */
+@media (max-width: 900px) {
     .grid-container {
         display: grid;
         grid-template-areas:

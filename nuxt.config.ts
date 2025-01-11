@@ -61,6 +61,12 @@ export default defineNuxtConfig({
 		head: {
 			link: [
 				{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+			],
+			meta: [
+				{
+					name: 'theme-color',
+					content: '#262E57'
+				}
 			]
 		}
 	},

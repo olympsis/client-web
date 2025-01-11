@@ -11,61 +11,61 @@ export class LocationManager {
     public lastKnownLocation: Location | undefined;
     public authorizationStatus: PermissionState = "prompt"
 
-    /**
-     * Requests location access from the user
-     * 
-     * @returns a promise containing the permission state
-     */
-    public async requestLocationPermission(): Promise<PermissionState> {
-      return new Promise((resolve, reject) => {
-        navigator.permissions
-          .query({ name: 'geolocation' })
-          .then((permissionStatus) => {
-            if (permissionStatus.state === 'granted') {
-              resolve('granted');
-            } else if (permissionStatus.state === 'prompt') {
-              navigator.geolocation.getCurrentPosition(
-                () => {
-                  resolve('granted');
-                },
-                () => {
-                  resolve('denied');
-                },
-                { enableHighAccuracy: true }
-              );
-            } else {
-              resolve('denied');
-            }
-          })
-          .catch((error) => {
-            reject(error);
-          });
-      });
-    }
+	/**
+	 * Requests location access from the user
+	 * 
+	 * @returns a promise containing the permission state
+	 */
+	public async requestLocationPermission(): Promise<PermissionState> {
+		return new Promise((resolve, reject) => {
+		navigator.permissions
+			.query({ name: 'geolocation' })
+			.then((permissionStatus) => {
+				if (permissionStatus.state === 'granted') {
+					resolve('granted');
+				} else if (permissionStatus.state === 'prompt') {
+					navigator.geolocation.getCurrentPosition(
+				() => {
+					resolve('granted');
+				},
+				() => {
+					resolve('denied');
+				},
+				{ enableHighAccuracy: true }
+				);
+				} else {
+					resolve('denied');
+				}
+			})
+			.catch((error) => {
+				reject(error);
+			});
+		});
+	}
   
     /**
      * Checks the browser to see if we have location access
      * 
      * @returns a promise containing the permission state
      */
-    public hasLocationAccess(): Promise<PermissionState> {
-      return new Promise((resolve, reject) => {
-        navigator.permissions
-          .query({ name: 'geolocation' })
-          .then((permissionStatus) => {
-            if (permissionStatus.state === 'granted') {
-              resolve('granted');
-            } else if (permissionStatus.state === 'prompt') {
-              resolve('prompt');
-            } else {
-              resolve('denied');
-            }
-          })
-          .catch((error) => {
-            reject(error);
-          });
-      });
-    }
+	public hasLocationAccess(): Promise<PermissionState> {
+		return new Promise((resolve, reject) => {
+		navigator.permissions
+			.query({ name: 'geolocation' })
+			.then((permissionStatus) => {
+				if (permissionStatus.state === 'granted') {
+					resolve('granted');
+				} else if (permissionStatus.state === 'prompt') {
+					resolve('prompt');
+				} else {
+					resolve('denied');
+				}
+				})
+				.catch((error) => {
+					reject(error);
+				});
+			});
+	}
 
     /**
      * A promise wrapper to await location update from the browser
@@ -73,13 +73,11 @@ export class LocationManager {
      * @param options object for position options
      * @returns a promise that gets the location from the browser
      */
-    public getCurrentPosition(
-        options?: PositionOptions
-      ): Promise<GeolocationPosition> {
-        return new Promise((resolve, reject) => {
-            navigator.geolocation.getCurrentPosition(resolve, reject, options);
-        });
-    }
+	public getCurrentPosition(options?: PositionOptions): Promise<GeolocationPosition> {
+		return new Promise((resolve, reject) => {
+			navigator.geolocation.getCurrentPosition(resolve, reject, options);
+		});
+	}
 
     /**
      * Checks for geo location authorization on browser.
@@ -99,9 +97,9 @@ export class LocationManager {
             if (hasPermissions === 'granted' || hasPermissions === 'prompt') {
                 try {
                     const position = await this.getCurrentPosition({
-                      enableHighAccuracy: true,
-                      maximumAge: 0,
-                      timeout: Infinity,
+						enableHighAccuracy: true,
+						maximumAge: 0,
+						timeout: 250,
                     });
                     
                     const { latitude, longitude, accuracy } = position.coords;

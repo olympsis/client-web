@@ -10,6 +10,16 @@ import { getMapkitServerToken } from "@/utils/MapHelpers";
 export class LocationManager {
     public lastKnownLocation: Location | undefined;
     public authorizationStatus: PermissionState = "prompt"
+	private genericFallBackLocation = new Location(
+		40.76553,
+		-73.97770,
+		'Manhattan',
+		'New York',
+		'NY',
+		'',
+		'United States',
+		'US'
+	);
 
 	/**
 	 * Requests location access from the user
@@ -97,8 +107,7 @@ export class LocationManager {
             if (hasPermissions === 'granted' || hasPermissions === 'prompt') {
                 try {
                     const position = await this.getCurrentPosition({
-						enableHighAccuracy: true,
-						maximumAge: 0,
+						maximumAge: 300000,
 						timeout: 250,
                     });
                     
@@ -202,7 +211,9 @@ export class LocationManager {
 			);
 			this.lastKnownLocation = data;
 		} catch (error) {
-			console.error(`Failed to reverse geocode location: ${error}`);
+			// If we fail to get location then we fall back on generic location
+			this.lastKnownLocation = this.genericFallBackLocation;
+			console.debug('Failed to reverse geocode location. Error: ' + error)
 		}
     }
 }

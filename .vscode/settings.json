@@ -6,6 +6,8 @@
         "autodocs",
         "firebaseapp",
         "firestore",
+        "jsrsasign",
+        "KJUR",
         "MAPKIT",
         "mycustompt",
         "nodenext",

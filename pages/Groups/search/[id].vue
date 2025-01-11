@@ -56,9 +56,10 @@
             <div id="location" class="section">
                 <h2>Location</h2>
                 <p>{{ groupLocation }}</p>
-                <div id="map-view">
+                <div id="map-view" v-if="!mapURL">
                     Failed to load map
                 </div>
+                <img id="map-view" v-else :src="mapURL">
             </div>
 
             <div id="history" class="section">
@@ -100,6 +101,7 @@ const service = new ClubService();
 const modelStore = useModelStore();
 
 const club = ref<Club | undefined>(undefined);
+const mapURL = ref<string | undefined> (undefined);
 const viewState = ref<VIEW_STATE>(VIEW_STATE.PENDING);
 const actionState = ref<VIEW_STATE>(VIEW_STATE.PENDING);
 const authModal = useTemplateRef<HTMLDialogElement>('auth-modal');
@@ -262,6 +264,16 @@ watchEffect(() => {
     }
 });
 
+onMounted(() => {
+    if (mapURL.value) return;
+    const city = club.value?.city ?? '';
+    const state = club.value?.state ?? '';
+    getMapSnapshot([city, state])
+        .then((blob) => {
+            mapURL.value = URL.createObjectURL(blob);
+        });
+});
+
 </script>
 
 <style scoped>
@@ -354,11 +366,11 @@ watchEffect(() => {
         #location {
 
             #map-view {
-                height: 10rem;
+                width: 95%;
                 display: flex;
+                margin: 0 auto;
                 align-items: center;
                 border-radius: 10px;
-                margin-right: 1.5rem;
                 justify-content: center;
                 color: var(--olympsis-gray);
                 background-color: var(--secondary-background-color);
@@ -386,6 +398,11 @@ watchEffect(() => {
         align-items: center;
         flex-direction: column;
         justify-content: unset;
+
+        #right {
+            margin-left: unset;
+            margin-bottom: 10rem;
+        }
     }
 }
 
@@ -397,8 +414,6 @@ watchEffect(() => {
 
         #right {
             max-width: calc(100vw - 1rem);
-
-            margin-bottom: 10rem;
         }
     }
 }

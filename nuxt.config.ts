@@ -22,6 +22,7 @@ export default defineNuxtConfig({
 			APP_ID: process.env.APP_ID ?? '',
 			APL_KEY_ID: process.env.APL_KEY_ID ?? '',
 			APL_TEAM_ID: process.env.APL_TEAM_ID ?? '',
+			APL_MAPKIT_SNAPSHOT_TOKEN: process.env.APL_MAPKIT_SNAPSHOT_TOKEN ?? '',
 
 			MAPKIT_ORIGIN: process.env.MAPKIT_ORIGIN ?? '',
 			MAPKIT_KEY: process.env.MAPKIT_KEY ?? '',

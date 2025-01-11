@@ -1,4 +1,5 @@
-import * as jose from 'jose';
+import * as jsrsasign from 'jsrsasign';
+import { importPKCS8, SignJWT } from 'jose';
 import { useSessionStore } from '@/stores/session-store';
 
 /**
@@ -79,37 +80,46 @@ async function getMapkitServerToken() : Promise<string> {
  * @param options a Token Options Object
  * @returns a string promise containing the token
  */
-async function createMapsAuthToken(options: TokenOptions): Promise<string> {
+function createMapsAuthToken(options: TokenOptions): string {
     const config = useRuntimeConfig();
     const { teamId, keyId, privateKey, expiresIn } = options;
 
     // Get the current time and expiration time in terms of seconds since UNIX Epoch
-    const alg = 'ES256'
     const issuedAt = Math.floor(Date.now() / 1000);
     const expiration = issuedAt + expiresIn;
 
     // Create the header
     const header = {
-        alg: alg,  // Algorithm used for signing
+        alg: 'ES256',  // Algorithm used for signing
         kid: keyId,    // Key ID from Apple Developer account
         typ: 'JWT'     // Type of token
     };
 
     // Create the payload with required claims
     const payload = {
+        iss: teamId,   // Issuer claim (team ID)
         iat: issuedAt,  // Issued at time (seconds since UNIX Epoch)
         exp: expiration, // Expiration time (seconds since UNIX Epoch)
         origin: config.public.MAPKIT_ORIGINs
     };
-    const cleanedKey = privateKey.replace(/\\n/g, '\n');
-    // Sign the token using the private key
-    const privateKeyObj = await jose.importPKCS8(cleanedKey, alg);
-    const jwt = await new jose.SignJWT(payload)
-        .setProtectedHeader(header)
-        .setIssuer(teamId)
-        .sign(privateKeyObj);
 
-    return jwt;
+    // Create the JWT
+    const sHeader = JSON.stringify(header);
+    const sPayload = JSON.stringify(payload);
+
+    // Clean the private key
+    const cleanedKey = privateKey.replace(/\\n/g, '\n');
+
+    // Sign the token using jsrsasign
+    const sJWT = jsrsasign.KJUR.jws.JWS.sign(
+        'ES256',           // algorithm
+        sHeader,           // header
+        sPayload,         // payload
+        cleanedKey,       // private key
+        'pkcs8pem'        // private key format
+    );
+
+    return sJWT;
 }
 
 /**
@@ -130,14 +140,31 @@ async function generateMapkitAuthToken() : Promise<string> {
             privateKey: config.public.MAPKIT_KEY.trim(),
             expiresIn: 3600
         }
+
         const token = await createMapsAuthToken(options);
         session.mapkitToken = token;
         return token;
     }
 }
 
+async function getMapSnapshot(location: any[]): Promise<Blob> {
+    const config = useRuntimeConfig();
+    const token = config.public.APL_MAPKIT_SNAPSHOT_TOKEN;
+    const coordinates = location.join(',');
+    const response = await fetch(
+        `https://snapshot.apple-mapkit.com/api/v1/snapshot?center=${coordinates}&token=${token}`
+    );
+
+    if (!response.ok) {
+        throw new Error(`Failed to get Map Snapshot. HTTP Error! Status: ${response.status}`);
+    }
+
+    return await response.blob();
+}
+
 export {
     getDirections,
+    getMapSnapshot,
     getMapkitServerToken,
     generateMapkitAuthToken
 }

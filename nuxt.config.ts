@@ -1,7 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-	ssr: true,
-	compatibilityDate: '2024-11-01',
+	compatibilityDate: '2025-01-01',
 	devtools: { enabled: true },
 	css: [
 		'~/assets/css/main.css'
@@ -48,9 +47,15 @@ export default defineNuxtConfig({
 		'/terms-of-use': { prerender: true },
 		'/privacy-policy': { prerender: true },
 
-		// We need this for SEO
-		// '/events/**': { ssr: true },
-		// '/groups/search/**': { ssr: true }
+		'/home': { ssr: false },
+		'/groups': { ssr: false },
+		'/groups/search': { ssr: false },
+		'/events': { ssr: false },
+		'/profile': { ssr: false },
+
+		'/events/**': { ssr: true },
+		'/groups/search/**': { ssr: true}
+
 	},
 	app: {
 		head: {

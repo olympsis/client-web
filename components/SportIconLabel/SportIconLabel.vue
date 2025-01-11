@@ -1,6 +1,6 @@
 <template>
     <div class="wrapper" :class="{ selected: isSelected }" >
-        <img :src="`/src/assets/icons/sports/${sport.valueOf()}/${sport.valueOf()}.svg`"
+        <img :src="`/images/sports/${sport.valueOf()}/${sport.valueOf()}.svg`"
         />
         {{ sportToString(sport) }}
     </div>

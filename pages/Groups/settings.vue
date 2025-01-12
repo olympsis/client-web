@@ -422,117 +422,82 @@ useSeoMeta({
     }
 
     #edit-dialog {
-        top: 40%;
+        top: 0;
+        border: unset;
+        background: transparent;
+        backdrop-filter: blur(5px);
         border-radius: var(--border-radius);
     }
 
     #group-picker-dialog {
-        top: 40%;
-        width: fit-content;
-        border-radius: var(--border-radius);
-
+        top: 0;
+        border: unset;
+        background: transparent;
+        backdrop-filter: blur(5px);
         #group-selector {
             margin-top: 0rem;
             margin-bottom: 0rem;
+            border-radius: var(--border-radius);
         }
     }
 
     #new-group-dialog {
-        top: 100px;
+        top: 0;
+        border: unset;
+        background: transparent;
+        backdrop-filter: blur(5px);
         border-radius: var(--border-radius);
 
         #new-group-card {
             border-radius: var(--border-radius);
         }
     }
+}
 
-    #members-dialog {
-        top: 40%;
+#members-dialog {
+    top: 0;
+    border: unset;
+    background: transparent;
+    backdrop-filter: blur(5px);
+
+
+    #members-dialog-container {
+        width: 100%;
+        margin: 1rem;
+        display: flex;
+        max-width: 25rem;
         height: 25.75rem;
-        max-width: 27rem;
-        border-radius: var(--border-radius);
-        background-color: var(--primary-background-color);
-
-        #members-dialog-container {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-
-            #cancel-button {
-                all: unset;
-                margin: 1rem;
-                cursor: pointer;
-                color: var(--primary-label-color);
-            }
-
-            #search-bar {
-                width: 95%;
-                height: 2rem;
-                border: unset;
-                margin: 0rem auto;
-                font-size: 1.4rem;
-                max-width: 32.5rem;
-                padding: 0rem 0.5rem;
-                color: var(--primary-label-color);
-                border-radius: var(--border-radius);
-                background-color: var(--secondary-background-color);
-            }
-
-            #member-list {
-                width: 100%;
-                max-height: 20rem;
-                overflow-y: scroll;
-                padding-bottom: 1rem;
-            }
-        }
-    }
-
-    #delete-dialog {
-        top: 5rem;
-        height: 11rem;
-        max-width: 22rem;
-        border-radius: var(--border-radius);
+        flex-direction: column;
+        align-items: flex-start;
+        border-radius: 20px;
+        box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
         background-color: var(--secondary-background-color);
 
-        #delete-dialog-container {
-            display: flex;
-            align-items: center;
-            flex-direction: column;
-            justify-content: center;
-            
+        #cancel-button {
+            all: unset;
+            margin: 1rem;
+            cursor: pointer;
+            color: var(--primary-label-color);
+        }
 
-            #content {
-                text-align: center;
-                margin-top: 1.5rem;
-                margin-left: 1rem;
-                margin-right: 1rem;
-                color: var(--primary-label-color);
-            }
+        #search-bar {
+            width: 95%;
+            height: 2rem;
+            border: unset;
+            margin: 0rem auto;
+            font-size: 1.4rem;
+            max-width: 32.5rem;
+            padding: 0rem 0.5rem;
+            color: var(--primary-label-color);
+            border-radius: var(--border-radius);
+            background-color: var(--tertiary-background-color);
+        }
 
-            #sub-content {
-                color: gray;
-                font-size: 0.8rem;
-                margin-top: 0.5rem;
-                margin-bottom: 1.5rem;
-            }
-
-            #actions {
-                flex-direction: row;
-
-                button {
-                    width: 100%;
-                    padding: 0.5rem;
-                    margin: 0rem 1rem;
-                }
-
-                #cancel {
-                    background-color: var(--tertiary-background-color);
-                }
-
-                #delete{
-                    background-color: var(--destructive-button-color);
-                }
-            }
+        #member-list {
+            width: 100%;
+            max-height: 20rem;
+            overflow-y: scroll;
+            padding-bottom: 1rem;
         }
     }
 }

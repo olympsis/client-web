@@ -242,6 +242,10 @@ useSeoMeta({
             }
         }
 
+        .actions {
+            margin-bottom: 2rem;
+        }
+        
         .nav-card {
             padding-bottom: 3rem;
         }
@@ -274,8 +278,6 @@ useSeoMeta({
                 width: 22rem;
                 height: 2.5rem;
             }
-
-            margin-bottom: 2rem;
         }
 
         #navigation-card{

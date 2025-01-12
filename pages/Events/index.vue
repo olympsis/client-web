@@ -71,10 +71,7 @@ import { EventService } from '@/data/services/EventService';
 import { Event, EventSection } from '@/data/models/EventModels';
 import { computed, onMounted, ref, useTemplateRef, watch } from 'vue';
 
-// TESTING DATA
-import { sampleEvents } from '@/data/dev-data/sample-events';
 import SearchBar from '@/components/SearchBar/SearchBar.vue';
-import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
 import EventListItem from '@/components/Events/EventListItem/EventListItem.vue';
 import NewEventCard from '@/components/Events/New Event/NewEventView/NewEventView.vue';
 import EventDateButton from '@/components/Buttons/EventDateButton/EventDateButton.vue';
@@ -84,13 +81,13 @@ const session = useSessionStore();
 const state = ref(VIEW_STATE.PENDING);
 const eventService = new EventService();
 
+const events = ref<Event[]>([]);
 const searchText = ref<string>('');
 const selectedDate = ref<string>(Date.now().toLocaleString());
 
 const newEventModalRef = useTemplateRef<HTMLDialogElement>('new-event-modal');
 const eventSettingsModalRef = useTemplateRef<HTMLDialogElement>('event-settings-modal');
 
-const events = ref<Event[]>([]);
 
 const eventSections = computed<EventSection[]>(() => {
     const sections: EventSection[] = [];
@@ -124,30 +121,6 @@ const eventSections = computed<EventSection[]>(() => {
     });
 
     return sections;
-});
-
-session.$subscribe((mutation: any, state) => {
-    const payload = mutation.payload;
-    if (payload?.lastKnownLocation) {
-        retryFetchEvents();
-    }
-});
-
-
-onMounted(() => {
-    fetchEvents()
-        .then((resp) => {
-            events.value = resp;
-            state.value = VIEW_STATE.SUCCESS;
-        })
-        .catch((error) => {
-            console.error('Failed to get events. Error: ', error);
-            state.value = VIEW_STATE.FAILURE;
-        });
-});
-
-definePageMeta({
-    key: route => route.fullPath
 });
 
 function handleShowNewEventModal() {
@@ -235,6 +208,29 @@ useSeoMeta({
     ogTitle: 'Events | Olympsis',
     description: 'Find sports events near you!',
     ogDescription: 'Find sports events near you!'
+});
+
+session.$subscribe((mutation: any, state) => {
+    const payload = mutation.payload;
+    if (payload?.lastKnownLocation) {
+        retryFetchEvents();
+    }
+});
+
+onMounted(() => {
+    fetchEvents()
+        .then((resp) => {
+            events.value = resp;
+            state.value = VIEW_STATE.SUCCESS;
+        })
+        .catch((error) => {
+            console.error('Failed to get events. Error: ', error);
+            state.value = VIEW_STATE.FAILURE;
+        });
+});
+
+definePageMeta({
+    key: route => route.fullPath
 });
 
 </script>

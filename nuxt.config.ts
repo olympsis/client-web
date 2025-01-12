@@ -15,14 +15,6 @@ export default defineNuxtConfig({
 	build: {
 		transpile: ['malakbel']
 	},
-	experimental: {
-		payloadExtraction: false
-	},
-	router: {
-		options: {
-			strict: true
-		}
-	},
 	runtimeConfig: {
 					
 		public: {
@@ -60,9 +52,9 @@ export default defineNuxtConfig({
 		'/privacy-policy': { prerender: true },
 
 		'/home': { ssr: false },
-		// '/groups': { ssr: false },
-		// '/groups/search': { ssr: false },
-		// '/events': { ssr: false },
+		'/groups': { ssr: false },
+		'/groups/search': { ssr: false },
+		'/events': { ssr: false },
 		'/profile': { ssr: false },
 
 		'/events/**': { ssr: true },
@@ -70,6 +62,8 @@ export default defineNuxtConfig({
 
 	},
 	app: {
+		keepalive: true,
+    	pageTransition: false,
 		head: {
 			link: [
 				{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }

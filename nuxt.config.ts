@@ -16,7 +16,6 @@ export default defineNuxtConfig({
 		transpile: ['malakbel']
 	},
 	runtimeConfig: {
-					
 		public: {
 			MODE: process.env.mode ?? 'dev',
 			
@@ -62,8 +61,6 @@ export default defineNuxtConfig({
 
 	},
 	app: {
-		keepalive: true,
-    	pageTransition: false,
 		head: {
 			link: [
 				{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }

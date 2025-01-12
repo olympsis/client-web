@@ -107,7 +107,13 @@ useSeoMeta({
         }
 
         .action {
+            height: 2rem;
+            border: unset;
+            cursor: pointer;
             margin: 2rem auto;
+            padding: 0rem 1rem;
+            border-radius: 10px;
+            background-color: var(--secondary-background-color);
         }
    }
 

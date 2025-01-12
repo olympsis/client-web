@@ -1,5 +1,4 @@
 <template>
-    <NavigationBar/>
     <main id="group-settings-view">
         <!-- Group Header -->
         <div id="header">

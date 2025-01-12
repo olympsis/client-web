@@ -1,5 +1,4 @@
 <template>
-    <NavigationBar/>
     <main id="group-applications-view">
         
         <!-- Header -->

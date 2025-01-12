@@ -80,7 +80,7 @@ function hideMenu() {
     left: 0;
     right: 0;
     z-index: 10;
-    width: 100%;
+    width: 100vw;
     display: flex;
     max-height: 60px;
     min-height: 60px;

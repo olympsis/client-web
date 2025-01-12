@@ -1,6 +1,5 @@
 <template>
-    <NavigationBar/>
-    <main class="grid-container">
+    <main id="group-view">
         <!-- Selected Group Info -->
         <div v-if="selectedGroup" class="info" :style="{ 'margin-top': '1rem' }">
             <GroupIcon :type="groupType" :image="groupLogo" :size="4"/>
@@ -224,9 +223,10 @@ useSeoMeta({
 </script>
 
 <style scoped>
-.grid-container {
+#group-view {
     display: grid;
     overflow: hidden;
+    width: fit-content;
     grid-template-areas:
     'name feed actions'
     'event feed groups'
@@ -391,7 +391,7 @@ useSeoMeta({
 }
 
 @media (max-width: 1530px) {
-    .grid-container {
+    #group-view {
         display: grid;
         grid-template-areas:
         'name feed'
@@ -483,7 +483,7 @@ useSeoMeta({
 }
 
 @media (max-width: 940px) {
-    .grid-container {
+    #group-view {
         width: 100%;
         display: grid;
         grid-template-areas:

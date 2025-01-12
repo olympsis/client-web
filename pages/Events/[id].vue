@@ -1,5 +1,4 @@
 <template>
-    <NavigationBar/>
     <main id="event-detail-view">
         <!-- Event Detail -->
         <div v-if="failed !== undefined && failed !== true" id="event-detail">

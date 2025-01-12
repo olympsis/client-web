@@ -1,5 +1,4 @@
 <template>
-    <NavigationBar/>
     <main id="groups-container">
         <div id="header">
             <h1>Groups</h1>
@@ -199,7 +198,6 @@ useSeoMeta({
 <style scoped>
 #groups-container {
     gap: 1rem;
-    height: 100%;
     display: grid;
     margin: 0 auto;
     overflow: hidden;

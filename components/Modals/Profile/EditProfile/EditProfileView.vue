@@ -52,7 +52,7 @@
             <div id="hometown" class="section">
                 <div class="title">Hometown</div>
                 <div class="sub-title">Where do you call home? We need a fall back location if we can't find your location.</div>
-                <button @click="showLocaleModal">
+                <button @click="" :style="{ color: 'gray' }">
                     {{ localeText }}
                 </button>
             </div>

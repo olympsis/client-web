@@ -299,6 +299,8 @@ onMounted(() => {
 <style scoped>
 #group-detail {
     display: flex;
+    margin: 0 auto;
+    width: fit-content;
     flex-direction: row;
     justify-content: space-around;
 

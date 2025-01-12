@@ -1,6 +1,7 @@
 import Aura from '@primevue/themes/aura';
 
 export default defineNuxtConfig({
+	ssr: true,
 	compatibilityDate: '2025-01-01',
 	devtools: { enabled: true },
 	css: [

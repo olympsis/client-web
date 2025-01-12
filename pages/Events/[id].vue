@@ -928,6 +928,8 @@ onMounted(() => {
 
 <style scoped>
 #event-detail-view {
+    margin: 0 auto;
+    width: fit-content;
     margin-bottom: auto;
     
     #event-detail {

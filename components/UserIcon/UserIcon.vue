@@ -1,6 +1,6 @@
 <template>
-    <div id="user-icon">
-        <div v-if="user && !imageFailed && image !== undefined">
+    <div id="user-icon" >
+        <div v-if="user && !imageFailed && image !== undefined" :style="{ width: `${size}rem`, height: `${size}rem`}">
             <img 
                 :src="image" 
                 class="image" 

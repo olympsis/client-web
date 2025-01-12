@@ -1,7 +1,7 @@
 import { getAuth } from 'firebase/auth';
 import { Venue, VenuesResponse } from '../models/VenueModels';
 import { Courrier, Method, Endpoint, Scheme } from 'malakbel';
-import { AdministrativeArea, Country, SubAdministrativeArea } from '../models/GenericModels';
+import { AdministrativeArea, Country, GeoJSON, SubAdministrativeArea } from '../models/GenericModels';
 
 export class LocaleService {
 
@@ -71,11 +71,7 @@ export class LocaleService {
             let areas: Array<SubAdministrativeArea> = [];
             let data: { [key: string]: any } = body;
             data.forEach((element: { [x: string]: string; })  => {
-                let a = new SubAdministrativeArea(
-                    element['id'],
-                    element['name'],
-                    element['admin_area_id']
-                );
+                let a = SubAdministrativeArea.decode<SubAdministrativeArea>(element);
                 areas.push(a);
             });
             return areas;

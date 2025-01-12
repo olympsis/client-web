@@ -3,7 +3,7 @@
     <main class="grid-container">
         <div class="info">
             <UserIcon :user="user" :size="10" class="icon"/>
-            <button class="action">Edit Profile</button>
+            <button class="action" @click="showEditModal">Edit Profile</button>
         </div>
         <NavigationCard class="nav-card" :state="state"/>
         <div class="badges">
@@ -26,6 +26,10 @@
             <button class="destructive-item" @click="handleLogout"> Log Out </button>
             <button class="destructive-item" @click="handleDelete"> Delete Account </button>
         </div>
+
+        <dialog id="edit-profile-modal" ref="edit-profile-modal" class="dialog">
+            <EditProfileView @close="hideEditModal"/>
+        </dialog>
     </main>
 </template>
 
@@ -38,8 +42,10 @@ import { useSessionStore } from '@/stores/session-store';
 import UserIcon from '@/components/UserIcon/UserIcon.vue';
 import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
 import NavigationCard from '@/components/NavigationCard/NavigationCard.vue';
+import EditProfileView from '~/components/Modals/Profile/EditProfile/EditProfileView.vue';
 
 const sessionStore = useSessionStore();
+const editProfileModal = useTemplateRef<HTMLDialogElement>('edit-profile-modal');
 
 const user = computed(() => {
     return sessionStore.user;
@@ -58,6 +64,14 @@ function handleLogout() {
 
 function handleDelete() {
     sessionStore.deleteAccount();
+}
+
+function showEditModal() {
+    editProfileModal.value?.show();
+}
+
+function hideEditModal() {
+    editProfileModal.value?.close();
 }
 
 useSeoMeta({
@@ -142,9 +156,9 @@ useSeoMeta({
         grid-area: settings;
 
         h2 {
-            color: white;
             margin-bottom: 1rem;
             align-self: flex-start;
+            color: var(--primary-label-color);
         }
         .item {
             width: 25rem;
@@ -202,6 +216,7 @@ useSeoMeta({
 /* @media (max-width: 1180px) { */
 @media (max-width: 900px) {
     .grid-container {
+        gap: unset;
         display: grid;
         grid-template-areas:
         'info'
@@ -259,6 +274,8 @@ useSeoMeta({
                 width: 22rem;
                 height: 2.5rem;
             }
+
+            margin-bottom: 2rem;
         }
 
         #navigation-card{
@@ -268,4 +285,16 @@ useSeoMeta({
     }
 }
 
+#edit-profile-modal {
+    top: 0;
+    border: unset;
+    background: transparent;
+    backdrop-filter: blur(5px);
+
+    #edit-profile-view {
+        border-radius: 20px;
+        max-width: 25rem !important;
+        box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+    }
+}
 </style>

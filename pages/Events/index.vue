@@ -187,7 +187,7 @@ async function fetchEvents(fetchCompleted: boolean = false) {
     state.value = VIEW_STATE.LOADING;
 
     let events: Event[];
-    const sports = session.user?.sports?.join(',') ?? 'all'
+    const sports = session.user?.sports.join(',') ?? 'all'
     const location = session.lastKnownLocation;
 
     if (!location) throw('Failed to get location. IMPLEMENT BETTER FALLBACK');
@@ -224,8 +224,10 @@ function retryFetchEvents() {
             state.value = VIEW_STATE.SUCCESS;
         })
         .catch((error) => {
-            console.error('Failed to get events. Error: ', error);
             state.value = VIEW_STATE.FAILURE;
+            const config = useRuntimeConfig();
+            if (config.public.MODE !== 'dev') return;
+            console.error('Failed to get events. Error: ', error);
         });
 }
 

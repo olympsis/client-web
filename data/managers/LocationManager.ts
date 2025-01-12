@@ -99,9 +99,7 @@ export class LocationManager {
      * Then we log success or failure
      */
     public async listenToLocationUpdates() {
-        const store = useModelStore();
 		const config = useRuntimeConfig();
-        const session = useSessionStore();
 
         if (navigator.geolocation) {
             const hasPermissions = await this.hasLocationAccess()
@@ -113,41 +111,12 @@ export class LocationManager {
                     });
                     
                     const { latitude, longitude, accuracy } = position.coords;
-                    const sports = session.user?.sports?.join(',') ?? '';
-					this.lastKnownLocation = new Location(latitude, longitude);
-
-                    // Two promises we want to wait for
-                    const localeInfoPromise = this.reverseGeocode({ lat: latitude, long: longitude });
-                    const localeDataPromise = session.eventService.getNearbyData(latitude, longitude, 1000000, sports);
-
-                    const responses = await Promise.allSettled([
-                        localeInfoPromise,
-                        localeDataPromise,
-                    ]);
-
-                    if (responses[1].status === "fulfilled") {
-                        const venues = responses[1].value?.venues ?? [];
-                        const events = responses[1].value?.events ?? [];
-                        store.setVenues(venues);
-                        store.setEvents(events);
-						
-                        session.$patch({
-                            venues: venues,
-                            events: events,
-                            lastKnownLocation: this.lastKnownLocation,
-                            hasLocation: hasPermissions === 'granted' || hasPermissions === 'prompt'
-                        });
-                    } else {
-						session.$patch({
-							lastKnownLocation: this.lastKnownLocation,
-							hasLocation: hasPermissions === 'granted' || hasPermissions === 'prompt'
-						});
-					}
+                    await this.fetchLocationData(hasPermissions, new Location(latitude, longitude));
+					
 					if (config.public.MODE !== 'dev') return;
-                    console.log(
-                      `LOCATION SERVICES: (UPDATE) \n long: ${latitude} \n lat: ${longitude} \n acc: ${accuracy} meters`
-                    );
-                  } catch (error: any) {
+                    	console.log(`LOCATION SERVICES: (UPDATE) \n long: ${latitude} \n lat: ${longitude} \n acc: ${accuracy} meters`);
+                  	} catch (error: any) {
+						await this.fetchLocationData(hasPermissions, this.genericFallBackLocation);
 						if (config.public.MODE !== 'dev') return;
                         switch (error.code) {
                             case 1:
@@ -162,17 +131,15 @@ export class LocationManager {
                             default:
                                 console.error(`LOCATION SERVICES: Error Code: ${error.code}, Message: ${error.message}`);
                                 break;
-                        }
-
-                        session.$patch({
-                            hasLocation: hasPermissions === 'granted' || hasPermissions === 'prompt'
-                        });
+                    	}
                 }
             } else {
+				await this.fetchLocationData('denied', this.genericFallBackLocation);
 				if (config.public.MODE !== 'dev') return;
                 console.log('LOCATION SERVICES: Unable to get location. Permission denied.');
             }
         } else {
+			await this.fetchLocationData('not-supported', this.genericFallBackLocation);
 			if (config.public.MODE !== 'dev') return;
           	console.error("LOCATION SERVICES: Geolocation is not supported by this browser.");
         }
@@ -222,4 +189,44 @@ export class LocationManager {
 			console.debug('Failed to reverse geocode location. Error: ' + error)
 		}
     }
+
+	/**
+	 * Calls backend to get events and venues in the area and then store the last known location
+	 * 
+	 * @param permission - permission state value
+	 * @param location - object that contains long/lat
+	 */
+	public async fetchLocationData(permission: string, location: Location) {
+		const store = useModelStore();
+		const session = useSessionStore();
+
+		// Grab user sports & await the two promises for getting events and reverse geocode
+		const sports = session.user?.sports.map((s) => s.valueOf()).join(',') ?? '';
+		const localeInfoPromise = this.reverseGeocode({ lat: location.latitude, long: location.longitude });
+		const localeDataPromise = session.eventService.getNearbyData(location.latitude, location.longitude, 1000000, sports);
+
+		const responses = await Promise.allSettled([
+			localeInfoPromise,
+			localeDataPromise,
+		]);
+
+		if (responses[1].status === "fulfilled") {
+			const venues = responses[1].value?.venues ?? [];
+			const events = responses[1].value?.events ?? [];
+			store.setVenues(venues);
+			store.setEvents(events);
+			
+			session.$patch({
+				venues: venues,
+				events: events,
+				lastKnownLocation: location,
+				hasLocation: permission === 'granted' || permission === 'prompt'
+			});
+		} else {
+			session.$patch({
+				lastKnownLocation: location,
+				hasLocation: permission === 'granted' || permission === 'prompt'
+			});
+		}
+	}
 }

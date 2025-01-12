@@ -640,19 +640,37 @@ class AdministrativeArea {
     }
 }
 
-class SubAdministrativeArea {
+class SubAdministrativeArea extends Codable<SubAdministrativeArea>{
     id: string
     name: string
     adminAreaID: string
+    location: GeoJSON
 
     constructor(
         id: string,
         name: string,
-        adminAreaID: string
+        adminAreaID: string,
+        location: GeoJSON
     ) {
+        super();
         this.id = id;
         this.name = name;
         this.adminAreaID = adminAreaID;
+        this.location = location;
+    }
+
+    static override decode<SubAdministrativeArea>(data: { [key: string]: any }): SubAdministrativeArea {
+        const object = Object();
+
+        if (data) {
+            object['id'] = data['id'];
+            object['name'] = data['name'];
+            object['admin_area_id'] = data['admin_area_id'];
+            object['location'] = GeoJSON.decode(data['location'])
+        }
+
+        Object.setPrototypeOf(object, SubAdministrativeArea.prototype);
+        return object;
     }
 }
 

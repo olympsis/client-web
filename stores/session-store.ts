@@ -60,7 +60,6 @@ export const useSessionStore = defineStore('session-store', () => {
     var mapkitToken: Ref<string | undefined> = ref(undefined);
     var mapKitServerToken: Ref<string | undefined> = ref(undefined); 
 
-    var modelStore = useModelStore();
     var authenticator = new AuthenticationFacade();
 
     var announcements: Ref<string[]> = ref([

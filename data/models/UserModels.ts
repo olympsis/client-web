@@ -1,3 +1,4 @@
+import { stringToSport, type SPORTS } from '../Enums';
 import { Club } from './ClubModels';
 import { Invitation } from './GenericModels';
 import { Codable } from './Models';
@@ -14,7 +15,7 @@ class UserData extends Codable<UserData> {
     clubs: string[] | undefined;
     hometown: number[] | undefined;
     organizations: string[] | undefined;
-    sports: string[] | undefined;
+    sports: SPORTS[] = [];
     deviceToken: string | undefined;
     
     static override decode<UserData>(data: { [key: string]: any }): UserData {
@@ -52,7 +53,9 @@ class UserData extends Codable<UserData> {
                 object['organizations'] = data['organizations'];
             }
             if (data['sports']) {
-                object['sports'] = data['sports'];
+                object['sports'] = Array(...data['sports']).map((s: string) => {
+                    return stringToSport(s);
+                });
             }
             if (data['device_token']) {
                 object['deviceToken'] = data['device_token'];

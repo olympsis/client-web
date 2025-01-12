@@ -56,7 +56,7 @@
                 </div>
 
                 <dialog ref="hometown-dialog" id="hometown-dialog">
-                    <LocalePicker :show-cities="true" @close="handleCloseHometownDialog"/>
+                    <LocalePicker :show-cities="true" @close="handleCloseHometownDialog" @completed=""/>
                 </dialog>
             </div>
 
@@ -78,7 +78,6 @@ import { Organization } from '@/data/models/OrganizationModels';
 import { GROUP_VISIBILITY, SPORTS, VIEW_STATE } from '~/data/Enums';
 import { NewGroupManager, NEW_GROUP_ERROR } from '@/data/managers/NewGroupManager';
 
-import MediaPicker from '@/components/MediaPicker/MediaPicker.vue';
 import GroupTypePicker from '../GroupTypePicker/GroupTypePicker.vue';
 import LocalePicker from '@/components/LocalePicker/LocalePicker.vue';
 import MultiSportsPicker from '@/components/MultiSportsPicker/MultiSportsPicker.vue';
@@ -127,11 +126,11 @@ function handleOpenHometownDialog() {
     }
 }
 
-function handleCloseHometownDialog(event: {
-    city: string,
-    state: string,
-    country: string
-} | undefined) {
+function handleCloseHometownDialog() {
+    hometownDialog.value?.close();
+}
+
+function handleLocaleCompleted(event: any) {
     if (hometownDialog.value) {
         if (event) {
             groupLocation.value = {

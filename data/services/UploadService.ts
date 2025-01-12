@@ -11,7 +11,7 @@ export class UploadService {
     }
     
     public async uploadImage(file: ArrayBuffer, name: string, bucket: string): Promise<ImageUploadResponse> {
-        const apiURL = process.env.API ?? '';
+        
         const token = await getAuth().currentUser?.getIdToken() ?? ''
         const headers = new Map<string, string>();
         headers.set('Authorization', token);
@@ -31,7 +31,7 @@ export class UploadService {
             headers: undefined
         };
 
-        const url = `https://${apiURL}${endpoint.path}${endpoint.mapToQueryString()}`
+        const url = `https://${this.http.host}${endpoint.path}${endpoint.mapToQueryString()}`
 
         headers.set('Content-Type', 'image/jpeg');
 

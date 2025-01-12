@@ -235,6 +235,31 @@ function sportToString(sport: SPORTS) : string {
     }
 }
 
+/**
+ * Takes a string and returns a sport enum associated with the string
+ * 
+ * @param sport - string value of the sport
+ * @returns sport enum
+ */
+function stringToSport(sport: string): SPORTS | undefined {
+    // Convert input to lowercase and trim for consistency
+    const normalizedInput = sport.toLowerCase().trim();
+    
+    // Check if the normalized input exists as a value in the enum
+    const enumValue = Object
+        .values(SPORTS)
+        .find(value => value === normalizedInput);
+    
+    // Return the enum if found, undefined if not
+    return enumValue as SPORTS | undefined;
+}
+
+/**
+ * Gets the internal images for sports
+ * 
+ * @param sport - sport to find images for
+ * @returns return an array of image urls
+ */
 function sportsInternalImages(sport: SPORTS) : string[] {
     switch (sport) {
         case SPORTS.BADMINTON:
@@ -322,6 +347,7 @@ export {
 
     SPORTS,
     sportToString,
+    stringToSport,
     sportsInternalImages,
 
     VIEW_SIZE,

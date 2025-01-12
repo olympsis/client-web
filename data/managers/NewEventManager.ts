@@ -192,7 +192,7 @@ export class NewEventManager {
         if (!url.includes('event-images/')) {
             const data = await fetch(url);
             const buffer = await data.arrayBuffer();
-            const name = uuidv4();
+            const name = `${uuidv4()}.jpeg`;
             const response = await this.uploadService.uploadImage(buffer, name, 'olympsis-event-images');
             if (response?.url) {
                 return response.url.replace(/^olympsis-/, '');

@@ -15,6 +15,9 @@ export default defineNuxtConfig({
 	build: {
 		transpile: ['malakbel']
 	},
+	experimental: {
+		payloadExtraction: false
+	},
 	runtimeConfig: {
 					
 		public: {

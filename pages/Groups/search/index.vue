@@ -1,4 +1,5 @@
 <template>
+    <NavigationBar/>
     <main id="groups-container">
         <div id="header">
             <h1>Groups</h1>

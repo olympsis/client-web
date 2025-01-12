@@ -1,4 +1,5 @@
 <template>
+    <NavigationBar/>
     <main id="group-reports-view">
         <!-- Header -->
         <div id="header">

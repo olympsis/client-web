@@ -1,4 +1,5 @@
 <template>
+    <NavigationBar/>
     <main id="events">
         <div id="header">
             <h1>Events</h1>

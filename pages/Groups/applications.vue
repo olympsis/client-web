@@ -1,6 +1,6 @@
 <template>
+    <NavigationBar/>
     <main id="group-applications-view">
-        
         <!-- Header -->
         <div id="header">
             <button @click="router.push('/groups/settings')">

@@ -1,4 +1,5 @@
 <template>
+    <NavigationBar/>
     <main id="group-view">
         <!-- Selected Group Info -->
         <div v-if="selectedGroup" class="info" :style="{ 'margin-top': '1rem' }">

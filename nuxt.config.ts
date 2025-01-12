@@ -60,9 +60,9 @@ export default defineNuxtConfig({
 		'/privacy-policy': { prerender: true },
 
 		'/home': { ssr: false },
-		'/groups': { ssr: false },
-		'/groups/search': { ssr: false },
-		'/events': { ssr: false },
+		// '/groups': { ssr: false },
+		// '/groups/search': { ssr: false },
+		// '/events': { ssr: false },
 		'/profile': { ssr: false },
 
 		'/events/**': { ssr: true },

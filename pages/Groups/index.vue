@@ -220,6 +220,10 @@ useSeoMeta({
     ogDescription: 'Join groups around the sports you love'
 });
 
+definePageMeta({
+    key: route => route.fullPath
+});
+
 </script>
 
 <style scoped>

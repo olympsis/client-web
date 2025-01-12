@@ -133,10 +133,6 @@ session.$subscribe((mutation: any, state) => {
     }
 });
 
-watch(selectedDate, (newVal, _) => {
-    // Scroll down to date if we have events for that date
-});
-
 
 onMounted(() => {
     fetchEvents()
@@ -148,6 +144,10 @@ onMounted(() => {
             console.error('Failed to get events. Error: ', error);
             state.value = VIEW_STATE.FAILURE;
         });
+});
+
+definePageMeta({
+    key: route => route.fullPath
 });
 
 function handleShowNewEventModal() {

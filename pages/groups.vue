@@ -1,7 +1,9 @@
 <template>
     <div>
         <NavigationBar/>
-        <NuxtPage :key="$route.fullPath"/>
+        <Suspense>
+            <NuxtPage :key="$route.fullPath"/>
+        </Suspense>
     </div>
 </template>
 

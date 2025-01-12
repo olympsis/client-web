@@ -18,6 +18,11 @@ export default defineNuxtConfig({
 	experimental: {
 		payloadExtraction: false
 	},
+	router: {
+		options: {
+			strict: true
+		}
+	},
 	runtimeConfig: {
 					
 		public: {

@@ -79,19 +79,20 @@ class Ownership extends Codable<Ownership> {
     }
 }
 
-class Organizer {
-    type: string | undefined;
+class Organizer extends Codable<Organizer> {
+    type: number | undefined;
     id: string | undefined;
 
     constructor(
-        type: string | undefined,
+        type: number | undefined,
         id: string | undefined
     ) {
+        super();
         this.type = type;
         this.id = id;
     }
 
-    static decode<Organizer>(data: { [key: string]: any }): Organizer {
+    static override decode<Organizer>(data: { [key: string]: any }): Organizer {
         const object = Object();
 
         if (data) {
@@ -106,23 +107,19 @@ class Organizer {
         Object.setPrototypeOf(object, Organizer.prototype);
         return object;
     }
-}
 
-interface Organizer {
-    encode(): { [key: string]: any; }
-}
+    override encode(): { [key: string]: any } {
+        const data: { [key: string]: any } = {};
 
-Organizer.prototype.encode = function(): { [key: string]: any } {
-    const data: { [key: string]: any } = {};
+        if (this.type) {
+            data['type'] = this.type;
+        }
+        if (this.id) {
+            data['id'] = this.id;
+        }
 
-    if (this.type) {
-        data['type'] = this.type;
+        return data;
     }
-    if (this.id) {
-        data['id'] = this.id;
-    }
-
-    return data;
 }
 
 class VenueDescriptor {

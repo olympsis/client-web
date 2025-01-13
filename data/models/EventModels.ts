@@ -13,7 +13,8 @@ import {
     eventSkillLevelToNumber, 
     eventVisibilityToNumber, 
     numberToEventSkillLevel, 
-    numberToEventVisibility, 
+    numberToEventVisibility,
+    GROUP_TYPE, 
 } from "../Enums";
   
 class Event extends Codable<Event> {
@@ -322,8 +323,9 @@ class EventDao {
         
         if (organizers) {
             this.organizers = organizers?.map((o) => {
+                
                 return new Organizer(
-                    o.type.valueOf(),
+                    o.type === GROUP_TYPE.CLUB ? 0 : 1,
                     o.club?.id ?? o.organization?.id
                 );
             });

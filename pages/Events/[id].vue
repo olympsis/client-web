@@ -348,12 +348,12 @@ const organizers = computed<string>(() => {
     if (arr && (clubs.value.length != 0 || orgs.value.length != 0)) {
         arr.forEach((organizer) => {
             switch(organizer.type) {
-                case GROUP_TYPE.CLUB:
+                case 0:// Club
                     const c = clubs.value.find((c) => { return c.id == organizer.id });
                     if (c?.name) {
                         names.push(c?.name);
                     }
-                case GROUP_TYPE.ORGANIZATION:
+                case 1:// Org
                     const o = orgs.value.find((o) => { return o.id == organizer.id });
                     if (o?.name) {
                         names.push(o.name);
@@ -806,12 +806,12 @@ async function loadEventData(id: string) {
     if (_event.organizers) {
         _event.organizers.forEach(async (o) => {
             switch (o.type) {
-                case GROUP_TYPE.CLUB:
+                case 0:
                     if (o.id) {
                         promises.push(session.clubService.getClub(o.id));
                     }
                     break;
-                case GROUP_TYPE.ORGANIZATION:
+                case 1:
                     if (o.id) {
                         promises.push(session.orgService.getOrganization(o.id));
                     }

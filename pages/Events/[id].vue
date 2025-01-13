@@ -624,14 +624,14 @@ function handleRSVPResponse(event: any) {
 }
 
 async function handleYesResponse() {
-    return await handleResponse('yes');
+    return await handleResponse(1);
 }
 
 async function handleMaybeResponse() {
-    return await handleResponse('maybe');
+    return await handleResponse(0);
 }
 
-async function handleResponse(response: string) {
+async function handleResponse(response: number) {
     let snippet: UserSnippet = UserSnippet.decode({
         'uuid': session.user?.uuid ?? '',
         'username': session.user?.username ?? '',

@@ -217,7 +217,7 @@ class VenueDescriptor {
 //     encode(): { [key: string]: string }
 // }
 
-class Participant {
+class Participant extends Codable<Participant> {
     id: string | undefined;
     user: UserSnippet | undefined;
     status: EVENT_RSVP_STATUS | undefined;
@@ -228,13 +228,13 @@ class Participant {
         status: EVENT_RSVP_STATUS | undefined,
         createdAt: number | undefined
     ) {
-        this.id = uuidv4();
+        super();
         this.user = user;
         this.status = status;
         this.createdAt = createdAt;
     }
 
-    static decode<Participant>(data: { [key: string]: any }): Participant {
+    static override decode<Participant>(data: { [key: string]: any }): Participant {
         const object = Object();
 
         if (data) {
@@ -255,31 +255,47 @@ class Participant {
         Object.setPrototypeOf(object, Participant.prototype);
         return object;
     }
+
+    override encode(): { [key: string]: any } {
+        const data: { [key: string]: any } = {};
+    
+        if (this.id) {
+            data['id'] = this.id;
+        }
+        if (this.user) {
+            data['user'] = this.user.encode();
+        }
+        if (this.status) {
+            data['status'] = this.status;
+        }
+        if (this.createdAt) {
+            data['created_at'] = this.createdAt;
+        }
+    
+        return data;
+    }
 }
 
-interface ParticipantDao {
-    encode(): { [key: string]: string }
-}
-
-class ParticipantDao {
+class ParticipantDao extends Codable<ParticipantDao> {
     id: string | undefined
     uuid: string | undefined
-    status: string | undefined
+    status: number | undefined
     createdAt: string | undefined
 
     constructor(
         id: string | undefined,
         uuid: string | undefined,
-        status: string | undefined,
+        status: number | undefined,
         createdAt: string | undefined,
     ) {
+        super();
         this.id = id
         this.uuid = uuid
         this.status = status
         this.createdAt = createdAt
     }
 
-    static decode<ParticipantDao>(data: { [key: string]: any }): ParticipantDao {
+    static override decode<ParticipantDao>(data: { [key: string]: any }): ParticipantDao {
         const object = Object();
 
         if (data) {
@@ -300,25 +316,25 @@ class ParticipantDao {
         Object.setPrototypeOf(object, ParticipantDao.prototype);
         return object;
     }
-}
 
-ParticipantDao.prototype.encode = function(): { [key: string]: any } {
-    const data: { [key: string]: any } = {};
-
-    if (this.id) {
-        data['id'] = this.id;
+    override encode(): { [key: string]: any } {
+        const data: { [key: string]: any } = {};
+    
+        if (this.id) {
+            data['id'] = this.id;
+        }
+        if (this.uuid) {
+            data['uuid'] = this.uuid;
+        }
+        if (this.status) {
+            data['status'] = this.status;
+        }
+        if (this.createdAt) {
+            data['created_at'] = this.createdAt;
+        }
+    
+        return data;
     }
-    if (this.uuid) {
-        data['uuid'] = this.uuid;
-    }
-    if (this.status) {
-        data['status'] = this.status;
-    }
-    if (this.createdAt) {
-        data['created_at'] = this.createdAt;
-    }
-
-    return data;
 }
 
 interface Like {

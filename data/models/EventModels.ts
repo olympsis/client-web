@@ -150,6 +150,9 @@ class Event extends Codable<Event> {
         if (this.maxParticipants) {
             data['max_participants'] = this.maxParticipants;
         }
+        if (this.participants) {
+            data['participants'] = this.participants.map((p) => p.encode());
+        }
         if (this.visibility) {
             data['visibility'] = eventVisibilityToNumber(this.visibility);
         }

@@ -24,7 +24,7 @@
 <script setup lang="ts">
 import { Event } from '@/data/models/EventModels';
 
-const props = defineProps({
+defineProps({
     event: { type: Event, required: true }
 });
 </script>

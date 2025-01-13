@@ -111,6 +111,10 @@ class Event extends Codable<Event> {
     override encode(): { [key: string]: any; } {
         const data: { [key: string]: any } = {};
 
+        if (this.id) {
+            data['id'] = this.id;
+        }
+
         if (this.type) {
             data['type'] = eventTypeToNumber(this.type);
         }

@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Event } from "./EventModels";
 import { UserSnippet } from "./UserModels";
 import { Organization } from "./OrganizationModels";
-import { numberToEventRSVP, type EVENT_RSVP_STATUS, type GROUP_TYPE } from "../Enums";
+import { eventRSVPToNumber, numberToEventRSVP, type EVENT_RSVP_STATUS, type GROUP_TYPE } from "../Enums";
 import { Codable } from "./Models";
 
 class Model {
@@ -266,7 +266,7 @@ class Participant extends Codable<Participant> {
             data['user'] = this.user.encode();
         }
         if (this.status) {
-            data['status'] = this.status;
+            data['status'] = eventRSVPToNumber(this.status);
         }
         if (this.createdAt) {
             data['created_at'] = this.createdAt;

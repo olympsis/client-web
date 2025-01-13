@@ -259,7 +259,6 @@ import EllipsisBlockButton from '~/components/Buttons/BlockImageButton/EllipsisB
 import EventPrimaryButton from '@/components/Buttons/EventPrimaryButton/EventPrimaryButton.vue';
 import EventDetailSettingsModal from '@/components/Modals/Events/EventDetailSettingsModal/EventDetailSettingsModal.vue';
 import EventParticipantsListModal from '@/components/Modals/Events/EventParticipantsListModal/EventParticipantsListModal.vue';
-import { EventService } from '~/data/services/EventService';
 
 const toast = useToast();
 const route = useRoute();
@@ -613,8 +612,8 @@ function hideRSVPModal() {
     }
 }
 
-function handleRSVPResponse(event: any) {
-    if (event.response === 'yes') {
+function handleRSVPResponse(_event: any) {
+    if (_event.response === 'yes') {
         handleYesResponse();
         hideRSVPModal();
     } else {
@@ -632,18 +631,19 @@ async function handleMaybeResponse() {
 }
 
 async function handleResponse(response: number) {
-    let snippet: UserSnippet = UserSnippet.decode({
-        'uuid': session.user?.uuid ?? '',
-        'username': session.user?.username ?? '',
-        'image_url': session.user?.imageURL ?? ''
-    });
+    const user = session.user;
+    let snippet = new UserSnippet(
+        user?.uuid ?? '',
+        user?.username ?? '',
+        user?.imageURL ?? ''
+    )
     let ptp: Participant = Participant.decode({
         'id': `${111}`,
         'status': response,
         'user': snippet,
         'created_at': Math.floor(Date.now() / 1000)
     });
-
+    
     try {
         let dao = new ParticipantDao(
             undefined,
@@ -655,6 +655,7 @@ async function handleResponse(response: number) {
         if (event.value?.id) {
             primaryState.value = VIEW_STATE.LOADING;
             if (await session.eventService.addParticipant(event.value.id, dao)) {
+                debugger;
                 event.value?.participants?.push(ptp)
                 primaryState.value = VIEW_STATE.PENDING;
             }

@@ -14,7 +14,13 @@
         <div id="actions">
             <ShareMenuButton text="Share event" @click="showCopiedToast"/>
             <ReportMenuButton text="Report event"/>
-            <TrashMenuButton v-if="eventState !== EVENT_STATE.COMPLETED && isAuthorized" text="Delete event" :is-destructive="true" v-bind:state="deleteButtonState"/>
+            <TrashMenuButton 
+                v-if="eventState !== EVENT_STATE.COMPLETED && isAuthorized" 
+                text="Delete event" 
+                :is-destructive="true" 
+                v-bind:state="deleteButtonState"
+                @click="handleEventDeletion"
+            />
         </div>
     </div>
 </template>
@@ -32,7 +38,7 @@ import TrashMenuButton from '~/components/Buttons/MenuButton/TrashMenuButton.vue
 import ReportMenuButton from '~/components/Buttons/MenuButton/ReportMenuButton.vue';
 
 const toast = useToast();
-
+const router = useRouter();
 const session = useSessionStore();
 const emit = defineEmits(['close']);
 const event = defineModel<Event | undefined>(
@@ -77,6 +83,16 @@ function handleEventStatusChange() {
 
 function showCopiedToast() {
     toast.add({ severity: 'secondary', summary: 'Link Copied', detail: 'You\'ve copied the link to this event', life: 3000 });
+}
+
+async function handleEventDeletion() {
+    const id = event.value?.id ?? '';
+    const isDeleted = await session.eventService.deleteEvent(id);
+    if (isDeleted) {
+        router.push('/events');
+    } else {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to delete event!', life: 3000 });
+    }
 }
 </script>
 

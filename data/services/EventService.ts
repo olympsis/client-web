@@ -152,10 +152,10 @@ export class EventService {
     }
 
     async removeParticipant(id: string) : Promise<boolean> {
-        let token = await getAuth().currentUser?.getIdToken() ?? ""
+        let token = await getAuth().currentUser?.getIdToken() ?? "";
 
-        let headers = new Map<string, string>()
-        headers.set('Authorization', token)
+        let headers = new Map<string, string>();
+        headers.set('Authorization', token);
 
         // FIXME: added 000 behind just to spoof server update this on the server so we no longer need participant ID
         const endpoint = new Endpoint(`/v1/events/${id}/participants/000`);
@@ -164,5 +164,19 @@ export class EventService {
             return true;
         }
         throw ('NOT IMPLEMENTED - Failed to get event from server.');
+    }
+
+    async deleteEvent(id: string): Promise<boolean> {
+        let token = await getAuth().currentUser?.getIdToken() ?? "";
+
+        let headers = new Map<string, string>();
+        headers.set('Authorization', token);
+
+        const endpoint = new Endpoint(`/v1/events/${id}`);
+        const [status, _headers, body] = await this.http.request(Method.DELETE, endpoint, undefined, headers);
+        if (status == 200) {
+            return true;
+        }
+        return false;
     }
 }

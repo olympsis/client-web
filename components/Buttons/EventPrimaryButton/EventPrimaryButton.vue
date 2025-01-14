@@ -32,7 +32,7 @@
 
         <!-- Live Button -->
         <div v-if="eventState === EVENT_STATE.LIVE" id="live" class="action">
-            <img class="icon" src="@/assets/icons/circle/circle.fill.white.svg">
+            <img class="icon" src="@/assets/icons/circle/circle.fill.white.svg" :style="{ 'width': '2rem' }">
             <div> Live </div>
         </div>
 

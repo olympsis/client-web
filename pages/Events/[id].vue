@@ -271,8 +271,8 @@ const venues: Ref<Array<Venue>> = ref([]);
 const orgs: Ref<Array<Organization>> = ref([]);
 
 const state= ref<VIEW_STATE>(VIEW_STATE.PENDING);
-const primaryState = ref<VIEW_STATE>(VIEW_STATE.PENDING);
 const failed: Ref<boolean | undefined> = ref(false);
+const primaryState = ref<VIEW_STATE>(VIEW_STATE.PENDING);
             
 const event: Ref<Event | undefined> = ref(undefined);
 const timeElapsed: Ref<string> = ref('');
@@ -320,7 +320,7 @@ const eventTitle = computed<string>(() => {
 
 const eventBody = computed<string>(() => {
     return event.value?.body ?? 'Join olympsis to find sports events near you!';
-})
+});
 
 const eventStatusText = computed<string>(() => {
     const minParticipants = event.value?.minParticipants;
@@ -347,7 +347,7 @@ const organizers = computed<string>(() => {
     if (arr && (clubs.value.length != 0 || orgs.value.length != 0)) {
         arr.forEach((organizer) => {
             switch(organizer.type) {
-                case 0:// Club
+                default:// Club
                     const c = clubs.value.find((c) => { return c.id == organizer.id });
                     if (c?.name) {
                         names.push(c?.name);
@@ -803,11 +803,10 @@ async function loadEventData(id: string) {
     let orgsArr: Organization[] = [];
 
     const _event = await session.eventService.getEvent(id);
-    
     if (_event.organizers) {
         _event.organizers.forEach(async (o) => {
             switch (o.type) {
-                case 0:
+                default:
                     if (o.id) {
                         promises.push(session.clubService.getClub(o.id));
                     }
@@ -846,6 +845,7 @@ async function loadEventData(id: string) {
             })
         });
 
+        
     return { 
         event: _event.encode(), 
         clubs: clubsArr.map((c) => c.encode()), 
@@ -903,6 +903,7 @@ watch(data, (newData) => {
 
     if (clubs.value) {
         clubs.value.forEach((c) => {
+            console.log(c)
             modelStore.setClub(c);
         });
     }

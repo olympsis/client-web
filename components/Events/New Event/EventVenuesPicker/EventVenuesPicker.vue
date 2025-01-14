@@ -229,7 +229,7 @@ async function lookUpCustomVenuesByName(name: string): Promise<VenueDescriptor[]
 
 </script>
 
-<style>
+<style scoped>
 #venues-picker-button {
     width: 100%;
     height: 100%;

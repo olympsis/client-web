@@ -15,7 +15,7 @@
         
         <ul id="applications-list">
             <li v-if="selectedGroupType === GROUP_TYPE.CLUB" v-for="application in filteredClubApplication">
-                <ClubApplicationCard :application="application"/>
+                <ClubApplicationCard :application="application" @answered="handleAnsweredApplication"/>
             </li>
             <li v-else v-for="application in organizationApplications">{{ application.id }}</li>
             <div id="no-applications" v-if="filteredClubApplication.length == 0">
@@ -57,6 +57,13 @@ const selectedGroupType: ComputedRef<GROUP_TYPE> = computed(() => {
     return selectedGroup.value?.type ?? GROUP_TYPE.CLUB;
 });
 
+function handleAnsweredApplication(event: { id: string | undefined}) {
+    if (event.id) {
+        const idx = clubApplications.value.findIndex((a) => a.id == event.id);
+        clubApplications.value.splice(idx, 1);
+    }
+}
+
 async function fetchApplications() {
     if (selectedGroup.value) {
         switch (selectedGroupType.value) {
@@ -72,7 +79,9 @@ async function fetchApplications() {
     }
 }
 
-fetchApplications();
+onMounted(() => {
+    fetchApplications();
+});
 
 useSeoMeta({
     title: () => 'Group Applications | Olympsis',

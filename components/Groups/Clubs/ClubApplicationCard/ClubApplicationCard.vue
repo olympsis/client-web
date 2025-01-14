@@ -32,7 +32,7 @@ const props = defineProps({
 });
 
 const session = useSessionStore();
-
+const emit = defineEmits(['answered']);
 const buttonState: Ref<VIEW_STATE> = ref(VIEW_STATE.PENDING);
 
 const applicant: ComputedRef<UserData | undefined> = computed(() => {
@@ -63,6 +63,13 @@ function handleApplicationResponse(status: string) {
                         props.application.status = status;
                     }
                     buttonState.value = VIEW_STATE.SUCCESS;
+                    emit('answered', { id: props.application?.id });
+                } else {
+                    buttonState.value = VIEW_STATE.FAILURE;
+                    
+                    setTimeout(() => {
+                        buttonState.value = VIEW_STATE.PENDING;
+                    }, 500);
                 }
             })
             .catch(() => {
@@ -95,20 +102,22 @@ function handleApplicationResponse(status: string) {
             }
 
             h2 {
-                font-size: 1rem;
                 color: gray;
+                font-size: 1rem;
+                font-weight: 400;
             }
         }
     }
 
     #application-body {
         text-align: left;
+        margin-top: 1rem;
         color: var(--primary-label-color);
     }
 
     #application-actions {
         display: flex;
-        margin: 1rem 0rem;
+        margin-top: 1rem;
         flex-direction: row;
 
         * {

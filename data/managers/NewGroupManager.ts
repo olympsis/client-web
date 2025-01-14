@@ -43,7 +43,12 @@ export class NewGroupManager {
         if (sports.length === 0) {
             return NEW_GROUP_ERROR.NO_SPORTS;
         }
-        if (homeTown === undefined) {
+        if (
+            homeTown === undefined || 
+            homeTown.administrativeArea === undefined || 
+            homeTown.subAdministrativeArea === undefined ||
+            homeTown.country === undefined
+        ) {
             return NEW_GROUP_ERROR.NO_HOMETOWN;
         }
         return null;

@@ -56,7 +56,7 @@
                 </div>
 
                 <dialog ref="hometown-dialog" id="hometown-dialog">
-                    <LocalePicker :show-cities="true" @close="handleCloseHometownDialog" @completed=""/>
+                    <LocalePicker :show-cities="true" @close="handleCloseHometownDialog" @completed="handleLocaleCompleted"/>
                 </dialog>
             </div>
 

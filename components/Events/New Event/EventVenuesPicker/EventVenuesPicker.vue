@@ -81,17 +81,17 @@
 
 <script setup lang="ts">
 
-import type { Ref, ComputedRef } from 'vue';
-import Dialog from 'primevue/dialog';
-import ScrollPanel from 'primevue/scrollpanel';
-import { getMapkitServerToken } from '@/utils/MapHelpers';
-import { useSessionStore } from '@/stores/session-store';
-import SearchBar from '@/components/SearchBar/SearchBar.vue';
 import { computed, ref, watch } from 'vue';
+import type { Ref, ComputedRef } from 'vue';
+import { useModelStore } from '@/stores/model-store';
+import { DEV_VENUES } from '@/data/dev-data/test-data';
+import { useSessionStore } from '@/stores/session-store';
+import { getMapkitServerToken } from '@/utils/MapHelpers';
 import { VenueDescriptor } from '@/data/models/GenericModels';
 
-import { DEV_VENUES } from '@/data/dev-data/test-data';
-import { useModelStore } from '@/stores/model-store';
+import Dialog from 'primevue/dialog';
+import ScrollPanel from 'primevue/scrollpanel';
+import SearchBar from '@/components/SearchBar/SearchBar.vue';
 
 const sessionStore = useSessionStore();
 const modelStore = useModelStore();
@@ -216,7 +216,7 @@ async function lookUpCustomVenuesByName(name: string): Promise<VenueDescriptor[]
     return results.map((r: any) => {
         return new VenueDescriptor(
             'external',
-            r['id'],
+            undefined,
             r['name'],
             r['structuredAddress']['locality'],
             r['structuredAddress']['administrativeAreaCode'],

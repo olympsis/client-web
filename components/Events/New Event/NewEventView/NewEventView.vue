@@ -144,6 +144,28 @@
                 />
             </div>
 
+            <!-- Min Participants -->
+            <div id="min-participants" class="event-section">
+                <div class="label">Min Participants</div>
+                <div class="sub-label"> Minimum number of participants to run the event </div>
+
+                <div id="input" class="participants-slider">
+                    <Slider v-model="eventMinParticipants" :style="{ width: '100%' }"/>
+                    <input type="number" v-model="eventMinParticipants"/>
+                </div>
+            </div>
+
+            <!-- Max Participants -->
+            <div id="max-participants" class="event-section">
+                <div class="label">Max Participants</div>
+                <div class="sub-label"> The Maximum number of participant for this event </div>
+
+                <div id="input" class="participants-slider">
+                    <Slider v-model="eventMaxParticipants" :step="5" :style="{ width: '100%' }"/>
+                    <input type="number" v-model="eventMaxParticipants"/>
+                </div>
+            </div>
+
             <!-- Image Picker -->
             <div id="event-image-picker">
                 <EventImagePicker v-model:selected-sport="eventSport" v-model:selected-image="eventImage" />
@@ -166,6 +188,7 @@ import { GroupSelection, VenueDescriptor } from '~/data/models/GenericModels';
 import { EVENT_SKILL_LEVEL, EVENT_TYPE, EVENT_VISIBILITY } from '~/data/Enums';
 import { NEW_EVENT_ERROR, NewEventManager } from '~/data/managers/NewEventManager';
 
+import Slider from 'primevue/slider';
 import DatePicker from 'primevue/datepicker';
 import EventTypePicker from '../EventTypePicker/EventTypePicker.vue';
 import EventImagePicker from '../EventImagePicker/EventImagePicker.vue';
@@ -188,10 +211,12 @@ const eventSport = computed<SPORTS>(() => {
 });
 const eventSports: Ref<Array<SPORTS>> = ref([SPORTS.RUNNING]);
 
-const eventVenues: Ref<VenueDescriptor[]> = ref([]);
-const eventType: Ref<EVENT_TYPE> = ref(EVENT_TYPE.REGULAR);
-const eventVisibility: Ref<EVENT_VISIBILITY> = ref(EVENT_VISIBILITY.PUBLIC);
-const eventSkillLevel: Ref<EVENT_SKILL_LEVEL> = ref(EVENT_SKILL_LEVEL.ANY_LEVEL);
+const eventVenues = ref<VenueDescriptor[]>([]);
+const eventType = ref<EVENT_TYPE>(EVENT_TYPE.REGULAR);
+const eventMinParticipants = ref<number>(0);
+const eventMaxParticipants = ref<number>(0);
+const eventVisibility = ref<EVENT_VISIBILITY>(EVENT_VISIBILITY.PUBLIC);
+const eventSkillLevel = ref<EVENT_SKILL_LEVEL>(EVENT_SKILL_LEVEL.ANY_LEVEL);
 
 const eventTitle: Ref<string> = ref('');
 const eventImage: Ref<string> = ref('');
@@ -232,8 +257,8 @@ function createNewEvent() {
             eventStartDate.value,
             eventEndDate.value,
             eventImage.value,
-            0,
-            0
+            eventMinParticipants.value,
+            eventMaxParticipants.value
         );
 
         if (data) {
@@ -381,5 +406,17 @@ function createNewEvent() {
     padding: 0.5rem;
     border-radius: 10px;
     background-color: var(--tertiary-background-color);
+}
+
+.participants-slider {
+    display: flex;
+    align-items: center;
+
+    input {
+        width: 5rem;
+        height: 2rem;
+        font-size: 1rem;
+        margin-left: 2rem;
+    }
 }
 </style>

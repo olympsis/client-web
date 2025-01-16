@@ -94,14 +94,20 @@ const eventState = computed<EVENT_STATE>(() => {
 
 const pendingState = computed<EVENT_PENDING_STATE>(() => {
     const user = session.user;
-    const participants = event.value?.participants ?? [];
+    const participants = event.value?.participants;
+    const waitlist = event.value?.waitList;
     if (user) {
         const participant = participants?.find((p) => p.user?.uuid === user?.uuid);
         if (participant !== undefined) {
             return EVENT_PENDING_STATE.CANCEL;
         }
+
+        const listed = waitlist?.find((p) => p.user?.uuid === user?.uuid);
+        if (listed !== undefined) {
+            return EVENT_PENDING_STATE.CANCEL;
+        }
     }
-    if (event.value?.maxParticipants && participants?.length >= event.value?.maxParticipants) {
+    if (event.value?.maxParticipants && (participants?.length ?? 0) >= event.value?.maxParticipants) {
         return EVENT_PENDING_STATE.WAITLIST;
     } else {
         return EVENT_PENDING_STATE.RSVP;

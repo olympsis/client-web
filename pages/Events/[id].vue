@@ -655,9 +655,15 @@ async function handleResponse(response: number) {
         if (event.value?.id) {
             primaryState.value = VIEW_STATE.LOADING;
             if (await session.eventService.addParticipant(event.value.id, dao)) {
-                debugger;
-                event.value?.participants?.push(ptp)
-                primaryState.value = VIEW_STATE.PENDING;
+                if (event.value.maxParticipants) {
+                    if (event.value.participants.length >= event.value.maxParticipants) {
+                        event.value.waitList.push(ptp);
+                        primaryState.value = VIEW_STATE.PENDING;
+                    }
+                } else {
+                    event.value?.participants.push(ptp)
+                    primaryState.value = VIEW_STATE.PENDING;
+                }
             }
         }
     } catch(error) {
@@ -771,7 +777,8 @@ function handlePrimaryAction() {
                 cancelRSVPResponse();
                 break;
             case EVENT_PENDING_STATE.WAITLIST:
-                throw('NOT IMPLEMENTED YET');
+                showRSVPModal();
+                break;
             case EVENT_PENDING_STATE.RSVP:
                 showRSVPModal();
                 break;
@@ -903,7 +910,6 @@ watch(data, (newData) => {
 
     if (clubs.value) {
         clubs.value.forEach((c) => {
-            console.log(c)
             modelStore.setClub(c);
         });
     }

@@ -28,11 +28,15 @@ class Event extends Codable<Event> {
     body: string;
     sports: string[];
     level: EVENT_SKILL_LEVEL;
+    
     startTime: number;
     stopTime: number;
+    
     minParticipants: number | undefined;
     maxParticipants: number | undefined;
-    participants: Participant[] | undefined;
+    participants: Participant[];
+    waitList: Participant[];
+    
     visibility: EVENT_VISIBILITY;
     externalLink: string | undefined;
     createdAt: number;
@@ -53,6 +57,7 @@ class Event extends Codable<Event> {
         minParticipants: number | undefined,
         maxParticipants: number | undefined,
         participants: Participant[],
+        waitList: Participant[],
         visibility: EVENT_VISIBILITY,
         externalLink: string | undefined,
         createdAt: number,
@@ -68,11 +73,15 @@ class Event extends Codable<Event> {
         this.body = body;
         this.sports = sports;
         this.level = level;
+        
         this.startTime = startTime;
         this.stopTime = stopTime;
+        
         this.minParticipants = minParticipants;
         this.maxParticipants = maxParticipants;
         this.participants = participants;
+        this.waitList = waitList;
+
         this.visibility = visibility;
         this.externalLink = externalLink;
         this.createdAt = createdAt;
@@ -85,8 +94,8 @@ class Event extends Codable<Event> {
             object['id'] = data['id'];
             object['type'] = numberToEventType(data['type']);
             object['poster'] = data['poster'] ? UserSnippet.decode(data['poster']) : undefined;
-            object['organizers'] = data['organizers'] ? data['organizers'].map((org: any) => Organizer.decode(org)) : undefined;
-            object['venues'] = data['venues'] ? data['venues'].map((v: any) => VenueDescriptor.decode(v)) : undefined;
+            object['organizers'] = data['organizers'] ? data['organizers'].map((org: any) => Organizer.decode(org)) : [];
+            object['venues'] = data['venues'] ? data['venues'].map((v: any) => VenueDescriptor.decode(v)) : [];
             object['imageURL'] = data['image_url'];
             object['title'] = data['title'];
             object['body'] = data['body'];
@@ -96,10 +105,11 @@ class Event extends Codable<Event> {
             object['stopTime'] = data['stop_time'];
             object['minParticipants'] = data['min_participants'];
             object['maxParticipants'] = data['max_participants'];
-            object['participants'] = data['participants'] ? data['participants'].map((participant: any) => Participant.decode(participant)) : undefined;
+            object['participants'] = data['participants'] ? data['participants'].map((participant: any) => Participant.decode(participant)) : [];
+            object['waitList'] = data['wait_list'] ? data['wait_list'].map((participant: any) => Participant.decode(participant)) : [];
             object['visibility'] = numberToEventVisibility(data['visibility']);
-            object['clubs'] = data['clubs'] ? data['clubs'].map((club: any) => Club.decode(club)) : undefined;
-            object['organizations'] = data['organizations'] ? data['organizations'].map((org: any) => Organization.decode(org)) : undefined;
+            object['clubs'] = data['clubs'] ? data['clubs'].map((club: any) => Club.decode(club)) : [];
+            object['organizations'] = data['organizations'] ? data['organizations'].map((org: any) => Organization.decode(org)) : [];
             object['externalLink'] = data['external_link'];
             object['createdAt'] = data['created_at'];
         }
@@ -156,6 +166,9 @@ class Event extends Codable<Event> {
         }
         if (this.participants) {
             data['participants'] = this.participants.map((p) => p.encode());
+        }
+        if (this.waitList) {
+            data['wait_list'] = this.waitList.map((p) => p.encode());
         }
         if (this.visibility) {
             data['visibility'] = eventVisibilityToNumber(this.visibility);

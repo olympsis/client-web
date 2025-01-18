@@ -18,6 +18,8 @@ const props = defineProps({ text: { type: String, required: true }});
 </script>
 
 <style scoped>
+@import url('/assets/css/main.css');
+
 #bold-text-button-label {
     width: 100%;
     display: flex;

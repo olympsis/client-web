@@ -10,6 +10,7 @@
                 </picture>
             </button>
         </div>
+        
         <ul id="participants-list" v-if="event.participants.length > 0">
             <li v-for="participant in event.participants" class="participant">
                 <div class="info">
@@ -47,10 +48,9 @@
 import { Event } from '@/data/models/EventModels';
 import UserIcon from '@/components/UserIcon/UserIcon.vue';
 
-const props = defineProps({
+defineProps({
     event: { type: Event, required: true }
 });
-
 </script>
 
 <style scoped>

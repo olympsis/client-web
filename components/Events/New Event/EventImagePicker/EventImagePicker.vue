@@ -165,7 +165,7 @@ function closeMediaPicker() {
         flex-direction: column;
         justify-content: center;
         color: var(--primary-label-color);
-        background-color: var(--tertiary-background-color);
+        background-color: var(--secondary-background-color);
 
         img {
             width: 1.5rem;

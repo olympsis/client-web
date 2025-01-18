@@ -136,7 +136,7 @@ function generateDisplayString() {
     align-items: center;
     justify-content: center;
     color: var(--primary-label-color);
-    background-color: var(--tertiary-background-color);
+    background-color: var(--secondary-background-color);
 }
 
 #event-organizers-popup {

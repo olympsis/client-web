@@ -239,7 +239,7 @@ async function lookUpCustomVenuesByName(name: string): Promise<VenueDescriptor[]
     font-size: 0.9rem;
     border-radius: 10px;
     color: var(--primary-label-color);
-    background-color: var(--tertiary-background-color);
+    background-color: var(--secondary-background-color);
 }
 
 #event-venues-popup-container {

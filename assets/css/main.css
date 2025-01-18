@@ -220,3 +220,16 @@ a:any-link:active {
 		background-position: 0% 50%, 50% 50%, 100% 50%;
 	}
 }
+
+.button {
+    all: unset;
+    cursor: pointer;
+    padding: 0.5rem;
+    height: fit-content;
+    border-radius: 10px;
+    background-color: var(--secondary-background-color);
+
+    &:hover {
+        transform: scale(1.1);
+    }
+}

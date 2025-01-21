@@ -104,9 +104,9 @@ function getStencilComponent() {
 function getAspectRatio() {
     switch (props.cropShape) {
         case CROP_SHAPE.LANDSCAPE:
-            return 16/9;
+            return 4/3;
         case CROP_SHAPE.PORTRAIT:
-            return 9/16;
+            return 3/4;
         case CROP_SHAPE.SQUARE:
             return 1;
         case CROP_SHAPE.CIRCLE:

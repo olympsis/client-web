@@ -10,9 +10,9 @@
             </div>
         </div>
         <div id="settings">
-            <PersonMenuButton text="Limit Event Spots"/>
-            <NorthEastMenuButton text="Add an External Link"/>
-            <ClockMenuButton text="Set up a Recurring Event"/>
+            <PersonMenuButton text="Limit Event Spots" @click="$emit('participants')" />
+            <NorthEastMenuButton text="Add an External Link" @click="$emit('link')" />
+            <ClockMenuButton text="Set up a Recurring Event" @click="$emit('recurrence')" />
         </div>
     </div>
 </template>

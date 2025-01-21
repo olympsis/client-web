@@ -11,7 +11,7 @@
                     </picture>
                 </button>
 
-                <button class="button" @click="eventSettingsModalRef?.show()">
+                <button class="button" @click="settingsModalRef?.show()">
                     <picture class="centered">
                         <source srcset="@/assets/icons/gear/gear.white.svg" media="(prefers-color-scheme: dark)">
                         <img src="@/assets/icons/gear/gear.svg"/>
@@ -156,19 +156,46 @@
 
             <!-- Primary Action -->
             <div id="action-wrapper">
-                <BoldTextButton v-model="state" text="create" @click="createNewEvent"/>
+                <BoldTextButton v-model="state" text="create event" @click="createNewEvent"/>
             </div>
         </div>
 
-        <dialog id="event-settings-modal" ref="eventSettingsModal" class="dialog">
-            <EventAdvancedSettings @close="eventSettingsModalRef?.close()"/>
+        <dialog id="settings-modal" ref="settings-modal" class="dialog">
+            <EventAdvancedSettings 
+                @close="settingsModalRef?.close()"
+                @link="handleShowExternalLinkSetting"
+                @recurrence="handleShowRecurrenceSetting"
+                @participants="handleShowParticipantsSetting"
+            />
+        </dialog>
+
+        <dialog id="participant-modal" ref="participant-modal" class="dialog">
+            <EventParticipantsLimitSettings 
+                @close="participantModalRef?.close()"
+                @done="handleLimitParticipants"
+            />
+        </dialog>
+
+        <dialog id="external-link-modal" ref="external-link-modal" class="dialog">
+            <EventExternalLinkSetting
+                @close="externalLinkModalRef?.close()"
+                @done="handleSetExternalLink"
+            />
+        </dialog>
+
+        <dialog id="recurrence-modal" ref="recurrence-modal" class="dialog">
+            <EventRecurrenceSettings
+                @close="recurrenceModalRef?.close()"
+                @done="handleSetEventRecurrence"
+            />
         </dialog>
     </div>
 </template>
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { SPORTS, VIEW_STATE } from '~/data/Enums';
+import { useToast } from 'primevue/usetoast';
+import { SPORTS, VIEW_STATE, EVENT_RECURRENCE_FREQUENCY } from '~/data/Enums';
 import { GroupSelection, VenueDescriptor } from '~/data/models/GenericModels';
 import { EVENT_SKILL_LEVEL, EVENT_TYPE, EVENT_VISIBILITY } from '~/data/Enums';
 import { NEW_EVENT_ERROR, NewEventManager } from '~/data/managers/NewEventManager';
@@ -184,7 +211,12 @@ import EventAdvancedSettings from '~/components/Events/New Event/EventAdvancedSe
 import EventVisibilityPicker from '~/components/Events/New Event/EventVisibilityPicker/EventVisibilityPicker.vue';
 import EventSkillLevelPicker from '~/components/Events/New Event/EventSkillLevelPicker/EventSkillLevelPicker.vue';
 import EventOrganizersPicker from '~/components/Events/New Event/EventOrganizersPicker/EventOrganizersPicker.vue';
+import EventRecurrenceSettings from '~/components/Modals/Events/EventRecurrenceModal/EventRecurrenceSettings.vue';
+import EventExternalLinkSetting from '~/components/Modals/Events/EventExternalLinkSetting/EventExternalLinkSetting.vue';
+import EventParticipantsLimitSettings from '~/components/Modals/Events/EventParticipantsLimitSettings/EventParticipantsLimitSettings.vue';
+import { RecurrenceOptions } from '~/data/models/EventModels';
 
+const toast = useToast();
 const router = useRouter();
 const state = ref<VIEW_STATE>(VIEW_STATE.PENDING);
 const manager: NewEventManager = new NewEventManager();
@@ -197,6 +229,7 @@ const eventSport = computed<SPORTS>(() => {
 const eventTitle = ref<string>('');
 const eventImage = ref<string>('');
 const eventDescription = ref<string>('');
+const eventExternalLink = ref<string>('');
 const eventMinParticipants = ref<number>(0);
 const eventMaxParticipants = ref<number>(0);
 const eventGroups = ref<GroupSelection[]>([]);
@@ -209,7 +242,13 @@ const eventSkillLevel = ref<EVENT_SKILL_LEVEL>(EVENT_SKILL_LEVEL.ANY_LEVEL);
 const eventStartDate = ref<Date>(new Date());
 const eventEndDate = ref<Date>(new Date(eventStartDate.value.getTime() + (60 * 60 * 1000)));
 
-const eventSettingsModalRef = useTemplateRef<HTMLDialogElement>('eventSettingsModal');
+const eventRecurrenceEndDate = ref<Date | undefined>(undefined);
+const eventRecurrenceFrequency = ref<EVENT_RECURRENCE_FREQUENCY | undefined>(undefined);
+
+const settingsModalRef = useTemplateRef<HTMLDialogElement>('settings-modal');
+const recurrenceModalRef = useTemplateRef<HTMLDialogElement>('recurrence-modal');
+const participantModalRef = useTemplateRef<HTMLDialogElement>('participant-modal');
+const externalLinkModalRef = useTemplateRef<HTMLDialogElement>('external-link-modal');
  
 function createNewEvent() {
     state.value = VIEW_STATE.LOADING;
@@ -246,15 +285,27 @@ function createNewEvent() {
         );
 
         if (data) {
-            manager.createNewEvent(data)
+            let opts: RecurrenceOptions | undefined;
+            if (eventRecurrenceFrequency.value != undefined && eventRecurrenceEndDate.value != undefined) {
+                opts = new RecurrenceOptions(
+                    eventRecurrenceFrequency.value,
+                    eventRecurrenceEndDate.value.getTime() / 1000,
+                    1
+                )
+            }
+            
+            manager.createNewEvent(data, opts)
                 .then((id: string | null) => {
                     if (!id) throw('No ID returned by the server.')
                     state.value = VIEW_STATE.SUCCESS;
-                    router.push(`/events/${id}`);
+                    setTimeout(() => {
+                        router.push(`/events/${id}`);
+                    }, 500);
                 })
                 .catch((error: any) => {
                     state.value = VIEW_STATE.FAILURE;
                     console.error('Failed to create event. Error: ', error);
+                    toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to create event!', life: 3000 });
                     setTimeout(() => {
                         state.value = VIEW_STATE.PENDING;
                     }, 250);
@@ -265,6 +316,39 @@ function createNewEvent() {
 
 function handleBackNavigation() {
     router.push('/events');
+}
+
+function handleShowRecurrenceSetting() {
+    settingsModalRef?.value?.close();
+    recurrenceModalRef?.value?.show();
+    
+}
+
+function handleShowParticipantsSetting() {
+    settingsModalRef?.value?.close();
+    participantModalRef?.value?.show();
+}
+
+function handleShowExternalLinkSetting() {
+    settingsModalRef?.value?.close();
+    externalLinkModalRef?.value?.show();
+}
+
+function handleSetEventRecurrence(event: { frequency: EVENT_RECURRENCE_FREQUENCY, endDate: Date }) {
+    recurrenceModalRef.value?.close();
+    eventRecurrenceEndDate.value = event.endDate;
+    eventRecurrenceFrequency.value = event.frequency;
+}
+
+function handleSetExternalLink(event: { link: string }) {
+    externalLinkModalRef.value?.close();
+    eventExternalLink.value = event.link;
+}
+
+function handleLimitParticipants(event: { min: number, max: number }) {
+    participantModalRef.value?.close();
+    eventMinParticipants.value = event.min;
+    eventMaxParticipants.value = event.max;
 }
 
 useSeoMeta({
@@ -307,7 +391,7 @@ useSeoMeta({
         }
 
         #event-type-config {
-            margin: 1rem;
+            margin: 0.5rem 1rem;
             display: flex;
             max-width: 22rem;
             justify-content: space-between;
@@ -319,7 +403,8 @@ useSeoMeta({
 
         #note {
             font-size: 0.9rem;
-            margin: 0.2rem 1rem;
+            margin: 0rem 1rem;
+            margin-bottom: 1rem;
             color: var(--tertiary-brand-color);
         }
     }
@@ -338,11 +423,18 @@ useSeoMeta({
 
 @media (max-width: 1030px) {
 #new-event-view {
+    width: 100%;
     display: flex;
     flex-direction: column;
 
+    #left {
+        width: 100%;
+        margin: 0 auto;
+    }
+
     #right {
-        margin-left: unset;
+        width: 100%;
+        margin: 0 auto;
 
         #action-wrapper {
             margin-bottom: 10rem;
@@ -435,13 +527,55 @@ useSeoMeta({
     color: var(--tertiary-brand-color);
 }
 
-#event-settings-modal{
+#settings-modal{
     top: 0;
     border: unset;
     background: transparent;
     backdrop-filter: blur(5px);
 
     #event-advanced-settings {
+        border-radius: 20px;
+        max-width: 25rem !important;
+        box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+    }
+
+}
+
+#recurrence-modal {
+    top: 0;
+    border: unset;
+    background: transparent;
+    backdrop-filter: blur(5px);
+
+    #event-recurrence-settings {
+        border-radius: 20px;
+        max-width: 25rem !important;
+        box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+    }
+
+}
+
+#external-link-modal {
+    top: 0;
+    border: unset;
+    background: transparent;
+    backdrop-filter: blur(5px);
+
+    #event-external-link-setting {
+        border-radius: 20px;
+        max-width: 25rem !important;
+        box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+    }
+
+}
+
+#participant-modal {
+    top: 0;
+    border: unset;
+    background: transparent;
+    backdrop-filter: blur(5px);
+
+    #event-participants-settings {
         border-radius: 20px;
         max-width: 25rem !important;
         box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;

@@ -2,7 +2,7 @@ import { getAuth } from 'firebase/auth'
 import type { Venue } from '../models/VenueModels';
 import { Courrier, Endpoint, Method, Scheme } from "malakbel";
 import type { ParticipantDao } from '../models/GenericModels';
-import { Event, EventDao, EventsResponse, LocationResponse } from "../models/EventModels";
+import { Event, EventDao, EventsResponse, LocationResponse, NewEventDao } from "../models/EventModels";
 
 export class EventService {
 
@@ -13,7 +13,7 @@ export class EventService {
         this.http = new Courrier(Scheme.HTTPS, config.public.API);
     }
 
-    async createEvent(dao: EventDao) : Promise<string | null> {
+    async createEvent(dao: NewEventDao) : Promise<string | null> {
         let token = await getAuth().currentUser?.getIdToken() ?? ""
         
         let headers = new Map<string, string>();
@@ -166,13 +166,18 @@ export class EventService {
         throw ('NOT IMPLEMENTED - Failed to get event from server.');
     }
 
-    async deleteEvent(id: string): Promise<boolean> {
+    async deleteEvent(id: string, deleteAll?: boolean): Promise<boolean> {
         let token = await getAuth().currentUser?.getIdToken() ?? "";
 
         let headers = new Map<string, string>();
         headers.set('Authorization', token);
 
-        const endpoint = new Endpoint(`/v1/events/${id}`);
+        let query = new Map<string, string>();
+        if (deleteAll) {
+            query.set("deleteAll", deleteAll === true ? "true" : "false");
+        }
+
+        const endpoint = new Endpoint(`/v1/events/${id}`, query);
         const [status, _headers, body] = await this.http.request(Method.DELETE, endpoint, undefined, headers);
         if (status == 200) {
             return true;

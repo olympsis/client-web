@@ -22,6 +22,13 @@
                 @click="handleEventDeletion"
             />
         </div>
+
+        <dialog id="delete-all" ref="delete-all" class="dialog">
+            <EventDeleteAll
+                @no="deleteEvent"
+                @yes="deleteEvent(true)"
+            />
+        </dialog>
     </div>
 </template>
 
@@ -33,6 +40,7 @@ import { useToast } from 'primevue/usetoast';
 import { Event } from '@/data/models/EventModels';
 import { useSessionStore } from '@/stores/session-store';
 
+import EventDeleteAll from '../EventDeleteAllModal/EventDeleteAll.vue';
 import ShareMenuButton from '~/components/Buttons/MenuButton/ShareMenuButton.vue';
 import TrashMenuButton from '~/components/Buttons/MenuButton/TrashMenuButton.vue';
 import ReportMenuButton from '~/components/Buttons/MenuButton/ReportMenuButton.vue';
@@ -41,6 +49,8 @@ const toast = useToast();
 const router = useRouter();
 const session = useSessionStore();
 const emit = defineEmits(['close']);
+const deleteAll = useTemplateRef<HTMLDialogElement>('delete-all');
+
 const event = defineModel<Event | undefined>(
     'event',
     { default: undefined, required: true }
@@ -85,9 +95,17 @@ function showCopiedToast() {
     toast.add({ severity: 'secondary', summary: 'Link Copied', detail: 'You\'ve copied the link to this event', life: 3000 });
 }
 
-async function handleEventDeletion() {
+function handleEventDeletion() {
+    if (event.value?.isRecurring) {
+        deleteAll.value?.show();
+    } else {
+        deleteEvent();
+    }
+}
+
+async function deleteEvent(deleteAll?: boolean) {
     const id = event.value?.id ?? '';
-    const isDeleted = await session.eventService.deleteEvent(id);
+    const isDeleted = await session.eventService.deleteEvent(id, deleteAll);
     if (isDeleted) {
         router.push('/events');
     } else {
@@ -100,6 +118,7 @@ async function handleEventDeletion() {
 #event-detail-settings-modal {
     min-width: 20rem;
     max-width: var(--dialog-max-width);
+    background-color: var(--primary-background-color);
     
     #header {
         display: flex;
@@ -113,19 +132,6 @@ async function handleEventDeletion() {
             white-space: nowrap;
             margin: auto;
             color: var(--primary-label-color);
-        }
-
-        .button {
-            width: 2.5rem;
-            height: 2.5rem;
-            border: unset;
-            cursor: pointer;
-            border-radius: 10px;
-            background-color: var(--tertiary-background-color);
-
-            &:hover {
-                transform: scale(1.1);
-            }
         }
     }
 
@@ -143,6 +149,20 @@ async function handleEventDeletion() {
         display: flex;
         align-items: center;
         justify-content: center;
+    }
+}
+
+#delete-all {
+    top: 0;
+    border: unset;
+    background: transparent;
+    backdrop-filter: blur(5px);
+
+    #event-delete-all-modal {
+        border-radius: 20px;
+        max-width: 25rem !important;
+        box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+        background-color: var(--secondary-background-color);
     }
 }
 </style>

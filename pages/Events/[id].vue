@@ -1408,7 +1408,7 @@ h1 {
     #event-detail-settings-modal {
         border-radius: 20px;
         box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
-        background-color: var(--secondary-background-color);
+        background-color: var(--primary-background-color);
     }
 }
 

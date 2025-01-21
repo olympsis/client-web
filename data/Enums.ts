@@ -46,6 +46,11 @@ enum EVENT_PENDING_STATE {
     CANCEL='cancel',
 }
 
+enum EVENT_RECURRENCE_FREQUENCY {
+    WEEKLY = 'WEEKLY',
+    MONTHLY = 'MONTHLY'
+}
+
 enum EVENT_RSVP_STATUS {
     MAYBE = 'maybe',
     YES = 'yes'
@@ -323,6 +328,7 @@ export {
     CROP_SHAPE,
     
     EVENT_PENDING_STATE,
+    EVENT_RECURRENCE_FREQUENCY,
     
     EVENT_RSVP_STATUS,
     eventRSVPToNumber,

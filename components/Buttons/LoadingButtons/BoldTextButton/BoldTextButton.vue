@@ -3,9 +3,7 @@
         <div id="text" v-if="model === VIEW_STATE.PENDING">
             {{ text }}
         </div>
-        <div v-if="model === VIEW_STATE.LOADING">
-            <div class="event-status-loader"></div>
-        </div>
+        <div v-if="model === VIEW_STATE.LOADING" class="event-status-loader"/>
     </div>
 </template>
 

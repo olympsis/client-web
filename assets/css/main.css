@@ -233,3 +233,44 @@ a:any-link:active {
         transform: scale(1.1);
     }
 }
+
+.settings-view {
+	.settings-header {
+		display: flex;
+		align-items: center;
+		flex-direction: row;
+		
+		.title {
+			margin: 0 auto;
+		}
+
+		.primary {
+			color: white;
+			font-size: 0.8rem;
+			padding: 0.5rem 1rem;
+			background-color: var(--primary-brand-color);
+		}
+
+		.secondary {
+			font-size: 0.8rem;
+			padding: 0.5rem 1rem;
+		}
+	}
+
+	.settings-body {
+		margin-top: 1rem;
+
+		.section {
+			margin: 0.5rem 0rem;
+			
+			.header {
+				font-size: 0.9rem;
+				font-weight: bold;
+			}
+			.sub-header {
+				font-size: 0.85rem;
+				color: var(--olympsis-gray);
+			}
+		}
+	}
+}

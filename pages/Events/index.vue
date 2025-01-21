@@ -51,11 +51,6 @@
             </div>
         </main>
 
-        <!-- New Event Modal -->
-        <dialog id="new-event-modal" ref="new-event-modal" class="dialog">
-            <NewEventCard @close="handleHideNewEventModal"/>
-        </dialog>
-
         <!-- Events Settings Modal -->
         <dialog id="event-settings-modal" ref="event-settings-modal" class="dialog">
 
@@ -74,7 +69,6 @@ import { computed, onMounted, ref, useTemplateRef, watch } from 'vue';
 
 import SearchBar from '@/components/SearchBar/SearchBar.vue';
 import EventListItem from '@/components/Events/EventListItem/EventListItem.vue';
-import NewEventCard from '@/components/Events/New Event/NewEventView/NewEventView.vue';
 import EventDateButton from '@/components/Buttons/EventDateButton/EventDateButton.vue';
 
 const router = useRouter();
@@ -86,7 +80,6 @@ const events = ref<Event[]>([]);
 const searchText = ref<string>('');
 const selectedDate = ref<string>(Date.now().toLocaleString());
 
-const newEventModalRef = useTemplateRef<HTMLDialogElement>('new-event-modal');
 const eventSettingsModalRef = useTemplateRef<HTMLDialogElement>('event-settings-modal');
 
 
@@ -125,19 +118,7 @@ const eventSections = computed<EventSection[]>(() => {
 });
 
 function handleShowNewEventModal() {
-    if (newEventModalRef.value) {
-        newEventModalRef.value.show();
-    } else {
-        console.error('Failed to find new event modal template reference.')
-    }
-}
-
-function handleHideNewEventModal() {
-    if (newEventModalRef.value) {
-        newEventModalRef.value.close();
-    } else {
-        console.error('Failed to find new event modal template reference.')
-    }
+    router.push('/events/new');
 }
 
 function handleShowEventSettingsModal() {

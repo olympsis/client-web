@@ -58,7 +58,7 @@ defineProps({
     min-width: 20rem;
     border-radius: 20px;
     max-width: var(--dialog-max-width);
-    background-color: var(--secondary-background-color);
+    background-color: var(--primary-background-color);
 
     #header {
         width: 100%;
@@ -73,19 +73,6 @@ defineProps({
             white-space: nowrap;
             margin: auto;
             color: var(--primary-label-color);
-        }
-
-        .button {
-            width: 2.5rem;
-            height: 2.5rem;
-            border: unset;
-            cursor: pointer;
-            border-radius: 10px;
-            background-color: var(--tertiary-background-color);
-
-            &:hover {
-                transform: scale(1.1);
-            }
         }
     }
 

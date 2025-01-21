@@ -41,6 +41,8 @@ class Event extends Codable<Event> {
     externalLink: string | undefined;
     createdAt: number;
 
+    isRecurring: boolean;
+
     constructor(
         id: string,
         type: EVENT_TYPE,
@@ -61,6 +63,7 @@ class Event extends Codable<Event> {
         visibility: EVENT_VISIBILITY,
         externalLink: string | undefined,
         createdAt: number,
+        isRecurring?: boolean,
     ){
         super();
         this.id = id;
@@ -85,6 +88,8 @@ class Event extends Codable<Event> {
         this.visibility = visibility;
         this.externalLink = externalLink;
         this.createdAt = createdAt;
+
+        this.isRecurring = isRecurring ?? false;
     }
   
     static override decode<Event>(data: { [key: string]: any }): Event {
@@ -112,6 +117,8 @@ class Event extends Codable<Event> {
             object['organizations'] = data['organizations'] ? data['organizations'].map((org: any) => Organization.decode(org)) : [];
             object['externalLink'] = data['external_link'];
             object['createdAt'] = data['created_at'];
+
+            object['isRecurring'] = data['is_recurring'];
         }
 
         Object.setPrototypeOf(object, Event.prototype);
@@ -178,6 +185,10 @@ class Event extends Codable<Event> {
         }
         if (this.createdAt) {
             data['created_at'] = this.createdAt;
+        }
+
+        if (this.isRecurring) {
+            data['is_recurring'] = this.isRecurring;
         }
 
         return data;
@@ -297,7 +308,7 @@ class Event extends Codable<Event> {
     }
 }
 
-class EventDao {
+class EventDao extends Codable<EventDao> {
     type: EVENT_TYPE | undefined;
     poster: string | undefined;
     organizers: Organizer[] | undefined;
@@ -333,6 +344,7 @@ class EventDao {
       maxParticipants: number | undefined,
       participants: Participant[] | undefined
     ) {
+        super();
         if (type) {
             this.type = type;
         }
@@ -399,65 +411,61 @@ class EventDao {
             this.visibility = visibility
         }
     }
-}
 
-interface EventDao {
-    encode(): { [key: string]: any }
-}
+    override encode(): { [key: string]: any } {
+        const data: { [key: string]: any } = {};
 
-EventDao.prototype.encode = function(): { [key: string]: any } {
-    const data: { [key: string]: any } = {};
-
-    if (this.type) {
-        data['type'] = eventTypeToNumber(this.type);
+        if (this.type) {
+            data['type'] = eventTypeToNumber(this.type);
+        }
+        if (this.poster) {
+            data['poster'] = this.poster;
+        }
+        if (this.organizers) {
+            data['organizers'] = this.organizers.map((org: Organizer) => org.encode());
+        }
+        if (this.venues) {
+            data['venues'] = this.venues.map((v) => v.encode());
+        }
+        if (this.imageURL) {
+            data['image_url'] = this.imageURL;
+        }
+        if (this.title) {
+            data['title'] = this.title;
+        }
+        if (this.body) {
+            data['body'] = this.body;
+        }
+        if (this.sports) {
+            data['sports'] = this.sports.map((s) => s.valueOf());
+        }
+        if (this.level !== undefined) {
+            data['level'] = eventSkillLevelToNumber(this.level);
+        }
+        if (this.startTime) {
+            data['start_time'] = this.startTime;
+        }
+        if (this.stopTime) {
+            data['stop_time'] = this.stopTime;
+        }
+        if (this.minParticipants) {
+            data['min_participants'] = this.minParticipants;
+        }
+        if (this.maxParticipants) {
+            data['max_participants'] = this.maxParticipants;
+        }
+        if (this.visibility) {
+            data['visibility'] = eventVisibilityToNumber(this.visibility);
+        }
+        if (this.externalLink) {
+            data['external_link'] = this.externalLink;
+        }
+        if (this.createdAt) {
+            data['created_at'] = this.createdAt;
+        }
+    
+        return data;
     }
-    if (this.poster) {
-        data['poster'] = this.poster;
-    }
-    if (this.organizers) {
-        data['organizers'] = this.organizers.map((org: Organizer) => org.encode());
-    }
-    if (this.venues) {
-        data['venues'] = this.venues.map((v) => v.encode());
-    }
-    if (this.imageURL) {
-        data['image_url'] = this.imageURL;
-    }
-    if (this.title) {
-        data['title'] = this.title;
-    }
-    if (this.body) {
-        data['body'] = this.body;
-    }
-    if (this.sports) {
-        data['sports'] = this.sports.map((s) => s.valueOf());
-    }
-    if (this.level !== undefined) {
-        data['level'] = eventSkillLevelToNumber(this.level);
-    }
-    if (this.startTime) {
-        data['start_time'] = this.startTime;
-    }
-    if (this.stopTime) {
-        data['stop_time'] = this.stopTime;
-    }
-    if (this.minParticipants) {
-        data['min_participants'] = this.minParticipants;
-    }
-    if (this.maxParticipants) {
-        data['max_participants'] = this.maxParticipants;
-    }
-    if (this.visibility) {
-        data['visibility'] = eventVisibilityToNumber(this.visibility);
-    }
-    if (this.externalLink) {
-        data['external_link'] = this.externalLink;
-    }
-    if (this.createdAt) {
-        data['created_at'] = this.createdAt;
-    }
-
-    return data;
 }
 
 class EventsResponse {
@@ -530,10 +538,67 @@ class EventSection {
     }
 }
 
+class NewEventDao extends Codable<NewEventDao> {
+    event: EventDao
+    includeHost?: Boolean
+    recurrenceOptions?: RecurrenceOptions
+
+    constructor(
+        event: EventDao,
+        includeHost?: boolean,
+        recurrenceOptions?: RecurrenceOptions
+    ) {
+        super();
+        this.event = event;
+        this.includeHost = includeHost;
+        this.recurrenceOptions = recurrenceOptions;
+    }
+
+    override encode(): { [key: string]: any } {
+        const data: { [key: string]: any } = {};
+
+        data['event'] = this.event.encode();
+        data['include_host'] = this.includeHost ?? false;
+        data['recurrence'] = this.recurrenceOptions?.encode();
+
+        return data
+    }
+}
+
+class RecurrenceOptions extends Codable<RecurrenceOptions> {
+    pattern: string
+    endTime: number
+    interval: number
+
+    constructor(
+        pattern: string,
+        endTime: number,
+        interval: number
+    ) {
+        super();
+        this.pattern = pattern;
+        this.endTime = endTime;
+        this.interval = interval;
+    }
+
+    override encode(): { [key: string]: any; } {
+        const data: { [key: string]: any } = {};
+
+        data['pattern'] = this.pattern;
+        data['end_time'] = this.endTime;
+        data['interval'] = this.interval;
+
+        return data;
+    }
+}
+
 export {
     Event,
     EventDao,
     EventsResponse,
     EventSection,
-    LocationResponse
+    LocationResponse,
+    
+    NewEventDao,
+    RecurrenceOptions
 }

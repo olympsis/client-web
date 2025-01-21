@@ -170,8 +170,6 @@ function generateDisplayString() {
             color: var(--primary-label-color);
 
             .button {
-                width: 1rem;
-                height: 1rem;
                 cursor: pointer;
                 border-radius: 50%;
                 margin: 0rem 0.7rem;
@@ -180,6 +178,7 @@ function generateDisplayString() {
 
             .selected {
                 border: unset;
+                border: 2px solid var(--primary-label-color);
                 background-color: var(--primary-label-color);
             }
 

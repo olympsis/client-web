@@ -2,7 +2,7 @@ import { SPORTS } from '../Enums';
 import { v4 as uuidv4 } from 'uuid';
 import { UserSnippet } from "../models/UserModels";
 import { useModelStore } from "@/stores/model-store";
-import { Event, EventDao } from "../models/EventModels";
+import { Event, EventDao, NewEventDao, RecurrenceOptions } from "../models/EventModels";
 import { EventService } from "../services/EventService";
 import { useSessionStore } from "@/stores/session-store";
 import { UploadService } from "../services/UploadService";
@@ -105,7 +105,7 @@ export class NewEventManager {
      * @param dao - event object
      * @returns a string of the ID of the event or Null if an error occurred
      */
-    public async createNewEvent(dao: EventDao) : Promise <string | null> {
+    public async createNewEvent(dao: EventDao, opts?: RecurrenceOptions) : Promise <string | null> {
         let isCustomImage = false;
         try {
             if (!dao.imageURL) throw('Event Image Required!');
@@ -118,7 +118,13 @@ export class NewEventManager {
             }
 
             // Create event server-side
-            const id = await this.eventService.createEvent(dao);
+            const newEventDao = new NewEventDao(
+                dao,
+                true,
+                opts
+            );
+
+            const id = await this.eventService.createEvent(newEventDao);
             if (id) {
                 return id
             } else {
@@ -171,6 +177,7 @@ export class NewEventManager {
             dao.minParticipants,
             dao.maxParticipants,
             [participant],
+            [],
             dao.visibility ?? EVENT_VISIBILITY.PUBLIC,
             dao.externalLink,
             timestamp ?? 0,

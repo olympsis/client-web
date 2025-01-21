@@ -78,11 +78,6 @@
         <dialog id="new-post-modal" ref="new-post-modal" class="dialog">
             <NewPostView  @close="postCardModalRef?.close()" @created="handleNewPost"/>
         </dialog>
-
-        <!-- New Event Modal -->
-        <dialog id="new-event-modal" ref="new-event-modal" class="dialog">
-            <NewEventCard @close="handleHideNewEventModal"/>
-        </dialog>
     </main>
 </template>
 
@@ -104,7 +99,6 @@ import NavigationCard from '@/components/NavigationCard/NavigationCard.vue';
 import NextEventCard from '@/components/Events/NextEventCard/NextEventCard.vue';
 import GroupSelector from '@/components/Groups/GroupSelector/GroupSelector.vue';
 import MembersListCard from '@/components/Groups/MembersListCard/MembersListCard.vue';
-import NewEventCard from '@/components/Events/New Event/NewEventView/NewEventView.vue';
 
 const toast = useToast();
 const router = useRouter();
@@ -188,19 +182,7 @@ function handleSelectedGroupChanged(event: any) {
 }
 
 function handleShowNewEventModal() {
-    if (eventCardModalRef.value) {
-        eventCardModalRef.value.show();
-    } else {
-        console.error('Failed to find template reference');
-    }
-}
-
-function handleHideNewEventModal() {
-    if (eventCardModalRef.value) {
-        eventCardModalRef.value.close();
-    } else {
-        console.error('Failed to find template reference');
-    }
+    router.push('/events/new');
 }
 
 async function handleGroupSharing() {

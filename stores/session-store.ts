@@ -1,5 +1,4 @@
-import { 
-    onAuthStateChanged,
+import {
     type Auth, 
 } from 'firebase/auth';
 
@@ -32,7 +31,8 @@ export const useSessionStore = defineStore('session-store', () => {
     var hasLocation = ref(false);
     var location = new LocationManager();
 
-    var authService = new AuthService();
+    var authenticator = new AuthenticationFacade();
+
     var userService = new UserService();
     var clubService = new ClubService();
     var orgService = new OrganizationService();
@@ -40,18 +40,18 @@ export const useSessionStore = defineStore('session-store', () => {
     var eventService = new EventService();
     var chatService = new ChatService();
 
-    var user: Ref<UserData | undefined> = ref();
+    var user = ref<UserData | undefined>();
 
-    var events: Ref<Event[]> = ref([]);
-    var venues: Ref<Venue[]> = ref([]);
+    var events = ref<Event[]>([]);
+    var venues = ref<Venue[]>([]);
 
-    var clubs: Ref<Club[]> = ref([]);
-    var organizations: Ref<Organization[]> = ref([]);
+    var clubs = ref<Club[]>([]);
+    var organizations = ref<Organization[]>([]);
 
-    var groups: Ref<GroupSelection[]> = ref([]);
-    var selectedGroup: Ref<GroupSelection | undefined> = ref();
+    var groups = ref<GroupSelection[]>([]);
+    var selectedGroup = ref<GroupSelection | undefined>();
 
-    var chatRooms: Ref<ChatRoom[]> = ref([]);
+    var chatRooms = ref<ChatRoom[]>([]);
 
     var lastKnownLocation: Ref<Location | undefined> = ref(undefined);
     var authStatus: Ref<AUTH_STATUS> = ref(AUTH_STATUS.unknown);
@@ -59,8 +59,6 @@ export const useSessionStore = defineStore('session-store', () => {
 
     var mapkitToken: Ref<string | undefined> = ref(undefined);
     var mapKitServerToken: Ref<string | undefined> = ref(undefined); 
-
-    var authenticator = new AuthenticationFacade();
 
     var announcements: Ref<string[]> = ref([
         "https://storage.googleapis.com/olympsis-feed-images/072bb74c-bebe-449d-9d1f-efe26b974081.jpg",
@@ -191,11 +189,17 @@ export const useSessionStore = defineStore('session-store', () => {
         }
     }
 
+    /**
+     * Logs the user out and sends the browser back to signin
+     */
     async function logout() {
         await authenticator.signOut();
         await navigateTo('/signin');
     }
 
+    /**
+     * Deletes the user's account and sends the browser back to signin
+     */
     async function deleteAccount() {
         await authenticator.deleteAccount();
         await navigateTo('signin');
@@ -223,7 +227,6 @@ export const useSessionStore = defineStore('session-store', () => {
         mapkitToken,
         mapKitServerToken,
 
-        authService,
         userService,
         clubService,
         orgService,

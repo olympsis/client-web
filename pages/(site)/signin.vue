@@ -44,6 +44,12 @@ async function handleSignInWithApple() {
 			session.checkAuthorizationStatus();
 			const handler = session.$subscribe((_, state) => {
 				handler();
+				if (state.user) {
+					if (state.user.clubs?.length != 0 || state.user.organizations?.length != 0) {
+						navigateTo('/groups');
+						return;
+					}
+				}
 				navigateTo('/groups/search');
 			});
 		}
@@ -59,6 +65,12 @@ async function handleSignInWithGoogle() {
 			session.checkAuthorizationStatus();
 			const handler = session.$subscribe((_, state) => {
 				handler();
+				if (state.user) {
+					if (state.user.clubs?.length != 0 || state.user.organizations?.length != 0) {
+						navigateTo('/groups');
+						return;
+					}
+				}
 				navigateTo('/groups/search');
 			});
 		}

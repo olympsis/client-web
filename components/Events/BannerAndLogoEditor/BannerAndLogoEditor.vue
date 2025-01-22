@@ -158,7 +158,7 @@ function handleCroppedBannerData(data: Array<CroppedMedia>) {
     margin-bottom: 5rem;
 
     #banner {
-        width: 20rem;
+        width: 100%;
         margin: auto;
         height: 20rem;
         display: flex;
@@ -169,14 +169,14 @@ function handleCroppedBannerData(data: Array<CroppedMedia>) {
         background-color: gray;
 
         @media (max-width: 940px) {
-            width: 20rem;
+            width: 100%;
             height: 20rem;
         }
     }
 
     #logo {
+        left: 37%;
         top: 17rem;
-        left: 13.5rem;
         width: 7.5rem;
         display: flex;
         height: 7.5rem;
@@ -188,8 +188,8 @@ function handleCroppedBannerData(data: Array<CroppedMedia>) {
         border: solid var(--secondary-background-color) 3px;
 
         @media (max-width: 940px) {
+            left: 37%;
             top: 17rem;
-            left: 8.5rem;
             width: 7.5rem;
             height: 7.5rem;
         }

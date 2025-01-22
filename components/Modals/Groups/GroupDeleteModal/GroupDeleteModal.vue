@@ -153,10 +153,11 @@ function handleDeleteGroup() {
 
         .button {
             width: 100%;
-            height: 2.25rem;
+            height: unset;
             border: unset;
             cursor: pointer;
             font-weight: bold;
+            text-align: center;
             font-size: 1.25rem;
             border-radius: 10px;
         }

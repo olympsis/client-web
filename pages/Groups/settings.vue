@@ -53,11 +53,6 @@
             />
         </dialog>
 
-        <!-- Create New Group Dialog -->
-        <dialog ref="new-group-dialog" id="new-group-dialog" class="dialog">
-            <NewGroupCard @close="hideNewGroupDialog"/>
-        </dialog>
-
         <!-- Members Dialog -->
         <dialog ref="members-dialog" id="members-dialog" class="dialog">
             <div id="members-dialog-container">
@@ -97,7 +92,6 @@ import { OrganizationService } from '@/data/services/OrganizationService';
 import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
 import GroupSelector from '@/components/Groups/GroupSelector/GroupSelector.vue';
 import MemberListItem from '@/components/Groups/MemberListItem/MemberListItem.vue';
-import NewGroupCard from '@/components/Groups/New Group/NewGroupCard/NewGroupCard.vue';
 import GroupLeaveModal from '@/components/Modals/Groups/GroupLeaveModal/GroupLeaveModal.vue';
 import GroupDeleteModal from '@/components/Modals/Groups/GroupDeleteModal/GroupDeleteModal.vue';
 import ClubLogoAndBanner from '@/components/Groups/Clubs/ClubLogoAndBanner/ClubLogoAndBanner.vue';
@@ -228,16 +222,7 @@ function hideGroupPickerDialog() {
 }
 
 function showNewGroupDialog() {
-    if (newGroupDialogRef.value) {
-        hideEditDialog();
-        hideGroupPickerDialog();
-        hideMembersDialog();
-        hideLeaveModal();
-        hideDeleteModal();
-        newGroupDialogRef.value.show();
-    } else {
-        console.error('Failed to find New Group Dialog template reference.');
-    }
+    router.push('/groups/new');
 }
 
 function hideNewGroupDialog() {

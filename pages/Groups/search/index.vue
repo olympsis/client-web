@@ -60,10 +60,6 @@
                 </ul>
             </div>
         </div>
-        
-        <dialog ref="new-group-dialog" id="new-group-dialog" class="dialog">
-            <NewGroupCard @close="handleCloseNewGroupDialog"/>
-        </dialog>
     </main>
 </template>
 
@@ -85,7 +81,6 @@ import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
 import NavigationCard from '@/components/NavigationCard/NavigationCard.vue';
 import SportsListCard from '@/components/SportsListCard/SportsListCard.vue';
 import ClubListCard from '@/components/Groups/Clubs/ClubListCard/ClubListCard.vue';
-import NewGroupCard from '@/components/Groups/New Group/NewGroupCard/NewGroupCard.vue';
 import ClubListCardTemplate from '@/components/Groups/Clubs/ClubListCardTemplate/ClubListCardTemplate.vue';
 
 
@@ -93,8 +88,6 @@ const router = useRouter();
 const modelStore = useModelStore();
 const sessionStore = useSessionStore();
 const state = ref(VIEW_STATE.SUCCESS);
-
-const newGroupDialog = useTemplateRef<HTMLDialogElement>('new-group-dialog');
 
 const searchText: Ref<string> = ref('');
 const selectedTags: Ref<Array<string>> = ref([]);
@@ -164,27 +157,7 @@ function handleSelectedSportsUpdate(event: { selectedSports: Array<string> }) {
 }
 
 function handleOpenNewGroupDialog() {
-    if (newGroupDialog.value) {
-        newGroupDialog.value.show();
-    } else {
-        console.error('Failed to find reference to new group dialog html component.')
-    }
-}
-
-function handleCloseNewGroupDialog(event: { newGroup: GroupSelection }) {
-    if (newGroupDialog.value) {
-        if (event) {
-            if (event.newGroup) {
-                const id = event.newGroup.club?.id ?? event.newGroup.organization?.id;
-                if (id) {
-                    router.push('/groups');
-                }
-            }
-        }
-        newGroupDialog.value.close();
-    } else {
-        console.error('Failed to find reference to new group dialog html component.')
-    }
+    router.push('/groups/new');
 }
 
 useSeoMeta({

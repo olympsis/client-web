@@ -274,13 +274,6 @@ function createNewGroup() {
     padding: 1rem;
     justify-content: space-between;
 
-    /* button {
-        all: unset;
-        cursor: pointer;
-        font-size: 0.9rem;
-        color: var(--primary-label-color);
-    } */
-
     h1 {
         font-size: 1rem;
         font-style: italic;

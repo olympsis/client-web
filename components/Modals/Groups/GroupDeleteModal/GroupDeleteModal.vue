@@ -32,6 +32,7 @@ import { OrganizationService } from '@/data/services/OrganizationService';
 
 import TextButton from '@/components/Buttons/LoadingButtons/TextButton/TextButton.vue';
 
+const toast = useToast();
 const emit = defineEmits([
     'close',
     'success'
@@ -66,11 +67,13 @@ function handleDeleteGroup() {
                                 emit('success');
                             }, 200);
                         } else {
+                            toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to delete club!', life: 3000 });
                             emit('close');
                         }
                     })
                     .catch((error) => {
                         console.error(`Failed to delete club ${props.group.club?.id}. Error: ${error}`);
+                        toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to delete Club!', life: 3000 });
                         emit('close');
                     });
             }
@@ -88,11 +91,13 @@ function handleDeleteGroup() {
                             }, 200);
                         } else {
                             state.value = VIEW_STATE.FAILURE;
+                            toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to delete Organization!', life: 3000 });
                             emit('close');
                         }
                     })
                     .catch((error) => {
                         console.error(`Failed to delete organization: ${props.group.organization?.id}.  Error: ${error}`);
+                        toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to delete Organization!', life: 3000 });
                         state.value = VIEW_STATE.FAILURE;
                         emit('close');
                     });

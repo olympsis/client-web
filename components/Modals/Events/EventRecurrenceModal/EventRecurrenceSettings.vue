@@ -1,7 +1,7 @@
 <template>
-    <div id="event-recurrence-settings" class="settings-view">
-        <div class="settings-header">
-            <button class="button secondary" @click="$emit('close')">
+    <div id="event-recurrence-settings" class="popup">
+        <div class="header">
+            <button class="secondary button" @click="$emit('close')">
                 Cancel
             </button>
 
@@ -9,12 +9,12 @@
                 Recurring Event
             </div>
 
-            <button class="button primary" @click="$emit('done', { frequency, endDate })">
+            <button class="primary button" @click="$emit('done', { frequency, endDate })">
                 Done
             </button>
         </div>
 
-        <div class="settings-body">
+        <div id="body" class="body">
             <div class="section">
                 <div class="header">
                     Recurrence Frequency
@@ -96,6 +96,10 @@ const endDate = ref<Date>(new Date());
     width: 100%;
     padding: 1rem;
     background-color: var(--primary-background-color);
+}
+
+#body {
+    flex-direction: column;
 }
 
 .actions {

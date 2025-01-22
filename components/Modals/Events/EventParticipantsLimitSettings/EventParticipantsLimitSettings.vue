@@ -1,7 +1,7 @@
 <template>
-    <div id="event-participants-settings" class="settings-view">
-        <div class="settings-header">
-            <button class="button secondary" @click="$emit('close')">
+    <div id="event-participants-settings" class="popup">
+        <div class="header">
+            <button class="secondary button" @click="$emit('close')">
                 Cancel
             </button>
 
@@ -9,12 +9,12 @@
                 Limit Participants
             </div>
 
-            <button class="button primary" @click="$emit('done', { min, max })">
+            <button class="primary button" @click="$emit('done', { min, max })">
                 Done
             </button>
         </div>
 
-        <div class="settings-body">
+        <div id="body" class="body">
             <div class="section">
                 <div class="header">
                     Min Participants
@@ -55,7 +55,10 @@ const max = ref<number>(0);
 #event-participants-settings {
     width: 100%;
     padding: 1rem;
-    background-color: var(--primary-background-color);
+}
+
+#body {
+    flex-direction: column;
 }
 
 .participants-slider {

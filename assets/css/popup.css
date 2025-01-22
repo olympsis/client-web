@@ -1,0 +1,44 @@
+.popup {
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    background-color: var(--primary-background-color);
+    
+    .header {
+        display: flex;
+		flex-direction: row;
+        align-items: center;
+
+        .title {
+            margin: 0 auto;
+        }
+
+        .primary {
+			color: white;
+			font-size: 0.8rem;
+			padding: 0.5rem 1rem;
+			background-color: var(--primary-brand-color);
+		}
+
+		.secondary {
+			font-size: 0.8rem;
+			padding: 0.5rem 1rem;
+		}
+    }
+
+    .body {
+        display: flex;
+        margin-top: 1rem;
+
+        .section {
+			margin: 0.5rem 0rem;
+			
+			.header {
+				font-size: 0.9rem;
+				font-weight: bold;
+			}
+			.sub-header {
+				font-size: 0.85rem;
+				color: var(--olympsis-gray);
+			}
+		}
+    }
+}

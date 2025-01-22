@@ -1,6 +1,6 @@
 <template>
-    <div id="event-external-link-setting" class="settings-view">
-        <div id="header" class="settings-header">
+    <div id="event-external-link-setting" class="popup">
+        <div id="header" class="header">
             <button class="button secondary" @click="$emit('close')">
                 Cancel
             </button>
@@ -13,7 +13,7 @@
                 Done
             </button>
         </div>
-        <div id="body" class="settings-body">
+        <div id="body" class="body">
             <div class="section">
                 <div class="header">
                     External Link
@@ -21,7 +21,7 @@
                 <div class="sub-header">
                     Where do you want participants to visit?
                 </div>
-                <input class="section-input" v-model="link"/>
+                <input class="input" v-model="link"/>
             </div>
         </div>
     </div>
@@ -35,6 +35,16 @@ const link = ref<string>('');
 #event-external-link-setting {
     width: 100%;
     padding: 1rem;
-    background-color: var(--primary-background-color);
+
+    .input {
+        width: 100%;
+        height: 2rem;
+        border: unset;
+        margin-top: 0.5rem;
+        font-size: 1.25rem;
+        border-radius: 10px;
+        padding: 0rem 0.5rem;
+        background-color: var(--secondary-background-color);
+    }
 }
 </style>

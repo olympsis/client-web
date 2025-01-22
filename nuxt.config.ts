@@ -4,7 +4,10 @@ export default defineNuxtConfig({
 	compatibilityDate: '2025-01-01',
 	devtools: { enabled: true },
 	css: [
-		'~/assets/css/main.css'
+		'~/assets/css/main.css',
+		'~/assets/css/modal.css',
+		'~/assets/css/popup.css',
+		'~/assets/css/animations.css'
 	],
 	modules: [
 		'@pinia/nuxt',

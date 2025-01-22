@@ -221,7 +221,7 @@ function handleBackNavigation(){
     if (!isAuthenticated.value) {
         router.push('/signin');
     } else {
-        router.push('/groups/search')
+        router.push('/groups/search');
     }
 }
 

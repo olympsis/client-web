@@ -315,7 +315,13 @@ function createNewEvent() {
 }
 
 function handleBackNavigation() {
-    router.push('/events');
+    const previousRoute = router.options.history.state.back;
+
+    if (previousRoute === '/groups') {
+        router.push('/groups');
+    } else {
+        router.push('/events');
+    }
 }
 
 function handleShowRecurrenceSetting() {

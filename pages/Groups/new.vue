@@ -118,7 +118,15 @@ const groupLocationString = computed<string>(() => {
 const hometownDialog = useTemplateRef<HTMLDialogElement>('hometown-dialog');
 
 function handleBackNavigation() {
-    router.push('/groups/settings');
+    const previousRoute = router.options.history.state.back
+
+    if (previousRoute === '/groups/search') {
+        router.push('/groups/search');
+    } else if (previousRoute === '/groups/settings') {
+        router.push('/groups/settings');
+    } else {
+        router.push('/groups');
+    }
 }
 
 function handleOpenHometownDialog() {

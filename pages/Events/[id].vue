@@ -796,8 +796,12 @@ function showCopiedToast() {
 }
 
 function handleBackNavigation() {
+    const previousRoute = router.options.history.state.back;
+    
     if (!isAuthenticated.value) {
         router.push('/signin');
+    } else if (previousRoute === '/groups') {
+        router.push('/groups');
     } else {
         router.push('/events');
     }

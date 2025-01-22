@@ -5,6 +5,8 @@
                 Cancel
             </button>
 
+            <div class="title"> Club Tags </div>
+
             <button class="primary button">
                 Done
             </button>

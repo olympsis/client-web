@@ -19,6 +19,10 @@
                 <GroupVisibilityPicker v-if="groupType === GROUP_TYPE.CLUB" v-model:model-value="groupVisibility"/>
             </div>
 
+            <div id="note">
+                *fields required.
+            </div>
+
             <!-- Title -->
             <input id="group-title" type="text" placeholder="New Group" v-model="groupTitle" class="text-input"/>
 
@@ -332,7 +336,8 @@ function createNewGroup() {
 #note {
     font-size: 0.8rem;
     font-style: italic;
-    margin: 0.2rem 1rem;
+    margin: 0rem 1rem;
+    margin-bottom: 1rem;
     color: var(--tertiary-brand-color);
 }
 

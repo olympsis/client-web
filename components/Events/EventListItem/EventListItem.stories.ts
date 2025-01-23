@@ -4,7 +4,7 @@ import { VenueDescriptor, Organizer } from "~/data/models/GenericModels";
 
 import EventListItem from "./EventListItem.vue";
 
-import '@assets/main.css';
+import '~/assets/css/main.css';
 
 export default {
   component: EventListItem,

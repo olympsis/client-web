@@ -3,7 +3,7 @@ import { Post } from "@/data/models/PostModels";
 import type { Meta, StoryObj } from "@storybook/vue3";
 import PostListItemSkeleton from "./PostListItemSkeleton.vue";
 
-import "@assets/main.css"
+import "~/assets/css/main.css"
 
 const data: Post = Post.decode({
   id: "0",

@@ -1,4 +1,4 @@
-import { Club } from '@data/models/ClubModels';
+import { Club } from '~/data/models/ClubModels';
 import { organizationDaoSamples } from './sample-orgs';
 
 // Assuming we have the necessary imports and class definitions

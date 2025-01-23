@@ -1,4 +1,4 @@
-import { Organization, OrganizationDao } from '@data/models/OrganizationModels';
+import { Organization, OrganizationDao } from '~/data/models/OrganizationModels';
 
 export const organizationDaoSamples: OrganizationDao[] = [
     new OrganizationDao(

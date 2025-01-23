@@ -1,24 +1,18 @@
-import type { StorybookConfig } from "@storybook/vue3-vite";
+import type { StorybookConfig } from "@storybook-vue/nuxt";
 
 const config: StorybookConfig = {
-  stories: ["../src/components/**/*.stories.ts"],
-  staticDirs: ['../public'],
+  stories: [
+    "../components/**/*.mdx",
+    "../components/**/*.stories.@(js|jsx|ts|tsx|mdx)",
+  ],
   addons: [
-    "@storybook/addon-links",
     "@storybook/addon-essentials",
+    "@chromatic-com/storybook",
     "@storybook/addon-interactions",
   ],
   framework: {
-    name: "@storybook/vue3-vite",
-    options: {
-      docgen: {
-        plugin: 'vue-component-meta',
-        tsconfig: 'tsconfig.app.json',
-      },
-    },
-  },
-  docs: {
-	autodocs: "tag",
+    name: "@storybook-vue/nuxt",
+    options: {},
   },
 };
 export default config;

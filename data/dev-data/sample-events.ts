@@ -1,8 +1,8 @@
 
-import { Event } from '@data/models/EventModels';
-import { UserSnippet } from '@data/models/UserModels';
-import { VenueDescriptor, Participant } from '@data/models/GenericModels';
-import { EVENT_RSVP_STATUS } from '../models/Enums';
+import { EVENT_RSVP_STATUS } from '~/data/Enums';
+import { Event } from '~/data/models/EventModels';
+import { UserSnippet } from '~/data/models/UserModels';
+import { VenueDescriptor, Participant } from '~/data/models/GenericModels';
 
 // Helper to create timestamps relative to now
 const now = new Date();

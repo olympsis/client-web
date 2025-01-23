@@ -56,13 +56,14 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import { Post } from '@/data/models/PostModels';
+import { calculateTimeAgo } from '@/utils/Time';
+import { generateImageURL } from '@/utils/Image';
+import { Like } from '~/data/models/GenericModels';
+import { PostService } from '@/data/services/PostService';
+
 import Menu from 'primevue/menu';
 import UserIcon from '@/components/UserIcon/UserIcon.vue';
-import { Post } from '@/data/models/PostModels';
-import { generateImageURL } from '@/utils/Image';
-import { calculateTimeAgo } from '@/utils/Time';
-import { PostService } from '@/data/services/PostService';
-import { Like } from '~/data/models/GenericModels';
 
 const props = defineProps({
     post: { type: Post, required: true }

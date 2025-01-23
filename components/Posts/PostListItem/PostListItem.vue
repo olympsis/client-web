@@ -34,7 +34,7 @@
             <div class="actions">
                 
                 <!-- Like Button -->
-                <button class="button like" @click="likePost">
+                <button class="button like" @click="toggleLike">
                     <picture v-if="!isLiked">
                         <source srcset="@/assets/icons/heart/heart.white.svg" media="(prefers-color-scheme: dark)"/>
                         <img src="@/assets/icons/heart/heart.svg" class="button-image">
@@ -62,11 +62,14 @@ import { Post } from '@/data/models/PostModels';
 import { generateImageURL } from '@/utils/Image';
 import { calculateTimeAgo } from '@/utils/Time';
 import { PostService } from '@/data/services/PostService';
+import { Like } from '~/data/models/GenericModels';
 
 const props = defineProps({
     post: { type: Post, required: true }
 });
 
+const toast = useToast();
+const session = useSessionStore();
 const emit = defineEmits(['deleted']);
 
 const service = new PostService();
@@ -102,8 +105,46 @@ const toggle = (event: any) => {
     menu.value.toggle(event);
 };
 
-const likePost = () => {
-    isLiked.value = !isLiked.value
+async function toggleLike() {
+    const uuid = session.user?.uuid;
+    if (!uuid) { return; }
+
+    const hasLiked = props.post.likes?.find((l) => l.uuid === uuid);
+    if (hasLiked) {
+        try {
+            const un_liked = await service.unLikePost(props.post.id, hasLiked.id);
+            if (!un_liked) { return; }
+
+            const idx = props.post.likes?.findIndex((l) => l.id == hasLiked.id);
+            if (!idx) { return; }
+            props.post.likes?.splice(idx, 1);
+
+            isLiked.value = false;
+        } catch(error) {
+            toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to remove like from post!', life: 3000 });
+            console.error(`Failed to remove like from post. Error: ${error}`);
+        }
+    } else {
+        try {
+            const id = await service.likePost(props.post.id);
+            const like = new Like(
+                id,
+                uuid,
+                new Date().getTime()/1000
+            );
+
+            if (props.post.likes) {
+                props.post.likes.push(like);
+            } else {
+                props.post.likes = [like];
+            }
+
+            isLiked.value = true;
+        } catch(error) {
+            toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to like post!', life: 3000 });
+            console.error(`Failed to like post. Error: ${error}`);
+        }
+    }
 };
 
 async function handleDeletion() {
@@ -111,6 +152,15 @@ async function handleDeletion() {
     // TODO: - FIX SERVER SIDE
     emit('deleted');
 }
+
+onMounted(() => {
+    // Handle if user liked post
+    const uuid = session.user?.uuid;
+    if (!uuid) { return; }
+    if (props.post.likes?.find((l) => l.uuid === uuid)) {
+        isLiked.value = true;
+    }
+});
 
 </script>
 

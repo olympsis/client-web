@@ -336,14 +336,60 @@ class ParticipantDao extends Codable<ParticipantDao> {
     }
 }
 
-interface Like {
-    // Define the properties of Like here
+class Like extends Codable<Like> {
+    id: string;
+    uuid: string;
+    createdAt: number;
+
+    constructor(
+        id: string,
+        uuid: string,
+        createdAt: number
+    ) {
+        super();
+        this.id = id;
+        this.uuid = uuid;
+        this.createdAt = createdAt;
+    }
 }
   
-interface Comment {
-    // Define the properties of Comment here
+class Comment extends Codable<Comment> {
+    id: string;
+    user: UserSnippet | undefined;
+    text: string;
+    createdAt: number;
+
+    constructor(
+        id: string,
+        user: UserSnippet | undefined,
+        text: string,
+        createdAt: number
+    ) {
+        super();
+        this.id = id;
+        this.user = user;
+        this.text = text;
+        this.createdAt = createdAt;
+    }
 }
-  
+
+class CommentDao extends Codable<CommentDao> {
+    uuid?: string;
+    text?: string;
+    createdAt?: number;
+
+    constructor(
+        uuid?: string,
+        text?: string,
+        createdAt?: number
+    ) {
+        super();
+        this.uuid = uuid;
+        this.text = text;
+        this.createdAt = createdAt;
+    }
+}
+
 class Member extends Codable<Member> {
     id: string | undefined;
     role: string | undefined;
@@ -404,13 +450,12 @@ class Member extends Codable<Member> {
         return data;
     }
 }
-
-class MemberDao {
+class MemberDao extends Codable<MemberDao> {
     id: string | undefined;
     role: string | undefined;
     uuid: string | undefined;
 
-    static decode<Member>(data: { [key: string]: any }): Member {
+    static override decode<Member>(data: { [key: string]: any }): Member {
         const object = Object();
 
         if (data) {
@@ -428,26 +473,22 @@ class MemberDao {
         Object.setPrototypeOf(object, MemberDao.prototype);
         return object;
     }
-}
 
-interface MemberDao {
-    encode(): { [key: string]: string }
-}
-
-MemberDao.prototype.encode = function(): { [key: string]: any } {
-    const data: { [key: string]: any } = {};
-
-    if (this.id) {
-        data['id'] = this.id;
+    override encode(): { [key: string]: any } {
+        const data: { [key: string]: any } = {};
+    
+        if (this.id) {
+            data['id'] = this.id;
+        }
+        if (this.role) {
+            data['role'] = this.role;
+        }
+        if (this.uuid) {
+            data['uuid'] = this.uuid;
+        }
+    
+        return data;
     }
-    if (this.role) {
-        data['role'] = this.role;
-    }
-    if (this.uuid) {
-        data['uuid'] = this.uuid;
-    }
-
-    return data;
 }
 
 class Invitation {
@@ -687,6 +728,11 @@ class SubAdministrativeArea extends Codable<SubAdministrativeArea>{
 }
 
 export {
+    Comment,
+    CommentDao,
+
+    Like,
+
     Model,
     Member,
     MemberDao,
@@ -710,9 +756,4 @@ export {
     Country,
     AdministrativeArea,
     SubAdministrativeArea
-}
-
-export type {
-    Like,
-    Comment
 }

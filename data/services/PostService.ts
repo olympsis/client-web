@@ -1,6 +1,7 @@
 import { getAuth } from 'firebase/auth'
 import { Post, PostDao, PostsResponse } from '../models/PostModels';
 import { Courrier, Method, Endpoint, Scheme, NetworkError } from 'malakbel';
+import type { Comment } from '../models/GenericModels';
 
 export class PostService {
 
@@ -76,6 +77,71 @@ export class PostService {
         } else {
             return false;
         }
-        
+    }
+
+    async likePost(id: string): Promise<string> {
+        let token = await getAuth().currentUser?.getIdToken() ?? ""
+
+        let headers = new Map<string, string>()
+        headers.set('Authorization', token)
+
+        const endpoint = new Endpoint(`/v1/posts/${id}/likes`);
+        const [status, _headers, body] = await this.http.request(Method.POST, endpoint, undefined, headers);
+        if (status == 200) {
+            if (body) {
+                const resp = body as { [key: string]: any }
+                return resp['id'];
+            }
+        }
+
+        throw(`Status Code (${status})`);
+    }
+
+    async unLikePost(id: string, lID: string): Promise<boolean> {
+        let token = await getAuth().currentUser?.getIdToken() ?? ""
+
+        let headers = new Map<string, string>()
+        headers.set('Authorization', token)
+
+        const endpoint = new Endpoint(`/v1/posts/${id}/likes/${lID}`);
+        const [status, _headers, body] = await this.http.request(Method.DELETE, endpoint, undefined, headers);
+        if (status == 200) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    async addComment(id: string, dao: Comment): Promise<string> {
+        let token = await getAuth().currentUser?.getIdToken() ?? ""
+
+        let headers = new Map<string, string>()
+        headers.set('Authorization', token)
+
+        const endpoint = new Endpoint(`/v1/posts/${id}/comments`);
+        const [status, _headers, body] = await this.http.request(Method.POST, endpoint, undefined, headers);
+        if (status == 200) {
+            if (body) {
+                const resp = body as { [key: string]: any }
+                return resp['id'];
+            }
+        }
+
+        throw(`Status Code (${status})`);
+    }
+
+    async removeComment(id: string, cID: string): Promise<boolean> {
+        let token = await getAuth().currentUser?.getIdToken() ?? ""
+
+        let headers = new Map<string, string>()
+        headers.set('Authorization', token)
+
+        const endpoint = new Endpoint(`/v1/posts/${id}/comments/${cID}`);
+        const [status, _headers, body] = await this.http.request(Method.DELETE, endpoint, undefined, headers);
+        if (status == 200) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

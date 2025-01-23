@@ -20,8 +20,8 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { Event } from '@/data/models/EventModels';
-import { VIEW_STATE } from '@/data/GlobalData';
-import { EVENT_STATE } from '@/data/models/Enums';
+import { VIEW_STATE } from '@/data/Enums';
+import { EVENT_STATE } from '@/data/Enums';
 
 const props = defineProps({ 
     event: { type: Event, required: true }

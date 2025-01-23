@@ -1,4 +1,4 @@
-import { VIEW_STATE } from "@/data/GlobalData";
+import { VIEW_STATE } from "@/data/Enums";
 import type { Meta, StoryObj } from "@storybook/vue3";
 import EventPrimaryButton from "./EventPrimaryButton.vue";
 import { sampleEvents } from "@/data/dev-data/sample-events";

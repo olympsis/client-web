@@ -1,5 +1,6 @@
 <template>
     <li id="post-list-item">
+        <!-- Post Header -->
         <div class="header">
             <!-- User Information -->
             <div class="user-info">
@@ -25,7 +26,7 @@
                 <img src="@/assets/icons/image/image.svg" class="button-image">
             </picture>
         </div>
-        
+    
         <a class="body">{{ post.body }}</a>
 
         <!-- Post Footer -->
@@ -43,7 +44,7 @@
                 </button>
 
                 <!-- Comment Button -->
-                <button class="button comment">
+                <button class="button comment" @click="emit('comments', { id: post.id })">
                     <picture>
                         <source srcset="@/assets/icons/comment/comment.white.svg" media="(prefers-color-scheme: dark)"/>
                         <img src="@/assets/icons/comment/comment.svg" class="button-image">
@@ -71,7 +72,7 @@ const props = defineProps({
 
 const toast = useToast();
 const session = useSessionStore();
-const emit = defineEmits(['deleted']);
+const emit = defineEmits(['comments', 'report', 'delete']);
 
 const service = new PostService();
 
@@ -89,7 +90,10 @@ const items = ref([
         items: [
             {
                 label: 'Report Post',
-                icon: 'pi pi-bug'
+                icon: 'pi pi-bug',
+                command: () => {
+                    emit('report', { post: props.post });
+                }
             },
             {
                 label: 'Delete Post',
@@ -151,7 +155,7 @@ async function toggleLike() {
 async function handleDeletion() {
     const deleted = await service.deletePost(props.post.id);
     // TODO: - FIX SERVER SIDE
-    emit('deleted');
+    emit('delete');
 }
 
 onMounted(() => {

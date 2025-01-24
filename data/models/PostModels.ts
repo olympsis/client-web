@@ -1,15 +1,15 @@
 import { UserSnippet } from "./UserModels";
-import { type Like, type Comment } from "./GenericModels";
+import { Comment, Like } from "./GenericModels";
 
 class Post {
     id: string;
     type: string;
     poster?: UserSnippet;
     body: string;
-    event?: Event | undefined;
-    images?: string[] | undefined;
-    likes?: Like[];
-    comments?: Comment[];
+    event?: string;
+    images?: string[];
+    likes: Like[];
+    comments: Comment[];
     createdAt: number;
     externalLink?: string;
 
@@ -18,7 +18,7 @@ class Post {
         type: string,
         poster: UserSnippet,
         body: string,
-        event: Event | undefined,
+        event: string | undefined,
         images: string[] | undefined,
         likes: Like[],
         comments: Comment[],
@@ -51,8 +51,12 @@ class Post {
             object['images'] = data['images']
         }
     
-        object['likes'] = data['likes']
-        object['comment'] = data['comment']
+        if (data['likes']) {
+            object['likes'] = data['likes'].map((l: any) => Like.decode(l)) ?? [];
+        }
+        if (data['comments']) {
+            object['comments'] = data['comments'].map((c: any) => Comment.decode(c)) ?? [];
+        }
         object['createdAt'] = data['created_at']
         object['externalLink'] = data['external_link']
     

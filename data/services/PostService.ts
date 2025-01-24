@@ -1,7 +1,7 @@
 import { getAuth } from 'firebase/auth'
 import { Post, PostDao, PostsResponse } from '../models/PostModels';
 import { Courrier, Method, Endpoint, Scheme, NetworkError } from 'malakbel';
-import type { Comment } from '../models/GenericModels';
+import type { Comment, CommentDao } from '../models/GenericModels';
 
 export class PostService {
 
@@ -112,14 +112,15 @@ export class PostService {
         }
     }
 
-    async addComment(id: string, dao: Comment): Promise<string> {
+    async addComment(id: string, dao: CommentDao): Promise<string> {
         let token = await getAuth().currentUser?.getIdToken() ?? ""
 
         let headers = new Map<string, string>()
         headers.set('Authorization', token)
 
+        const data = JSON.stringify(dao.encode());
         const endpoint = new Endpoint(`/v1/posts/${id}/comments`);
-        const [status, _headers, body] = await this.http.request(Method.POST, endpoint, undefined, headers);
+        const [status, _headers, body] = await this.http.request(Method.POST, endpoint, data, headers);
         if (status == 200) {
             if (body) {
                 const resp = body as { [key: string]: any }

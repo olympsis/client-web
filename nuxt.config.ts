@@ -7,6 +7,7 @@ export default defineNuxtConfig({
 																'~/assets/css/main.css',
 																'~/assets/css/modal.css',
 																'~/assets/css/popup.css',
+																'~/assets/css/dialog.css',
 																'~/assets/css/animations.css'
 								],
 								modules: [

@@ -212,10 +212,6 @@ class VenueDescriptor {
     }
 }
 
-// interface VenueDescriptor {
-//     encode(): { [key: string]: string }
-// }
-
 class Participant extends Codable<Participant> {
     id: string | undefined;
     user: UserSnippet | undefined;
@@ -351,6 +347,27 @@ class Like extends Codable<Like> {
         this.uuid = uuid;
         this.createdAt = createdAt;
     }
+
+    static override decode(data: { [key: string]: any; }) {
+        const object = Object();
+
+        if (data) {
+            if (data['id']) {
+                object['id'] = data['id'];
+            }
+
+            if (data['uuid']) {
+                object['uuid'] = data['uuid'];
+            }
+
+            if (data['created_at']) {
+                object['createdAt'] = data['created_at'];
+            }
+        }
+
+        Object.setPrototypeOf(object, Like.prototype);
+        return object;
+    }
 }
   
 class Comment extends Codable<Comment> {
@@ -371,6 +388,27 @@ class Comment extends Codable<Comment> {
         this.text = text;
         this.createdAt = createdAt;
     }
+
+    static override decode(data: { [key: string]: any; }) {
+        const object = Object();
+        if (data) {
+            if (data['id']) {
+                object['id'] = data['id'];
+            }
+            if (data['user']) {
+                object['user'] = UserSnippet.decode(data['user']);
+            }
+            if (data['text']) {
+                object['text'] = data['text'];
+            }
+            if (data['created_at']) {
+                object['createdAt'] = data['created_at'];
+            }
+        }
+
+        Object.setPrototypeOf(object, Comment.prototype);
+        return object;
+    }
 }
 
 class CommentDao extends Codable<CommentDao> {
@@ -387,6 +425,14 @@ class CommentDao extends Codable<CommentDao> {
         this.uuid = uuid;
         this.text = text;
         this.createdAt = createdAt;
+    }
+
+    override encode(): { [key: string]: any; } {
+        const data: { [key: string]: any; } = {};
+        data['uuid'] = this.uuid;
+        data['text'] = this.text;
+
+        return data;
     }
 }
 

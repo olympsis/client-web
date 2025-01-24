@@ -1,32 +1,44 @@
-function calculateTimeAgo(timestamp: number): string {
-    const currentTime = Date.now() / 1000; // Get current time in seconds
-    const timeDifference = currentTime - timestamp;
-  
-    const secondsInAMinute: number = 60;
-    const secondsInAnHour: number = 3600;
-    const secondsInADay: number = 86400;
-    const secondsInAMonth: number = 2629800;
-    const secondsInAYear: number = 31557600;
-  
-    if (timeDifference < secondsInAMinute) {
+function calculateTimeAgo(timestamp: number, verbose: boolean = true): string {
+  const currentTime = Date.now() / 1000;
+  const timeDifference = currentTime - timestamp;
+
+  const secondsInAMinute = 60;
+  const secondsInAnHour = 3600;
+  const secondsInADay = 86400;
+  const secondsInAMonth = 2629800;
+  const secondsInAYear = 31557600;
+
+  if (timeDifference < secondsInAMinute) {
       const seconds = Math.floor(timeDifference);
-      return seconds === 1 ? `${seconds} second ago` : `${seconds} seconds ago`;
-    } else if (timeDifference < secondsInAnHour) {
+      return verbose ? 
+          (seconds === 1 ? `${seconds} second ago` : `${seconds} seconds ago`) :
+          `${seconds}s`;
+  } else if (timeDifference < secondsInAnHour) {
       const minutes = Math.floor(timeDifference / secondsInAMinute);
-      return minutes === 1 ? `${minutes} minute ago` : `${minutes} minutes ago`;
-    } else if (timeDifference < secondsInADay) {
+      return verbose ?
+          (minutes === 1 ? `${minutes} minute ago` : `${minutes} minutes ago`) :
+          `${minutes}m`;
+  } else if (timeDifference < secondsInADay) {
       const hours = Math.floor(timeDifference / secondsInAnHour);
-      return hours === 1 ? `${hours} hour ago` : `${hours} hours ago`;
-    } else if (timeDifference < secondsInAMonth) {
+      return verbose ?
+          (hours === 1 ? `${hours} hour ago` : `${hours} hours ago`) :
+          `${hours}h`;
+  } else if (timeDifference < secondsInAMonth) {
       const days = Math.floor(timeDifference / secondsInADay);
-      return days === 1 ? `${days} day ago` : `${days} days ago`;
-    } else if (timeDifference < secondsInAYear) {
+      return verbose ?
+          (days === 1 ? `${days} day ago` : `${days} days ago`) :
+          `${days}d`;
+  } else if (timeDifference < secondsInAYear) {
       const months = Math.floor(timeDifference / secondsInAMonth);
-      return months === 1 ? `${months} month ago` : `${months} months ago`;
-    } else {
+      return verbose ?
+          (months === 1 ? `${months} month ago` : `${months} months ago`) :
+          `${months}mo`;
+  } else {
       const years = Math.floor(timeDifference / secondsInAYear);
-      return years === 1 ? `${years} year ago` : `${years} years ago`;
-    }
+      return verbose ?
+          (years === 1 ? `${years} year ago` : `${years} years ago`) :
+          `${years}y`;
+  }
 }
 
 function areDatesOnSameDay(date1: Date, date2: Date): boolean {

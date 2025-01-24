@@ -2,7 +2,13 @@
     <div id="post-feed">
         <!-- Post List -->
         <ul id="post-list" v-if="state !== VIEW_STATE.LOADING"> 
-            <PostListItem v-for="post in posts" :post="post" @deleted="handleDeletedPost(post.id)"/>
+            <PostListItem 
+            v-for="post in posts" 
+            :post="post" 
+            @comments="handleShowComments"
+            @report=""
+            @deleted="handleDeletedPost(post.id)"
+            />
         </ul>
 
         <!-- No Posts View -->
@@ -24,11 +30,23 @@
 
         <!-- Post Skeleton List -->
         <ul id="post-list" v-if="state === VIEW_STATE.LOADING">
-                <PostListItemSkeleton :has-image="false"/>
-                <PostListItemSkeleton :has-image="true"/>
-                <PostListItemSkeleton :has-image="false"/>
+            <PostListItemSkeleton :has-image="false"/>
+            <PostListItemSkeleton :has-image="true"/>
+            <PostListItemSkeleton :has-image="false"/>
         </ul>
     </div>
+    <Dialog 
+        ref="post-comments" 
+        position="center" 
+        blockScroll
+        :showHeader="false" 
+        v-model:visible="showCommentsDialog"
+        :style="{ 'top': '10px', 'max-width': '32rem', 'max-height': '80vh', 'overflow-y': 'hidden'}"
+    >
+        <template #container="{closeCallback}">
+            <PostCommentsPopup v-if="selectedPost" :post="selectedPost" @close="closeCallback"/>
+        </template>
+    </Dialog>
 </template>
 
 <script setup lang="ts">
@@ -38,6 +56,8 @@ import { Post } from '@/data/models/PostModels';
 import { useSessionStore } from '@/stores/session-store';
 import { useGroupsViewModel } from '@/stores/groups-view-model';
 
+import Dialog from 'primevue/dialog';
+import PostCommentsPopup from '../PostCommentsPopup/PostCommentsPopup.vue';
 import PostListItem from '@/components/Posts/PostListItem/PostListItem.vue';
 import PostListItemSkeleton from '../PostListItem/PostListItemSkeleton.vue';
 
@@ -59,8 +79,19 @@ function handleDeletedPost(id: string) {
     viewModel.posts = viewModel.posts;
 }
 
+const showCommentsDialog = ref(false);
+const commentsDialog = ref('post-comments');
+const selectedPost = ref<Post | undefined>(undefined);
+
 function handleNewPost(post: Post) {
     viewModel.posts.push(post);
+}
+
+function handleShowComments(event: { id: string }) {
+    const post = posts.value.find((p) => p.id === event.id);
+    if (!post) { return; }
+    selectedPost.value = post;
+    showCommentsDialog.value = true;
 }
 
 defineExpose({

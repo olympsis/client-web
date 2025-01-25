@@ -2,6 +2,7 @@
     <NavigationBar/>
     <main id="group-detail">
         <div id="left">
+            <!-- Header -->
             <div id="header">
                 <button class="button" :style="{ marginRight: '1rem' }" @click="handleBackNavigation">
                     <picture class="centered">
@@ -25,7 +26,10 @@
 
             <div id="info">
                 <div id="visibility">
-                    <img src="@/assets/icons/globe/globe.white.svg">
+                    <picture>
+                        <source srcset="@/assets/icons/globe/globe.white.svg" media="(prefers-color-scheme: dark)">
+                        <img src="@/assets/icons/globe/globe.svg">
+                    </picture>
                     <div>Public Group</div>
                 </div>
 
@@ -270,6 +274,8 @@ const { data } = await useAsyncData(
         immediate: true,
     }
 );
+
+
 watchEffect(() => {
     if (!data.value) return;
     club.value = Club.decode(data.value);
@@ -299,6 +305,7 @@ onMounted(() => {
 
 <style scoped>
 #group-detail {
+    width: 100% !important;
     display: flex;
     margin: 0 auto;
     width: fit-content;
@@ -345,8 +352,12 @@ onMounted(() => {
                 margin-top: 7rem;
                 align-items: center;
 
+                picture {
+                    height: 24px;
+                }
+
                 div {
-                    margin-left: 1rem;
+                    margin-left: 0.5rem;
                     color: var(--primary-label-color);
                 }
             }

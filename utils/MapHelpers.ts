@@ -147,6 +147,11 @@ async function generateMapkitAuthToken() : Promise<string> {
     }
 }
 
+/**
+ * Fetches a map image of a location from the mapkitJS server API
+ * @param location - [long, lat] or [city, state] position to get image for
+ * @returns the blob data of the image 
+ */
 async function getMapSnapshot(location: any[]): Promise<Blob> {
     const config = useRuntimeConfig();
     const token = config.public.APL_MAPKIT_SNAPSHOT_TOKEN;
@@ -162,9 +167,28 @@ async function getMapSnapshot(location: any[]): Promise<Blob> {
     return await response.blob();
 }
 
+/**
+ * Generates a signed URL to fetch image from mapkitJS server
+ * @param params - the string value of the query params for a mapkit snapshot
+ * @returns 
+ */
+function generateMapSnapshotSignedURL(params: string): string {
+    const config = useRuntimeConfig();
+    const snapshotPath = `/api/v1/snapshot?${params}`;
+    const completePath = `${snapshotPath}&teamId=${config.public.APL_TEAM_ID}&keyId=${config.public.APL_KEY_ID}`;
+    const sig = new jsrsasign.KJUR.crypto.Signature({ alg: 'SHA256withECDSA' });
+    const key = jsrsasign.KEYUTIL.getKey(config.public.MAPKIT_KEY.trim());
+
+    sig.init(key);
+    sig.updateString(completePath);
+    
+    return `${completePath}&signature=${jsrsasign.hextob64(sig.sign())}`;
+}
+
 export {
     getDirections,
     getMapSnapshot,
     getMapkitServerToken,
-    generateMapkitAuthToken
+    generateMapkitAuthToken,
+    generateMapSnapshotSignedURL
 }

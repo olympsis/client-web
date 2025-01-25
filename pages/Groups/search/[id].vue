@@ -306,6 +306,7 @@ onMounted(() => {
     justify-content: space-around;
 
     #left {
+        width: 100%;
         max-width: 30rem;
 
         #header {
@@ -369,7 +370,8 @@ onMounted(() => {
     }
 
     #right {
-        width: 30rem;
+        width: 100%;
+        max-width: 30rem;
         margin-top: 1rem;
         margin-left: 1.5rem;
 

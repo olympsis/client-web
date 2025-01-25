@@ -288,6 +288,7 @@ definePageMeta({
                 img {
                     margin-right: 0.25rem;
                 }
+                background-color: var(--olympsis-gray);
             }
         }
 

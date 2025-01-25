@@ -100,7 +100,7 @@ function createMapsAuthToken(options: TokenOptions): string {
         iss: teamId,   // Issuer claim (team ID)
         iat: issuedAt,  // Issued at time (seconds since UNIX Epoch)
         exp: expiration, // Expiration time (seconds since UNIX Epoch)
-        origin: config.public.MAPKIT_ORIGINs
+        origin: config.public.MAPKIT_ORIGIN
     };
 
     // Create the JWT

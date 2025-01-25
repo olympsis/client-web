@@ -901,7 +901,11 @@ const { data } = await useAsyncData(
 );
 
 watch(data, (newData) => {
-    if (!newData) return;
+    if (!newData) {
+        failed.value = true;
+        return;
+    };
+    
     event.value = Event.decode(newData.event);
     clubs.value = newData.clubs.map((c) => Club.decode(c));
     orgs.value = newData.orgs.map((o) => Organization.decode(o));

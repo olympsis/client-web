@@ -5,7 +5,7 @@
             <h1>Events</h1>
 
             <div id="actions">
-                <button @click="handleShowNewEventModal">
+                <button @click="navigateToNewEvent">
                     <img src="@/assets/icons/plus/plus.white.svg">
                 </button>
                 <button @click="">
@@ -30,11 +30,15 @@
         </div>
 
         <main id="events-body">
-            <div v-if="state === VIEW_STATE.LOADING">
-                <div id="loader" class="spinner-loader"/>
+            <div v-if="state === VIEW_STATE.LOADING" id="loader" class="spinner-loader"/>
+
+            <div v-else-if="state === VIEW_STATE.SUCCESS && eventSections.length == 0" id="no-events" class="no-events">
+                <img src="@/assets/images/event-404.svg">
+                <div>No Events Found</div>
+                <button class="button" @click="navigateToNewEvent">Create One</button>
             </div>
 
-            <ul id="events-list" v-if="state === VIEW_STATE.SUCCESS">
+            <ul v-else-if="state === VIEW_STATE.SUCCESS && eventSections.length > 0" id="events-list">
                 <li id="event-section" v-for="section in eventSections">
                     <h2>{{ section.dayString }}</h2>
                     <ul id="section-events">
@@ -45,15 +49,15 @@
                 </li>
             </ul>
 
-            <div v-if="state === VIEW_STATE.FAILURE" id="failed-events">
-                <h3>Failed to get events</h3>
-                <button @click="retryFetchEvents">Try Again?</button>
+            <div v-else-if="state === VIEW_STATE.FAILURE" id="not-found" class="no-events">
+                <img src="@/assets/images/event-404.svg">
+                <div>Failed to find Events</div>
+                <button class="button" @click="retryFetchEvents">Try Again</button>
             </div>
         </main>
 
         <!-- Events Settings Modal -->
         <dialog id="event-settings-modal" ref="event-settings-modal" class="dialog">
-
         </dialog>
     </main>
 </template>
@@ -73,7 +77,7 @@ import EventDateButton from '@/components/Buttons/EventDateButton/EventDateButto
 
 const router = useRouter();
 const session = useSessionStore();
-const state = ref(VIEW_STATE.PENDING);
+const state = ref(VIEW_STATE.LOADING);
 const eventService = new EventService();
 
 const events = ref<Event[]>([]);
@@ -117,7 +121,7 @@ const eventSections = computed<EventSection[]>(() => {
     return sections;
 });
 
-function handleShowNewEventModal() {
+function navigateToNewEvent() {
     router.push('/events/new');
 }
 
@@ -384,6 +388,28 @@ definePageMeta({
                 border-radius: 10px;
                 background-color: var(--primary-brand-color);
             }
+        }
+    }
+
+    .no-events {
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        
+        div {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        img {
+            margin: 'auto';
+            max-Width: 30rem; 
+        }
+
+        button {
+            color: white;
+            margin: 1rem 0rem;
+            background-color: var(--primary-brand-color);
         }
     }
 }

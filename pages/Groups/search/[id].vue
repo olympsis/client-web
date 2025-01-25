@@ -310,7 +310,7 @@ onMounted(() => {
     margin: 0 auto;
     width: fit-content;
     flex-direction: row;
-    justify-content: space-around;
+    justify-content: center;
 
     #left {
         width: 100%;

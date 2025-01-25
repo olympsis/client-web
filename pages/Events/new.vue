@@ -20,7 +20,17 @@
             </div>
 
             <!-- Title -->
-            <input id="event-title" type="text" placeholder="New Event" v-model="eventTitle" class="text-input"/>
+            <input 
+                id="event-title"
+                :class="{
+                    label: newEventError !== NEW_EVENT_ERROR.NO_TITLE, 
+                    'title-error': newEventError === NEW_EVENT_ERROR.NO_TITLE 
+                }"
+                class="text-input"
+                type="text" 
+                placeholder="New Event" 
+                v-model="eventTitle" 
+            />
 
             <!-- Config -->
             <div id="event-type-config">
@@ -527,6 +537,10 @@ useSeoMeta({
     color: red;
     display: flex;
     font-weight: bold;
+}
+
+.title-error {
+    border: 1px solid red !important;
 }
 
 .asterisk {

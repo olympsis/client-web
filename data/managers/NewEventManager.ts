@@ -31,11 +31,11 @@ export class NewEventManager {
         eventStartTime: Date,
         eventEndTime: Date
     ) : NEW_EVENT_ERROR | null {
-        if (organizers.length === 0) {
-            return NEW_EVENT_ERROR.NO_ORGANIZERS;
-        }
         if (title === '') {
             return NEW_EVENT_ERROR.NO_TITLE;
+        }
+        if (organizers.length === 0) {
+            return NEW_EVENT_ERROR.NO_ORGANIZERS;
         }
         if (description === '') {
             return NEW_EVENT_ERROR.NO_DESCRIPTION;

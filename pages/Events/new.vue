@@ -28,7 +28,7 @@
                 }"
                 class="text-input"
                 type="text" 
-                placeholder="New Event" 
+                placeholder="Event Title" 
                 v-model="eventTitle" 
             />
 
@@ -403,7 +403,9 @@ useSeoMeta({
             font-size: 2.5rem;
             font-weight: bold;
             padding: 0rem 1rem;
-            background-color: var(--primary-background-color);
+            margin: 0.5rem 0.5rem;
+            border-radius: 10px;
+            background-color: var(--secondary-background-color);
         }
 
         #event-type-config {

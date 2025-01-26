@@ -89,7 +89,7 @@ const eventSettingsModalRef = useTemplateRef<HTMLDialogElement>('event-settings-
 const eventSections = computed<EventSection[]>(() => {
     const sections: EventSection[] = [];
     events.value.filter((e) => e.title?.toLowerCase().includes(searchText.value.toLowerCase())).forEach((e) => {
-        const eventDate = new Date((e.startTime ?? 0) * 1000);
+        const eventDate = new Date(e.startTime * 1000);
         const eventDay = eventDate.getDate()  // Changed from getDay() to getDate()
         const eventMonth = eventDate.getMonth();
         const eventYear = eventDate.getFullYear();

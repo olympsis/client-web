@@ -7,7 +7,7 @@
             <div v-else class="venue-loading"></div>
         </div>
         <div class="event-status">
-            <a class="status">{{ status }}</a>
+            <a class="status">{{ statusString }}</a>
             <a class="time"> {{ event.timeToString() }}</a>
             <div id="participants">
                 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
@@ -21,7 +21,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { VIEW_STATE } from '~/data/Enums';
+import { EVENT_STATE, VIEW_STATE } from '~/data/Enums';
 import type { Ref, ComputedRef } from 'vue';
 import { generateImageURL } from '~/utils/image-extensions';
 import { Event } from '~/data/models/EventModels';
@@ -35,15 +35,43 @@ const props = defineProps({
     event: { type: Event, required: true }
 });
 
-const status = ref("Pending");
-const state = ref(VIEW_STATE.LOADING);
+const status = ref<EVENT_STATE>(EVENT_STATE.PENDING);
+const statusString = computed<string>(() => {
+    switch(status.value) {
+        case EVENT_STATE.PENDING:
+            return 'Pending';
+        case EVENT_STATE.LIVE:
+            return 'Live';
+        default:
+            return 'Ended';
+    }
+});
+const updateStatus = () => {
+    const now = Date.now();
+    const startTime = new Date(props.event.startTime * 1000).getTime();
+    const endTime = new Date(props.event.stopTime * 1000).getTime();
+    
+    if (now < startTime) {
+        status.value = EVENT_STATE.PENDING;
+    } else if (now >= startTime && now <= endTime) {
+        status.value = EVENT_STATE.LIVE;
+    } else {
+        status.value = EVENT_STATE.COMPLETED;
+    }
+};
+updateStatus();
+const interval = setInterval(updateStatus, 30000);
 
+onUnmounted(() => {
+    clearInterval(interval);
+});
+
+const state = ref(VIEW_STATE.LOADING);
 const image = computed(() => {
     return props.event.imageURL ? generateImageURL(props.event.imageURL) : undefined;
 });
 
 const venues: Ref<Venue[]> = ref([]);
-
 const venueName: ComputedRef<string> = computed(() => {
     if (venues.value.length == 1) {
         return venues.value[0]?.name ?? 'Unknown Venue';
@@ -75,7 +103,6 @@ async function loadLocationData() {
     });
     return _venues;
 }
-
 loadLocationData()
     .then((response) => {
         venues.value.push(...response);

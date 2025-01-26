@@ -23,16 +23,16 @@ export const useGroupsViewModel = defineStore('groups-view-model', () => {
         if (sessionStore.selectedGroup) {
             if (posts.value.length == 0) {
                 loadNextPosts()
-                .then((_posts) => {
-                    posts.value = _posts;
-                    state.value = VIEW_STATE.SUCCESS;
-                    return
-                })
-                .catch((error) => {
-                    console.error('Failed to load groups view model: ' + error);
-                    state.value = VIEW_STATE.FAILURE;
-                    return
-                })
+                    .then((_posts) => {
+                        posts.value = _posts;
+                        state.value = VIEW_STATE.SUCCESS;
+                        return;
+                    })
+                    .catch((error) => {
+                        console.error('Failed to load groups view model: ' + error);
+                        state.value = VIEW_STATE.FAILURE;
+                        return;
+                    });
             } else {
                 state.value = VIEW_STATE.SUCCESS;
             }

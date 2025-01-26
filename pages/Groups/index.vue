@@ -131,7 +131,13 @@ const items = ref([
     }
 ]);
 
-viewModel.load();
+/**
+ * I truly do want it to fetch post data on anytime we navigate here.
+ * Eventually I will be more tactful about only fetching more instead of invalidating our client side data.
+ */
+onMounted(() => {
+    viewModel.loadNextPosts();
+});
 
 const showGroupSelector = ref(false);
 

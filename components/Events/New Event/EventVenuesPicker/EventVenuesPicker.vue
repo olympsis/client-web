@@ -86,7 +86,7 @@ import type { Ref, ComputedRef } from 'vue';
 import { useModelStore } from '@/stores/model-store';
 import { DEV_VENUES } from '@/data/dev-data/test-data';
 import { useSessionStore } from '@/stores/session-store';
-import { getMapkitServerToken } from '@/utils/MapHelpers';
+import { getMapkitServerToken } from '~/utils/map-helpers';
 import { VenueDescriptor } from '@/data/models/GenericModels';
 
 import Dialog from 'primevue/dialog';

@@ -17,7 +17,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { GROUP_TYPE } from '~/data/Enums';
-import { generateImageURL } from '~/utils/Image';
+import { generateImageURL } from '~/utils/image-extensions';
 
 const props = defineProps<{
     type: GROUP_TYPE,

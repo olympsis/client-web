@@ -51,7 +51,7 @@
 <script setup lang="ts">
 
 import { ref, computed } from 'vue';
-import { generateImageURL } from '~/utils/Image';
+import { generateImageURL } from '~/utils/image-extensions';
 import { useSessionStore } from '~/stores/session-store';
 
 import ProfileButton from '~/components/ProfileButton/ProfileButton.vue';

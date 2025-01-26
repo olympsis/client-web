@@ -20,7 +20,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { UserSnippet } from '@/data/models/UserModels';
-import { generateImageURL } from '~/utils/Image';
+import { generateImageURL } from '~/utils/image-extensions';
 
 const props = defineProps<{
     user: UserSnippet | undefined,

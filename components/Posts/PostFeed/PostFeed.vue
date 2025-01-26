@@ -80,7 +80,6 @@ function handleDeletedPost(id: string) {
 }
 
 const showCommentsDialog = ref(false);
-const commentsDialog = ref('post-comments');
 const selectedPost = ref<Post | undefined>(undefined);
 
 function handleNewPost(post: Post) {

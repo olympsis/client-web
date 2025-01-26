@@ -1,7 +1,7 @@
 import { Location } from "../models/GenericModels";
 import { useModelStore } from "@/stores/model-store";
 import { useSessionStore } from "~/stores/session-store";
-import { getMapkitServerToken } from "@/utils/MapHelpers";
+import { getMapkitServerToken } from "~/utils/map-helpers";
 
 /**
  * Location Manager handles all location events and features.

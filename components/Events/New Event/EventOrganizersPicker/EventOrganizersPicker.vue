@@ -54,7 +54,7 @@ import { GROUP_TYPE } from '~/data/Enums';
 import Popover from 'primevue/popover';
 import ScrollPanel from 'primevue/scrollpanel';
 import { Club } from '~/data/models/ClubModels';
-import { generateImageURL } from '~/utils/Image';
+import { generateImageURL } from '~/utils/image-extensions';
 import { useSessionStore } from '~/stores/session-store';
 import { GroupSelection } from '~/data/models/GenericModels';
 import { Organization } from '~/data/models/OrganizationModels';

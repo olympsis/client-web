@@ -103,6 +103,7 @@ import MembersListCard from '@/components/Groups/MembersListCard/MembersListCard
 const toast = useToast();
 const router = useRouter();
 
+const modelStore = useModelStore();
 const sessionStore = useSessionStore();
 const viewModel = useGroupsViewModel();
 
@@ -136,13 +137,12 @@ const items = ref([
  * Eventually I will be more tactful about only fetching more instead of invalidating our client side data.
  */
 onMounted(() => {
-    viewModel.loadNextPosts();
+    viewModel.load();
 });
 
 const showGroupSelector = ref(false);
 
 const postCardModalRef = useTemplateRef<HTMLDialogElement>('new-post-modal');
-const eventCardModalRef = useTemplateRef<HTMLDialogElement>('new-event-modal');
 
 const selectedGroup = computed(() => {
     return sessionStore.selectedGroup
@@ -153,10 +153,9 @@ const state = computed<VIEW_STATE>(() => {
 });
 
 const nextEvent = computed<Event | undefined>(() => {
-    return sessionStore.events
-        .filter((e) => e.participants?.find((p) => p.user?.uuid === sessionStore.user?.uuid))
-        .sort((a, b) => (a.startTime ?? 0) - (b.startTime ?? 0))
-        [0];
+    const clubId = (selectedGroup.value?.club?.id ?? selectedGroup.value?.organization?.id) ?? '';
+    return modelStore.getAllEvents()
+        .mostRecentForClub(clubId);
 });
 
 const groups = computed(() => {

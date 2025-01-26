@@ -1,7 +1,7 @@
 import { 
     handleRoutes,
     handleAuthorizationStatus,
-} from "~/utils/Routing";
+} from "~/utils/router-helpers";
 import { AUTH_STATUS } from "~/data/Enums";
 
 export default defineNuxtRouteMiddleware((to, from) => {

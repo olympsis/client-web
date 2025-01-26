@@ -58,8 +58,8 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { Post } from '@/data/models/PostModels';
-import { calculateTimeAgo } from '@/utils/Time';
-import { generateImageURL } from '@/utils/Image';
+import { calculateTimeAgo } from '~/utils/time-helpers';
+import { generateImageURL } from '~/utils/image-extensions';
 import { Like } from '~/data/models/GenericModels';
 import { PostService } from '@/data/services/PostService';
 

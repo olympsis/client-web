@@ -21,21 +21,17 @@ export const useGroupsViewModel = defineStore('groups-view-model', () => {
     function load() {
         state.value = VIEW_STATE.LOADING;
         if (sessionStore.selectedGroup) {
-            if (posts.value.length == 0) {
-                loadNextPosts()
-                    .then((_posts) => {
-                        posts.value = _posts;
-                        state.value = VIEW_STATE.SUCCESS;
-                        return;
-                    })
-                    .catch((error) => {
-                        console.error('Failed to load groups view model: ' + error);
-                        state.value = VIEW_STATE.FAILURE;
-                        return;
-                    });
-            } else {
-                state.value = VIEW_STATE.SUCCESS;
-            }
+            loadNextPosts()
+                .then((_posts) => {
+                    posts.value = _posts;
+                    state.value = VIEW_STATE.SUCCESS;
+                    return;
+                })
+                .catch((error) => {
+                    console.error('Failed to load groups view model: ' + error);
+                    state.value = VIEW_STATE.FAILURE;
+                    return;
+                });
         } else {
             // Wait half a second for the session store to propagate the changes
             setTimeout(() => {
@@ -49,12 +45,15 @@ export const useGroupsViewModel = defineStore('groups-view-model', () => {
             const id = sessionStore.selectedGroup?.club?.id ?? sessionStore.selectedGroup?.organization?.id
             const response = await postService.getPosts(id ?? '')
             if (response && response.posts) {
+                state.value = VIEW_STATE.SUCCESS;
                 return response.posts
             } else {
-                return []
+                state.value = VIEW_STATE.SUCCESS;
+                return [];
             }
         } else {
-            return []
+            state.value = VIEW_STATE.SUCCESS;
+            return [];
         }
     }
 

@@ -65,7 +65,7 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
 import { VIEW_STATE } from '@/data/Enums';
-import { compareUTCNowToDateNormal } from '@/utils/Time';
+import { compareUTCNowToDateNormal } from '~/utils/time-helpers';
 import { useSessionStore } from '@/stores/session-store';
 import { EventService } from '@/data/services/EventService';
 import { Event, EventSection } from '@/data/models/EventModels';

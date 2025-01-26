@@ -85,7 +85,7 @@ import { computed, ref } from 'vue';
 import { useToast } from 'primevue/usetoast';
 import { Club } from '@/data/models/ClubModels';
 import { useRoute, useRouter } from 'vue-router';
-import { formatRelativeTime } from '@/utils/Time';
+import { formatRelativeTime } from '~/utils/time-helpers';
 import { Member } from '@/data/models/GenericModels';
 import { AUTH_STATUS, VIEW_STATE } from '@/data/Enums';
 import { useSessionStore } from '@/stores/session-store';

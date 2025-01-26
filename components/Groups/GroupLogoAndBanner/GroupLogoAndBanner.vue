@@ -17,7 +17,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { generateImageURL } from '~/utils/Image';
+import { generateImageURL } from '~/utils/image-extensions';
 
 const props = defineProps({
     logoURL: { required: true },

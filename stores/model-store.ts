@@ -130,6 +130,9 @@ export const useModelStore = defineStore('model-store', () => {
         });
     }
 
+    function deleteEventByID(id: string): boolean {
+        return eventModels.delete(id);
+    }
 
     async function getClubByID(id: string) : Promise<Club> {
         const memory = clubModels.get(id);
@@ -230,6 +233,7 @@ export const useModelStore = defineStore('model-store', () => {
         getAllEvents,
         setEvent,
         setEvents,
+        deleteEventByID,
 
         getClubByID,
         getAllClubs,

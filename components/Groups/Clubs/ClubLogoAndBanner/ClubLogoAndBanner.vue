@@ -18,7 +18,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { Club } from '@/data/models/ClubModels';
-import { generateImageURL } from '~/utils/Image';
+import { generateImageURL } from '~/utils/image-extensions';
 
 const props = defineProps({
     club: { type: Club }

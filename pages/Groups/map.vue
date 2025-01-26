@@ -76,7 +76,7 @@ import { Venue } from '@/data/models/VenueModels';
 import { Event } from '@/data/models/EventModels';
 import { useModelStore } from '@/stores/model-store';
 import { useSessionStore } from '@/stores/session-store';
-import { getMapkitServerToken, generateMapkitAuthToken } from '@/utils/MapHelpers';
+import { getMapkitServerToken, generateMapkitAuthToken } from '~/utils/map-helpers';
 import { createVNode, watch, onMounted, ref, render, computed, type Ref, type ComputedRef } from 'vue';
 
 import EventsListModal from '@/components/Events/EventsListModal/EventsListModal.vue';

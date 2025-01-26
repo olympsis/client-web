@@ -105,8 +105,10 @@ function handleEventDeletion() {
 
 async function deleteEvent(deleteAll?: boolean) {
     const id = event.value?.id ?? '';
+    const store = useModelStore();
     const isDeleted = await session.eventService.deleteEvent(id, deleteAll);
     if (isDeleted) {
+        store.deleteEventByID(id);
         router.push('/events');
     } else {
         toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to delete event!', life: 3000 });

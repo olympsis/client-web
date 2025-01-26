@@ -87,10 +87,10 @@
 import { computed, ref, type Ref } from 'vue';
 import { Event } from '@/data/models/EventModels';
 import { Venue } from '@/data/models/VenueModels';
-import { getDirections } from '@/utils/MapHelpers';
+import { getDirections } from '~/utils/map-helpers';
 import { useModelStore } from '@/stores/model-store';
 import { useSessionStore } from '@/stores/session-store';
-import { generateImageURL } from '@/utils/Image';
+import { generateImageURL } from '~/utils/image-extensions';
 
 import { useRouter } from 'vue-router';
 import EventListItem from '@/components/Events/EventListItem/EventListItem.vue';

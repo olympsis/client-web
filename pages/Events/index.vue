@@ -152,7 +152,7 @@ async function fetchEvents(fetchCompleted: boolean = false) {
     events = await eventService.getEvents(
         location.latitude, 
         location.longitude, 
-        100000, // Radius of lookup
+        1000000, // Radius of lookup
         sports, // Sports involved
         fetchCompleted ? 'ended' : 'pending, live', // Status of events
         0,

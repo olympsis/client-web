@@ -54,9 +54,16 @@ function areDatesOnSameDay(date1: Date, date2: Date): boolean {
 }
 
 function compareUTCNowToDateNormal(date: Date): string {
-    const now = new Date((Math.floor(Date.now() / 1000) - 86400) * 1000);
-    const tomorrow = new Date((Math.floor(Date.now() / 1000) - 86400) * 1000);
+  const now = new Date(Math.floor(Date.now() / 1000) * 1000);
+  const tomorrow = new Date(Math.floor(Date.now() / 1000) * 1000);
     tomorrow.setDate(tomorrow.getDate() + 1);
+
+    // Check if today
+    if (date.getFullYear() === now.getFullYear() &&
+        date.getMonth() === now.getMonth() &&
+        date.getDate() === now.getDate()) {
+        return 'Today';
+    }
     
     // Check if tomorrow
     if (date.getFullYear() === tomorrow.getFullYear() &&

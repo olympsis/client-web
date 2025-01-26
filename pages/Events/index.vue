@@ -86,20 +86,19 @@ const selectedDate = ref<string>(Date.now().toLocaleString());
 
 const eventSettingsModalRef = useTemplateRef<HTMLDialogElement>('event-settings-modal');
 
-
 const eventSections = computed<EventSection[]>(() => {
     const sections: EventSection[] = [];
     events.value.filter((e) => e.title?.toLowerCase().includes(searchText.value.toLowerCase())).forEach((e) => {
         const eventDate = new Date((e.startTime ?? 0) * 1000);
-        const eventDay = eventDate.getDay()
+        const eventDay = eventDate.getDate()  // Changed from getDay() to getDate()
         const eventMonth = eventDate.getMonth();
         const eventYear = eventDate.getFullYear();
 
         // Find if we have an existing section
         const existing = sections.find((s) => {
-            const sectionDay = s.date.getDay();
+            const sectionDay = s.date.getDate();  // Changed from getDay() to getDate()
             const sectionMonth = s.date.getMonth();
-            const sectionYear = s.date.getFullYear()
+            const sectionYear = s.date.getFullYear();
 
             return sectionDay === eventDay && 
                 sectionMonth === eventMonth &&

@@ -27,6 +27,7 @@
             <EventDeleteAll
                 @no="deleteEvent"
                 @yes="deleteEvent(true)"
+                @close="deleteAll?.close()"
             />
         </dialog>
     </div>

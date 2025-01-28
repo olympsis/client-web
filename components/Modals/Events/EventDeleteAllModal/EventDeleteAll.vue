@@ -1,7 +1,14 @@
 <template>
     <div id="event-delete-all-modal">
         <div id="header">
-           This is Recurring Event
+            <button class="button" @click="$emit('close')">
+                <picture>
+                    <source srcset="@/assets/icons/xmark/xmark.white.svg" media="(prefers-color-scheme: dark)">
+                    <img src="@/assets/icons/xmark/xmark.svg">
+                </picture>
+            </button>
+           
+            <div>This is Recurring Event</div>
         </div>
         <div id="body">
             <div id="title"> Would you like to delete all of the recurring events? </div>
@@ -29,7 +36,8 @@ import TextButton from '@/components/Buttons/LoadingButtons/TextButton/TextButto
 
 const emit = defineEmits([
     'no',
-    'yes'
+    'yes',
+    'close'
 ]);
 
 const state = ref<VIEW_STATE>(VIEW_STATE.PENDING);
@@ -45,13 +53,23 @@ const state = ref<VIEW_STATE>(VIEW_STATE.PENDING);
     #header {
         width: 100%;
         display: flex;
-        font-size: 0.9rem;
+        
         align-items: center;
         padding: 0.75rem 0rem;
         justify-content: center;
         border-radius: 15px 15px 0px 0px;
         color: var(--primary-label-color);
-        background-color: var(--tertiary-background-color);
+
+        button {
+            margin-left: 1rem;
+            height: 24px !important;
+            background-color: var(--tertiary-background-color);
+        }
+
+        div {
+            font-size: 0.9rem;
+            margin: 0rem auto;
+        }
     }
 
     #body {

@@ -1,6 +1,6 @@
 <template>
 	<div id="locale-picker">
-		<div id="top-content">
+		<div id="top-content" v-if="showCancel">
 			<button @click="$emit('close')">Cancel</button>
 		</div>
 
@@ -72,7 +72,8 @@ import { LocaleService } from '@/data/services/LocaleService';
 import { AdministrativeArea, Country, SubAdministrativeArea } from '@/data/models/GenericModels';
 
 const props = defineProps({
-    showCities: { type: Boolean, default: false }
+    showCities: { type: Boolean, default: false },
+	showCancel: { type: Boolean, default: true }
 });
 
 const emit = defineEmits([

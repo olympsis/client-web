@@ -31,6 +31,10 @@
     .header {
         flex-direction: column;
 
+        .title {
+            text-align: center;
+        }
+
         .sub-title {
             font-size: 1rem;
             font-style: normal;

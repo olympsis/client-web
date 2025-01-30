@@ -10,7 +10,6 @@
         justify-content: center;
         border-radius: 15px 15px 0px 0px;
         color: var(--primary-label-color);
-        background-color: var(--tertiary-background-color);
 
         .title {
             font-weight: bold;
@@ -24,6 +23,7 @@
             color: gray;
             font-style: italic;
             font-size: 0.75rem;
+            text-align: center;
         }
     }
 

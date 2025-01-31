@@ -11,7 +11,7 @@
                 <button @click="">
                     <img src="@/assets/icons/map/map.fill.svg">
                 </button>
-                <button @click="">
+                <button @click="eventSettingsModalRef?.show()">
                     <img src="@/assets/icons/gear/gear.fill.white.svg">
                 </button>
             </div>
@@ -58,13 +58,14 @@
 
         <!-- Events Settings Modal -->
         <dialog id="event-settings-modal" ref="event-settings-modal" class="dialog">
+            <EventsSettings @close="eventSettingsModalRef?.close()" @update="handleSettingsChanged"/>
         </dialog>
     </main>
 </template>
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
-import { VIEW_STATE } from '@/data/Enums';
+import { SPORTS, VIEW_STATE } from '@/data/Enums';
 import { compareUTCNowToDateNormal } from '~/utils/time-helpers';
 import { useSessionStore } from '@/stores/session-store';
 import { EventService } from '@/data/services/EventService';
@@ -74,6 +75,7 @@ import { computed, onMounted, ref, useTemplateRef, watch } from 'vue';
 import SearchBar from '@/components/SearchBar/SearchBar.vue';
 import EventListItem from '@/components/Events/EventListItem/EventListItem.vue';
 import EventDateButton from '@/components/Buttons/EventDateButton/EventDateButton.vue';
+import EventsSettings from '~/components/Dialog/Events/EventsSettings/EventsSettings.vue';
 
 const router = useRouter();
 const session = useSessionStore();
@@ -143,23 +145,23 @@ function handleHideEventSettingsModal() {
 async function fetchEvents(fetchCompleted: boolean = false) {
     state.value = VIEW_STATE.LOADING;
 
-    let events: Event[];
+    let _events: Event[];
     const sports = session.user?.sports.join(',') ?? 'all'
     const location = session.lastKnownLocation;
 
     if (!location) throw('Failed to get location. IMPLEMENT BETTER FALLBACK');
 
-    events = await eventService.getEvents(
+    _events = await eventService.getEvents(
         location.latitude, 
         location.longitude, 
-        1000000, // Radius of lookup
+        64373, // Radius of lookup
         sports, // Sports involved
         fetchCompleted ? 'ended' : 'pending, live', // Status of events
         0,
         100
     );
 
-    return events;
+    return _events;
 }
 
 function fetchCompletedEvents() {
@@ -186,6 +188,36 @@ function retryFetchEvents() {
             if (config.public.MODE !== 'dev') return;
             console.error('Failed to get events. Error: ', error);
         });
+}
+
+async function handleSettingsChanged(event: { radius: number, sports: any}) {
+    eventSettingsModalRef.value?.close();
+    state.value = VIEW_STATE.LOADING;
+
+    let _events: Event[];
+    const radius = event.radius * 1609;
+    const sports = event.sports.value.map((s: any) => s.valueOf()).join(',');
+    const location = session.lastKnownLocation;
+
+    if (!location) throw('Failed to get location. IMPLEMENT BETTER FALLBACK');
+
+    try {
+        _events = await eventService.getEvents(
+            location.latitude, 
+            location.longitude, 
+            radius, // Radius of lookup
+            sports, // Sports involved
+            'pending, live', // Status of events
+            0,
+            100
+        );
+
+        events.value = _events;
+        state.value = VIEW_STATE.SUCCESS;
+    } catch (error) {
+        state.value = VIEW_STATE.FAILURE;
+        console.error('Failed to fetch events. Error: ' + error);
+    }
 }
 
 useSeoMeta({
@@ -414,16 +446,18 @@ definePageMeta({
     }
 }
 
-#new-event-modal {
+#event-settings-modal {
     top: 0;
     border: unset;
     background: transparent;
     backdrop-filter: blur(5px);
 
-    #new-event-card {
-        border-radius: 20px;
+    #event-settings-dialog {
         box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
-        background-color: var(--secondary-background-color);
+
+        @media (max-width: 940px) {
+            width: 98%;
+        }
     }
 }
 </style>

@@ -64,10 +64,11 @@ onMounted(() => {
 <style scoped>
 #event-settings-dialog {
     padding: 1rem;
+    max-width: 32rem;
     border-radius: 20px;
 }
 .body {
-    margin: 0rem 1rem;
+    margin: 1rem;
     flex-direction: column;
 }
 

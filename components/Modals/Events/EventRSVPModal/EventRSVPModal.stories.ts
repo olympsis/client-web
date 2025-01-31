@@ -1,4 +1,3 @@
-
 import EventRSVPModal from "./EventRSVPModal.vue";
 import type { Meta, StoryObj } from "@storybook/vue3";
 import { sampleEvents } from "@/data/dev-data/sample-events";

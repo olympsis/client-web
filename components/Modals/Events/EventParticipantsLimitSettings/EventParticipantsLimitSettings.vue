@@ -47,6 +47,7 @@
 </template>
 
 <script setup lang="ts">
+import Slider from 'primevue/slider';
 const min = ref<number>(0);
 const max = ref<number>(0);
 </script>

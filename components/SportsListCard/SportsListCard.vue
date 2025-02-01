@@ -88,8 +88,6 @@ small {
 
         .button {
             margin: 1rem;
-            width: 1.2rem;
-            height: 1.2rem;
             cursor: pointer;
             border-radius: 50%;
             border: 1px solid var(--primary-label-color);
@@ -98,8 +96,6 @@ small {
 
         .selected-button {
             margin: 1rem;
-            width: 1.2rem;
-            height: 1.2rem;
             cursor: pointer;
             border-radius: 50%;
             background-color: var(--secondary-brand-color);

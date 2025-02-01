@@ -13,16 +13,34 @@
         </div>
 
         <div class="actions">
-            <button class="secondary button" @click="$emit('deny')">
+            <button class="secondary button" @click="$emit('denied')">
                 Deny
             </button>
 
-            <button class="primary button" @click="$emit('allow')">
+            <button class="primary button" @click="$emit('allowed')">
                 Allow
             </button>
         </div>
     </div>
 </template>
+
+<script setup lang="ts">
+const session = useSessionStore();
+const emit = defineEmits(['allowed', 'denied', 'error']);
+
+async function requestUserLocation() {
+    try {
+        const isAllowed = await session.requestLocation();
+        if (isAllowed) {
+            emit('allowed');
+        } else {
+            emit('denied');
+        }
+    } catch (error) {
+        emit('error', error);
+    }
+}
+</script>
 
 <style scoped>
 #location-request {

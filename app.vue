@@ -1,12 +1,12 @@
 <template>
-  <div id="app">
-	<Analytics/>
-	<SpeedInsights/>
-  <Toast/>
-	<LoadingView v-if="isLoading"/>
-	<FailedView v-if="hasFailed"/>
-    <NuxtPage/>
-  </div>
+	<div id="app">
+		<Analytics/>
+		<SpeedInsights/>
+		<Toast/>
+		<LoadingView v-if="isLoading"/>
+		<FailedView v-if="hasFailed"/>
+		<NuxtPage/>
+	</div>
 </template>
 
 <script setup lang="ts">

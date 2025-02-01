@@ -145,6 +145,12 @@ export const useSessionStore = defineStore('session-store', () => {
         }
     }
 
+    async function requestLocation(): Promise<boolean> {
+        const resp = await location.requestLocationPermission();
+        if (resp == 'denied') { return false; }
+        return true;
+    }
+
     async function load(): Promise<{ 
         user: UserData | undefined, 
         selections: GroupSelection[],
@@ -214,6 +220,7 @@ export const useSessionStore = defineStore('session-store', () => {
         clubs,
         organizations,
         
+        
         groups,
         selectedGroup,
 
@@ -240,6 +247,7 @@ export const useSessionStore = defineStore('session-store', () => {
         load,
         logout,
         deleteAccount,
+        requestLocation,
         checkAuthorizationStatus
     }
 });

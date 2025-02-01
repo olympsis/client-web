@@ -73,9 +73,10 @@ const image = computed(() => {
 
 const venues: Ref<Venue[]> = ref([]);
 const venueName: ComputedRef<string> = computed(() => {
-    if (venues.value.length == 1) {
-        return venues.value[0]?.name ?? 'Unknown Venue';
-    } else if (venues.value.length > 1) {
+    const venuesLength = props.event.venues.length;
+    if (venuesLength == 1) {
+        return (venues.value[0]?.name ?? props.event.venues[0]?.name) ?? 'Unknown Venue';
+    } else if (venuesLength > 1) {
         return `${venues.value[0]?.name} & ${venues.value.length-1} more`
     } else {
         return 'Unknown Venue';

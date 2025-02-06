@@ -1,6 +1,6 @@
 <template>
     <div id="user-icon" >
-        <div v-if="user && !imageFailed && image !== undefined" :style="{ width: `${size}rem`, height: `${size}rem`}">
+        <div v-if="user && image !== undefined && !imageFailed" :style="{ width: `${size}rem`, height: `${size}rem`}">
             <img 
                 :src="image" 
                 class="image" 
@@ -35,7 +35,7 @@ const image = computed<string | undefined>(() => {
 const imageFailed = ref(false);
 
 const onImageError = () => {
-    imageFailed.value = false;
+    imageFailed.value = true;
 };
 
 </script>

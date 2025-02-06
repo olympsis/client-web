@@ -1,7 +1,7 @@
 <template>
     <div class="selector-wrapper">
         <ul id="members-list" >
-            <li v-for="member in members"><MemberListItem :member="member" style="margin: 1rem 0rem;"/></li>
+            <MemberListItem v-for="member in members" :member="member" style="margin: 1rem 0rem;"/>
         </ul>
     </div>
 </template>

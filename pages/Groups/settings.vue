@@ -59,9 +59,7 @@
                 <button id="cancel-button" @click="hideMembersDialog">Close</button>
                 <input id="search-bar" type="text" v-model="membersSearchText"/>
                 <div id="member-list">
-                    <ul v-for="member in members">
-                        <MemberListItem :member="member" style="margin: 1rem 0rem;"/>
-                    </ul>
+                    <MemberListItem v-for="member in members" :member="member" style="margin: 1rem;"/>
                 </div>
             </div>
         </dialog>

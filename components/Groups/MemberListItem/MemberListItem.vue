@@ -2,13 +2,21 @@
     <li id="member-list-item">
         <div id="user-info">
             <UserIcon :user="member.user" :size="3"/>
-            <a class="name">{{ member.user?.username ?? 'olympsis-user' }}</a>
+            <div id="info">
+                <a class="name">{{ member.user?.username ?? 'olympsis-user' }}</a>
+                <div 
+                    v-if="member.role !== 'member'" 
+                    class="role" 
+                    :class="{ owner: member.role === 'owner', admin: member.role === 'admin'}"
+                >
+                    {{ member.role }}</div>
+            </div>
         </div>
 
         <div id="menu">
             <button @click="toggleMenu">
                 <picture>
-                    <source srcset="@/assets/icons/ellipsis/ellipsis.svg">
+                    <source srcset="@/assets/icons/ellipsis/ellipsis.svg" media="(prefers-color-scheme: light)">
                     <img src="@/assets/icons/ellipsis/ellipsis.white.svg">
                 </picture>
             </button>
@@ -178,10 +186,31 @@ onMounted(() => {
         display: flex;
         align-items: center;
 
-        .name {
-            font-size: 1.3rem;
+        #info {
             margin: 0rem 1rem;
-            color: var(--primary-label-color);
+
+            .name {
+                font-size: 1.3rem;
+                color: var(--primary-label-color);
+            }
+
+            .role {
+                color: white;
+                font-size: 0.8rem;
+                width: fit-content;
+                border-radius: 5px;
+                margin-top: 0.25rem;
+                padding: 0.15rem 0.5rem;
+                text-transform: capitalize;
+
+                &.owner {
+                    background-color: var(--tertiary-brand-color);
+                }
+
+                &.admin {
+                    background-color: var(--secondary-brand-color);
+                }
+            }
         }
     }
 

@@ -50,14 +50,14 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import type { ComputedRef } from 'vue';
-import { GROUP_TYPE } from '~/data/Enums';
+import { GROUP_ROLE, GROUP_TYPE } from '~/data/Enums';
+import { useSessionStore } from '~/stores/session-store';
+import { generateImageURL } from '~/utils/image-extensions';
+import { GroupSelection } from '~/data/models/GenericModels';
+
 import Popover from 'primevue/popover';
 import ScrollPanel from 'primevue/scrollpanel';
-import { Club } from '~/data/models/ClubModels';
-import { generateImageURL } from '~/utils/image-extensions';
-import { useSessionStore } from '~/stores/session-store';
-import { GroupSelection } from '~/data/models/GenericModels';
-import { Organization } from '~/data/models/OrganizationModels';
+
 
 
 const op = ref();
@@ -73,7 +73,16 @@ const model = defineModel<GroupSelection[]>({ default: [] });
 
 const sessionStore = useSessionStore();
 const availableGroups: ComputedRef<GroupSelection[]> = computed(() => {
-    return sessionStore.groups;
+    const uuid = sessionStore.user?.uuid;
+    
+    return sessionStore.groups.filter((g) => {
+        switch (g.type) {
+            case GROUP_TYPE.ORGANIZATION:
+                return g.organization?.members?.find((m) => m.user?.uuid === uuid)?.role != GROUP_ROLE.MEMBER;
+            default:
+            return g.club?.members?.find((m) => m.user?.uuid === uuid)?.role != GROUP_ROLE.MEMBER;
+        }
+    });
 });
 
 function getGroupName(group: GroupSelection) : string {

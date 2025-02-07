@@ -302,7 +302,7 @@ ClubDao.prototype.encode = function(): { [key: string]: any } {
         data['description'] = this.description;
     }
     if (this.sports) {
-        data['sport'] = this.sports;
+        data['sports'] = this.sports;
     }
     if (this.city) {
         data['city'] = this.city;

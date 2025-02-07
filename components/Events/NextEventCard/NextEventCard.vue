@@ -11,7 +11,7 @@
         <div v-else>
             <div class="holder">
                 <a class="text"> No Upcoming Events </a>
-                <button id="new-event" @click="$emit('create-event')">Create an Event</button>
+                <button v-if="isAdmin" id="new-event" @click="$emit('create-event')">Create an Event</button>
             </div>
         </div>
     </div>
@@ -19,13 +19,29 @@
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
+import { GROUP_ROLE } from '~/data/Enums';
 import { Event } from '~/data/models/EventModels';
 import EventListItem from '../EventListItem/EventListItem.vue';
 
 const router = useRouter();
-const props = defineProps({
+const session = useSessionStore();
+
+defineProps({
     event: { type: Event }
 })
+
+const isAdmin = computed<boolean>(() => {
+    const user = session.user;
+    if (!user) return false;
+
+    const group = session.selectedGroup?.club ?? session.selectedGroup?.organization;
+    if (!group) return false;
+
+    const member = group.members?.find((m) => m.user?.uuid === user.uuid);
+    if (!member) return false;
+
+    return member.role !== GROUP_ROLE.MEMBER;
+});
 </script>
 
 <style scoped>

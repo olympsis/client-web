@@ -68,7 +68,7 @@ onMounted(() => {
             if (props.member.role != 'owner') {
                 _options.push(
                     {
-                        label: 'Change Rank',
+                        label: 'Change Role',
                         icon: 'pi pi-bug',
                         command: () => {
                             emit('change-rank', { member: props.member });
@@ -98,7 +98,7 @@ onMounted(() => {
             } else {
                 _options.push(
                     {
-                        label: 'Change Rank',
+                        label: 'Change Role',
                         icon: 'pi pi-bug',
                         command: () => {
                             emit('change-rank', { member: props.member });

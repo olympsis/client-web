@@ -81,6 +81,20 @@
         <dialog ref="delete-modal" id="delete-modal" class="dialog" v-if="selectedGroup">
             <GroupDeleteModal :group="selectedGroup" @close="hideDeleteModal" @success="handleLeaveGroup"/>
         </dialog>
+
+        <Dialog
+            ref="op"
+            v-if="selectedMember"
+            id="change-rank-dialog"
+            v-model:visible="showDialog"
+            blockScroll
+            position="center"
+            :style="{'width': '100%', 'max-width': '32rem', 'overflow-y': 'scroll', 'background-color': 'var(--primary-background-color)'}"
+        >
+            <template #container>
+                <ChangeRankModal :member="selectedMember" @close="showDialog = false"/>
+            </template>
+        </Dialog>
     </main>
 </template>
 
@@ -93,18 +107,23 @@ import { GROUP_TYPE, VIEW_STATE } from '@/data/Enums';
 import { useSessionStore } from '@/stores/session-store';
 import { Organization } from '@/data/models/OrganizationModels';
 
+import Dialog from 'primevue/dialog';
 import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
 import GroupSelector from '@/components/Groups/GroupSelector/GroupSelector.vue';
 import MemberListItem from '@/components/Groups/MemberListItem/MemberListItem.vue';
+import ChangeRankModal from '~/components/Modals/Groups/ChangeRank/ChangeRankModal.vue';
 import GroupLeaveModal from '@/components/Modals/Groups/GroupLeaveModal/GroupLeaveModal.vue';
 import GroupDeleteModal from '@/components/Modals/Groups/GroupDeleteModal/GroupDeleteModal.vue';
 import ClubLogoAndBanner from '@/components/Groups/Clubs/ClubLogoAndBanner/ClubLogoAndBanner.vue';
 import { GroupManager } from '~/data/managers/GroupManager';
-import type { Member } from '~/data/models/GenericModels';
+import { Member } from '~/data/models/GenericModels';
 
 const router = useRouter();
 const sessionStore = useSessionStore();
 const manager = new GroupManager();
+
+const showDialog = ref(false);
+const selectedMember = ref<Member | undefined>(undefined);
 
 const editDialogRef = useTemplateRef<HTMLDialogElement>('edit-dialog');
 const groupPickerDialogRef = useTemplateRef<HTMLDialogElement>('group-picker-dialog');
@@ -310,7 +329,8 @@ function handleLeaveGroup() {
 }
 
 function handleChangeRank(event: { member: Member}) {
-
+    selectedMember.value = event.member;
+    showDialog.value = true;
 }
 
 function handleRemoveUser(event: { member: Member}) {

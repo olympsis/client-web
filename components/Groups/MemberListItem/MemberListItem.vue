@@ -14,7 +14,7 @@
         </div>
 
         <div id="menu">
-            <button @click="toggleMenu">
+            <button @click="toggleMenu" v-if="!isUser">
                 <picture>
                     <source srcset="@/assets/icons/ellipsis/ellipsis.svg" media="(prefers-color-scheme: light)">
                     <img src="@/assets/icons/ellipsis/ellipsis.white.svg">
@@ -44,6 +44,11 @@ const emit = defineEmits([
 
 const menu = ref();
 const options = ref<any[]>([]);
+const session = useSessionStore();
+
+const isUser = computed<boolean>(() => {
+    return session.user?.uuid === props.member.user?.uuid;
+});
 
 const toggleMenu = (event: any) => {
     menu.value.toggle(event);

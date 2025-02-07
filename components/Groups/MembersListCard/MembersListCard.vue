@@ -7,8 +7,8 @@
                 style="margin: 1rem 0rem;"
                 @change-rank="handleChangeRank"
                 @report-user=""
-                @remove-user="handleRemoveUser"
-                @leave-group="handleLeaveGroup"
+                @remove-user="handleKickUser"
+                @leave-group=""
             />
         </ul>
 
@@ -25,6 +25,20 @@
                 <ChangeRankModal :member="selectedMember" @close="showDialog = false"/>
             </template>
         </Dialog>
+
+        <Dialog
+            ref="op"
+            v-if="selectedMember"
+            id="kick-member-dialog"
+            v-model:visible="showKickDialog"
+            blockScroll
+            position="center"
+            :style="{'width': '100%', 'max-width': '25rem', 'overflow-y': 'scroll', 'background-color': 'var(--primary-background-color)'}"
+        >
+            <template #container>
+                <GroupKickModal v-if="selectedMember" :member="selectedMember" @close="showKickDialog = false" @kicked="handleKickedUser"/>
+            </template>
+        </Dialog>
     </div>
 </template>
 
@@ -32,40 +46,44 @@
 import Dialog from 'primevue/dialog';
 import MemberListItem from '../MemberListItem/MemberListItem.vue';
 import ChangeRankModal from '~/components/Modals/Groups/ChangeRank/ChangeRankModal.vue';
+import GroupKickModal from '~/components/Modals/Groups/GroupKickModal/GroupKickModal.vue';
 
 import { Member } from '~/data/models/GenericModels';
 import { GroupManager } from '~/data/managers/GroupManager';
+import GroupLeaveModal from '~/components/Modals/Groups/GroupLeaveModal/GroupLeaveModal.vue';
 
 defineProps({
     members: { type: Array<Member>, required: true }
 });
 
-
+const session = useSessionStore();
 
 const showDialog = ref(false);
+const showKickDialog = ref(false);
 const selectedMember = ref<Member | undefined>(undefined);
 
-const manager = new GroupManager();
 function handleChangeRank(event: { member: Member}) {
     selectedMember.value = event.member;
     showDialog.value = true;
 }
 
-async function handleRemoveUser(event: { member: Member}) {
-    const isRemoved = await manager.kickMember(event.member);
-    if (isRemoved) {
-        const session = useSessionStore();
-        const selectedGroup = session.selectedGroup?.club ?? session.selectedGroup?.organization;
-        if (selectedGroup) {
-            const idx = selectedGroup.members?.findIndex((m) => m.id === event.member.id);
-            if (idx !== undefined && idx != -1) {
-                selectedGroup.members?.splice(idx, 1);
-            }
-        }
-    }
+function handleKickUser(event: { member: Member}) {
+    selectedMember.value = event.member;
+    showKickDialog.value = true;
 }
 
-function handleLeaveGroup() {}
+
+function handleKickedUser() {
+    showKickDialog.value = false;
+    if (!selectedMember.value) return;
+    const selectedGroup = session.selectedGroup?.club ?? session.selectedGroup?.organization;
+    if (!selectedGroup) return;
+
+    const idx = selectedGroup.members?.findIndex((m) => m.id === selectedMember.value?.id) ?? -1;
+    if (idx != undefined && idx == -1) return;
+
+    selectedGroup.members?.splice(idx, 1);
+}
 
 </script>
 

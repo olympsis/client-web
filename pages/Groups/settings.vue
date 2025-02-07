@@ -34,7 +34,7 @@
             <button @click="router.push('/groups/applications')"> Applications </button>
             <button @click="router.push('/groups/reports')"> Reports </button>
             <button @click="showGroupPickerDialog"> Change Organization </button>
-            <button @click="showNewGroupDialog"> Create a New Group </button>
+            <button @click="router.push('/groups/new')"> Create a New Group </button>
             <button @click="router.push('/groups/search')"> Search for clubs </button>
             <button @click="showMembersDialog"> Members </button>
             <button v-if="canLeaveGroup" class="destructive" @click="showLeaveModal"> Leave Club </button>
@@ -82,6 +82,11 @@
             <GroupDeleteModal :group="selectedGroup" @close="hideDeleteModal" @success="handleLeaveGroup"/>
         </dialog>
 
+        <!-- Kick Member Dialog -->
+        <dialog ref="kick-modal" id="kick-modal" class="dialog">
+            <GroupKickModal v-if="selectedMember" :member="selectedMember" @close="hideKickModal" @kicked="handleKickedUser"/>
+        </dialog>
+
         <Dialog
             ref="op"
             v-if="selectedMember"
@@ -103,6 +108,7 @@
 import { useRouter } from 'vue-router';
 import { Club } from '@/data/models/ClubModels';
 import { computed, ref, useTemplateRef } from 'vue';
+import { Member } from '~/data/models/GenericModels';
 import { GROUP_TYPE, VIEW_STATE } from '@/data/Enums';
 import { useSessionStore } from '@/stores/session-store';
 import { Organization } from '@/data/models/OrganizationModels';
@@ -112,28 +118,26 @@ import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
 import GroupSelector from '@/components/Groups/GroupSelector/GroupSelector.vue';
 import MemberListItem from '@/components/Groups/MemberListItem/MemberListItem.vue';
 import ChangeRankModal from '~/components/Modals/Groups/ChangeRank/ChangeRankModal.vue';
+import GroupKickModal from '~/components/Modals/Groups/GroupKickModal/GroupKickModal.vue';
 import GroupLeaveModal from '@/components/Modals/Groups/GroupLeaveModal/GroupLeaveModal.vue';
 import GroupDeleteModal from '@/components/Modals/Groups/GroupDeleteModal/GroupDeleteModal.vue';
 import ClubLogoAndBanner from '@/components/Groups/Clubs/ClubLogoAndBanner/ClubLogoAndBanner.vue';
-import { GroupManager } from '~/data/managers/GroupManager';
-import { Member } from '~/data/models/GenericModels';
 
 const router = useRouter();
 const sessionStore = useSessionStore();
-const manager = new GroupManager();
 
 const showDialog = ref(false);
 const selectedMember = ref<Member | undefined>(undefined);
 
 const editDialogRef = useTemplateRef<HTMLDialogElement>('edit-dialog');
 const groupPickerDialogRef = useTemplateRef<HTMLDialogElement>('group-picker-dialog');
-const newGroupDialogRef = useTemplateRef<HTMLDialogElement>('new-group-dialog');
 const membersDialogRef = useTemplateRef<HTMLDialogElement>('members-dialog');
+
+const kickModalRef = useTemplateRef<HTMLDialogElement>('kick-modal');
 const leaveModalRef = useTemplateRef<HTMLDialogElement>('leave-modal');
 const deleteModalRef = useTemplateRef<HTMLDialogElement>('delete-modal');
 
 const membersSearchText = ref('');
-const groupPickerState = ref(VIEW_STATE.PENDING);
 
 const groups = computed(() => {
     return sessionStore.groups
@@ -205,7 +209,6 @@ const canDeleteGroup = computed<boolean>(() => {
 
 function showEditDialog() {
     if (editDialogRef.value) {
-        hideNewGroupDialog();
         hideGroupPickerDialog();
         hideMembersDialog();
         hideLeaveModal();
@@ -227,7 +230,6 @@ function hideEditDialog() {
 function showGroupPickerDialog() {
     if (groupPickerDialogRef.value) {
         hideEditDialog();
-        hideNewGroupDialog();
         hideMembersDialog();
         hideLeaveModal();
         hideDeleteModal();
@@ -245,22 +247,9 @@ function hideGroupPickerDialog() {
     }
 }
 
-function showNewGroupDialog() {
-    router.push('/groups/new');
-}
-
-function hideNewGroupDialog() {
-    if (newGroupDialogRef.value) {
-        newGroupDialogRef.value.close();
-    } else {
-        console.error('Failed to find New Group Dialog template reference.');
-    }
-}
-
 function showMembersDialog() {
     if (membersDialogRef.value) {
         hideEditDialog();
-        hideNewGroupDialog();
         hideGroupPickerDialog();
         hideLeaveModal();
         hideDeleteModal();
@@ -281,7 +270,6 @@ function hideMembersDialog() {
 function showLeaveModal() {
     if (leaveModalRef.value) {
         hideEditDialog();
-        hideNewGroupDialog();
         hideGroupPickerDialog();
         hideMembersDialog();
         hideDeleteModal();
@@ -302,7 +290,6 @@ function hideLeaveModal() {
 function showDeleteModal() {
     if (deleteModalRef.value) {
         hideEditDialog();
-        hideNewGroupDialog();
         hideGroupPickerDialog();
         hideMembersDialog();
         hideLeaveModal();
@@ -320,6 +307,22 @@ function hideDeleteModal() {
     }
 }
 
+function showKickModal() {
+    if (kickModalRef.value) {
+        kickModalRef.value.show();
+    } else {
+        console.error('Failed to find Kick Dialog template reference.');
+    }
+}
+
+function hideKickModal() {
+    if (kickModalRef.value) {
+        kickModalRef.value.close();
+    } else {
+        console.error('Failed to find Kick Dialog template reference.');
+    }
+}
+
 function handleSelectedGroupChanged(event: any) {
     hideGroupPickerDialog();
 }
@@ -334,7 +337,20 @@ function handleChangeRank(event: { member: Member}) {
 }
 
 function handleRemoveUser(event: { member: Member}) {
-    
+    selectedMember.value = event.member;
+    showKickModal();
+}
+
+function handleKickedUser() {
+    hideKickModal();
+    if (!selectedMember.value) return;
+    const selectedGroup = sessionStore.selectedGroup?.club ?? sessionStore.selectedGroup?.organization;
+    if (!selectedGroup) return;
+
+    const idx = selectedGroup.members?.findIndex((m) => m.id === selectedMember.value?.id) ?? -1;
+    if (idx != undefined && idx == -1) return;
+
+    selectedGroup.members?.splice(idx, 1);
 }
 
 
@@ -542,6 +558,20 @@ useSeoMeta({
     backdrop-filter: blur(5px);
 
     #group-delete-modal {
+        border-radius: 20px;
+        max-width: 25rem !important;
+        box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+        background-color: var(--secondary-background-color);
+    }
+}
+
+#kick-modal {
+    top: 0;
+    border: unset;
+    background: transparent;
+    backdrop-filter: blur(5px);
+
+    #group-kick-modal {
         border-radius: 20px;
         max-width: 25rem !important;
         box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;

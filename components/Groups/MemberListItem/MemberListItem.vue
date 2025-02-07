@@ -7,9 +7,9 @@
                 <div 
                     v-if="member.role !== 'member'" 
                     class="role" 
-                    :class="{ owner: member.role === 'owner', admin: member.role === 'admin'}"
+                    :class="{ owner: member.role === GROUP_ROLE.OWNER, admin: member.role === GROUP_ROLE.ADMIN}"
                 >
-                    {{ member.role }}</div>
+                    {{ member.role.valueOf() }}</div>
             </div>
         </div>
 
@@ -29,14 +29,14 @@
 import Menu from 'primevue/menu';
 import { Member } from '~/data/models/GenericModels';
 import UserIcon from '@/components/UserIcon/UserIcon.vue';
+import { GROUP_ROLE } from '~/data/Enums';
 
 const props = defineProps({
     member: { type: Member, required: true }
 });
 
 const emit = defineEmits([
-    'promote-user',
-    'demote-user',
+    'change-rank',
     'report-user',
     'remove-user',
     'leave-group'
@@ -68,25 +68,13 @@ onMounted(() => {
             if (props.member.role != 'owner') {
                 _options.push(
                     {
-                        label: 'Promote User',
+                        label: 'Change Rank',
                         icon: 'pi pi-bug',
                         command: () => {
-                            emit('promote-user', { member: props.member });
+                            emit('change-rank', { member: props.member });
                         }
                     }
                 );
-
-                if (props.member.role != 'member') {
-                    _options.push(
-                        {
-                            label: 'Demote User',
-                            icon: 'pi pi-bug',
-                            command: () => {
-                                emit('demote-user', { member: props.member });
-                            }
-                        }
-                    );
-                }
 
                 _options.push(
                     {
@@ -110,10 +98,10 @@ onMounted(() => {
             } else {
                 _options.push(
                     {
-                        label: 'Demote User',
+                        label: 'Change Rank',
                         icon: 'pi pi-bug',
                         command: () => {
-                            emit('demote-user', { member: props.member });
+                            emit('change-rank', { member: props.member });
                         }
                     }
                 );

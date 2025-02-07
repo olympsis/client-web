@@ -59,7 +59,15 @@
                 <button id="cancel-button" @click="hideMembersDialog">Close</button>
                 <input id="search-bar" type="text" v-model="membersSearchText"/>
                 <div id="member-list">
-                    <MemberListItem v-for="member in members" :member="member" style="margin: 1rem;"/>
+                    <MemberListItem 
+                        v-for="member in members" 
+                        :member="member" 
+                        style="margin: 1rem;"
+                        @change-rank="handleChangeRank"
+                        @report-user=""
+                        @remove-user="handleRemoveUser"
+                        @leave-group="handleLeaveGroup"
+                    />
                 </div>
             </div>
         </dialog>
@@ -83,9 +91,7 @@ import { Club } from '@/data/models/ClubModels';
 import { computed, ref, useTemplateRef } from 'vue';
 import { GROUP_TYPE, VIEW_STATE } from '@/data/Enums';
 import { useSessionStore } from '@/stores/session-store';
-import { ClubService } from '@/data/services/ClubService';
 import { Organization } from '@/data/models/OrganizationModels';
-import { OrganizationService } from '@/data/services/OrganizationService';
 
 import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
 import GroupSelector from '@/components/Groups/GroupSelector/GroupSelector.vue';
@@ -93,11 +99,12 @@ import MemberListItem from '@/components/Groups/MemberListItem/MemberListItem.vu
 import GroupLeaveModal from '@/components/Modals/Groups/GroupLeaveModal/GroupLeaveModal.vue';
 import GroupDeleteModal from '@/components/Modals/Groups/GroupDeleteModal/GroupDeleteModal.vue';
 import ClubLogoAndBanner from '@/components/Groups/Clubs/ClubLogoAndBanner/ClubLogoAndBanner.vue';
+import { GroupManager } from '~/data/managers/GroupManager';
+import type { Member } from '~/data/models/GenericModels';
 
 const router = useRouter();
 const sessionStore = useSessionStore();
-const clubService = new ClubService();
-const orgService = new OrganizationService();
+const manager = new GroupManager();
 
 const editDialogRef = useTemplateRef<HTMLDialogElement>('edit-dialog');
 const groupPickerDialogRef = useTemplateRef<HTMLDialogElement>('group-picker-dialog');
@@ -301,6 +308,15 @@ function handleSelectedGroupChanged(event: any) {
 function handleLeaveGroup() {
     sessionStore.removeGroup(selectedGroup.value?.id ?? '');
 }
+
+function handleChangeRank(event: { member: Member}) {
+
+}
+
+function handleRemoveUser(event: { member: Member}) {
+    
+}
+
 
 useSeoMeta({
     title: () => 'Group Settings | Olympsis',

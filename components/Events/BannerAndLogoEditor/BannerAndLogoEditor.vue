@@ -29,7 +29,7 @@
         <dialog id="banner-picker" ref="banner-picker-modal" class="dialog">
             <MediaPicker 
                 v-model:medias="bannerPickerImages" 
-                :crop-shape="mediaCropShape" 
+                :crop-shape="bannerCropShape" 
                 @close="hideBannerPicker" 
                 @cropped-media-results="handleCroppedBannerData"
             />
@@ -54,6 +54,7 @@ import { type CroppedMedia } from '~/data/GlobalData';
 import MediaPicker from '~/components/MediaPicker/MediaPicker.vue';
 
 const mediaCropShape = ref(CROP_SHAPE.SQUARE);
+const bannerCropShape = ref(CROP_SHAPE.LANDSCAPE);
 
 const pickingBoolean = ref<'logo' | 'banner'>('banner');
 

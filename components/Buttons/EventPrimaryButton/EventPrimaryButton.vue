@@ -170,4 +170,8 @@ const pendingState = computed<EVENT_PENDING_STATE>(() => {
 #completed {
     background-color: var(--olympsis-gray);
 }
+
+#live {
+    background-color: var(--olympsis-red);
+}
 </style>

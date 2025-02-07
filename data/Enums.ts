@@ -159,6 +159,23 @@ function numberToEventVisibility(visibility: number): EVENT_VISIBILITY {
     }
 }
 
+enum GROUP_ROLE {
+    OWNER = 'owner',
+    ADMIN = 'admin',
+    MEMBER = 'member'
+}
+function stringToGroupRole(role: string): GROUP_ROLE {
+    switch (role.toLowerCase()) {
+        case 'owner':
+            return GROUP_ROLE.OWNER;
+        case 'admin':
+            return GROUP_ROLE.ADMIN;
+        case 'member':
+        default:
+            return GROUP_ROLE.MEMBER;
+    }
+}
+
 enum GROUP_TYPE {
     CLUB = "club",
     ORGANIZATION = "organization"
@@ -347,6 +364,9 @@ export {
     EVENT_VISIBILITY,
     eventVisibilityToNumber,
     numberToEventVisibility,
+    
+    GROUP_ROLE,
+    stringToGroupRole,
     
     GROUP_TYPE,
     GROUP_VISIBILITY,

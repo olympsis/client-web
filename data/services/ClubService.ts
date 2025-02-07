@@ -1,6 +1,7 @@
 import { getAuth } from "firebase/auth";
 import { Courrier, Endpoint, Method, Scheme } from "malakbel";
 import { Club, ClubApplicationDao, ClubApplicationsResponse, ClubDao, ClubsResponse } from "../models/ClubModels";
+import type { ChangeRoleRequest } from "../models/GenericModels";
 
 export class ClubService {
 
@@ -226,6 +227,46 @@ export class ClubService {
 
         const endpoint = new Endpoint(`/v1/clubs/${clubID}/applications/${id}`);
         const [status, _headers, body] = await this.http.request(Method.PUT, endpoint, data, headers);
+
+        if (status === 200) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    /**
+     * MODERATION
+     */
+
+    async changeMemberRank(clubID: string, memberID: string, request: ChangeRoleRequest): Promise<boolean> {
+        const auth = getAuth();
+        let token = await auth.currentUser?.getIdToken() ?? ""
+
+        let headers = new Map<string, string>();
+        headers.set('Authorization', token);
+        const data = JSON.stringify(request.encode());
+
+        const endpoint = new Endpoint(`/v1/clubs/${clubID}/members/${memberID}/rank`);
+        const [status, _headers, body] = await this.http.request(Method.PUT, endpoint, data, headers);
+
+        if (status === 200) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    async kickMember(clubID: string, memberID: string): Promise<boolean> {
+        const auth = getAuth();
+        let token = await auth.currentUser?.getIdToken() ?? ""
+
+        let headers = new Map<string, string>();
+        headers.set('Authorization', token);
+
+        const endpoint = new Endpoint(`/v1/clubs/${clubID}/members/${memberID}/kick`);
+        const [status, _headers, body] = await this.http.request(Method.PUT, endpoint, undefined, headers);
 
         if (status === 200) {
             return true;

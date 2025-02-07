@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Event } from "./EventModels";
 import { UserSnippet } from "./UserModels";
 import { Organization } from "./OrganizationModels";
-import { eventRSVPToNumber, numberToEventRSVP, type EVENT_RSVP_STATUS, type GROUP_TYPE } from "../Enums";
+import { eventRSVPToNumber, GROUP_ROLE, numberToEventRSVP, stringToGroupRole, type EVENT_RSVP_STATUS, type GROUP_TYPE } from "../Enums";
 import { Codable } from "./Models";
 
 class Model {
@@ -437,16 +437,16 @@ class CommentDao extends Codable<CommentDao> {
 }
 
 class Member extends Codable<Member> {
-    id: string | undefined;
-    role: string | undefined;
+    id: string;
+    role: GROUP_ROLE;
     user: UserSnippet | undefined;
-    joinedAt: number | undefined;
+    joinedAt: number;
 
     constructor(
-        id: string | undefined,
-        role: string | undefined,
+        id: string,
+        role: GROUP_ROLE,
         user: UserSnippet | undefined,
-        joinedAt: number | undefined
+        joinedAt: number
     ){
         super();
         this.id = id;
@@ -463,7 +463,7 @@ class Member extends Codable<Member> {
                 object['id'] = data['id'];
             }
             if (data['role']) {
-                object['role'] = data['role'];
+                object['role'] = data['role'] ? stringToGroupRole(data['role']) : GROUP_ROLE.MEMBER;
             }
             if (data['user']) {
                 object['user'] = UserSnippet.decode(data['user']);
@@ -484,7 +484,7 @@ class Member extends Codable<Member> {
             data['id'] = this.id;
         }
         if (this.role) {
-            data['role'] = this.role;
+            data['role'] = this.role.valueOf();
         }
         if (this.user) {
             data['user'] = this.user.encode();
@@ -773,6 +773,27 @@ class SubAdministrativeArea extends Codable<SubAdministrativeArea>{
     }
 }
 
+class ChangeRoleRequest extends Codable<ChangeRoleRequest> {
+    role: string;
+
+    constructor(
+        role: string
+    ) {
+        super();
+        this.role = role;
+    }
+
+    override encode(): { [key: string]: any } {
+        const data: { [key: string]: any } = {};
+    
+        if (this.role) {
+            data['role'] = this.role;
+        }
+    
+        return data;
+    }
+}
+
 export {
     Comment,
     CommentDao,
@@ -800,6 +821,7 @@ export {
     ImageUploadResponse,
 
     Country,
+    ChangeRoleRequest,
     AdministrativeArea,
-    SubAdministrativeArea
+    SubAdministrativeArea,
 }

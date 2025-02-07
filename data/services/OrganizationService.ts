@@ -1,6 +1,7 @@
 import { getAuth } from "firebase/auth";
 import { Courrier, Endpoint, Method, Scheme } from "malakbel";
 import { Organization, OrganizationDao } from "../models/OrganizationModels";
+import type { ChangeRoleRequest } from "../models/GenericModels";
 
 export class OrganizationService {
 
@@ -97,6 +98,45 @@ export class OrganizationService {
             }
         } catch (error) {
             console.error(`Failed to organization club: ${error}`);
+            return false;
+        }
+    }
+
+    /**
+     * MODERATION
+     */
+
+    async changeMemberRank(clubID: string, memberID: string, request: ChangeRoleRequest): Promise<boolean> {
+        const auth = getAuth();
+        let token = await auth.currentUser?.getIdToken() ?? ""
+
+        let headers = new Map<string, string>();
+        headers.set('Authorization', token);
+        const data = JSON.stringify(request.encode());
+
+        const endpoint = new Endpoint(`/v1/organizations/${clubID}/members/${memberID}/rank`);
+        const [status, _headers, body] = await this.http.request(Method.PUT, endpoint, data, headers);
+
+        if (status === 200) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    async kickMember(clubID: string, memberID: string): Promise<boolean> {
+        const auth = getAuth();
+        let token = await auth.currentUser?.getIdToken() ?? ""
+
+        let headers = new Map<string, string>();
+        headers.set('Authorization', token);
+
+        const endpoint = new Endpoint(`/v1/organizations/${clubID}/members/${memberID}/kick`);
+        const [status, _headers, body] = await this.http.request(Method.PUT, endpoint, undefined, headers);
+
+        if (status === 200) {
+            return true;
+        } else {
             return false;
         }
     }

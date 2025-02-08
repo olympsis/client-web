@@ -15,7 +15,7 @@
                             </picture>
                         </button>
 
-                        <button class="button" @click="handleEventSharing">
+                        <button v-if="isShareable == true" class="button" @click="handleEventSharing">
                             <picture class="centered">
                                 <source srcset="@/assets/icons/share/share.white.svg" media="(prefers-color-scheme: dark)">
                                 <img src="@/assets/icons/share/share.svg"/>
@@ -90,7 +90,7 @@
 
                     <!-- Participants Detail -->
                     <div id="participants-details">
-                        <EventParticipantsPeek :event="event"/>
+                        <EventParticipantsPeek v-if="event" :event="event"/>
                         <button @click="handleOpenParticipantsModal">See who’s going...</button>
                     </div>
                 </div>
@@ -105,6 +105,7 @@
             <div id="event-detail-mobile">
                 <!-- Event Header -->
                 <div id="header">
+                    <!-- Navigation Button -->
                     <button class="button" :style="{ marginRight: '1rem' }" @click="handleBackNavigation">
                         <picture class="centered">
                             <source srcset="@/assets/icons/chevron/chevron.left.white.svg" media="(prefers-color-scheme: dark)">
@@ -115,12 +116,14 @@
                     <!-- Event Title -->
                     <h1 id="title">{{ event?.title }}</h1>
 
-                    <button class="button" @click="handleEventSharing">
+                    <!-- Share Button & Placeholder -->
+                    <button v-if="isShareable == true" class="button" @click="handleEventSharing">
                         <picture class="centered">
                             <source srcset="@/assets/icons/share/share.white.svg" media="(prefers-color-scheme: dark)">
                             <img src="@/assets/icons/share/share.svg"/>
                         </picture>
                     </button>
+                    <div v-else></div>
                 </div>
 
                 <!-- Event Sub header -->
@@ -190,7 +193,7 @@
 
                 <!-- Participants Detail -->
                 <div id="participants-details">
-                    <EventParticipantsPeek :event="event"/>
+                    <EventParticipantsPeek v-if="event" :event="event"/>
                     <button @click="handleOpenParticipantsModal">{{ participantsPeekText }}</button>
                 </div>
             </div>
@@ -225,7 +228,7 @@
 </template>
 
 <script setup lang="ts">
-import { VIEW_STATE } from '@/data/Enums';
+import { EVENT_VISIBILITY, GROUP_ROLE, VIEW_STATE } from '@/data/Enums';
 import { useToast } from 'primevue/usetoast';
 import { Club } from '@/data/models/ClubModels';
 import { useRoute, useRouter } from 'vue-router';
@@ -270,7 +273,7 @@ const clubs: Ref<Array<Club>> = ref([]);
 const venues: Ref<Array<Venue>> = ref([]);
 const orgs: Ref<Array<Organization>> = ref([]);
 
-const state= ref<VIEW_STATE>(VIEW_STATE.PENDING);
+const state = ref<VIEW_STATE>(VIEW_STATE.PENDING);
 const failed: Ref<boolean | undefined> = ref(false);
 const primaryState = ref<VIEW_STATE>(VIEW_STATE.PENDING);
             
@@ -292,6 +295,28 @@ const eventID = computed<string>(() => {
 
 const isAuthenticated = computed<boolean>(() => {
     return session.authStatus === AUTH_STATUS.authenticated;
+});
+
+const isAdmin = computed<boolean>(() => {
+    const uuid = session.user?.uuid;
+    const adminGroups = session.groups.filter((g) => {
+        const group = g.club ?? g.organization;
+        if (!group) return false;
+        return group.members?.find((m) => m.user?.uuid === uuid && m.role !== GROUP_ROLE.MEMBER);
+    });
+    return adminGroups.find((g) => {
+        const group = g.club ?? g.organization;
+        if (!group) return false;
+        return event.value?.organizers.find((o) => o.id === group.id);
+    }) != undefined;
+});
+
+const isShareable = computed<boolean>(() => {
+    if (isAdmin.value == true) {
+        return true;
+    } else {
+        return event.value?.visibility === EVENT_VISIBILITY.PUBLIC;
+    }
 });
 
 const eventState = computed<EVENT_STATE>(() => {

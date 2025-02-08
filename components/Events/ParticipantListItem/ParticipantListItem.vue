@@ -45,7 +45,7 @@ const options = ref<any[]>([
                 label: 'Remove from Event',
                 icon: 'pi pi-bug',
                 command: () => {
-                    emit('kicked', { member: props.participant });
+                    emit('kicked', { participant: props.participant });
                 }
             }
         ]

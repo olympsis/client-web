@@ -52,6 +52,7 @@ import { Participant } from '~/data/models/GenericModels';
 import SearchBar from '~/components/SearchBar/SearchBar.vue';
 import ParticipantListItem from '~/components/Events/ParticipantListItem/ParticipantListItem.vue';
 import { GROUP_ROLE } from '~/data/Enums';
+import { EventService } from '~/data/services/EventService';
 
 const props = defineProps({
     event: { type: Event, required: true }
@@ -89,8 +90,17 @@ const isAdmin = computed<boolean>(() => {
     }) != undefined;
 });
 
-function handleKickParticipant() {
+async function handleKickParticipant(event: { participant: Participant }) {
+    if (event.participant?.id == undefined) return;
 
+    const service = new EventService();
+    const isKicked = await service.removeParticipant(props.event.id, event.participant.id!);
+    if (!isKicked) return;
+
+    const idx = props.event.participants.findIndex((p) => p.id === event.participant.id);
+    if (idx == -1) return;
+    
+    props.event.participants.splice(idx, 1);
 }
 
 </script>

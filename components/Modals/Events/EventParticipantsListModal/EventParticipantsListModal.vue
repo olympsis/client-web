@@ -17,31 +17,25 @@
         
         <!-- Event Participants List -->
         <ul v-if="participants.length > 0" id="participants-list" >
-            <li v-for="participant in participants" class="participant">
-                <div class="info">
-                    <UserIcon 
-                        :size="3"
-                        :user="participant.user"
-                    />
-                    <div>{{ participant.user?.username }}</div>
-                </div>
-                <div class="response">{{ participant.status }}</div>
-            </li>
+            <ParticipantListItem 
+                v-for="participant in participants" 
+                :participant="participant" 
+                :is-user="uuid === participant.user?.uuid"
+                :is-admin="isAdmin"
+                @kicked="handleKickParticipant"
+            />
         </ul>
 
         <!-- Event WaitList -->
         <ul v-if="waitList.length > 0" id="wait-list" >
             <div id="label">Wait List</div>
-            <li v-for="participant in waitList" class="participant">
-                <div class="info">
-                    <UserIcon 
-                        :size="3"
-                        :user="participant.user"
-                    />
-                    <div>{{ participant.user?.username }}</div>
-                </div>
-                <div class="response">{{ participant.status }}</div>
-            </li>
+            <ParticipantListItem 
+                v-for="participant in waitList" 
+                :participant="participant" 
+                :is-user="uuid === participant.user?.uuid"
+                :is-admin="isAdmin"
+                @kicked="handleKickParticipant"
+            />
         </ul>
 
         <!-- No Participants -->
@@ -55,13 +49,15 @@
 import { Event } from '@/data/models/EventModels';
 import { Participant } from '~/data/models/GenericModels';
 
-import UserIcon from '@/components/UserIcon/UserIcon.vue';
 import SearchBar from '~/components/SearchBar/SearchBar.vue';
+import ParticipantListItem from '~/components/Events/ParticipantListItem/ParticipantListItem.vue';
+import { GROUP_ROLE } from '~/data/Enums';
 
 const props = defineProps({
     event: { type: Event, required: true }
 });
 
+const session = useSessionStore();
 const searchValue = ref<string>('');
 
 const participants = computed<Participant[]>(() => {
@@ -75,6 +71,27 @@ const waitList = computed<Participant[]>(() => {
         return p.user?.username?.toLocaleLowerCase().includes(searchValue.value.toLocaleLowerCase())
     });
 });
+
+const uuid = computed<string | undefined>(() => {
+    return session.user?.uuid;
+});
+
+const isAdmin = computed<boolean>(() => {
+    const adminGroups = session.groups.filter((g) => {
+        const group = g.club ?? g.organization;
+        if (!group) return false;
+        return group.members?.find((m) => m.user?.uuid === uuid.value && m.role !== GROUP_ROLE.MEMBER);
+    });
+    return adminGroups.find((g) => {
+        const group = g.club ?? g.organization;
+        if (!group) return false;
+        return props.event.organizers.find((o) => o.id === group.id);
+    }) != undefined;
+});
+
+function handleKickParticipant() {
+
+}
 
 </script>
 
@@ -113,36 +130,8 @@ const waitList = computed<Participant[]>(() => {
         padding: 0.5rem 0rem;
         list-style-type: none;
 
-        .participant {
-            display: flex;
-            margin: 0.5rem 1rem;
-            align-items: center;
-
-            .info {
-                display: flex;
-                align-items: center;
-                color: var(--primary-label-color);
-
-                #user-icon {
-                    margin-right: 0.5rem;
-                }
-            }
-
-            .response {
-                width: 100%;
-                text-align: end;
-                justify-content: flex-end;
-                text-transform: capitalize;
-                color: var(--primary-label-color);
-            }
-
-            .yes {
-                border: 0.25rem solid var(--primary-brand-color);
-            }
-
-            .maybe {
-                border: 0.25rem solid var(--secondary-brand-color);
-            }
+        li {
+            margin: 1rem;
         }
     }
 
@@ -164,36 +153,8 @@ const waitList = computed<Participant[]>(() => {
             background-color: var(--tertiary-brand-color);
         }
 
-        .participant {
-            display: flex;
-            margin: 0.5rem 1rem;
-            align-items: center;
-
-            .info {
-                display: flex;
-                align-items: center;
-                color: var(--primary-label-color);
-
-                #user-icon {
-                    margin-right: 0.5rem;
-                }
-            }
-
-            .response {
-                width: 100%;
-                text-align: end;
-                justify-content: flex-end;
-                text-transform: capitalize;
-                color: var(--primary-label-color);
-            }
-
-            .yes {
-                border: 0.25rem solid var(--primary-brand-color);
-            }
-
-            .maybe {
-                border: 0.25rem solid var(--secondary-brand-color);
-            }
+        li {
+            margin: 1rem;
         }
     }
 

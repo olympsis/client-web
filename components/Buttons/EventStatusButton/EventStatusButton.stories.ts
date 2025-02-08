@@ -3,8 +3,6 @@ import type { Meta, StoryObj } from "@storybook/vue3";
 import EventStatusButton from "./EventStatusButton.vue";
 import { sampleEvents } from "~/data/dev-data/sample-events";
 
-import '@assets/main.css';
-
 const meta: Meta<typeof EventStatusButton> = {
     component: EventStatusButton
 };

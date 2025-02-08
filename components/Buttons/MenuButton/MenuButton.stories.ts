@@ -2,8 +2,6 @@ import MenuButton from "./MenuButton.vue";
 import { VIEW_STATE } from "~/data/Enums";
 import type { Meta, StoryObj } from "@storybook/vue3";
 
-import '@assets/main.css';
-
 const meta: Meta<typeof MenuButton> = {
     component: MenuButton
 };

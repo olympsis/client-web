@@ -3,8 +3,6 @@ import type { Meta, StoryObj } from "@storybook/vue3";
 import EventPrimaryButton from "./EventPrimaryButton.vue";
 import { sampleEvents } from "@/data/dev-data/sample-events";
 
-import '@assets/main.css';
-
 const meta: Meta<typeof EventPrimaryButton> = {
     component: EventPrimaryButton
 };

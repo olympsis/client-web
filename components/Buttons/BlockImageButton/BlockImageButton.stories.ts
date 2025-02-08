@@ -2,8 +2,6 @@ import { VIEW_STATE } from "~/data/Enums";
 import type { Meta, StoryObj } from "@storybook/vue3";
 import BlockImageButton from "./BlockImageButton.vue";
 
-import '@assets/main.css';
-
 const meta: Meta<typeof BlockImageButton> = {
     component: BlockImageButton
 };

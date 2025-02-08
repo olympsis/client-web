@@ -1,5 +1,7 @@
 <template>
     <div id="event-participants-list-modal">
+
+        <!-- List Header -->
         <div id="header">
             <h1>Participants</h1>
 
@@ -10,9 +12,12 @@
                 </picture>
             </button>
         </div>
+
+        <SearchBar v-model:value="searchValue"/>
         
-        <ul id="participants-list" v-if="event.participants.length > 0">
-            <li v-for="participant in event.participants" class="participant">
+        <!-- Event Participants List -->
+        <ul v-if="participants.length > 0" id="participants-list" >
+            <li v-for="participant in participants" class="participant">
                 <div class="info">
                     <UserIcon 
                         :size="3"
@@ -24,9 +29,10 @@
             </li>
         </ul>
 
-        <ul id="wait-list" v-if="event.waitList.length > 0">
+        <!-- Event WaitList -->
+        <ul v-if="waitList.length > 0" id="wait-list" >
             <div id="label">Wait List</div>
-            <li v-for="participant in event.waitList" class="participant">
+            <li v-for="participant in waitList" class="participant">
                 <div class="info">
                     <UserIcon 
                         :size="3"
@@ -38,7 +44,8 @@
             </li>
         </ul>
 
-        <div v-if="event.participants.length === 0 && event.waitList.length === 0" id="no-participants">
+        <!-- No Participants -->
+        <div v-if="participants.length === 0 && waitList.length === 0" id="no-participants">
             No Participants
         </div>
     </div>
@@ -46,11 +53,29 @@
 
 <script setup lang="ts">
 import { Event } from '@/data/models/EventModels';
-import UserIcon from '@/components/UserIcon/UserIcon.vue';
+import { Participant } from '~/data/models/GenericModels';
 
-defineProps({
+import UserIcon from '@/components/UserIcon/UserIcon.vue';
+import SearchBar from '~/components/SearchBar/SearchBar.vue';
+
+const props = defineProps({
     event: { type: Event, required: true }
 });
+
+const searchValue = ref<string>('');
+
+const participants = computed<Participant[]>(() => {
+    return props.event.participants.filter((p) => {
+        return p.user?.username?.toLocaleLowerCase().includes(searchValue.value.toLocaleLowerCase());
+    });
+});
+
+const waitList = computed<Participant[]>(() => {
+    return props.event.waitList.filter((p) => {
+        return p.user?.username?.toLocaleLowerCase().includes(searchValue.value.toLocaleLowerCase())
+    });
+});
+
 </script>
 
 <style scoped>
@@ -74,6 +99,11 @@ defineProps({
             margin: auto;
             color: var(--primary-label-color);
         }
+    }
+
+    #search-bar {
+        width: 90%;
+        margin: 0 auto;
     }
 
     #participants-list {

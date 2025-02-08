@@ -12,14 +12,14 @@
 
 <script setup lang="ts">
 import { computed, type ComputedRef } from 'vue';
+import { EVENT_RSVP_STATUS } from '~/data/Enums';
 import { Event } from '@/data/models/EventModels';
 import { Participant } from '@/data/models/GenericModels';
 
 import UserIcon from '@/components/UserIcon/UserIcon.vue';
-import { EVENT_RSVP_STATUS } from '~/data/Enums';
 
 const props = defineProps({
-    event: Event
+    event: { type: Event, required: true }
 });
 
 const participants: ComputedRef<Array<Participant>> = computed(() => {

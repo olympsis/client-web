@@ -26,10 +26,11 @@
 </template>
 
 <script setup lang="ts">
-import Menu from 'primevue/menu';
-import { Member } from '~/data/models/GenericModels';
-import UserIcon from '@/components/UserIcon/UserIcon.vue';
 import { GROUP_ROLE } from '~/data/Enums';
+import { Member } from '~/data/models/GenericModels';
+
+import Menu from 'primevue/menu';
+import UserIcon from '@/components/UserIcon/UserIcon.vue';
 
 const props = defineProps({
     member: { type: Member, required: true }

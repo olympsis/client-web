@@ -96,6 +96,8 @@ import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
 import GroupMembersPeek from '@/components/Groups/GroupMembersPeek/GroupMembersPeek.vue';
 import GroupLogoAndBanner from '@/components/Groups/GroupLogoAndBanner/GroupLogoAndBanner.vue';
 import BoldTextButton from '@/components/Buttons/LoadingButtons/BoldTextButton/BoldTextButton.vue';
+import { SnapshotService } from '~/data/services/SnapshotService';
+import { getAuth } from 'firebase/auth';
 
 const toast = useToast();
 const route = useRoute();
@@ -289,17 +291,29 @@ onMounted(() => {
     if (mapURL.value) return;
     const city = club.value?.city ?? '';
     const state = club.value?.state ?? '';
+    const country = club.value?.country ?? '';
 
     mapState.value = VIEW_STATE.LOADING;
-    getMapSnapshot([city, state])
+
+    
+    const service = new SnapshotService();
+    service.getMapSnapshot(`${city}, ${state} ${country}`)
         .then((blob) => {
             mapURL.value = URL.createObjectURL(blob);
             mapState.value = VIEW_STATE.SUCCESS;
         })
-        .catch(() => {
+        .catch((error) => {
+            console.error(`Failed to load snapshot. Error: ${error}`);
             mapState.value = VIEW_STATE.FAILURE;
         });
 });
+
+async function getSnapshot() {
+    const token = await getAuth().currentUser?.getIdToken()
+    if (token === undefined) {
+        
+    }
+}
 
 </script>
 

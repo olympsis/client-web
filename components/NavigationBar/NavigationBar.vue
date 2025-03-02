@@ -89,10 +89,12 @@ function hideMenu() {
 
     #logo {
         flex: 1;
+        font-weight: 900;
         font-size: 1.5rem;
+        font-style: normal;
         text-align: center;
-        font-weight: bolder;
         color: var(--navigation-label);
+        font-family: 'Archivo', 'Helvetica Nue';
     }
 
     #mobile-routes {

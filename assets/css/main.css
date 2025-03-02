@@ -30,6 +30,22 @@
   src: url('../../public/fonts/Roboto/Roboto-Bold.ttf') format("truetype");
 }
 
+@font-face {
+	font-family: 'Archivo';
+	src: url('@/public/fonts/Archivo/Archivo-VariableFont_wdth,wght.ttf') format('truetype-variations');
+	font-weight: 100 900;
+	font-style: normal;
+	font-display: swap;
+}
+  
+  @font-face {
+	font-family: 'Archivo';
+	src: url('@/public/fonts/Archivo/Archivo-Italic-VariableFont_wdth,wght.ttf') format('truetype-variations');
+	font-weight: 100 900;
+	font-style: italic;
+	font-display: swap;
+}
+
 :root {
 	color-scheme: light dark;
 

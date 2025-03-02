@@ -1,19 +1,15 @@
 <template>
     <header id="navigation-bar">
-        <NuxtLink to="/home" id="logo"/>
+        <NuxtLink to="/home" id="logo">
+            OLYMPSIS
+        </NuxtLink>
        
         <div id="web-routes" class="routes">
-            <NuxtLink to="/home" activeClass="route-selected" class="route">
-                <div class="home"/>
-            </NuxtLink>
+            <NuxtLink to="/home" activeClass="route-selected" class="route"> Dashboard </NuxtLink>
 
-            <NuxtLink to="/groups" activeClass="route-selected" class="route">
-                <div class="group" />
-            </NuxtLink>
+            <NuxtLink to="/groups" activeClass="route-selected" class="route"> Groups </NuxtLink>
 
-            <NuxtLink to="/events" activeClass="route-selected" class="route">
-                <div class="events" />
-            </NuxtLink>
+            <NuxtLink to="/events" activeClass="route-selected" class="route"> Events </NuxtLink>
 
             <!-- <NuxtLink to="/rooms" activeClass="route-selected" class="route">
                 <div class="chats" />
@@ -85,20 +81,18 @@ function hideMenu() {
     max-height: 60px;
     min-height: 60px;
     position: sticky;
-    padding: 0rem 1rem;
     align-items: center;
     position: -webkit-sticky;
     justify-content: space-between;
-    background-color: var(--primary-brand-color);
+    border-bottom: solid 1px var(--navigation-border);
+    background-color: var(--primary-background-color);
 
     #logo {
-        width: 40px;
-        height: 40px;
-        min-width: 40px;
-        margin: 0rem 1rem;
-        border-radius: 5px;
-        background-size: 40px;
-        background-image: url('@/assets/logo/logo-black.png');
+        flex: 1;
+        font-size: 1.5rem;
+        text-align: center;
+        font-weight: bolder;
+        color: var(--navigation-label);
     }
 
     #mobile-routes {
@@ -106,6 +100,7 @@ function hideMenu() {
     }
 
     .routes {
+        flex: 2;
         width: 100%;
         display: flex;
         min-width: 12rem;
@@ -115,7 +110,7 @@ function hideMenu() {
     }
 
     .profile {
-        margin-right: 1rem;
+        flex: 1;
         align-items: center;
         justify-content: center;
     }
@@ -143,6 +138,7 @@ function hideMenu() {
             max-width: none;
         }
         a {
+            flex: 1;
             margin: 0rem auto !important;
         }
     }
@@ -158,14 +154,15 @@ function hideMenu() {
 
 .route {
     display: flex;
+    font-weight: 500;
     margin: 0rem 2rem;
     align-items: center;
     flex-direction: column;
+    color: var(--navigation-label);
 
     .label {
         color: white;
         font-size: 0.65rem;
-        font-weight: normal;
         text-transform: uppercase;
     }
 
@@ -175,7 +172,7 @@ function hideMenu() {
         background-size: 35px 40px;
         background-position: center;
         background-repeat: no-repeat;
-        background-image: url('@/assets/icons/home/home.svg');
+        background-image: var(--home-icon);
     }
 
     .group {
@@ -184,7 +181,7 @@ function hideMenu() {
         background-size: 40px;
         background-position: center;
         background-repeat: no-repeat;
-        background-image: url('@/assets/icons/group/group.svg');
+        background-image: var(--group-icon);
     }
 
     .events {
@@ -193,7 +190,7 @@ function hideMenu() {
         background-size: 33px;
         background-position: center;
         background-repeat: no-repeat;
-        background-image: url('@/assets/icons/calendar/calendar.white.svg');
+        background-image: var(--events-icon);
     }
 
     .chats {
@@ -208,9 +205,13 @@ function hideMenu() {
 
 .route-selected {
     display: flex;
+    font-weight: 600;
     margin: 0rem 2rem;
     align-items: center;
     flex-direction: column;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-thickness: 1.5px;
     
     .label {
         color: white;
@@ -223,7 +224,7 @@ function hideMenu() {
         width: 35px;
         height: 40px;
         background-size: 35px 40px;
-        background-image: url('@/assets/icons/home/home.fill.svg');
+        background-image: var(--home-icon-selected);
     }
 
     .group {
@@ -232,7 +233,7 @@ function hideMenu() {
         background-size: 40px;
         background-position: center;
         background-repeat: no-repeat;
-        background-image: url('@/assets/icons/group/group.fill.white.svg');
+        background-image: var(--group-icon-selected);
     }
 
     .events {
@@ -241,7 +242,7 @@ function hideMenu() {
         background-size: 33px;
         background-position: center;
         background-repeat: no-repeat;
-        background-image: url('@/assets/icons/calendar/calendar.fill.white.svg');
+        background-image: var(--events-icon-selected);
     }
 
 

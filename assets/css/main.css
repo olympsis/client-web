@@ -38,7 +38,7 @@
 	--tertiary-brand-color: #F7A007;
 	--quaternary-brand-color: #A5E9E8;
 
-	--primary-background-color: #E8E7E3;
+	--primary-background-color: #FFFFFF;
 	--secondary-background-color: #F3F2EF;
 	--tertiary-background-color: #FFFFFF;
 
@@ -57,6 +57,21 @@
 	--card-border-radius: 10px;
 	--button-border-radius: 10px;
 
+	--navigation-label: #262E57;
+	--navigation-border: rgba(0, 0, 0, 0.15);
+
+	--home-icon: url('@/assets/icons/home/home.svg');
+    --home-icon-selected: url('@/assets/icons/home/home.fill.svg');
+    
+    --group-icon: url('@/assets/icons/group/group.svg');
+    --group-icon-selected: url('@/assets/icons/group/group.fill.svg');
+    
+    --events-icon: url('@/assets/icons/calendar/calendar.svg');
+    --events-icon-selected: url('@/assets/icons/calendar/calendar.fill.svg');
+    
+    --chats-icon: url('@/assets/icons/bubble2/bubble.2.svg');
+    --chats-icon-selected: url('@/assets/icons/bubble2/bubble.2.fill.svg');
+
 	dialog[open] {
 		display: flex;
 		align-items: center;
@@ -67,13 +82,28 @@
 }
 
 @media(prefers-color-scheme: dark) {
-  :root {
-    --primary-background-color: #1E1E1E;
-    --secondary-background-color: #2D2D2D;
-    --tertiary-background-color: #383838;
+	:root {
+		--primary-background-color: #1E1E1E;
+		--secondary-background-color: #2D2D2D;
+		--tertiary-background-color: #383838;
 
-    --primary-label-color: #FFFFFF;
-  }
+		--primary-label-color: #FFFFFF;
+
+		--navigation-label: #FFFFFF;
+		--navigation-border: rgba(255, 255, 255, 0.15);
+
+		--home-icon: url('@/assets/icons/home/home.white.svg');
+		--home-icon-selected: url('@/assets/icons/home/home.fill.white.svg');
+
+		--group-icon: url('@/assets/icons/group/group.white.svg');
+		--group-icon-selected: url('@/assets/icons/group/group.fill.white.svg');
+
+		--events-icon: url('@/assets/icons/calendar/calendar.white.svg');
+		--events-icon-selected: url('@/assets/icons/calendar/calendar.fill.white.svg');
+
+		--chats-icon: url('@/assets/icons/bubble2/bubble.2.white.svg');
+		--chats-icon-selected: url('@/assets/icons/bubble2/bubble.2.fill.white.svg');
+	}
 }
 
 *,

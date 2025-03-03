@@ -1,13 +1,14 @@
 <template>
     <div id="quick-actions">
-        <NuxtLink id="events" class="action" to="/events">
+        <NuxtLink v-if="!hasEvent" id="events" class="action" to="/events">
             <div id="body">
                 <h2 id="header">Lookup Events</h2>
                 <div id="sub-header">Explore venues, games and what’s happening near you. Get out play and touch some grass!</div>
             </div>
             <img class="icon" src="@/assets/icons/map/map.fill.svg">
         </NuxtLink>
-        <NuxtLink id="groups" class="action" to="/groups/search">
+        
+        <NuxtLink v-if="!hasGroup" id="groups" class="action" to="/groups/search">
             <div id="body">
                 <h2 id="header">Search Groups</h2>
                 <div id="sub-header">Explore groups, connect with like minded people. Get out play and have some fun!</div>
@@ -20,6 +21,14 @@
 </template>
 
 <script setup lang="ts">
+const session = useSessionStore();
+const hasEvent = computed<Boolean>(() => {
+    return session.events?.mostRecentForUser(session.user?.uuid ?? '') != undefined;
+});
+const hasGroup = computed<Boolean>(() => {
+    return session.user?.clubs != undefined || session.user?.organizations != undefined;
+});
+
 </script>
 
 <style scoped>
@@ -35,6 +44,7 @@
         padding: 0.5rem 0rem;
         margin: 0.25rem 0rem;
         border-radius: 0.5rem;
+        justify-content: space-between;
 
         #body {
             display: flex;

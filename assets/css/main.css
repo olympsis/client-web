@@ -38,9 +38,25 @@
 	font-display: swap;
 }
   
-  @font-face {
+@font-face {
 	font-family: 'Archivo';
 	src: url('@/public/fonts/Archivo/Archivo-Italic-VariableFont_wdth,wght.ttf') format('truetype-variations');
+	font-weight: 100 900;
+	font-style: italic;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'Inter';
+	src: url('@/public/fonts/Inter/Inter-VariableFont_opsz,wght.ttf') format('truetype-variations');
+	font-weight: 100 900;
+	font-style: normal;
+	font-display: swap;
+}
+  
+@font-face {
+	font-family: 'Inter';
+	src: url('@/public/fonts/Inter/Inter-Italic-VariableFont_opsz,wght.ttf') format('truetype-variations');
 	font-weight: 100 900;
 	font-style: italic;
 	font-display: swap;
@@ -135,7 +151,7 @@ body {
     overflow: hidden;
 	max-height: 100vh;
     max-height: 100dvh;
-	font-family: 'Helvetica Nue', 'Arial', 'Roboto', sans-serif;
+	font-family: 'Inter', 'Helvetica Nue', sans-serif;
 }
 
 * {

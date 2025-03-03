@@ -1,6 +1,6 @@
 <template>
     <div id="announcements-gallery">
-        <h2>Announcements</h2>
+        <h3>Announcements</h3>
         <Galleria 
             v-if="state !== VIEW_STATE.LOADING" 
             :value="images" 
@@ -70,11 +70,11 @@ const images = computed<string[]>(() => {
         border: unset;
     }
 
-    h2 {
-        margin-bottom: 1rem;
+    h3 {
         margin-left: 1rem;
+        margin-bottom: 1rem;        
         color: var(--primary-label-color);
-        font-family: 'Helvetica Nue', 'Arial', 'Roboto', sans-serif;
+        font-family: 'Archivo', 'Helvetica Nue', 'Roboto', sans-serif;
     } 
 
     .image {

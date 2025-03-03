@@ -1,10 +1,9 @@
 <template>
     <div>
         <div v-if="state != VIEW_STATE.LOADING" class="container">
-            <h1> Welcome Back{{$props.name}}, </h1>
-            <h2> ready to play?</h2>
+            <h1> Welcome Back{{$props.name}}! </h1>
         </div>
-        <Skeleton v-if="state === VIEW_STATE.LOADING" class="mb-2 container" borderRadius="10px" style="width: 25rem; height: 12rem;"></Skeleton>
+        <Skeleton v-if="state === VIEW_STATE.LOADING" class="mb-2 container" borderRadius="10px" style="width: 25rem; height: 5rem;"></Skeleton>
     </div>
 </template>
 
@@ -23,24 +22,23 @@ const props = defineProps<{
 .container {
     display: flex;
     width: 100%;
-    height: 12rem;
+    height: 5rem;
     padding: 2rem 2rem;
+    border-radius: 10px;
     flex-direction: column !important;
     justify-content: unset !important;;
-    background-color: var(--secondary-background-color);
-    border-radius: 10px;
 }
 h1 {
-    font-weight: 300;
+    font-weight: 600;
     font-size: 1.8rem;
     color: var(--primary-label-color);
-    font-family: 'Helvetica Nue', 'Arial', 'Roboto', sans-serif;
+    font-family: 'Archivo', 'Helvetica Nue', 'Roboto', sans-serif;
 }
 h2 {
     color: gray;
     font-weight: 200;
     font-size: 1.6rem;
-    font-family: 'Helvetica Nue', 'Arial', 'Roboto', sans-serif;
+    font-family: 'Archivo', 'Helvetica Nue', 'Roboto', sans-serif;
 }
 
 @media (max-width: 1280px) {

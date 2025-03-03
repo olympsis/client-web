@@ -1,6 +1,6 @@
 <template>
     <div id="quick-actions">
-        <NuxtLink v-if="!hasEvent" id="events" class="action" to="/events">
+        <NuxtLink id="events" class="action" to="/events">
             <div id="body">
                 <h2 id="header">Lookup Events</h2>
                 <div id="sub-header">Explore venues, games and what’s happening near you. Get out play and touch some grass!</div>
@@ -50,11 +50,14 @@ const hasGroup = computed<Boolean>(() => {
             display: flex;
             text-align: left;
             margin: 0rem 1rem;
+            font-size: 0.75rem;
             flex-direction: column;
             padding-bottom: 0.25rem;
 
             #header {
+                font-style: italic;
                 font-family: 'Archivo';
+                text-transform: uppercase;
             }
         }
     }

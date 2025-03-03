@@ -1,19 +1,11 @@
 <template>
     <NavigationBar/>
     <main id="home-view">
-        <div id="header">
-            <h1>Olympsis</h1>
-
-            <div id="trailing">
-                <button id="notifications-button" @click="toggleNotificationsPopover">
-                    <img class="notifications" alt="notifications button image" src="@/assets/icons/bell/bell.white.svg"/>
-                </button>
-            </div>
-        </div>
-
         <WelcomeCard :name="name" :state="state" class="welcome-card"/>
-        <FieldListPeek :venues="venues" :state="state" class="fields"/>
-        <NavigationCard :state="state" class="nav-card" />
+        <QuickActions class="quick-actions"/>
+        <MotivationalQuote class="motivational-quote"/>
+        <!-- <FieldListPeek :venues="venues" :state="state" class="fields"/> -->
+        <!-- <NavigationCard :state="state" class="nav-card" /> -->
         <AnnouncementsGallery class="announcements"/>
 
         <Popover 
@@ -44,10 +36,12 @@ import { useModelStore } from '@/stores/model-store';
 import { useSessionStore } from '@/stores/session-store';
 
 import Popover from 'primevue/popover';
+import QuickActions from '~/components/QuickActions/QuickActions.vue';
 import WelcomeCard from '@/components/Home/WelcomeCard/WelcomeCard.vue';
 import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
 import NavigationCard from '@/components/NavigationCard/NavigationCard.vue';
 import FieldListPeek from '@/components/Venues/VenueListPeek/VenueListPeek.vue';
+import MotivationalQuote from '~/components/MotivationalQuote/MotivationalQuote.vue';
 import AnnouncementsGallery from '@/components/Home/AnnouncementsGallery/AnnouncementsGallery.vue';
 
 const router = useRouter();
@@ -95,10 +89,13 @@ useSeoMeta({
     padding: 1rem 3rem;
     height: calc(100vh-60px);
     grid-template-areas:
-        'header header header'
-        'welcome main main'
-        'fields main main'
-        'footer main main';
+        'welcome welcome'
+        'quick quote'
+        'main main'
+        'next next'
+        'venues venues'
+        'events events';
+    grid-template-rows: 3rem auto auto auto;
     grid-template-columns: 25rem auto auto;
 
     #header {
@@ -175,7 +172,7 @@ useSeoMeta({
     }
 }
 
-@media (max-width: 1280px) {
+/* @media (max-width: 1280px) {
     #home-view {
         grid-template-areas:
         'header header'
@@ -190,16 +187,18 @@ useSeoMeta({
             margin-bottom: 5rem;
         }
     }
-}
+} */
 
 @media (max-width: 940px) {
     #home-view {
         grid-template-areas:
-        'header'
+        'quote'
         'welcome'
+        'actions'
         'main'
-        'fields'
-        'footer';
+        'next'
+        'venues'
+        'events';
         max-width: 33rem;
         padding: 1rem 0rem;
         grid-template-rows: unset;
@@ -230,5 +229,13 @@ useSeoMeta({
     justify-content: center;
     box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
     background-color: var(--secondary-background-color);
+}
+
+.quick-actions {
+    grid-area: quick;
+}
+
+.motivational-quote {
+    grid-area: quote;
 }
 </style>

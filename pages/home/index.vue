@@ -1,8 +1,13 @@
 <template>
     <NavigationBar/>
     <main id="home-view">
+        <!-- Welcome -->
         <WelcomeCard :name="name" :state="state"/>
+
+        <!-- Quick Actions -->
         <QuickActions class="quick-actions"/>
+
+        <!-- Quote -->
         <MotivationalQuote class="motivational-quote"/>
         
         <!-- Announcements Gallery -->
@@ -13,23 +18,6 @@
 
         <!-- Nearby Venues List -->
         <NearbyVenues class="nearby-venues" :venues="venues"/>
-
-        <Popover 
-            ref="notifications-popover" 
-            id="notifications-popover" 
-            :dismissable="true"
-            :pt="{
-                root: () => ({
-                    style: {
-                        
-                    }
-                })
-            }"
-        >
-            <div id="notifications">
-                <p>No Notifications</p>
-            </div>
-        </Popover>
     </main>
 </template>
 
@@ -37,11 +25,11 @@
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { VIEW_STATE } from '@/data/Enums';
+import { Event } from '~/data/models/EventModels';
 import { Venue } from '@/data/models/VenueModels';
 import { useModelStore } from '@/stores/model-store';
 import { useSessionStore } from '@/stores/session-store';
 
-import Popover from 'primevue/popover';
 import QuickActions from '~/components/QuickActions/QuickActions.vue';
 import WelcomeCard from '@/components/Home/WelcomeCard/WelcomeCard.vue';
 import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
@@ -49,13 +37,10 @@ import NearbyVenues from '~/components/Venues/NearbyVenues/NearbyVenues.vue';
 import EventsSection from '~/components/Events/EventsSection/EventsSection.vue';
 import MotivationalQuote from '~/components/MotivationalQuote/MotivationalQuote.vue';
 import AnnouncementsGallery from '@/components/Home/AnnouncementsGallery/AnnouncementsGallery.vue';
-import type { Event } from '~/data/models/EventModels';
 
 const router = useRouter();
 const modelStore = useModelStore();
 const sessionStore = useSessionStore();
-
-const notificationsPopoverRef = useTemplateRef('notifications-popover');
 
 const state = computed<VIEW_STATE>(() => {
     return sessionStore.loadingState;

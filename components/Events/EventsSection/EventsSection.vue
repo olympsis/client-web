@@ -4,18 +4,21 @@
             <h3> {{ title }} </h3>
         </div>
         <ul id="list">
-            <EventListItem2 v-for="event in events" :event="event"/>
+            <EventListItem2 v-for="event in events" :event="event" @selected="router.push(`/events/${event.id}`)"/>
         </ul>
     </div>
 </template>
 
 <script setup lang="ts">
-import type { Event } from '~/data/models/EventModels';
+import { Event } from '~/data/models/EventModels';
 import EventListItem2 from '../EventListItem-v2/EventListItem2.vue';
+
 defineProps({
     title: { type: String, default: "Next Events" },
     events: { type: Array<Event>, required: true }
-})
+});
+
+const router = useRouter();
 </script>
 
 <style scoped>

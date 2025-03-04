@@ -1,6 +1,6 @@
 <template>
-    <li id="venue-list-item">
-        <img :src="image" class="image" @click="visible = true"/>
+    <li id="venue-list-item" @click="$emit('selected', { venue: venue })">
+        <img :src="image" class="image"/>
         <div class="bottom">
             <div class="info">
                 <div class="name">{{ name }}</div>
@@ -20,18 +20,6 @@
             </picture>
         </div>
     </li>
-
-    <!-- <Dialog 
-        v-model:visible="visible" 
-        position="center" 
-        blockScroll
-        :showHeader="false" 
-        :style="{ 'top': '10px', 'height': '80vh', 'overflow-y': 'hidden'}"
-    >
-        <template #container="{ closeCallback }">
-            <VenueDetailCard :venue="venue" :events="[]" @close="closeCallback"/>
-        </template>
-    </Dialog> -->
 </template>
 
 <script setup lang="ts">
@@ -47,7 +35,7 @@ const props = defineProps({
     venue: { type: Venue, required: true }
 });
 
-const visible = ref(false);
+
 
 const name = computed(() => {
     return props.venue.name

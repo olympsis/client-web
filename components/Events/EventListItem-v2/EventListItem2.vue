@@ -1,6 +1,5 @@
 <template>
-    <li id="event-list-item">
-
+    <li id="event-list-item" @click="$emit('selected', { event: event })">
         <!-- Event Image -->
         <div id="header">
             <img class="image" :src="image">

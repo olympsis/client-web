@@ -64,10 +64,10 @@ const images = computed<string[]>(() => {
 <style scoped>
 #announcements-gallery {
     width: 100%;
-    height: auto;
+    height: 100%;
     overflow: hidden;
-    max-height: 1000px;
     margin: 2rem 0rem;
+    max-height: 1000px;
 
     * {
         border: unset;

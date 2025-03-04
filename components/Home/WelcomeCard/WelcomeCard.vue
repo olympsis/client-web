@@ -23,7 +23,7 @@ defineProps<{
     width: 100%;
     display: flex;
     align-self: end;
-    margin: 0rem 1rem;
+    margin: 1rem;
     grid-area: welcome;
     border-radius: 10px;
     padding: 0rem 1.5rem;

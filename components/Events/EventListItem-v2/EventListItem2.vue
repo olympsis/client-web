@@ -140,15 +140,16 @@ loadLocationData()
 #event-list-item {
     min-width: 20rem;
     max-width: 23rem;
+    position: relative;
     list-style-type: none;
-    border-radius: 0px 0px 10px 10px;
+    border-radius: 10px;
     box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
     background-color: var(--secondary-background-color);
 
     #header {
         #sports {
-            top: 2rem;
-            left: 2rem;
+            top: 1rem;
+            left: 1rem;
             display: flex;
             position: absolute;
         }
@@ -217,9 +218,9 @@ loadLocationData()
 
         #detail-right {
             #status {
-                font-size: 1rem;
+                font-size: 0.9rem;
                 font-weight: 600;
-                margin-bottom: 0.5rem;
+                margin: 0.25rem 0rem;
             }
 
             #participants {

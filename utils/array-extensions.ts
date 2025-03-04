@@ -1,5 +1,12 @@
 import { Event } from "~/data/models/EventModels";
 
+Array.prototype.userNextEvents = function <T extends Event>(this: T[], uuid: string): T[] | undefined {
+    if (this.length === 0) return undefined;
+    return this
+        .filter((e) => e.participants?.some((participant) => participant.user?.uuid === uuid))
+        .sort((a, b) => a.startTime - b.startTime);
+};
+
 Array.prototype.mostRecentForUser = function <T extends Event>(this: T[], uuid: string): T | undefined {
     if (this.length === 0) return undefined;
     return this

@@ -86,7 +86,7 @@ const openMaps = () => {
     min-width: 22rem;
     max-width: 25rem;
     margin: 0rem 1rem;
-    border-radius: 0px 0px 10px 10px;
+    border-radius: 10px;
     box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
     background-color: var(--secondary-background-color);
 

@@ -8,6 +8,9 @@
         <!-- Announcements Gallery -->
         <AnnouncementsGallery class="announcements"/>
 
+        <!-- Next Events -->
+        <EventsSection v-if="events.length != 0" :events="events"/>
+
         <!-- Nearby Venues List -->
         <NearbyVenues class="nearby-venues" :venues="venues"/>
 
@@ -43,8 +46,10 @@ import QuickActions from '~/components/QuickActions/QuickActions.vue';
 import WelcomeCard from '@/components/Home/WelcomeCard/WelcomeCard.vue';
 import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
 import NearbyVenues from '~/components/Venues/NearbyVenues/NearbyVenues.vue';
+import EventsSection from '~/components/Events/EventsSection/EventsSection.vue';
 import MotivationalQuote from '~/components/MotivationalQuote/MotivationalQuote.vue';
 import AnnouncementsGallery from '@/components/Home/AnnouncementsGallery/AnnouncementsGallery.vue';
+import type { Event } from '~/data/models/EventModels';
 
 const router = useRouter();
 const modelStore = useModelStore();
@@ -54,6 +59,11 @@ const notificationsPopoverRef = useTemplateRef('notifications-popover');
 
 const state = computed<VIEW_STATE>(() => {
     return sessionStore.loadingState;
+});
+
+const events = computed<Event[]>(() => {
+    const uuid = sessionStore.user?.uuid ?? '';
+    return sessionStore.events.userNextEvents(uuid) ?? [];
 });
 
 const venues = computed<Venue[]>(() => {
@@ -80,7 +90,7 @@ useSeoMeta({
 
 <style scoped>
 #home-view {
-    gap: 2rem;
+    gap: 0;
     display: grid;
     margin: 0 auto;
     padding: 1rem 3rem;

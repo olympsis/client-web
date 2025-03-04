@@ -45,6 +45,11 @@ defineProps({
         }
     }
 
+    #no-events {
+        width: 100%;
+        height: 24rem;
+    }
+
     @media (max-width: 970px) {
         width: 100vw;
     }

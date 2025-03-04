@@ -67,6 +67,7 @@ const images = computed<string[]>(() => {
     height: auto;
     overflow: hidden;
     max-height: 1000px;
+    margin: 2rem 0rem;
 
     * {
         border: unset;

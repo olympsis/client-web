@@ -38,7 +38,7 @@
 import { ref, computed } from 'vue';
 import { Venue } from '@/data/models/VenueModels';
 import { getDirections } from '~/utils/map-helpers';
-import { generateImageURL } from '~/utils/image-extensions';
+import { generateImageURL } from '~/utils/image-helpers';
 
 import Dialog from 'primevue/dialog';
 import VenueDetailCard from '@/components/Venues/VenueDetailCard/VenueDetailCard.vue';

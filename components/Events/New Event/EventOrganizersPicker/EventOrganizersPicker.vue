@@ -52,7 +52,7 @@ import { computed, ref } from 'vue';
 import type { ComputedRef } from 'vue';
 import { GROUP_ROLE, GROUP_TYPE } from '~/data/Enums';
 import { useSessionStore } from '~/stores/session-store';
-import { generateImageURL } from '~/utils/image-extensions';
+import { generateImageURL } from '~/utils/image-helpers';
 import { GroupSelection } from '~/data/models/GenericModels';
 
 import Popover from 'primevue/popover';

@@ -59,7 +59,7 @@
 import { ref } from 'vue';
 import { Post } from '@/data/models/PostModels';
 import { calculateTimeAgo } from '~/utils/time-helpers';
-import { generateImageURL } from '~/utils/image-extensions';
+import { generateImageURL } from '~/utils/image-helpers';
 import { Like } from '~/data/models/GenericModels';
 import { PostService } from '@/data/services/PostService';
 

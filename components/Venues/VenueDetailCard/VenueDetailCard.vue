@@ -90,7 +90,7 @@ import { Venue } from '@/data/models/VenueModels';
 import { getDirections } from '~/utils/map-helpers';
 import { useModelStore } from '@/stores/model-store';
 import { useSessionStore } from '@/stores/session-store';
-import { generateImageURL } from '~/utils/image-extensions';
+import { generateImageURL } from '~/utils/image-helpers';
 
 import { useRouter } from 'vue-router';
 import EventListItem from '@/components/Events/EventListItem/EventListItem.vue';

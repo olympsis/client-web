@@ -55,7 +55,7 @@ import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { VIEW_STATE } from '~/data/Enums';
 import { Club } from '~/data/models/ClubModels';
-import { generateImageURL } from '~/utils/image-extensions';
+import { generateImageURL } from '~/utils/image-helpers';
 import { useSessionStore } from '~/stores/session-store';
 
 import Dialog from 'primevue/dialog';

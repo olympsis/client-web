@@ -44,7 +44,7 @@
 
 <script setup lang="ts">
 import { CROP_SHAPE } from '~/data/Enums';
-import { generateImageURL } from '~/utils/image-extensions';
+import { generateImageURL } from '~/utils/image-helpers';
 import type { ComputedRef, ShallowRef } from 'vue';
 import { type CroppedMedia } from '~/data/GlobalData';
 import { computed, ref, useTemplateRef, watch } from 'vue';

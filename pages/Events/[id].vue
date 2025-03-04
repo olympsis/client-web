@@ -232,7 +232,7 @@ import { EVENT_VISIBILITY, GROUP_ROLE, VIEW_STATE } from '@/data/Enums';
 import { useToast } from 'primevue/usetoast';
 import { Club } from '@/data/models/ClubModels';
 import { useRoute, useRouter } from 'vue-router';
-import { generateImageURL } from '~/utils/image-extensions';
+import { generateImageURL } from '~/utils/image-helpers';
 import { Venue } from '@/data/models/VenueModels';
 import { Event } from '@/data/models/EventModels';
 import { getDirections } from '~/utils/map-helpers';

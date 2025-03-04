@@ -68,7 +68,7 @@ import { computed, onMounted, ref } from 'vue';
 import ScrollPanel from 'primevue/scrollpanel';
 import { Club } from '@/data/models/ClubModels';
 import { calculateTimeAgo } from '~/utils/time-helpers';
-import { generateImageURL } from '~/utils/image-extensions';
+import { generateImageURL } from '~/utils/image-helpers';
 import { Location } from '@/data/models/GenericModels';
 import { getMapkitServerToken } from '~/utils/map-helpers';
 

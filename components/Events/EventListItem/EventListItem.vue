@@ -23,7 +23,7 @@
 import { ref, computed } from 'vue';
 import { EVENT_STATE, VIEW_STATE } from '~/data/Enums';
 import type { Ref, ComputedRef } from 'vue';
-import { generateImageURL } from '~/utils/image-extensions';
+import { generateImageURL } from '~/utils/image-helpers';
 import { Event } from '~/data/models/EventModels';
 import { Venue } from '~/data/models/VenueModels';
 import { useModelStore } from '@/stores/model-store';

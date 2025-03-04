@@ -9,7 +9,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { Venue } from '~/data/models/VenueModels';
-import { generateImageURL } from '~/utils/image-extensions';
+import { generateImageURL } from '~/utils/image-helpers';
 
 const props = defineProps({
     venue: { type: Venue, required: true },

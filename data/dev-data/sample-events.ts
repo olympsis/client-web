@@ -65,10 +65,10 @@ const sampleEvents: Event[] = [
             id: "club_123"
         }],
         venues: [sampleVenue],
-        image_url: "https://example.com/basketball.jpg",
+        image_url: "event-images/basketball-0.jpg",
         title: "Pickup Basketball Game",
         body: "Casual pickup basketball game. All skill levels welcome!",
-        sport: "basketball",
+        sports: ["basketball"],
         level: 1,
         start_time: Math.floor(today.setHours(18, 30) / 1000), // Today at 6:30 PM
         stop_time: Math.floor(today.setHours(20, 0) / 1000),   // Today at 8:00 PM
@@ -89,10 +89,10 @@ const sampleEvents: Event[] = [
             id: "org_456"
         }],
         venues: [sampleVenue],
-        image_url: "https://example.com/soccer.jpg",
+        image_url: "event-images/soccer-1.jpg",
         title: "5-a-side Soccer Tournament",
         body: "Competitive 5-a-side soccer tournament. Prizes for winners!",
-        sport: "soccer",
+        sports: ["soccer"],
         level: 2,
         start_time: Math.floor(tomorrow.setHours(10, 0) / 1000), // Tomorrow at 10:00 AM
         stop_time: Math.floor(tomorrow.setHours(16, 0) / 1000),  // Tomorrow at 4:00 PM
@@ -113,10 +113,10 @@ const sampleEvents: Event[] = [
             id: "org_789"
         }],
         venues: [sampleVenue],
-        image_url: "https://example.com/tennis.jpg",
+        image_url: "event-images/tennis-0.jpg",
         title: "Tennis Practice Session",
         body: "Open tennis practice session for intermediate players.",
-        sport: "tennis",
+        sports: ["tennis"],
         level: 2,
         start_time: Math.floor(nextWeek.setHours(9, 0) / 1000),  // Next week at 9:00 AM
         stop_time: Math.floor(nextWeek.setHours(11, 0) / 1000),  // Next week at 11:00 AM
@@ -137,10 +137,10 @@ const sampleEvents: Event[] = [
             id: "club_123"
         }],
         venues: [sampleVenue],
-        image_url: "https://example.com/basketball.jpg",
+        image_url: "event-images/basketball-1.jpg",
         title: "Pickup Basketball Game",
         body: "Casual pickup basketball game. All skill levels welcome!",
-        sport: "basketball",
+        sports: ["basketball"],
         level: 1,
         start_time: Math.floor(today.setHours(18, 30) / 1000), // Today at 6:30 PM
         stop_time: Math.floor(today.setHours(20, 0) / 1000),   // Today at 8:00 PM
@@ -161,10 +161,10 @@ const sampleEvents: Event[] = [
             id: "org_456"
         }],
         venues: [sampleVenue],
-        image_url: "https://example.com/soccer.jpg",
+        image_url: "event-images/soccer-2.jpg",
         title: "5-a-side Soccer Tournament",
         body: "Competitive 5-a-side soccer tournament. Prizes for winners!",
-        sport: "soccer",
+        sports: ["soccer"],
         level: 2,
         start_time: Math.floor(tomorrow.setHours(10, 0) / 1000), // Tomorrow at 10:00 AM
         stop_time: Math.floor(tomorrow.setHours(16, 0) / 1000),  // Tomorrow at 4:00 PM
@@ -185,10 +185,10 @@ const sampleEvents: Event[] = [
             id: "org_789"
         }],
         venues: [sampleVenue],
-        image_url: "https://example.com/tennis.jpg",
+        image_url: "event-images/tennis-1.jpg",
         title: "Tennis Practice Session",
         body: "Open tennis practice session for intermediate players.",
-        sport: "tennis",
+        sports: ["tennis"],
         level: 2,
         start_time: Math.floor(nextWeek.setHours(9, 0) / 1000),  // Next week at 9:00 AM
         stop_time: Math.floor(nextWeek.setHours(11, 0) / 1000),  // Next week at 11:00 AM

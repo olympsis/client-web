@@ -43,7 +43,7 @@
                     <h2>{{ section.dayString }}</h2>
                     <ul id="section-events">
                         <li v-for="event in section.events" @click="router.push(`/events/${event.id}`)">
-                            <EventListItem :event="event"/>
+                            <EventListItem2 :event="event"/>
                         </li>
                     </ul>
                 </li>
@@ -73,7 +73,7 @@ import { Event, EventSection } from '@/data/models/EventModels';
 import { computed, onMounted, ref, useTemplateRef, watch } from 'vue';
 
 import SearchBar from '@/components/SearchBar/SearchBar.vue';
-import EventListItem from '@/components/Events/EventListItem/EventListItem.vue';
+import EventListItem2 from '~/components/Events/EventListItem-v2/EventListItem2.vue';
 import EventDateButton from '@/components/Buttons/EventDateButton/EventDateButton.vue';
 import EventsSettings from '~/components/Dialog/Events/EventsSettings/EventsSettings.vue';
 
@@ -372,7 +372,8 @@ definePageMeta({
             }
 
             li {
-                margin: 0.5rem 0rem;
+                width: fit-content;
+                margin: 0.5rem auto;
 
                 #section-events {
                     padding: 0;
@@ -381,13 +382,17 @@ definePageMeta({
                     margin: 0rem 1rem;
                     list-style-type: none;
 
-                    grid-template-columns: 1fr 1fr;
+                    grid-template-columns: 1fr 1fr 1fr;
 
                     li {
                         margin: 0rem;
                     }
 
-                    @media (max-width: 940px) {
+                    @media (max-width: 1030px) { 
+                        grid-template-columns: 1fr 1fr;
+                    }
+
+                    @media (max-width: 850px) {
                         grid-template-columns: 1fr;
                     }
 

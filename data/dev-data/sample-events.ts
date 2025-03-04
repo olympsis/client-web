@@ -151,6 +151,29 @@ const sampleEvents: Event[] = [
         created_at: Math.floor(Date.now() / 1000) - 86400, // Created yesterday
     }),
 
+    Event.decode({
+        id: "evt_001",
+        type: "pickup",
+        poster: sampleUsers[0],
+        organizers: [{
+            type: "club",
+            id: "club_123"
+        }],
+        venues: [sampleVenue],
+        image_url: "event-images/basketball-2.jpg",
+        title: "Pickup Basketball Game",
+        body: "Casual pickup basketball game. All skill levels welcome!",
+        sports: ["basketball"],
+        level: 1,
+        start_time: Math.floor(today.setHours(18, 30) / 1000), // Today at 6:30 PM
+        stop_time: Math.floor(today.setHours(20, 0) / 1000),   // Today at 8:00 PM
+        min_participants: 6,
+        max_participants: 12,
+        participants: createParticipants(),
+        visibility: "public",
+        created_at: Math.floor(Date.now() / 1000) - 86400, // Created yesterday
+    }),
+
     // Event happening tomorrow
     Event.decode({
         id: "evt_002",

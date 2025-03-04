@@ -1,5 +1,5 @@
 <template>
-    <div id="venue-list-item">
+    <li id="venue-list-item">
         <img :src="image" class="image" @click="visible = true"/>
         <div class="bottom">
             <div class="info">
@@ -7,7 +7,7 @@
 
                 <div class="location-wrapper">
                     <picture>
-                        <source srcset="@/assets/icons/pin-drop/pin.drop.svg" media="(prefers-color-scheme: dark)"> 
+                        <source srcset="@/assets/icons/pin-drop/pin.drop.white.svg" media="(prefers-color-scheme: dark)"> 
                         <img class="location-pin" src="@/assets/icons/pin-drop/pin.drop.svg"> 
                     </picture>
                     <div class="location">{{ city }}, {{ state }}</div>
@@ -19,9 +19,9 @@
                 <img src="@/assets/icons/car/car.svg" class="directions">
             </picture>
         </div>
-    </div>
+    </li>
 
-    <Dialog 
+    <!-- <Dialog 
         v-model:visible="visible" 
         position="center" 
         blockScroll
@@ -31,7 +31,7 @@
         <template #container="{ closeCallback }">
             <VenueDetailCard :venue="venue" :events="[]" @close="closeCallback"/>
         </template>
-    </Dialog>
+    </Dialog> -->
 </template>
 
 <script setup lang="ts">
@@ -83,6 +83,8 @@ const openMaps = () => {
 
 <style scoped>
 #venue-list-item {
+    min-width: 22rem;
+    max-width: 25rem;
     margin: 0rem 1rem;
     border-radius: 0px 0px 10px 10px;
     box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
@@ -90,11 +92,13 @@ const openMaps = () => {
 
     .image {
         width: 100%;
-        height: auto;
+        height: 15rem;
+        object-fit: cover;
         border-radius: 10px 10px 0px 0px;
     }
 
     .bottom {
+        height: 4rem;
         display: flex;
         align-items: end;
         padding: 0.25rem 1rem 0.75rem 1rem;

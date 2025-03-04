@@ -1,6 +1,9 @@
 <template>
     <div id="motivational-quote">
-        <img src="@/assets/images/logo.png" class="logo">
+        <picture>
+            <source srcset="@/assets/images/logo.white.png" media="(prefers-color-scheme: dark)">
+            <img src="@/assets/images/logo.png" class="logo">
+        </picture>
         <div id="quote">
             <div class="body">{{ selectedQuote.quote }}</div>
             <div class="author">{{"-" + selectedQuote.author}}</div>
@@ -103,9 +106,10 @@ const selectedQuote = ref<Quote>(quotes[Math.floor(Math.random() * quotes.length
 #motivational-quote {
     display: flex;
     padding: 1rem;
+    margin: 0rem 1rem;
     align-items: center;
     border-radius: 0.5rem;
-    background-color: #F4F4F7;
+    background-color: var(--secondary-background-color);
 
     #quote {
         margin: 0rem 1rem;
@@ -118,7 +122,6 @@ const selectedQuote = ref<Quote>(quotes[Math.floor(Math.random() * quotes.length
 }
 
 .body {
-    color: black;
     font-family: 'Inter';
 }
 

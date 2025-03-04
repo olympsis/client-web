@@ -1,9 +1,9 @@
 <template>
-    <div>
-        <div v-if="state != VIEW_STATE.LOADING" class="container">
+    <div id="welcome-card">
+        <div v-if="state != VIEW_STATE.LOADING">
             <h1> Welcome Back{{$props.name}}! </h1>
         </div>
-        <Skeleton v-if="state === VIEW_STATE.LOADING" class="mb-2 container" borderRadius="10px" style="width: 25rem; height: 5rem;"></Skeleton>
+        <Skeleton v-if="state === VIEW_STATE.LOADING" class="mb-2" borderRadius="10px" style="width: 25rem; height: 5rem;"></Skeleton>
     </div>
 </template>
 
@@ -11,7 +11,7 @@
 import Skeleton from 'primevue/skeleton';
 import { VIEW_STATE } from '~/data/Enums';
 
-const props = defineProps<{
+defineProps<{
     name: string | undefined,
     state: VIEW_STATE
 }>();
@@ -19,12 +19,14 @@ const props = defineProps<{
 </script>
 
 <style scoped>
-.container {
-    display: flex;
+#welcome-card {
     width: 100%;
-    height: 5rem;
-    padding: 2rem 2rem;
+    display: flex;
+    align-self: end;
+    margin: 0rem 1rem;
+    grid-area: welcome;
     border-radius: 10px;
+    padding: 0rem 1.5rem;
     flex-direction: column !important;
     justify-content: unset !important;;
 }
@@ -41,23 +43,9 @@ h2 {
     font-family: 'Archivo', 'Helvetica Nue', 'Roboto', sans-serif;
 }
 
-@media (max-width: 1280px) {
-    .container {
-        width: unset;
-    }
-}
-
-@media (max-width: 675px) {
-    .container {
-        margin: 0rem 1rem;
-    }
-}
-
-@media (max-width: 430px) {
-    .container {
-        width: unset;
-        height: 10rem;
-        padding: 2rm 1.5rem;
+@media (max-width: 970px) {
+    #welcome-card {
+        padding: unset;
     }
 }
 </style>

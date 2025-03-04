@@ -1,12 +1,15 @@
 <template>
     <NavigationBar/>
     <main id="home-view">
-        <WelcomeCard :name="name" :state="state" class="welcome-card"/>
+        <WelcomeCard :name="name" :state="state"/>
         <QuickActions class="quick-actions"/>
         <MotivationalQuote class="motivational-quote"/>
-        <!-- <FieldListPeek :venues="venues" :state="state" class="fields"/> -->
-        <!-- <NavigationCard :state="state" class="nav-card" /> -->
+        
+        <!-- Announcements Gallery -->
         <AnnouncementsGallery class="announcements"/>
+
+        <!-- Nearby Venues List -->
+        <NearbyVenues class="nearby-venues" :venues="venues"/>
 
         <Popover 
             ref="notifications-popover" 
@@ -39,8 +42,7 @@ import Popover from 'primevue/popover';
 import QuickActions from '~/components/QuickActions/QuickActions.vue';
 import WelcomeCard from '@/components/Home/WelcomeCard/WelcomeCard.vue';
 import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
-import NavigationCard from '@/components/NavigationCard/NavigationCard.vue';
-import FieldListPeek from '@/components/Venues/VenueListPeek/VenueListPeek.vue';
+import NearbyVenues from '~/components/Venues/NearbyVenues/NearbyVenues.vue';
 import MotivationalQuote from '~/components/MotivationalQuote/MotivationalQuote.vue';
 import AnnouncementsGallery from '@/components/Home/AnnouncementsGallery/AnnouncementsGallery.vue';
 
@@ -64,12 +66,8 @@ const name = computed<string>(() => {
     if (user) {
         return ` ${user.firstName}`
     }
-    return ''
+    return '';
 });
-
-function toggleNotificationsPopover(event: any) {
-    notificationsPopoverRef.value?.toggle(event);
-}
 
 useSeoMeta({
     title: 'Olympsis',
@@ -81,7 +79,6 @@ useSeoMeta({
 </script>
 
 <style scoped>
-
 #home-view {
     gap: 2rem;
     display: grid;
@@ -90,13 +87,13 @@ useSeoMeta({
     height: calc(100vh-60px);
     grid-template-areas:
         'welcome welcome'
-        'quick quote'
+        'actions quote'
         'main main'
         'next next'
         'venues venues'
         'events events';
-    grid-template-rows: 3rem auto auto auto;
-    grid-template-columns: 25rem auto auto;
+    grid-template-columns: 25rem 28rem;
+    grid-template-rows: 3rem auto auto auto auto auto;
 
     #header {
         display: flex;
@@ -146,50 +143,24 @@ useSeoMeta({
         grid-area: welcome;
     }
 
-    .fields {
-        grid-area: fields
+    .motivational-quote {
+        grid-area: quote;
     }
 
-    .nav-card {
-        grid-area: footer;
+    .quick-actions {
+        grid-area: actions;
     }
 
     .announcements {
         grid-area: main;
     }
 
-    .chats {
-        width: 2rem;
-        height: 2rem;
-        cursor: pointer;
-        margin-top: 0.25rem;
-    }
-
-    .notifications {
-        width: 2rem;
-        height: 2rem;
-        cursor: pointer;
+    .nearby-venues {
+        grid-area: venues;
     }
 }
 
-/* @media (max-width: 1280px) {
-    #home-view {
-        grid-template-areas:
-        'header header'
-        'welcome fields'
-        'footer fields'
-        'main main'
-        'main main'
-        ;
-        grid-template-columns: 25rem 25rem;
-
-        .announcements {
-            margin-bottom: 5rem;
-        }
-    }
-} */
-
-@media (max-width: 940px) {
+@media (max-width: 970px) {
     #home-view {
         grid-template-areas:
         'quote'
@@ -199,43 +170,10 @@ useSeoMeta({
         'next'
         'venues'
         'events';
-        max-width: 33rem;
+        width: 100vw;
         padding: 1rem 0rem;
         grid-template-rows: unset;
-        grid-template-columns: unset;
-
-
-        .nav-card {
-            padding-bottom: 5rem;
-        }
-
-        #navigation-card {
-            margin: 0rem 1rem;
-        }
-
-        .announcements {
-            margin-bottom: unset;
-        }
+        grid-template-columns: 1fr;
     }
-}
-
-#notifications {
-    width: 20rem;
-    display: flex;
-    padding: 1rem;
-    min-height: 25rem;
-    border-radius: 10px;
-    align-items: center;
-    justify-content: center;
-    box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
-    background-color: var(--secondary-background-color);
-}
-
-.quick-actions {
-    grid-area: quick;
-}
-
-.motivational-quote {
-    grid-area: quote;
 }
 </style>

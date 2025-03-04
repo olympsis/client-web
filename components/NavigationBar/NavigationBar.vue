@@ -118,7 +118,7 @@ function hideMenu() {
     }
 }
 
-@media (max-width: 940px) {
+@media (max-width: 970px) {
     #navigation-bar {
         display: flex;
         justify-content: space-between;

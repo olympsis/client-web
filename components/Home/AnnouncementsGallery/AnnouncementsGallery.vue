@@ -15,8 +15,8 @@
                 }),
                 nextIcon: (options) => ({
                     style: {
-                        'width': '2.5rem',
-                        'height': '2.5rem'
+                        'width': '2rem',
+                        'height': '2rem'
                     }
                 }),
                 prevButton: (options) => ({
@@ -27,8 +27,8 @@
                 }),
                 prevIcon: (options) => ({
                     style: {
-                        'width': '2.5rem',
-                        'height': '2.5rem'
+                        'width': '2rem',
+                        'height': '2rem'
                     }
                 })
             }"
@@ -63,9 +63,11 @@ const images = computed<string[]>(() => {
 
 <style scoped>
 #announcements-gallery {
-    width: auto;
-    height: 100%;
+    width: 100%;
+    height: auto;
+    overflow: hidden;
     max-height: 1000px;
+
     * {
         border: unset;
     }
@@ -74,25 +76,21 @@ const images = computed<string[]>(() => {
         margin-left: 1rem;
         margin-bottom: 1rem;        
         color: var(--primary-label-color);
-        font-family: 'Archivo', 'Helvetica Nue', 'Roboto', sans-serif;
+        font-family: 'Inter';
     } 
 
     .image {
         width: 100%;
         height: auto;
+        object-fit: contain;
         border-radius: 10px;
     }
 
-    @media (max-width: 940px) {
+    @media (max-width: 970px) {
         .image {
             width: 100%;
             height: auto;
-            border-radius: 10px;
-        }
-    }
-
-    @media (max-width: 675px) {
-        .image {
+            border: unset;
             border-radius: unset;
         }
     }

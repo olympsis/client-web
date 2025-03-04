@@ -42,7 +42,7 @@ const hasGroup = computed<Boolean>(() => {
         cursor: pointer;
         align-items: center;
         padding: 0.5rem 0rem;
-        margin: 0.25rem 0rem;
+        margin: 0.25rem 1rem;
         border-radius: 0.5rem;
         justify-content: space-between;
 

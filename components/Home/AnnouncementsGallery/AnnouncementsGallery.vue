@@ -65,6 +65,7 @@ const images = computed<string[]>(() => {
 #announcements-gallery {
     width: 100%;
     height: 100%;
+    grid-area: main;
     overflow: hidden;
     margin: 2rem 0rem;
     max-height: 1000px;

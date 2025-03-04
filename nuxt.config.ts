@@ -46,7 +46,7 @@ export default defineNuxtConfig({
 	routeRules: {
 		// Sites routes
 		'/': {
-										redirect: '/signin'
+			redirect: '/signin'
 		},
 		'/signin': { prerender: true },
 		'/about-us': { prerender: true },
@@ -72,8 +72,14 @@ export default defineNuxtConfig({
 			meta: [
 				{
 					name: 'theme-color',
-					content: '#262E57'
-				}
+					content: '#FFFFFF',
+					media: '(prefers-color-scheme: light)'
+				  },
+				  {
+					name: 'theme-color',
+					content: '#1E1E1E',
+					media: '(prefers-color-scheme: dark)'
+				  }
 			]
 		}
 	},

@@ -226,6 +226,7 @@ loadLocationData()
                 display: flex;
                 align-items: center;
                 flex-direction: row;
+                justify-content: end;
 
                 #count {
                     margin-left: 0.25rem;

@@ -148,7 +148,6 @@ useSeoMeta({
 
     .announcements {
         height: 100%;
-        grid-area: main;
     }
 
     .nearby-venues {

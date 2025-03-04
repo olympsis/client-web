@@ -24,6 +24,7 @@ const router = useRouter();
 <style scoped>
 #events-section {
     width: 100%;
+    margin: 1rem 0rem;
 
     #header {
         h3 {

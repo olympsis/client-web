@@ -34,7 +34,7 @@ defineProps({
         height: 5.5rem;
         cursor: pointer;
         font-size: 0.85rem;
-        border-radius: 1rem;
+        border-radius: 20px !important;
         align-items: center;
         flex-direction: column;
         justify-content: center;
@@ -45,6 +45,10 @@ defineProps({
         img {
             width: 2.5rem;
             height: 2.5rem;
+        }
+
+        p {
+            font-weight: bold;
         }
     }
 

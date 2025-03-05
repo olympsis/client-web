@@ -6,7 +6,7 @@
             <div v-if="pendingState === EVENT_PENDING_STATE.RSVP" id="rsvp" class="action">
                 <div v-if="state === VIEW_STATE.PENDING" class="body">
                     <img class="icon" src="@/assets/icons/mail/mail.white.svg"/>
-                    <div> RSVP </div>
+                    <p> RSVP </p>
                 </div>
                 <div v-if="state === VIEW_STATE.LOADING" class="body spinner-loader"/>
             </div>
@@ -15,7 +15,7 @@
             <div v-if="pendingState === EVENT_PENDING_STATE.WAITLIST" id="waitlist" class="action">
                 <div v-if="state === VIEW_STATE.PENDING" class="body">
                     <img class="icon" src="@/assets/icons/hourglass/hourglass.white.svg"/>
-                    <div> Waitlist </div>
+                    <p> Waitlist </p>
                 </div>
                 <div v-if="state === VIEW_STATE.LOADING" class="body spinner-loader"/>
             </div>
@@ -24,7 +24,7 @@
             <div v-if="pendingState === EVENT_PENDING_STATE.CANCEL" id="cancel" class="action">
                 <div v-if="state === VIEW_STATE.PENDING" class="body">
                     <img class="icon" src="@/assets/icons/xmark/xmark.white.svg"/>
-                    <div> Cancel </div>
+                    <p> Cancel </p>
                 </div>
                 <div v-if="state === VIEW_STATE.LOADING" class="body spinner-loader"/>
             </div>
@@ -33,13 +33,13 @@
         <!-- Live Button -->
         <div v-if="eventState === EVENT_STATE.LIVE" id="live" class="action">
             <img class="icon" src="@/assets/icons/circle/circle.fill.white.svg" :style="{ 'width': '2rem' }">
-            <div> Live </div>
+            <p> Live </p>
         </div>
 
         <!-- Completed Button -->
         <div v-if="eventState === EVENT_STATE.COMPLETED" id="completed" class="action">
             <img class="icon" src="@/assets/icons/block/block.white.svg">
-            <div> Ended </div>
+            <p> Ended </p>
         </div>
     </button>
 </template>
@@ -122,6 +122,10 @@ const pendingState = computed<EVENT_PENDING_STATE>(() => {
     display: flex;
     align-items: center;
     justify-content: center;
+
+    p {
+        font-weight: bold;
+    }
 }
 
 .action {
@@ -131,7 +135,7 @@ const pendingState = computed<EVENT_PENDING_STATE>(() => {
     cursor: pointer;
     min-width: 4rem;
     max-width: 15rem;
-    border-radius: 10px;
+    border-radius: 20px !important;
     align-items: center;
     flex-direction: column;
     justify-content: center;

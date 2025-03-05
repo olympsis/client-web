@@ -28,13 +28,17 @@ defineProps({
     display: flex;
     align-items: center;
 
+    p {
+        font-weight: bold;
+    }
+
     #button {
         width: 100%;
         display: flex;
         height: 5.5rem;
         cursor: pointer;
         font-size: 0.85rem;
-        border-radius: 1rem;
+        border-radius: 20px !important;
         align-items: center;
         flex-direction: column;
         justify-content: center;

@@ -1,6 +1,9 @@
 <template>
     <div id="event-header">
+        <!-- Event Title -->
         <h1 id="title">{{ event.title }}</h1>
+        
+        <!-- Venues Information -->
         <div id="venues" class="section">
             <picture class="icon">
                 <source srcset="@/assets/icons/pin-drop/pin.drop.white.svg" media="(prefers-color-scheme: dark)">
@@ -13,6 +16,7 @@
             </div>
         </div>
 
+        <!-- Event Date Info -->
         <div id="datetime" class="section">
             <picture class="icon">
                 <source srcset="@/assets/icons/calendar/calendar.month.white.svg" media="(prefers-color-scheme: dark)">
@@ -25,6 +29,7 @@
             </div>
         </div>
 
+        <!-- Add Calendar Button -->
         <div id="add-calendar">
             <picture :style="{ width: '24px', height: '24px', margin: '0rem 0.5rem' }"">
                 <source srcset="@/assets/icons/calendar/calendar.month.white.svg" media="(prefers-color-scheme: dark)">

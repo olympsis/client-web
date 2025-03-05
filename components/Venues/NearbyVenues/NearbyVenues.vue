@@ -56,7 +56,7 @@ function handleSelectedVenue(event: { venue: Venue }) {
         display: flex;
         padding: unset;
         overflow-x: scroll;
-        padding: 0.5rem 0rem;
+        padding: 0rem 0rem 0.5rem 0rem;
         list-style-type: none;
 
         li {

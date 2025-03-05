@@ -241,7 +241,7 @@ class Event extends Codable<Event> {
         return `${hours}:${minutes} ${m}`;
     }
     
-    public stopTimeToString(stopTime: number | undefined = undefined): string {
+    public stopTimeToString(): string {
         const date = new Date(this.stopTime);
         let hours = date.getHours();
         const minutes = date.getMinutes().toString().padStart(2, '0');

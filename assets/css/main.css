@@ -88,6 +88,7 @@
 	--border-radius: 10px;
 	--card-border-radius: 10px;
 	--button-border-radius: 10px;
+	--icon-border-color: rgb(0, 0, 0, 0.1);
 
 	--navigation-label: #262E57;
 	--navigation-border: rgba(0, 0, 0, 0.15);
@@ -123,6 +124,7 @@
 
 		--navigation-label: #FFFFFF;
 		--navigation-border: rgba(255, 255, 255, 0.15);
+		--icon-border-color: rgb(255, 255, 255, 0.1);
 
 		--home-icon: url('@/assets/icons/home/home.white.svg');
 		--home-icon-selected: url('@/assets/icons/home/home.fill.white.svg');
@@ -152,6 +154,10 @@ body {
 	max-height: 100vh;
     max-height: 100dvh;
 	font-family: 'Inter', 'Helvetica Nue', sans-serif;
+}
+
+h1 {
+	font-family: 'Archivo';
 }
 
 * {

@@ -1,6 +1,6 @@
 import { Organization, OrganizationDao } from '~/data/models/OrganizationModels';
 
-export const organizationDaoSamples: OrganizationDao[] = [
+const sampleOrgsDao: OrganizationDao[] = [
     new OrganizationDao(
         "org_001",
         "National Sports Academy",
@@ -73,7 +73,7 @@ export const organizationDaoSamples: OrganizationDao[] = [
 ];
 
 // Assuming we have the necessary imports and class definitions
-export const organizationSamples: Organization[] = [
+const sampleOrgs: Organization[] = [
     new Organization(
         "org_001",
         "University Athletic Association",
@@ -158,3 +158,5 @@ export const organizationSamples: Organization[] = [
         1651363200000  // May 1, 2022
     )
 ];
+
+export { sampleOrgs, sampleOrgsDao }

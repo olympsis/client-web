@@ -3,8 +3,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { Event } from "./EventModels";
 import { UserSnippet } from "./UserModels";
 import { Organization } from "./OrganizationModels";
-import { eventRSVPToNumber, GROUP_ROLE, numberToEventRSVP, stringToGroupRole, type EVENT_RSVP_STATUS, type GROUP_TYPE } from "../Enums";
 import { Codable } from "./Models";
+import { eventRSVPToNumber, GROUP_ROLE, numberToEventRSVP, stringToGroupRole, type EVENT_RSVP_STATUS, type GROUP_TYPE } from "../Enums";
 
 class Model {
     id: string | undefined
@@ -80,7 +80,7 @@ class Ownership extends Codable<Ownership> {
 }
 
 class Organizer extends Codable<Organizer> {
-    type: number;
+    type: number; // 0 - club | 1 - org
     id: string | undefined;
 
     constructor(

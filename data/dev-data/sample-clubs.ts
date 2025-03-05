@@ -1,11 +1,11 @@
 import { Club } from '~/data/models/ClubModels';
-import { organizationDaoSamples } from './sample-orgs';
+import { sampleOrgsDao } from './sample-orgs';
 
 // Assuming we have the necessary imports and class definitions
-export const clubSamples: Club[] = [
+const sampleClubs: Club[] = [
     new Club(
         "club_001",
-        organizationDaoSamples[0],
+        sampleOrgsDao[0],
         "Varsity Soccer Club",
         "Official university soccer club for competitive players",
         ["soccer"],
@@ -24,7 +24,7 @@ export const clubSamples: Club[] = [
 
     new Club(
         "club_002",
-        organizationDaoSamples[1],
+        sampleOrgsDao[1],
         "Downtown Basketball Association",
         "Community basketball league for all skill levels",
         ["basketball"],
@@ -43,7 +43,7 @@ export const clubSamples: Club[] = [
 
     new Club(
         "club_003",
-        organizationDaoSamples[2],
+        sampleOrgsDao[2],
         "Junior Tennis Academy",
         "Elite tennis training program for youth athletes",
         ["tennis"],
@@ -62,7 +62,7 @@ export const clubSamples: Club[] = [
 
     new Club(
         "club_004",
-        organizationDaoSamples[3],
+        sampleOrgsDao[3],
         "CrossFit Warriors",
         "High-intensity functional fitness training",
         ["crossfit", "fitness"],
@@ -81,7 +81,7 @@ export const clubSamples: Club[] = [
 
     new Club(
         "club_005",
-        organizationDaoSamples[4],
+        sampleOrgsDao[4],
         "Alpine Ski Club",
         "Winter sports enthusiasts group for skiing and snowboarding",
         ["skiing", "snowboarding"],
@@ -98,3 +98,5 @@ export const clubSamples: Club[] = [
         1651363200000  // May 1, 2022
     )
 ];
+
+export { sampleClubs }

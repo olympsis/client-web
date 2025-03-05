@@ -180,6 +180,22 @@ enum GROUP_TYPE {
     CLUB = "club",
     ORGANIZATION = "organization"
 }
+function groupTypeToNumber(type: GROUP_TYPE): number {
+    switch (type) {
+        default:
+            return 0;
+        case GROUP_TYPE.ORGANIZATION:
+            return 1;
+    }
+}
+function numberToGroupType(type: number): GROUP_TYPE {
+    switch (type) {
+        default: 
+            return GROUP_TYPE.CLUB;
+        case 1:
+            return GROUP_TYPE.ORGANIZATION;
+    }
+}
 
 enum GROUP_VISIBILITY {
     PUBLIC='public',
@@ -369,6 +385,9 @@ export {
     stringToGroupRole,
     
     GROUP_TYPE,
+    groupTypeToNumber,
+    numberToGroupType,
+    
     GROUP_VISIBILITY,
 
     SPORTS,

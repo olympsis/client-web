@@ -61,8 +61,8 @@ const sampleEvents: Event[] = [
         type: "pickup",
         poster: sampleUsers[0],
         organizers: [{
-            type: "club",
-            id: "club_123"
+            type: 0,
+            id: "club_001"
         }],
         venues: [sampleVenue],
         image_url: "event-images/basketball-0.jpg",

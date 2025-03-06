@@ -30,6 +30,8 @@ const toast = useToast();
 
 <style scoped>
 #event-media {
+    width: 100%;
+    grid-area: media;
     max-width: 30rem;
     position: relative;
 
@@ -39,6 +41,7 @@ const toast = useToast();
     }
 
     #media {
+        width: 100%;
         max-width: 30rem;
         border-radius: 10px;
     }

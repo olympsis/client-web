@@ -2,201 +2,20 @@
     <NavigationBar/>
     <main id="event-detail-view">
         <!-- Event Detail -->
-        <div v-if="failed !== undefined && failed !== true" id="event-detail">
-            <!-- Desktop View -->
-            <div id="event-detail-desktop">
-                <div id="event-detail-left-section">
-                    <!-- Event Header -->
-                    <div id="header">
-                        <button class="button" :style="{ marginRight: '1rem' }" @click="handleBackNavigation">
-                            <picture class="centered">
-                                <source srcset="@/assets/icons/chevron/chevron.left.white.svg" media="(prefers-color-scheme: dark)">
-                                <img src="@/assets/icons/chevron/chevron.left.svg"/>
-                            </picture>
-                        </button>
-
-                        <button v-if="isShareable == true" class="button" @click="handleEventSharing">
-                            <picture class="centered">
-                                <source srcset="@/assets/icons/share/share.white.svg" media="(prefers-color-scheme: dark)">
-                                <img src="@/assets/icons/share/share.svg"/>
-                            </picture>
-                        </button>
-                    </div>
-
-                    <!-- Event Title -->
-                    <h1 id="title">{{ event?.title }}</h1>
-
-                    <!-- Event Sub header -->
-                    <div id="sub-header">
-                        <div id="organizers">
-                            <img src="@/assets/icons/group/group.secondary.svg"/>
-                            <h2>{{ organizers }}</h2>
-                        </div>
-                        <div id="venue-wrapper">
-                            <img src="@/assets/icons/pin-drop/pin-drop.secondary.svg"/>
-                            <div class="venue">
-                                <h3 class="name"> {{ venueName }} </h3>
-                                <h4 class="location"> {{ venueLocation }} </h4>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Event Body -->
-                    <div id="event-body">
-                        <div class="info">
-                            <h2> Details </h2>
-                            <hr :style="{ width: '100%', margin: '0rem 1rem', color: 'gray', 'background-color': 'gray' }"/>
-                            <p>{{ eventDate }}</p>
-                        </div>
-                        <p class="description">{{ eventDescription }}</p>
-                    </div>
-                    
-                    <!-- Event Details -->
-                    <div id="event-details">
-                        <div class="time">
-                            <p :class="{ 
-                                'label': true,
-                                'ended-label': eventState === EVENT_STATE.COMPLETED,
-                                'live-label': eventState === EVENT_STATE.LIVE,
-                                'ready-label': eventState === EVENT_STATE.PENDING,
-                                'pending-label': eventState === EVENT_STATE.PENDING && (event?.minParticipants && (event?.participants?.length ?? 0) < (event?.minParticipants ?? 1))
-                            }"> {{ eventStatusText }} </p>
-                            <div class="counter">
-                                <img src="@/assets/icons/clock/clock.secondary.svg"/>
-                                <p v-if="eventState != EVENT_STATE.LIVE"> {{ eventStartStopTime }} </p>
-                                <p v-else> {{ timeElapsed }}</p>
-                            </div>
-                            
-                        </div>
-
-                        <div class="participants">
-                            <p> {{ eventParticipants }} </p>
-                        </div>
-
-                        <div class="difficulty">
-                            <div class="skill-level">
-                                <div v-for="_ in eventSkillLabel" class="level-icon"></div>
-                            </div>
-                            <p :style="{ textTransform: 'capitalize' }"> {{ eventDifficulty }} </p>
-                        </div>
-                    </div>
-
-                    <!-- Event Actions -->
-                    <div id="event-actions">
-                        <CarBlockButton class="action" text="Directions" @click="openMaps"/>
-                        <GlobeBlockButton class="action" :text="eventVisibility"/>
-                        <EllipsisBlockButton class="action" text="More" @click="handleOpenSettingsModal"/>
-                    </div>
-
-                    <!-- Participants Detail -->
-                    <div id="participants-details">
-                        <EventParticipantsPeek v-if="event" :event="event"/>
-                        <button @click="handleOpenParticipantsModal">See who’s going...</button>
-                    </div>
-                </div>
-                
-                <div id="event-detail-right-section">
-                    <img id="event-image" :src="eventImageURL"/>
-                    <EventPrimaryButton v-if="event" v-model:event="event" v-model:state="primaryState" @click="handlePrimaryAction"/>
-                </div>
-            </div>
-
-            <!-- Mobile View -->
-            <div id="event-detail-mobile">
-                <!-- Event Header -->
-                <div id="header">
-                    <!-- Navigation Button -->
-                    <button class="button" :style="{ marginRight: '1rem' }" @click="handleBackNavigation">
-                        <picture class="centered">
-                            <source srcset="@/assets/icons/chevron/chevron.left.white.svg" media="(prefers-color-scheme: dark)">
-                            <img src="@/assets/icons/chevron/chevron.left.svg"/>
-                        </picture>
-                    </button>
-
-                    <!-- Event Title -->
-                    <h1 id="title">{{ event?.title }}</h1>
-
-                    <!-- Share Button & Placeholder -->
-                    <button v-if="isShareable == true" class="button" @click="handleEventSharing">
-                        <picture class="centered">
-                            <source srcset="@/assets/icons/share/share.white.svg" media="(prefers-color-scheme: dark)">
-                            <img src="@/assets/icons/share/share.svg"/>
-                        </picture>
-                    </button>
-                    <div v-else></div>
-                </div>
-
-                <!-- Event Sub header -->
-                <div id="sub-header">
-                    <div id="organizers">
-                        <img src="@/assets/icons/group/group.secondary.svg"/>
-                        <h2>{{ organizers }}</h2>
-                    </div>
-                    <div id="venue-wrapper">
-                        <img src="@/assets/icons/pin-drop/pin-drop.secondary.svg"/>
-                        <div class="venue">
-                            <h3 class="name"> {{ venueName }} </h3>
-                            <h4 class="location"> {{ venueLocation }} </h4>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Event Image -->
-                <img id="image" :src="eventImageURL"/>
-
-                <!-- Event Body -->
-                <div id="event-body">
-                    <div class="info">
-                        <h2> Details </h2>
-                        <hr :style="{ width: '100%', margin: '0rem 1rem', color: 'gray', 'background-color': 'gray' }"/>
-                        <p>{{ eventDate }}</p>
-                    </div>
-                    <p class="description">{{ eventDescription }}</p>
-                </div>
-
-                <!-- Event Details -->
-                <div id="event-details">
-                    <div class="time">
-                        <p :class="{ 
-                            'label': true,
-                            'ended-label': eventState === EVENT_STATE.COMPLETED,
-                            'live-label': eventState === EVENT_STATE.LIVE,
-                            'ready-label': eventState === EVENT_STATE.PENDING,
-                            'pending-label': eventState === EVENT_STATE.PENDING && (event?.minParticipants && (event?.participants?.length ?? 0) < (event?.minParticipants ?? 1))
-                        }"> {{ eventStatusText }} </p>
-                        <div class="counter">
-                            <img src="@/assets/icons/clock/clock.secondary.svg"/>
-                            <p v-if="eventState != EVENT_STATE.LIVE"> {{ eventStartStopTime }} </p>
-                            <p v-else> {{ timeElapsed }}</p>
-                        </div>
-                    </div>
-
-                    <div class="participants">
-                        <p> {{ eventParticipants }} </p>
-                    </div>
-
-                    <div class="difficulty">
-                        <div class="skill-level">
-                            <div v-for="_ in eventSkillLabel" class="level-icon"></div>
-                        </div>
-                        <p :style="{ textTransform: 'capitalize' }"> {{ eventDifficulty }} </p>
-                    </div>
-                </div>
-
-                <!-- Event Actions -->
-                <div id="event-actions">
-                    <CarBlockButton class="action" text="Directions" @click="openMaps"/>
-                    <GlobeBlockButton class="action" :text="eventVisibility"/>
-                    <EventPrimaryButton v-if="event" v-model:event="event" v-model:state="primaryState" @click="handlePrimaryAction"/>
-                    <EllipsisBlockButton class="action" text="More" @click="handleOpenSettingsModal"/>
-                </div>
-
-                <!-- Participants Detail -->
-                <div id="participants-details">
-                    <EventParticipantsPeek v-if="event" :event="event"/>
-                    <button @click="handleOpenParticipantsModal">{{ participantsPeekText }}</button>
-                </div>
-            </div>
+        <div v-if="failed !== undefined && failed !== true && event != undefined" id="event-detail">
+            <EventMedia :event="event"/>
+            <EventOrganizers :event="event" :clubs="clubs" :organizations="orgs"/>
+            <EventHeader :event="event" :venues="venues" class="header"/>
+            <EventBody 
+                class="body" 
+                :event="event"
+                :venues="venues"
+                @open-auth="showAuthModal" 
+                @open-rsvp="showRSVPModal" 
+                @open-settings="handleOpenSettingsModal"
+            />
+            <EventParticipantsPeek :event="event" @open-participants="handleOpenParticipantsModal"/>
+            <EventLocations :event="event" :venues="venues"/>
 
             <!-- RSVP -->
             <dialog id="rsvp-modal" ref="rsvp-modal" class="dialog">
@@ -251,6 +70,12 @@ import {
     GROUP_TYPE,
     eventSkillLevelToNumber, 
 } from '@/data/Enums';
+
+import EventBody from '~/components/Events/EventBody/EventBody.vue';
+import EventMedia from '~/components/Events/EventMedia/EventMedia.vue';
+import EventHeader from '~/components/Events/EventHeader/EventHeader.vue';
+import EventLocations from '~/components/Events/EventLocations/EventLocations.vue';
+import EventOrganizers from '~/components/Events/EventOrganizers/EventOrganizers.vue';
 
 import AuthModal from '@/components/Auth/AuthModal/AuthModal.vue';
 import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
@@ -552,8 +377,7 @@ const eventStartStopTime = computed<string>(() => {
         } else { // If we don't we just add 2hrs to the start time
             const startTime = event.value?.startTime;
             if (startTime) {
-                const twoHoursAgo = startTime + (2 * 60 * 60);
-                return event.value?.stopTimeToString(twoHoursAgo) ?? 'Unknown';
+                return event.value?.stopTimeToString() ?? 'Unknown';
             } else {
                 return 'Unknown';
             }
@@ -971,18 +795,37 @@ onMounted(() => {
 <style scoped>
 #event-detail-view {
     margin: 0 auto;
-    width: fit-content;
     margin-bottom: auto;
     
     #event-detail {
+        gap: 2rem;
+        display: grid;
+        margin-top: 3rem;
+        position: relative;
         margin-bottom: 2rem;
+        grid-template-areas:
+            'media header'
+            'media body'
+            'media locations'
+            'host locations'
+            'participants locations'
+            ;
+        grid-template-columns: 30rem 30rem;
+
+        .body {
+            margin-top: 1rem;
+            max-width: 30rem;
+        }
+
         #event-detail-desktop {
             gap: 2rem;
             display: grid;
             position: relative;
             grid-template-areas:
-            'info image'
-            'info image';
+            'media header'
+            'media body'
+            'host location'
+            ;
             grid-template-columns: 30rem 30rem;
 
             #event-detail-left-section {
@@ -1160,168 +1003,19 @@ onMounted(() => {
             }
         }
 
-        #event-detail-mobile {
-            display: none;
-        }
-
-        @media(max-width: 1050px) {
-            #event-detail-desktop {
-                display: none;
-            }
-
-            #event-detail-mobile {
-                display: flex;
-                max-width: 32rem;
-                position: relative;
-                flex-direction: column;
-
-                #header {
-                    display: flex;
-                    margin: 1rem 1rem;
-                    flex-direction: row;
-                    justify-content: space-between;
-
-                    h1 {
-                        margin: auto;
-                    }
-
-                    .centered {
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                    }
-                }
-
-                #sub-header {
-                    margin: 0.5rem 1rem;
-
-                    #organizers {
-                        display: flex;
-                        align-items: flex-end;
-
-                        h2 {
-                            font-weight: normal;
-                            margin: 0rem 0.5rem;
-                            color: var(--primary-label-color);
-                        }
-                    }
-
-                    #venue-wrapper {
-                        display: flex;
-                        align-items: center;
-
-                        .venue {
-                            margin: 0.25rem 0.5rem;
-                            .name {
-                                font-weight: 500;
-                                color: var(--primary-label-color);
-                            }
-
-                            .location {
-                                color: gray;
-                                font-weight: normal;
-                            }
-                        }
-                    }
-                }
-
-                #image {
-                    width: 100vw;
-                    max-width: 32rem;
-                    max-height: 25rem;
-                    object-fit: cover;
-                }
-
-
-                #event-body {
-                    margin-top: 1rem;
-                    margin-left: 1rem;
-                    margin-right: 1rem;
-                    color: var(--primary-label-color);
-
-                    .info {
-                        display: flex;
-                        align-items: center;
-                    }
-
-                    .description {
-                        margin: 0.5rem 0rem;
-                        font-size: 1rem;
-                    }
-                }
-
-                #event-details {
-                    display: flex;
-                    padding: 1.5rem;
-                    margin: 1rem;
-                    align-items: center;
-                    border-radius: 10px;
-                    justify-content: space-around;
-                    color: var(--primary-label-color);
-                    background-color: var(--secondary-background-color);
-
-                    .participants {
-                        align-items: center;
-                    }
-                }
-
-                #event-actions {
-                    gap: 1rem;
-                    display: flex;
-                    margin: 0rem 1rem;
-                    justify-content: space-around;
-
-                    .action {
-                        display: flex;
-                        width: 100%;
-                        height: 5.5rem;
-                        cursor: pointer;
-                        max-width: 15rem;
-                        border-radius: 1rem;
-                        align-items: center;
-                        flex-direction: column;
-                        justify-content: center;
-                        color: var(--primary-label-color);
-                        background-color: var(--secondary-background-color);
-
-                        img {
-                            width: 2.5rem;
-                            height: 2.5rem;
-                        }
-
-                        p {
-                            font-size: 0.9rem;
-                        }
-                    }
-
-                    .rsvp {
-                        color: white;
-                        background-color: var(--primary-brand-color);
-                    }
-
-                    .cancel {
-                        color: white;
-                        background-color: var(--secondary-brand-color);
-                    }
-                }
-
-                #participants-details {
-                    margin-top: 1rem;
-                    margin-bottom: 5rem;
-                    margin-left: 1rem;
-                    margin-right: 1rem;
-
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-
-                    button {
-                        all: unset;
-                        cursor: pointer;
-                        white-space: nowrap;
-                        color: var(--primary-label-color);
-                    }
-                }
+        @media(max-width: 1100px) {
+            grid-template-areas:
+            'header'
+            'media'
+            'body'
+            'host'
+            'participants'
+            'locations'
+            ;
+            grid-template-columns: auto;
+            margin: 2rem 1rem;
+            .body {
+                margin-top: unset;
             }
         }
 
@@ -1366,70 +1060,6 @@ onMounted(() => {
             text-align: center;
         }
     }
-}
-
-h1 {
-    color: var(--primary-label-color);
-}
-
-.button {
-    all: unset;
-    cursor: pointer;
-    padding: 0.5rem;
-    height: fit-content;
-    border-radius: 10px;
-    background-color: var(--secondary-background-color);
-
-    &:hover {
-        transform: scale(1.1);
-    }
-}
-
-.difficulty {
-    .skill-level {
-        display: flex; 
-        align-items: center; 
-        margin-bottom: 0.25rem;
-        justify-content: center;
-
-        .level-icon {
-            width: 0.75rem; 
-            height: 0.75rem;
-            border-radius: 50%;
-            margin: 0rem 0.15rem;
-            background-color: var(--quaternary-brand-color);
-        }
-    }
-}
-
-.counter {
-    display: flex;
-    align-items: center;
-
-    img {
-        margin: 0rem 0.15rem;
-    }
-}
-
-.label {
-    font-weight: bold;
-    margin-bottom: 0.25rem;
-}
-
-.ended-label {
-    color: gray;
-}
-
-.ready-label {
-    color: green;
-}
-
-.live-label {
-    color: red;
-}
-
-.pending-label {
-    color: orange;
 }
 
 #settings-modal {

@@ -3,7 +3,7 @@
         <h2>Hosted by</h2>
         <ul id="list">
             <li v-for="organizer in organizers" class="organizer">
-                <GroupBadge :type="organizer.type" :imageURL="organizer.imageURL" :size="2" />
+                <GroupBadge :type="organizer.type" :imageURL="organizer.imageURL" :size="2.5" />
                 <div id="name">{{ organizer.name }}</div>
             </li>
         </ul>
@@ -45,7 +45,8 @@ const organizers = computed<Array<{ type: number, name: String, imageURL: string
 
 <style scoped>
 #event-organizers {
-
+    grid-area: host;
+    
     #list {
         padding: 0;
         margin-top: 0.5rem;

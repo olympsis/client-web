@@ -229,7 +229,7 @@ class Event extends Codable<Event> {
     }
 
     public startTimeToString(): string {
-        const date = new Date(this.startTime);
+        const date = new Date(this.startTime * 1000);
         let hours = date.getHours();
         const minutes = date.getMinutes().toString().padStart(2, '0');
         const m = hours >= 12 ? 'PM' : 'AM';
@@ -242,7 +242,7 @@ class Event extends Codable<Event> {
     }
     
     public stopTimeToString(): string {
-        const date = new Date(this.stopTime);
+        const date = new Date(this.stopTime * 1000);
         let hours = date.getHours();
         const minutes = date.getMinutes().toString().padStart(2, '0');
         const m = hours >= 12 ? 'PM' : 'AM';

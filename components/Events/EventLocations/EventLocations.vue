@@ -56,8 +56,10 @@ onMounted(() => {
 
 <style scoped>
 #event-locations {
+    max-width: 30rem;
+    grid-area: locations;
     #map {
-        height: 15rem;
+        width: 100%;
         border-radius: 20px;
         margin: 0.5rem 0rem;
     }
@@ -67,7 +69,8 @@ onMounted(() => {
     }
 
     #map-placeholder {
-        height: 15rem;
+        width: 100%;
+        max-height: 20rem;
         margin: 0.5rem 0rem;
         border-radius: 20px;
         background-color: var(--secondary-background-color);

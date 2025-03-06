@@ -31,7 +31,7 @@
 
         <!-- Add Calendar Button -->
         <div id="add-calendar">
-            <picture :style="{ width: '24px', height: '24px', margin: '0rem 0.5rem' }"">
+            <picture :style="{ width: '24px', height: '24px', margin: '0rem 0.5rem' }">
                 <source srcset="@/assets/icons/calendar/calendar.month.white.svg" media="(prefers-color-scheme: dark)">
                 <img src="@/assets/icons/calendar/calendar.month.svg">
             </picture>
@@ -57,6 +57,8 @@ defineProps({
 
 <style scoped>
 #event-header {
+    grid-area: header;
+    
     .section {
         display: flex;
         margin: 1rem 0rem;

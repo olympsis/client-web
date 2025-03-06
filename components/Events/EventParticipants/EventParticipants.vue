@@ -1,8 +1,8 @@
 <template>
     <div id="participants-peek">
-        <h2>{{ participants.length + " Going" }}</h2>
+        <h2>{{ event.participants.length + " Going" }}</h2>
         <ul id="participants">
-            <li class="participant" v-for="participant in participants">
+            <li class="participant" v-for="participant in event.participants">
                 <UserIcon 
                     :user="participant.user" 
                     :size="2" 
@@ -13,7 +13,7 @@
             </li>
         </ul>
 
-        <div id="more" v-if="participants.length > 5" @click="$emit('show-participants')">{{ "+" + (participants.length - 5) + " More" }}</div>
+        <div id="more" v-if="event.participants.length > 5" @click="$emit('show-participants')">{{ "+" + (event.participants.length - 5) + " More" }}</div>
     </div>
 </template>
 
@@ -29,33 +29,13 @@ const props = defineProps({
     event: { type: Event, required: true }
 });
 
-const participants: ComputedRef<Array<Participant>> = computed(() => {
-    // De-reference from event's participants array
-    const array: Array<Participant> = props.event?.participants?.map((x) => x) ?? []
-    const length = array.length;
-    for (let i = 0; i < 5 - length; ++i) {
-        let ptp: Participant = Participant.decode({
-            'id': `${i}`,
-            'status': 'maybe',
-            'created_at': 0
-        });
-        if (ptp) {
-            array.push(ptp)
-        }
-    }
-
-    return array;
-});
-
 </script>
 
 <style scoped>
 #participants-peek {
-    width: 100%;
-    display: flex;
-    margin-right: 1rem;
     overflow-x: scroll;
     flex-direction: column;
+    grid-area: participants;
 
     #participants {
         padding: 0rem;

@@ -14,7 +14,6 @@ export class SnapshotService {
         // Add retry mechanism for token retrieval
         const getToken = async (maxRetries: number = 5, delayMs: number = 500): Promise<string> => {
             let retries = 0;
-            
             while (retries < maxRetries) {
                 const token = await getAuth().currentUser?.getIdToken();
                 

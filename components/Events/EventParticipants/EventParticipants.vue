@@ -1,12 +1,19 @@
 <template>
     <div id="participants-peek">
-        <UserIcon 
-            v-for="participant in participants" 
-            :user="participant.user" 
-            :size="3" 
-            :style="{ 'height': '3.5rem' }"
-            :class="{ 'yes': participant.status === EVENT_RSVP_STATUS.YES, 'maybe': participant.status === EVENT_RSVP_STATUS.MAYBE }"
-        />
+        <h2>{{ participants.length + " Going" }}</h2>
+        <ul id="participants">
+            <li class="participant" v-for="participant in participants">
+                <UserIcon 
+                    :user="participant.user" 
+                    :size="2" 
+                    :style="{ 'height': '2.5rem' }"
+                    :class="{ 'yes': participant.status === EVENT_RSVP_STATUS.YES, 'maybe': participant.status === EVENT_RSVP_STATUS.MAYBE }"
+                />
+                <div class="name">{{ participant.user?.username ?? 'olympsis-user' }}</div>
+            </li>
+        </ul>
+
+        <div id="more" v-if="participants.length > 5" @click="$emit('show-participants')">{{ "+" + (participants.length - 5) + " More" }}</div>
     </div>
 </template>
 
@@ -48,8 +55,31 @@ const participants: ComputedRef<Array<Participant>> = computed(() => {
     display: flex;
     margin-right: 1rem;
     overflow-x: scroll;
+    flex-direction: column;
+
+    #participants {
+        padding: 0rem;
+        list-style-type: none;
+
+        .participant {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+
+            .name {
+                font-weight: bold;
+                margin-left: 2rem;
+            }
+        }
+    }
+
+    #more {
+        font-weight: bold;
+    }
 
     * {
+        width: fit-content;
+        margin-top: 0.25rem;
         margin-right: -1.5rem;
     }
 

@@ -1,6 +1,6 @@
 <template>
     <div id="participants-peek">
-        <h2>{{ event.participants.length + " Going" }}</h2>
+        <h2>{{ event.participants.length + " " + displayString }}</h2>
         <ul id="participants">
             <li class="participant" v-for="participant in event.participants">
                 <UserIcon 
@@ -19,14 +19,37 @@
 
 <script setup lang="ts">
 import { computed, type ComputedRef } from 'vue';
-import { EVENT_RSVP_STATUS } from '~/data/Enums';
 import { Event } from '@/data/models/EventModels';
-import { Participant } from '@/data/models/GenericModels';
+import { EVENT_RSVP_STATUS, EVENT_STATE } from '~/data/Enums';
 
 import UserIcon from '@/components/UserIcon/UserIcon.vue';
 
 const props = defineProps({
     event: { type: Event, required: true }
+});
+
+const eventState = computed<EVENT_STATE>(() => {
+    const timestamp = Math.floor(new Date().getTime() / 1000);
+    const thirtyMinutesAgo = timestamp - (30 * 60);
+    const twoHoursAgo = timestamp - (2 * 60 * 60);
+
+    const startTime = (props.event?.startTime) ?? 0;
+    const stopTime = (props.event?.stopTime) ?? 0;
+
+    if (
+        (stopTime !== 0 && stopTime < timestamp) ||
+        (startTime !== 0 && startTime < twoHoursAgo)
+    ) {
+        return EVENT_STATE.COMPLETED;
+    } else if (startTime !== undefined && startTime < thirtyMinutesAgo) {
+        return EVENT_STATE.LIVE;
+    } else {
+        return EVENT_STATE.PENDING;
+    }
+});
+
+const displayString = computed<string>(() => {
+    return eventState.value != EVENT_STATE.COMPLETED ? "Going" : "Went" ;
 });
 
 </script>

@@ -23,6 +23,7 @@ const router = useRouter();
         gap: 1rem;
         padding: 0rem;
         display: flex;
+        padding: 1rem 0rem;
         overflow-y: scroll;
     }
 }

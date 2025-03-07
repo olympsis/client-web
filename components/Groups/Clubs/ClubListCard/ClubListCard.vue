@@ -1,29 +1,43 @@
 <template>
-    <div id="club-list-container">
+    <li id="club-list-card">
         
         <!-- Picture & Header -->
         <div id="club-header">
             <img :src="imageURL" v-if="!imageFailed && imageURL !== undefined" @error="imageFailed = true">
-            <picture id="default-img" v-if="imageFailed || imageURL === undefined">
-                <source srcset="@/assets/icons/group/group.fill.white.svg" media="(prefers-color-scheme: dark)">
-                <img src="@/assets/icons/group/group.fill.svg">
-            </picture>
-            <div id="club-info">
-                <h1>{{ name }}</h1>
-                <h2>{{ location }}</h2>
+            <div id="default-img" v-if="imageFailed || imageURL === undefined">
+                <picture id="default-img" >
+                    <source srcset="@/assets/icons/group/group.fill.white.svg" media="(prefers-color-scheme: dark)">
+                    <img src="@/assets/icons/group/group.fill.svg">
+                </picture>
             </div>
+
+            <ul id="sports">
+                <SportLabel v-for="sport in club.sports" :sport="sport"/>
+            </ul>
         </div>
 
         <!-- Tags -->
-        <div id="club-tags">
+        <!-- <div id="club-tags">
             <div class="tag" v-for="tag in tags">{{ tag }}</div>
-        </div>
+        </div> -->
 
         <!-- Body -->
-        <div id="club-body">{{ body }}</div>
+        <div id="club-body">
+            <div id="club-info">
+                <h4>{{ name }}</h4>
+                <div id="location">
+                    <picture :style="{ height: '1rem', width: '1rem', marginRight: '0.25rem' }">
+                        <source srcset="@/assets/icons/pin-drop/pin.drop.white.svg" media="(prefers-color-scheme: dark)"> 
+                        <img class="location-pin" src="@/assets/icons/pin-drop/pin.drop.svg"> 
+                    </picture>
+                    <div id="location-name">{{ club.city + ', ' + club.state }}</div>
+                </div>
+            </div>
+            <div id="body">{{ body }}</div>
+        </div>
 
         <!-- Actions -->
-        <div id="club-actions">
+        <div id="club-actions" v-if="!isMember">
             <div class="details-button" @click="navigateToClubDetails"> View Details </div>
             <TextButton text="Apply" success-text="Applied" failure-text="Failed" v-model="buttonState" @click="apply"/>
         </div>
@@ -47,7 +61,7 @@
                 <ClubDetailsCard :club="club" @close="closeCallback"/>
             </template>
         </Dialog>
-    </div>
+    </li>
 </template>
 
 <script setup lang="ts">
@@ -59,11 +73,13 @@ import { generateImageURL } from '~/utils/image-helpers';
 import { useSessionStore } from '~/stores/session-store';
 
 import Dialog from 'primevue/dialog';
+import SportLabel from '~/components/SportLabel/SportLabel.vue';
 import ClubDetailsCard from '../ClubDetailsCard/ClubDetailsCard.vue';
 import TextButton from '@/components/Buttons/LoadingButtons/TextButton/TextButton.vue';
 
 const props = defineProps({
-    club: { type: Club, required: true }
+    club: { type: Club, required: true },
+    isMember: { type: Boolean, default: false }
 });
 
 const router = useRouter();
@@ -74,8 +90,8 @@ const showClubDetail = ref(false);
 const buttonState = ref(VIEW_STATE.PENDING);
 
 const imageURL = computed(() => {
-    if (props.club.logo) {
-        return generateImageURL(props.club.logo);
+    if (props.club.banner) {
+        return generateImageURL(props.club.banner);
     }
     return undefined;
 });
@@ -120,29 +136,31 @@ function apply() {
 </script>
 
 <style scoped>
-#club-list-container {
+#club-list-card {
+    height: 100%;
     max-width: 30rem;
-    padding: 1rem;
+    list-style-type: none;
     border-radius: var(--card-border-radius);
     background-color: var(--secondary-background-color);
 
     #club-header {
         display: flex;
+        position: relative;
 
         img {
-            width: 6rem;
-            height: 6rem;
-            border-radius: 10px;
+            width: 100%;
+            height: 9rem;
+            border-radius: 10px 10px 0px 0px;
         }
 
         #default-img {
-            width: 6rem;
-            height: 6rem;
+            width: 100%;
+            height: 9rem;
             display: flex;
-            border-radius: 10px;
+            border-radius: 10px 10px 0px 0px;
             align-items: center;
             justify-content: center;
-            background-color: var(--tertiary-background-color);
+            background-color: var(--olympsis-gray);
 
             img {
                 width: 3rem;
@@ -150,18 +168,12 @@ function apply() {
             }
         }
 
-        #club-info {
-            margin: 0rem 1rem;
-            h1 {
-                font-size: 1.3rem;
-                color: var(--primary-label-color);
-            }
-            h2 {
-                color: gray;
-                font-size: 1rem;
-                margin-top: 0.2rem;
-                font-weight: normal;
-            }
+        #sports {
+            padding: 0;
+            display: flex;
+            margin: 0.5rem;
+            position: absolute;
+            flex-direction: row;
         }
     }
 
@@ -182,13 +194,13 @@ function apply() {
     }
 
     #club-body {
-        margin: 1rem 0rem;
+        margin: 1rem;
         color: var(--primary-label-color);
     }
 
     #club-actions {
         display: flex;
-        margin: 1rem 0rem 0.5rem 0rem;
+        padding: 1rem;
 
         .details-button {
             width: 100%;
@@ -215,6 +227,23 @@ function apply() {
             justify-content: center;
             background-color: var(--primary-brand-color);
         }
+    }
+}
+
+#club-info {
+    margin-bottom: 1rem;
+}
+
+#location {
+    opacity: 0.5;
+    display: flex;
+    font-size: 0.95rem;
+    align-items: center;
+    margin: 0.25rem 0rem;
+
+    .location-pin {
+        width: 1rem;
+        height: 1rem;
     }
 }
 </style>

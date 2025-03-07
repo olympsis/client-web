@@ -1,31 +1,59 @@
 <template>
     <NavigationBar/>
-    <main class="grid-container">
-        <div class="info">
-            <UserIcon :user="user" :size="10" class="icon"/>
-            <button class="action" @click="showEditModal">Edit Profile</button>
+    <main id="profile-page">
+        <div class="header">
+            <div id="image">
+                <UserIcon :user="user" :size="10" class="icon"/>
+                <button class="action" @click="showEditModal">Edit Profile</button>
+            </div>
+            <div id="info">
+                <div id="name">
+                    <h1>{{ user?.firstName + " " + user?.lastName }}</h1>
+                    <h2>{{ "@" + user?.username }}</h2>
+                </div>
+                <div id="body">{{ user?.bio }}</div>
+            </div>
         </div>
-        <NavigationCard class="nav-card" :state="state"/>
-        <div class="badges">
-            <h2>Badges</h2>
-            <div class="holder">
 
-            </div>
+        <div id="body">
+            <Tabs value="0">
+                <TabList
+                :pt="{ 
+                    activeBar: { 
+                        style: { 
+                            backgroundColor: 'var(--primary-brand-color)', height: '2.5px' 
+                        } 
+                    } 
+                    }">
+                    <Tab value="0" class="font">Achievements</Tab>
+                    <Tab value="1" class="font">Groups Enrolled</Tab>
+                    <Tab value="2" class="font">Events Attended</Tab>
+                </TabList>
+                <TabPanels>
+                <TabPanel value="0">
+                    <AwardsTab />
+                </TabPanel>
+                <TabPanel value="1">
+                    <GroupsTab :clubs="sessionStore.clubs" :organizations="sessionStore.organizations"/>
+                </TabPanel>
+                <TabPanel value="2">
+                    <p class="m-0">
+                        At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa
+                        qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus.
+                    </p>
+                </TabPanel>
+            </TabPanels>
+            </Tabs>
         </div>
-        <div class="trophies">
-            <h2>Trophies</h2>
-            <div class="holder">
-                
-            </div>
-        </div>
-        <div class="actions">
+
+        <!-- <div class="actions">
             <h2>Settings</h2>
             <button class="item"> Report an Issue </button>
             <RouterLink to="/terms-of-use" class="item"> Terms of Service </RouterLink>
             <RouterLink to="/privacy-policy" class="item"> Privacy Policy </RouterLink>
             <button class="destructive-item" @click="handleLogout"> Log Out </button>
             <button class="destructive-item" @click="handleDelete"> Delete Account </button>
-        </div>
+        </div> -->
 
         <dialog id="edit-profile-modal" ref="edit-profile-modal" class="dialog">
             <EditProfileView @close="hideEditModal"/>
@@ -39,9 +67,15 @@ import { computed } from 'vue';
 import { VIEW_STATE } from '@/data/Enums';
 import { useSessionStore } from '@/stores/session-store';
 
+import Tab from 'primevue/tab';
+import Tabs from 'primevue/tabs';
+import TabList from 'primevue/tablist';
+import TabPanel from 'primevue/tabpanel';
+import TabPanels from 'primevue/tabpanels';
 import UserIcon from '@/components/UserIcon/UserIcon.vue';
+import AwardsTab from '~/components/Profile/AwardsTab/AwardsTab.vue';
+import GroupsTab from '~/components/Profile/GroupsTab/GroupsTab.vue';
 import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
-import NavigationCard from '@/components/NavigationCard/NavigationCard.vue';
 import EditProfileView from '~/components/Modals/Profile/EditProfile/EditProfileView.vue';
 
 const sessionStore = useSessionStore();
@@ -84,23 +118,36 @@ useSeoMeta({
 </script>
 
 <style scoped>
-.grid-container {
-    display: grid;
-    grid-template-areas:
-    'info badges settings'
-    '... badges settings'
-    'footer trophies settings'
-    ;
-    gap: 2rem;
+.font {
+    font-size: 0.9rem;
+    font-weight: normal;
+}
+.p-tab-active {
+    font-weight: 500;
+    color: var(--primary-label-color);
+    border-color: var(--primary-brand-color);
+}
+.p-tab-panels {
+    background: var(--primary-background-color);
+}
+.p-tablist-tab-list {
+    background: var(--primary-background-color);
+}
+#profile-page {
+    width: 100%;
+    display: flex;
     margin: 0 auto;
+    max-width: 53rem;
     padding-top: 4rem;
     padding-left: 3rem;
     padding-right: 3rem;
+    flex-direction: column;
 
-   .info {
+   .header {
         display: flex;
-        flex-direction: column;
         grid-area: info;
+        flex-direction: row;
+
         .icon {
             margin: 0rem auto;
             width: fit-content;
@@ -196,100 +243,28 @@ useSeoMeta({
     }
 }
 
-@media (max-width: 1600px) {
-    .grid-container {
-        display: grid;
-        grid-template-areas:
-        'info badges'
-        'settings badges'
-        'settings trophies'
-        'footer trophies'
-        ;
-        gap: 2rem;
-        margin: 0 auto;
-        padding-top: 4rem;
-        padding-left: 3rem;
-        padding-right: 3rem;
-        grid-template-columns: 25rem auto;
-    }
-
-    .actions {
-        h2 {
-            display: none;
-        }
-    }
-}
-/* @media (max-width: 1180px) { */
-@media (max-width: 900px) {
-    .grid-container {
-        gap: unset;
-        display: grid;
-        grid-template-areas:
-        'info'
-        'badges'
-        'trophies'
-        'settings'
-        'footer'
-        ;
-        padding-left: unset;
-        padding-right: unset;
-
-        .badges {
-            .holder {
-                width: 25rem;
-                height: 10rem;
-            }
-        }
-
-        .trophies {
-            .holder {
-                width: 25rem;
-                height: 10rem;
-            }
-        }
-
-        .actions {
-            margin-bottom: 2rem;
-        }
-        
-        .nav-card {
-            padding-bottom: 3rem;
-        }
-    }
+#image {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
-@media (max-width: 430px) { 
-    .grid-container {
-        .badges {
-            .holder {
-                width: 22rem;
-                height: 10rem;
-            }
-        }
+#info {
+    display: flex;
+    margin-top: 1rem;
+    margin-left: 1rem;
+    align-items: start;
 
-        .trophies {
-            .holder {
-                width: 22rem;
-                height: 10rem;
-            }
-        }
+    #name {
+        display: flex;
+        margin-left: 1rem;
+        flex-direction: column;
+        justify-content: start;
+    }
 
-        .actions {
-            .item {
-                width: 22rem;
-                height: 2.5rem;
-            }
-
-            .destructive-item {
-                width: 22rem;
-                height: 2.5rem;
-            }
-        }
-
-        #navigation-card{
-            margin: unset;
-            padding-bottom: 3rem;
-        }
+    h2 {
+        color: gray;
+        font-style: italic;
     }
 }
 

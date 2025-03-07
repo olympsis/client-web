@@ -84,8 +84,9 @@ const props = defineProps({
         }
 
         .image {
-            width: 40rem;
-            height: 40rem;
+            width: 100%;
+            height: 30rem;
+            max-width: 40rem;
             margin-bottom: 1rem;
         }
 

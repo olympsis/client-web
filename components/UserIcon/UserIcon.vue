@@ -1,13 +1,12 @@
 <template>
     <div id="user-icon" >
-        <div v-if="user && image !== undefined && !imageFailed" :style="{ width: `${size}rem`, height: `${size}rem`}">
-            <img 
-                :src="image" 
-                class="image" 
-                :style="{ width: `${size}rem`, height: `${size}rem`}"
-                @error="onImageError"
-            />
-        </div>
+        <img 
+            v-if="user && image !== undefined && !imageFailed"
+            :src="image" 
+            class="image" 
+            :style="{ width: `${size}rem`, height: `${size}rem`}"
+            @error="onImageError"
+        />
         <div v-else class="icon"  :style="{ width: `${size}rem`, height: `${size}rem`}">
             <picture>
                 <source srcset="@/assets/icons/person/person.white.svg" media="(prefers-color-scheme: dark)"/>
@@ -44,6 +43,7 @@ const onImageError = () => {
 
 #user-icon {
     border-radius: 50%;
+    height: fit-content;
 }
 
 .image {

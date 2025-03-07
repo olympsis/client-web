@@ -3,8 +3,8 @@
         <UserIcon 
             v-for="member in members" 
             :user="member.user" 
-            :size="3" 
-            :style="{ 'height': '3.5rem' }"
+            :size="2.5" 
+            class="user"
         />
     </div>
 </template>
@@ -44,18 +44,14 @@ const members: ComputedRef<Member[]> = computed(() => {
     width: 100%;
     display: flex;
     margin-right: 1rem;
-    overflow-x: scroll;
 
     * {
         margin-right: -1.25rem;
     }
 
-    .yes {
+    .user {
+        height: 3rem;
         border: 0.25rem solid var(--primary-brand-color);
-    }
-
-    .maybe {
-        border: 0.25rem solid var(--secondary-brand-color);
     }
 }
 </style>

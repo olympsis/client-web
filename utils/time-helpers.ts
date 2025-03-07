@@ -41,6 +41,23 @@ function calculateTimeAgo(timestamp: number, verbose: boolean = true): string {
   }
 }
 
+function getMonthAndYear(timestamp: number): string {
+	const date = new Date(timestamp * 1000); // Convert seconds to milliseconds
+	
+	// Get month name
+	const monthNames = [
+	  "January", "February", "March", "April", "May", "June", 
+	  "July", "August", "September", "October", "November", "December"
+	];
+	const month = monthNames[date.getMonth()];
+	
+	// Get year
+	const year = date.getFullYear();
+	
+	// Return formatted string
+	return `${month} ${year}`;
+  }
+
 function areDatesOnSameDay(date1: Date, date2: Date): boolean {
     const year1 = date1.getFullYear();
     const month1 = date1.getMonth();
@@ -144,8 +161,9 @@ function formatRelativeTime(timestamp: number): string {
 }
 
 export {
-  calculateTimeAgo,
-  areDatesOnSameDay,
-  formatRelativeTime,
+	getMonthAndYear,
+  	calculateTimeAgo,
+  	areDatesOnSameDay,
+  	formatRelativeTime,
 	compareUTCNowToDateNormal
 }

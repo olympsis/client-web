@@ -1,60 +1,46 @@
 <template>
     <NavigationBar/>
     <main id="group-detail">
-        <GroupLogoAndBanner :logo-u-r-l="groupLogoURL" :banner-u-r-l="groupBannerURL" :sports="club?.sports" class="header"/>
-        <div id="left">
-            <div id="images">
-                <h1>{{ groupName }}</h1>
-                
-            </div>
+        <GroupLogoAndBanner :logo-u-r-l="groupLogoURL" :banner-u-r-l="groupBannerURL" :sports="club?.sports" class="media"/>
 
-            <div id="info">
-                <div id="visibility">
-                    <picture>
-                        <source srcset="@/assets/icons/globe/globe.white.svg" media="(prefers-color-scheme: dark)">
-                        <img src="@/assets/icons/globe/globe.svg">
-                    </picture>
-                    <div>Public Group</div>
-                </div>
+        <div id="header">
+            <h1>{{ club?.name }}</h1>
+            <div id="description">{{ club?.description }}</div>
+        </div>
 
+        <div id="sub-header">
+             <div class="section">
                 <div id="members">
                     <GroupMembersPeek :members="groupMembers"/>
-                    <div>{{ groupMembersString }}</div>
+                    <div :style="{ width: '100%', fontWeight: 'bold', marginLeft: '1rem' }">{{ groupMembersString }}</div>
                 </div>
-            </div>
 
-            <div id="actions">
-                <BoldTextButton v-model="actionState" text="apply" @click="apply"/>
-            </div>
+                <button @click="" class="action">Request to Join</button>
+             </div>
+             <div class="section">
+                <div id="info" :style="{ display: 'flex', gap: '1rem', margin: '1rem 0rem' }">
+                    <div id="foundation">
+                        <picture class="icon">
+                            <source srcset="@/assets/icons/calendar/calendar.month.white.svg" media="(prefers-color-scheme: dark)">
+                            <img src="@/assets/icons/calendar/calendar.month.svg">
+                        </picture>
+
+                        <div :style="{ marginLeft: '0.5rem' }">{{ `Created ${getMonthAndYear(club?.createdAt ?? 0)}` }}</div>
+                    </div>
+
+                    <div id="visibility">
+                        <picture class="icon">
+                            <source srcset="@/assets/icons/globe/globe.white.svg" media="(prefers-color-scheme: dark)">
+                            <img src="@/assets/icons/globe/globe.svg">
+                        </picture>
+                        <div :style="{ textTransform: 'capitalize', marginLeft: '0.5rem' }">{{ `${groupVisibility} Community` }}</div>
+                    </div>
+                </div>
+             </div>
         </div>
 
-        <div id="right">
-            <div id="about" class="section">
-                <h2>About</h2>
-                <p>{{ groupAbout }}</p>
-            </div>
-
-            <div id="tags" class="section">
-                <h2>Tags</h2>
-                <p>
-                    No tags set
-                </p>
-            </div>
-
-            <div id="location" class="section">
-                <h2>Location</h2>
-                <p>{{ groupLocation }}</p>
-                <div id="map-view" v-if="!mapURL">
-                    {{ mapStateString }}
-                </div>
-                <img id="map-view" v-else :src="mapURL">
-            </div>
-
-            <div id="history" class="section">
-                <h2>History</h2>
-                <p>{{ groupHistory }}</p>
-            </div>
-        </div>
+        <GroupFeed v-if="club" :club="club"/>
+        <GroupSmallSection v-if="club" :group="club"/>
 
         <!-- Auth Modal -->
         <dialog id="auth-modal" ref="auth-modal" class="dialog">
@@ -66,22 +52,23 @@
 <script setup lang="ts">
 
 import { computed, ref } from 'vue';
+import { getAuth } from 'firebase/auth';
 import { useToast } from 'primevue/usetoast';
 import { Club } from '@/data/models/ClubModels';
 import { useRoute, useRouter } from 'vue-router';
-import { formatRelativeTime } from '~/utils/time-helpers';
 import { Member } from '@/data/models/GenericModels';
 import { AUTH_STATUS, VIEW_STATE } from '@/data/Enums';
 import { useSessionStore } from '@/stores/session-store';
 import { ClubService } from '@/data/services/ClubService';
+import { SnapshotService } from '~/data/services/SnapshotService';
+import { formatRelativeTime, getMonthAndYear } from '~/utils/time-helpers';
 
 import AuthModal from '~/components/Auth/AuthModal/AuthModal.vue';
+import GroupFeed from '~/components/Groups/GroupFeed/GroupFeed.vue';
 import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
 import GroupMembersPeek from '@/components/Groups/GroupMembersPeek/GroupMembersPeek.vue';
+import GroupSmallSection from '~/components/Groups/GroupSmallSection/GroupSmallSection.vue';
 import GroupLogoAndBanner from '@/components/Groups/GroupLogoAndBanner/GroupLogoAndBanner.vue';
-import BoldTextButton from '@/components/Buttons/LoadingButtons/BoldTextButton/BoldTextButton.vue';
-import { SnapshotService } from '~/data/services/SnapshotService';
-import { getAuth } from 'firebase/auth';
 
 const toast = useToast();
 const route = useRoute();
@@ -142,6 +129,10 @@ const groupLocation = computed<string>(() => {
     const subAdmin = club.value.city;
     const adminArea = club.value.state;
     return `${subAdmin}, ${adminArea}`;
+});
+
+const groupVisibility = computed<string>(() => {
+    return club.value?.visibility ?? 'public';
 });
 
 const groupHistory = computed<string>(() => {
@@ -302,121 +293,80 @@ async function getSnapshot() {
 </script>
 
 <style scoped>
+
 #group-detail {
-    display: flex;
-    margin: 0 auto;
-    width: fit-content;
-    flex-direction: row;
-    width: 100% !important;
+    width: 100%;
+    display: grid;
+    grid-template-areas:
+    'media media'
+    'header header'
+    'sub-header sub-header'
+    'feed location'
+    'feed location'
+    ;
     justify-content: center;
+}
 
-    #left {
-        width: 100%;
+.media {
+    margin-top: 1rem;
+    max-width: 58rem;
+    grid-area: media;
+    padding: 0rem 1rem;
+}
 
-        #header {
-            margin: 1rem 0rem;
+#header {
+    width: 100%;
+    padding: 1rem;
+    max-width: 58rem;
+    grid-area: header;
 
-            .button {
-                all: unset;
-                cursor: pointer;
-                padding: 0.5rem;
-                border-radius: 10px;
-                background-color: var(--secondary-background-color);
-
-                &:hover {
-                    transform: scale(1.1);
-                }
-            }
-
-            .centered {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-        }
-
-        #images {
-            h1 {
-                margin: 1rem;
-                color: var(--primary-label-color);
-            }
-        }
-
-        #info {
-            #visibility {
-                width: 100%;
-                display: flex;
-                margin-top: 7rem;
-                align-items: center;
-
-                picture {
-                    height: 24px;
-                }
-
-                div {
-                    margin-left: 0.5rem;
-                    color: var(--primary-label-color);
-                }
-            }
-
-            #members {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-
-                #group-members-peek {
-                    min-width: 15rem;
-                    margin: 1rem 0rem;
-                }
-
-                div {
-                    width: fit-content;
-                    color: var(--primary-label-color);
-                }
-            }
-        }
-    }
-
-    #right {
-        width: 100%;
-        max-width: 30rem;
-        margin-top: 1rem;
-        margin-left: 1.5rem;
-
-        .section {
-            margin: 1rem 0rem;
-
-            h2 {
-                color: var(--primary-label-color);
-            }
-
-            p {
-                margin: 0.5rem;
-                color: gray;
-            }
-        }
-
-        #location {
-
-            #map-view {
-                width: 95%;
-                display: flex;
-                margin: 0 auto;
-                min-height: 19rem;
-                align-items: center;
-                border-radius: 10px;
-                justify-content: center;
-                color: var(--olympsis-gray);
-                background-color: var(--secondary-background-color);
-            }
-        }
+    h1 {
+        margin-bottom: 0.5rem;
     }
 }
 
-.header {
-    margin-top: 1rem;
+#sub-header {
+    width: 100%;
+    padding: 1rem;
     max-width: 58rem;
-    padding: 0rem 1rem;
+    grid-area: sub-header;
+}
+
+.section {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+
+    justify-content: space-between;
+}
+
+#members {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+#foundation {
+    opacity: 0.7;
+    display: flex;
+    align-items: center;
+}
+
+#visibility {
+    opacity: 0.7;
+    display: flex;
+    align-items: center;
+}
+
+.action {
+    border: unset;
+    color: white;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    padding: 0rem 1.5em;
+    border-radius: 25px;
+    background-color: var(--primary-brand-color);
 }
 
 #auth-modal {
@@ -429,32 +379,6 @@ async function getSnapshot() {
         border-radius: 20px;
         max-width: 25rem !important;
         box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
-    }
-}
-
-@media (max-width: 1040px) {
-    #group-detail {
-        display: flex;
-        align-items: center;
-        flex-direction: column;
-        justify-content: unset;
-
-        #right {
-            margin-left: unset;
-            margin-bottom: 10rem;
-        }
-    }
-}
-
-@media (max-width: 500px) {
-    #group-detail {
-        #left {
-            max-width: calc(100vw - 1rem);
-        }
-
-        #right {
-            max-width: calc(100vw - 1rem);
-        }
     }
 }
 </style>

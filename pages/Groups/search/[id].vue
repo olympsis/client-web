@@ -1,27 +1,11 @@
 <template>
     <NavigationBar/>
     <main id="group-detail">
+        <GroupLogoAndBanner :logo-u-r-l="groupLogoURL" :banner-u-r-l="groupBannerURL" :sports="club?.sports" class="header"/>
         <div id="left">
-            <!-- Header -->
-            <div id="header">
-                <button class="button" :style="{ marginRight: '1rem' }" @click="handleBackNavigation">
-                    <picture class="centered">
-                        <source srcset="@/assets/icons/chevron/chevron.left.white.svg" media="(prefers-color-scheme: dark)">
-                        <img src="@/assets/icons/chevron/chevron.left.svg"/>
-                    </picture>
-                </button>
-
-                <button class="button" @click="handleGroupSharing">
-                    <picture class="centered">
-                        <source srcset="@/assets/icons/share/share.white.svg" media="(prefers-color-scheme: dark)">
-                        <img src="@/assets/icons/share/share.svg"/>
-                    </picture>
-                </button>
-            </div>
-
             <div id="images">
                 <h1>{{ groupName }}</h1>
-                <GroupLogoAndBanner :logo-u-r-l="groupLogoURL" :banner-u-r-l="groupBannerURL" />
+                
             </div>
 
             <div id="info">
@@ -319,16 +303,15 @@ async function getSnapshot() {
 
 <style scoped>
 #group-detail {
-    width: 100% !important;
     display: flex;
     margin: 0 auto;
     width: fit-content;
     flex-direction: row;
+    width: 100% !important;
     justify-content: center;
 
     #left {
         width: 100%;
-        max-width: 30rem;
 
         #header {
             margin: 1rem 0rem;
@@ -428,6 +411,12 @@ async function getSnapshot() {
             }
         }
     }
+}
+
+.header {
+    margin-top: 1rem;
+    max-width: 58rem;
+    padding: 0rem 1rem;
 }
 
 #auth-modal {

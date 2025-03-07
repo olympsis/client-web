@@ -16,7 +16,7 @@
         </div>
 
         <div id="body">
-            <Tabs value="0">
+            <Tabs value="0" scrollable>
                 <TabList
                 :pt="{ 
                     activeBar: { 
@@ -292,12 +292,17 @@ onMounted(() => {
     margin-top: 1rem;
     margin-left: 1rem;
     align-items: start;
+    flex-direction: column;
 
     #name {
         display: flex;
         margin-left: 1rem;
         flex-direction: column;
         justify-content: start;
+    }
+
+    #body {
+        margin: 1rem;
     }
 
     h2 {

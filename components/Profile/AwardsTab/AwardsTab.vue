@@ -3,7 +3,7 @@
         <div id="badges-section" class="section">
             <h2>Badges</h2>
             <div class="list">
-                No Recorded Trophies
+                No Recorded Badges
             </div>
         </div>
         <div id="trophies-section" class="section">
@@ -28,6 +28,7 @@
     .section {
         width: 100%;
         display: flex;
+        margin: 1rem 0rem;
         flex-direction: column;
     }
 

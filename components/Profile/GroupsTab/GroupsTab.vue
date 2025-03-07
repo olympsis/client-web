@@ -7,12 +7,13 @@
             </ul>
         </div>
 
-        <div v-if="organizations.length > 0" id="orgs" class="section">
+        <!-- We don't support organizations on the web app yet -->
+        <!-- <div v-if="organizations.length > 0" id="orgs" class="section">
             <h2>Organizations</h2>
             <ul class="list">
 
             </ul>
-        </div>
+        </div> -->
     </div>
 </template>
 

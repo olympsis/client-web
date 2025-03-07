@@ -34,13 +34,10 @@
                     <AwardsTab />
                 </TabPanel>
                 <TabPanel value="1">
-                    <GroupsTab :clubs="sessionStore.clubs" :organizations="sessionStore.organizations"/>
+                    <GroupsTab :clubs="userClubs" :organizations="[]"/>
                 </TabPanel>
                 <TabPanel value="2">
-                    <p class="m-0">
-                        At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa
-                        qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus.
-                    </p>
+                    <EventsTab :events="session.pastEvents"/>
                 </TabPanel>
             </TabPanels>
             </Tabs>
@@ -65,6 +62,7 @@
 
 import { computed } from 'vue';
 import { VIEW_STATE } from '@/data/Enums';
+import { Club } from '~/data/models/ClubModels';
 import { useSessionStore } from '@/stores/session-store';
 
 import Tab from 'primevue/tab';
@@ -75,29 +73,44 @@ import TabPanels from 'primevue/tabpanels';
 import UserIcon from '@/components/UserIcon/UserIcon.vue';
 import AwardsTab from '~/components/Profile/AwardsTab/AwardsTab.vue';
 import GroupsTab from '~/components/Profile/GroupsTab/GroupsTab.vue';
+import EventsTab from '~/components/Profile/EventsTab/EventsTab.vue';
 import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
 import EditProfileView from '~/components/Modals/Profile/EditProfile/EditProfileView.vue';
+import { EventService } from '~/data/services/EventService';
+import type { Event } from '~/data/models/EventModels';
 
-const sessionStore = useSessionStore();
+
+const session = useSessionStore();
+const eventService = new EventService();
 const editProfileModal = useTemplateRef<HTMLDialogElement>('edit-profile-modal');
 
 const user = computed(() => {
-    return sessionStore.user;
+    return session.user;
 })
 
 const state = computed<VIEW_STATE>(() => {
     return VIEW_STATE.SUCCESS;
 });
 
+const userClubs = computed<Array<Club>>(() => {
+    let _clubs: Array<Club> = [];
+    user.value?.clubs?.forEach((id) => {
+        const club = session.clubs.find((c) => c.id == id);
+        if (club) { _clubs.push(club); }
+    })
+
+    return _clubs;
+});
+
 function handleLogout() {
-    sessionStore.logout()
+    session.logout()
         .then (() => {
             console.log('Logged Out User');
         });
 }
 
 function handleDelete() {
-    sessionStore.deleteAccount();
+    session.deleteAccount();
 }
 
 function showEditModal() {
@@ -108,11 +121,36 @@ function hideEditModal() {
     editProfileModal.value?.close();
 }
 
+async function fetchPastEvents() {
+    let _events: Event[];
+    const sports = session.user?.sports.join(',') ?? 'all'
+    const location = session.lastKnownLocation;
+
+    if (!location) throw('Failed to get location. IMPLEMENT BETTER FALLBACK');
+
+    _events = await eventService.getEvents(
+        location.latitude, 
+        location.longitude, 
+        64373, // Radius of lookup
+        sports, // Sports involved
+        'completed',
+        0,
+        100
+    );
+
+    session.pastEvents = _events.filter((e) => e.participants.find((u) => u.user?.uuid == user.value?.uuid));
+}
+
+
 useSeoMeta({
     title: () => 'Profile | Olympsis',
     ogTitle: () => 'Profile | Olympsis',
     description: 'Join groups around the sports you love!',
     ogDescription: 'Join groups around the sports you love'
+});
+
+onMounted(() => {
+    fetchPastEvents()
 });
 
 </script>
@@ -265,6 +303,14 @@ useSeoMeta({
     h2 {
         color: gray;
         font-style: italic;
+    }
+}
+
+@media (max-width: 970px) {
+    #profile-page {
+        padding-top: 4rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
     }
 }
 

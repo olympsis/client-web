@@ -43,6 +43,8 @@ export const useSessionStore = defineStore('session-store', () => {
     var user = ref<UserData | undefined>();
 
     var events = ref<Event[]>([]);
+    var pastEvents = ref<Event[]>([]);
+    
     var venues = ref<Venue[]>([]);
 
     var clubs = ref<Club[]>([]);
@@ -215,7 +217,10 @@ export const useSessionStore = defineStore('session-store', () => {
         hasLoaded,
         hasLocation,
         user,
+        
         events,
+        pastEvents,
+
         venues,
         clubs,
         organizations,

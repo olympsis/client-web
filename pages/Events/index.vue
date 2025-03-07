@@ -21,10 +21,10 @@
             <SearchBar v-model:value="searchText"/>
 
             <div id="actions">
-                <button id="past-events-button" @click="fetchCompletedEvents">
+                <!-- <button id="past-events-button" @click="fetchCompletedEvents">
                     <img src="@/assets/icons/history/history.white.svg">
                     Past Events
-                </button>
+                </button> -->
                 <EventDateButton v-model="selectedDate"/>
             </div>
         </div>

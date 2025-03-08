@@ -23,7 +23,7 @@
                     <GroupMembersPeek :members="groupMembers"/>
                     <div :style="{ width: '100%', fontWeight: 'bold', marginLeft: '1rem' }">{{ groupMembersString }}</div>
                 </div>
-                <TextButton text="Request to Join" success-text="Requested" failure-text="Failed" v-model="buttonState" @click="apply" class="action"/>
+                <TextButton v-if="!isMember" text="Request to Join" success-text="Requested" failure-text="Failed" v-model="buttonState" @click="apply" class="action"/>
              </div>
              <div class="section">
                 <div id="info" :style="{ display: 'flex', gap: '1rem', margin: '1rem 0rem' }">
@@ -160,6 +160,13 @@ const groupMembersString = computed<string>(() => {
     if (!club.value?.members) return 'Unknown';
     return club.value.members.length > 1 ? `${club.value.members.length} members` : `${club.value.members.length} member`;
 });
+
+const isMember = computed<Boolean>(() => {
+    const uuid = session.user?.uuid;
+    if (!uuid) return false;
+
+    return groupMembers.value.find((m) => m.user?.uuid === uuid) !== undefined;
+})
 
 /**
  * FUNCTIONS

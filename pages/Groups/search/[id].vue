@@ -9,7 +9,8 @@
                 </picture>
             </button>
         </div>
-        <GroupLogoAndBanner :logo-u-r-l="groupLogoURL" :banner-u-r-l="groupBannerURL" :sports="club?.sports" class="media"/>
+
+        <GroupLogoAndBanner :logo-u-r-l="groupLogoURL" :banner-u-r-l="groupBannerURL" :sports="club?.sports" class="media" @clicked-share="handleGroupSharing"/>
 
         <div id="header">
             <h1>{{ club?.name }}</h1>
@@ -22,8 +23,7 @@
                     <GroupMembersPeek :members="groupMembers"/>
                     <div :style="{ width: '100%', fontWeight: 'bold', marginLeft: '1rem' }">{{ groupMembersString }}</div>
                 </div>
-
-                <button @click="" class="action">Request to Join</button>
+                <TextButton text="Request to Join" success-text="Requested" failure-text="Failed" v-model="buttonState" @click="apply" class="action"/>
              </div>
              <div class="section">
                 <div id="info" :style="{ display: 'flex', gap: '1rem', margin: '1rem 0rem' }">
@@ -48,7 +48,8 @@
         </div>
 
         <GroupFeed v-if="club" :club="club"/>
-        <GroupSmallSection v-if="club" :group="club"/>
+
+        <GroupSmallSection v-if="club" :group="club" class="small-section"/>
 
         <!-- Auth Modal -->
         <dialog id="auth-modal" ref="auth-modal" class="dialog">
@@ -74,6 +75,7 @@ import { formatRelativeTime, getMonthAndYear } from '~/utils/time-helpers';
 import AuthModal from '~/components/Auth/AuthModal/AuthModal.vue';
 import GroupFeed from '~/components/Groups/GroupFeed/GroupFeed.vue';
 import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
+import TextButton from '~/components/Buttons/LoadingButtons/TextButton/TextButton.vue';
 import GroupMembersPeek from '@/components/Groups/GroupMembersPeek/GroupMembersPeek.vue';
 import GroupSmallSection from '~/components/Groups/GroupSmallSection/GroupSmallSection.vue';
 import GroupLogoAndBanner from '@/components/Groups/GroupLogoAndBanner/GroupLogoAndBanner.vue';
@@ -84,6 +86,7 @@ const router = useRouter();
 const session = useSessionStore();
 const service = new ClubService();
 const modelStore = useModelStore();
+const buttonState = ref(VIEW_STATE.PENDING);
 
 const club = ref<Club | undefined>(undefined);
 const mapURL = ref<string | undefined> (undefined);
@@ -287,13 +290,6 @@ onMounted(() => {
         });
 });
 
-async function getSnapshot() {
-    const token = await getAuth().currentUser?.getIdToken()
-    if (token === undefined) {
-        
-    }
-}
-
 </script>
 
 <style scoped>
@@ -349,6 +345,7 @@ async function getSnapshot() {
 .section {
     width: 100%;
     display: flex;
+    align-items: center;
     flex-direction: row;
 
     justify-content: space-between;
@@ -373,20 +370,34 @@ async function getSnapshot() {
 }
 
 .action {
-    border: unset;
-    color: white;
     cursor: pointer;
-    font-size: 1rem;
-    font-weight: bold;
-    padding: 0rem 1.5em;
-    border-radius: 25px;
-    background-color: var(--primary-brand-color);
+     max-width: 10rem;
 }
 
 .centered {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+@media(max-width: 940px) {
+    #group-detail {
+        grid-template-areas:
+        'nav nav'
+        'media media'
+        'header header'
+        'sub-header sub-header'
+        'feed feed'
+        'feed feed'
+        ;
+    }
+    .small-section {
+        display: none;
+    }
+
+    .p-tabpanels {
+        padding: unset;
+    }
 }
 
 #auth-modal {

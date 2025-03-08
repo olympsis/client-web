@@ -1,7 +1,7 @@
 <template>
     <div id="group-members-peek">
         <UserIcon 
-            v-for="member in members" 
+            v-for="member in members.slice(0, 5)" 
             :user="member.user" 
             :size="2.5" 
             class="user"
@@ -46,7 +46,7 @@ const members: ComputedRef<Member[]> = computed(() => {
     margin-right: 1rem;
 
     * {
-        margin-right: -1.25rem;
+        margin-right: -1.5rem;
     }
 
     .user {

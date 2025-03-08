@@ -2,7 +2,7 @@
     <NavigationBar/>
     <main id="groups-container">
         <div id="header">
-            <h1>Groups</h1>
+            <h1>Explore Groups</h1>
 
             <div id="body">
                 <SearchBar v-model:value="searchText" />
@@ -39,26 +39,12 @@
             </div>
         </div>
 
-        <div id="tags">
-            <TagsListCard @selected-changed="handleSelectedTagsUpdate"/>
-        </div>
-
-        <div id="sports">
-            <SportsListCard @selected-changed="handleSelectedSportsUpdate"/>
-        </div>
-
-        <div id="nav">
-            <NavigationCard :state="state"/>
-        </div>
-
         <div id="list-wrapper">
             <SearchBar v-model:value="searchText"/>
-            <div id="list">
-                <ul id="list-container">
-                    <ClubListCardTemplate v-if="state === VIEW_STATE.LOADING" v-for="_ in 10"/>
-                    <ClubListCard v-else v-for="club in filteredClubs" :club="club" />
-                </ul>
-            </div>
+            <ul id="list-container">
+                <ClubListCardTemplate v-if="state === VIEW_STATE.LOADING" v-for="_ in 10"/>
+                <ClubListCard v-else v-for="club in filteredClubs" :club="club" />
+            </ul>
         </div>
     </main>
 </template>
@@ -173,19 +159,18 @@ useSeoMeta({
 #groups-container {
     gap: 1rem;
     display: grid;
+    height: 100dvh;
     margin: 0 auto;
     overflow: hidden;
     padding: 0rem 2rem;
     grid-template-areas: 
-    "header header header"
-    "sports list list"
-    "tags list list"
-    "nav list list";
-    grid-template-columns: 25rem auto auto;
-    grid-template-rows: 5rem 18rem 18rem auto;
+    "header header"
+    "list list"
+    "list list"
+    "list list";
 
     h1 {
-        font-weight: 900;
+        width: 100%;
         color: var(--primary-label-color);
     }
 
@@ -271,122 +256,27 @@ useSeoMeta({
             display: none;
         }
 
-        #list {
+        #list-container {
+            display: grid;
             grid-area: list;
-            margin: 0rem auto;
+            row-gap: 0.5rem;
             list-style: none;
+            margin: 0rem auto;
+            column-gap: 0.5rem;
             overflow-y: scroll;
             border-radius: 10px;
-            height: calc(100dvh - calc(60px + calc(50px + 2rem)));
+            grid-template-rows: 25rem;
+            padding-inline-start: unset;
+            grid-template-columns: 25rem 25rem;
+            height: calc(100dvh - 110px - 2rem);
 
-            #list-container {
-                display: grid;
-                row-gap: 0.5rem;
-                column-gap: 0.5rem;
-                padding-inline-start: unset;
-                grid-template-columns: 25rem 25rem;
-
-                #search-bar {
-                    display: none;
-                }
-            }
-        }
-    }
-}
-
-@media (max-width: 1280px) {
-    #groups-container {
-        grid-template-areas: 
-            "header list"
-            "sports list"
-            "tags list"
-            "nav list";
-        width: fit-content;
-        margin-top: 1rem;
-        grid-template-columns: 22rem 26rem;
-
-        #header {
-            display: none;
-        }
-
-        #header-mobile {
-            width: 100%;
-            display: flex;
-            grid-area: header;
-
-            #leading {
-                width: 100%;
-                height: 40px;
-                display: flex;
-                max-width: 42rem;
-                justify-content: space-between;
-            }
-
-            #trailing {
-                display: flex;
-                width: 7rem;
-                border-radius: 10px;
-                padding: 0.25rem 1rem;
-                justify-content: space-between;
-                background-color: var(--secondary-background-color);
-                
-                #plus {
-                    width: 2rem;
-                    height: 2rem;
-                    cursor: pointer;
-
-                    img {
-                        width: 2rem;
-                        height: 2rem;
-                    }
-                }
-
-                #chats {
-                    width: 2rem;
-                    height: 2rem;
-                    cursor: pointer;
-                    margin: 0rem 0.5rem;
-                    margin-right: 0.5rem;
-
-                    img {
-                        width: 2.2rem;
-                        height: 2.2rem;
-                        margin-top: 0.1rem;
-                    }
-                }
-
-                #settings {
-                    width: 2rem;
-                    height: 2rem;
-                    cursor: pointer;
-
-                    img {
-                        width: 2rem;
-                        height: 2rem;
-                    }
-                }
-            }
-        }
-
-        #list-wrapper {
-            grid-area: list;
             #search-bar {
-                width: 100%;
-                display: flex;
-                max-width: 42rem;
-                margin-right: 1rem;
-                margin-bottom: 1rem;
-            }
-
-            #list {
-                max-width: 31rem;
-                #list-container {
-                    grid-template-columns: 25rem;
-                }
+                display: none;
             }
         }
     }
 }
+
 
 @media (max-width: 940px) {
     #groups-container {
@@ -407,11 +297,9 @@ useSeoMeta({
                 margin-right: unset;
             }
 
-            #list {
-                height: calc(100vh - calc(60px + calc(40px + 5.5rem)));
-                #list-container {
-                    grid-template-columns: auto;
-                }
+            #list-container {
+                grid-template-columns: auto;
+                height: calc(100dvh - 110px - 2rem);
             }
         }
 

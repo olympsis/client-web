@@ -53,11 +53,15 @@ onMounted(() => {
 <style scoped>
 #feed {
     width: 100vw;
-    height: 90dvh;
     grid-area: feed;
     max-width: 35rem;
     padding: 0rem 1rem;
     overflow-x: scroll;
+}
+@media(max-width: 940px) {
+    #feed {
+        max-width: unset;
+    }
 }
 .font {
     font-size: 0.9rem;

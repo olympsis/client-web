@@ -175,7 +175,7 @@ onMounted(() => {
     height: auto;
     margin: 0 auto;
     max-width: 42rem;
-    border-radius: 10px;
+    border-radius: 16px;
     background-color: var(--secondary-background-color);
 
     .header {
@@ -252,10 +252,6 @@ onMounted(() => {
     .button-image {
         width: 1.5rem;
         height: 1.5rem;
-    }
-    
-    @media (max-width: 675px) {
-        border-radius: unset;
     }
 }
 

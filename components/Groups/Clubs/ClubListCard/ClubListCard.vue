@@ -143,6 +143,11 @@ function apply() {
     border-radius: var(--card-border-radius);
     background-color: var(--secondary-background-color);
 
+    #body {
+        height: 5rem;
+        overflow-y: scroll;
+    }
+
     #club-header {
         display: flex;
         position: relative;

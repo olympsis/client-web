@@ -60,9 +60,12 @@ import Dialog from 'primevue/dialog';
 import PostCommentsPopup from '../PostCommentsPopup/PostCommentsPopup.vue';
 import PostListItem from '@/components/Posts/PostListItem/PostListItem.vue';
 import PostListItemSkeleton from '../PostListItem/PostListItemSkeleton.vue';
+import type { Club } from '~/data/models/ClubModels';
 
 const session = useSessionStore();
 const viewModel = useGroupsViewModel();
+const showCommentsDialog = ref(false);
+const selectedPost = ref<Post | undefined>(undefined);
 
 const state = computed<VIEW_STATE>(() => {
     return viewModel.state;
@@ -79,9 +82,6 @@ function handleDeletedPost(id: string) {
     viewModel.posts = viewModel.posts;
 }
 
-const showCommentsDialog = ref(false);
-const selectedPost = ref<Post | undefined>(undefined);
-
 function handleNewPost(post: Post) {
     viewModel.posts.push(post);
 }
@@ -93,8 +93,13 @@ function handleShowComments(event: { id: string }) {
     showCommentsDialog.value = true;
 }
 
+function loadPostsForClub(club: Club) {
+    viewModel?.loadPostsForClub(club);
+}
+
 defineExpose({
-    handleNewPost
+    handleNewPost,
+    loadPostsForClub
 });
 
 </script>

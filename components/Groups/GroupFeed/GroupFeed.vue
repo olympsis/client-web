@@ -15,13 +15,13 @@
             </TabList>
             <TabPanels>
                 <TabPanel value="0">
-                    <PostFeed />
+                    <PostFeed ref="feed"/>
                 </TabPanel>
                 <TabPanel value="1">
                     <ClubMembers :club="club"/>
                 </TabPanel>
                 <TabPanel value="2">
-                    
+                    <ClubEvents :club="club"/>
                 </TabPanel>
             </TabPanels>
         </Tabs>
@@ -29,17 +29,24 @@
 </template>
 
 <script setup lang="ts">
+import { Club } from '~/data/models/ClubModels';
+
 import Tab from 'primevue/tab';
 import Tabs from 'primevue/tabs';
 import TabList from 'primevue/tablist';
 import TabPanel from 'primevue/tabpanel';
 import TabPanels from 'primevue/tabpanels';
-import ClubMembers from '../ClubMembers/ClubMembers.vue';
+import ClubEvents from '../Clubs/ClubEvents/ClubEvents.vue';
+import ClubMembers from '../Clubs/ClubMembers/ClubMembers.vue';
 import PostFeed from '~/components/Posts/PostFeed/PostFeed.vue';
-import { Club } from '~/data/models/ClubModels';
 
-defineProps({
+const props = defineProps({
    club: { type: Club, required: true } 
+});
+
+const feed = useTemplateRef<typeof PostFeed>('feed');
+onMounted(() => {
+    feed.value?.loadPostsForClub(props.club);
 });
 </script>
 

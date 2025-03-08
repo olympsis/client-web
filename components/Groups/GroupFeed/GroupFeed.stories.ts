@@ -1,3 +1,4 @@
+import { sampleClubs } from "~/data/dev-data/sample-clubs";
 import GroupFeed from "./GroupFeed.vue";
 import type { Meta, StoryObj } from "@storybook/vue3";
 
@@ -10,7 +11,9 @@ type Story = StoryObj<typeof GroupFeed>;
 
 export const Basic: Story = {
 name: "Group Feed",
-args: {},
+args: {
+    club: sampleClubs[0]
+},
 render: (args) => ({
     setup() {
         return {
@@ -18,7 +21,7 @@ render: (args) => ({
         };
     },
     components: { GroupFeed },
-    template: '<GroupFeed />',
+    template: '<GroupFeed :club="club"/>',
 }),
 tags: ["autodocs"],
 decorators: [],

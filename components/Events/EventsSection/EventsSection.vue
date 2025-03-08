@@ -14,7 +14,7 @@ import { Event } from '~/data/models/EventModels';
 import EventListItem2 from '../EventListItem-v2/EventListItem2.vue';
 
 defineProps({
-    title: { type: String, default: "Next Events" },
+    title: { type: String, default: "Your Next Events" },
     events: { type: Array<Event>, required: true }
 });
 
@@ -24,6 +24,7 @@ const router = useRouter();
 <style scoped>
 #events-section {
     width: 100%;
+    grid-area: next;
     margin: 1rem 0rem;
 
     #header {

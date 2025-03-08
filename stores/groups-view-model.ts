@@ -5,6 +5,7 @@ import { Post } from "../data/models/PostModels";
 import { useSessionStore } from "./session-store";
 import { PostService } from "../data/services/PostService";
 import { GroupSelection } from "../data/models/GenericModels";
+import type { Club } from "~/data/models/ClubModels";
 
 export const useGroupsViewModel = defineStore('groups-view-model', () => {
     var state = ref(VIEW_STATE.LOADING);
@@ -21,7 +22,12 @@ export const useGroupsViewModel = defineStore('groups-view-model', () => {
     function load() {
         state.value = VIEW_STATE.LOADING;
         if (sessionStore.selectedGroup) {
-            loadNextPosts()
+            const id = sessionStore.selectedGroup.club?.id ?? sessionStore.selectedGroup.organization?.id
+            if (!id) {
+                state.value = VIEW_STATE.FAILURE;
+                return;
+            }
+            loadNextPosts(id)
                 .then((_posts) => {
                     posts.value = _posts;
                     state.value = VIEW_STATE.SUCCESS;
@@ -40,17 +46,27 @@ export const useGroupsViewModel = defineStore('groups-view-model', () => {
         }
     }
 
-    async function loadNextPosts() : Promise<Post[]> {
-        if (sessionStore.selectedGroup) {
-            const id = sessionStore.selectedGroup?.club?.id ?? sessionStore.selectedGroup?.organization?.id
-            const response = await postService.getPosts(id ?? '')
-            if (response && response.posts) {
+    function loadPostsForClub(club: Club) {
+        state.value = VIEW_STATE.LOADING;
+        const id = club.id ?? '';
+        loadNextPosts(id)
+            .then((_posts) => {
+                posts.value = _posts;
                 state.value = VIEW_STATE.SUCCESS;
-                return response.posts
-            } else {
-                state.value = VIEW_STATE.SUCCESS;
-                return [];
-            }
+                return;
+            })
+            .catch((error) => {
+                console.error('Failed to load groups view model: ' + error);
+                state.value = VIEW_STATE.FAILURE;
+                return;
+            });
+    }
+
+    async function loadNextPosts(id: string) : Promise<Post[]> {
+        const response = await postService.getPosts(id)
+        if (response && response.posts) {
+            state.value = VIEW_STATE.SUCCESS;
+            return response.posts
         } else {
             state.value = VIEW_STATE.SUCCESS;
             return [];
@@ -60,7 +76,13 @@ export const useGroupsViewModel = defineStore('groups-view-model', () => {
     function changeSelectedGroup(group: GroupSelection) {
         state.value = VIEW_STATE.LOADING
         sessionStore.selectedGroup = group
-        loadNextPosts()
+        const id = group.club?.id ?? group.organization?.id
+        if (!id) {
+            state.value = VIEW_STATE.FAILURE
+            return;
+        }
+
+        loadNextPosts(id)
             .then((_posts) => {
                 if (sessionStore.selectedGroup) {
                     posts.value = _posts;
@@ -88,6 +110,7 @@ export const useGroupsViewModel = defineStore('groups-view-model', () => {
 
         load,
         loadNextPosts,
+        loadPostsForClub,
         changeSelectedGroup
     }
 });

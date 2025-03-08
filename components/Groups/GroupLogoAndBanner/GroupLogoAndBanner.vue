@@ -94,6 +94,7 @@ const banner = computed<string | undefined>(() => {
         display: flex;
         width: 100%;
         height: 20rem;
+        border-radius: 16px;
         align-items: center;
         justify-content: center;
         background-color: var(--secondary-background-color);
@@ -110,6 +111,7 @@ const banner = computed<string | undefined>(() => {
         display: flex;
         margin-top: 16rem;
         margin-left: 2rem;
+        border-radius: 50%;
         position: absolute;
         align-items: center;
         justify-content: center;
@@ -124,6 +126,7 @@ const banner = computed<string | undefined>(() => {
 
     #list {
         top: 0;
+        gap: 1rem;
         padding: 0;
         margin: 1rem;
         display: flex;

@@ -49,7 +49,7 @@ import { Member } from '~/data/models/GenericModels';
 
 import Dialog from 'primevue/dialog';
 import SearchBar from '~/components/SearchBar/SearchBar.vue';
-import MemberListItem from '../MemberListItem/MemberListItem.vue';
+import MemberListItem from '../../MemberListItem/MemberListItem.vue';
 import ChangeRankModal from '~/components/Modals/Groups/ChangeRank/ChangeRankModal.vue';
 import GroupKickModal from '~/components/Modals/Groups/GroupKickModal/GroupKickModal.vue';
 

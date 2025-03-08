@@ -1,6 +1,6 @@
 import { GROUP_TYPE } from "@/data/Enums";
 import type { Meta, StoryObj } from "@storybook/vue3";
-import { clubSamples } from "@/data/dev-data/sample-clubs";
+import { sampleClubs } from "@/data/dev-data/sample-clubs";
 import { GroupSelection } from "@/data/models/GenericModels";
 
 import GroupLeaveModal from "./GroupLeaveModal.vue";
@@ -15,7 +15,7 @@ type Story = StoryObj<typeof GroupLeaveModal>;
 export const Basic: Story = {
     name: "Group Leave Dialog",
     args: {
-        group: new GroupSelection(GROUP_TYPE.CLUB, clubSamples[0], undefined)
+        group: new GroupSelection(GROUP_TYPE.CLUB, sampleClubs[0], undefined)
     },
     render: (args) => ({
         setup() {

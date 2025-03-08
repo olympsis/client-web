@@ -1,6 +1,14 @@
 <template>
     <NavigationBar/>
     <main id="group-detail">
+        <div id="sub-nav">
+            <button class="button" @click="handleBackNavigation">
+                <picture class="centered">
+                    <source srcset="@/assets/icons/chevron/chevron.left.white.svg" media="(prefers-color-scheme: dark)">
+                    <img src="@/assets/icons/chevron/chevron.left.svg"/>
+                </picture>
+            </button>
+        </div>
         <GroupLogoAndBanner :logo-u-r-l="groupLogoURL" :banner-u-r-l="groupBannerURL" :sports="club?.sports" class="media"/>
 
         <div id="header">
@@ -199,11 +207,7 @@ function apply() {
 }
 
 function handleBackNavigation(){
-    if (!isAuthenticated.value) {
-        router.push('/signin');
-    } else {
-        router.push('/groups/search');
-    }
+    router.push('/groups/search');
 }
 
 function handleNewUserAuthentication() {
@@ -297,7 +301,9 @@ async function getSnapshot() {
 #group-detail {
     width: 100%;
     display: grid;
+    margin-top: 1rem;
     grid-template-areas:
+    'nav nav'
     'media media'
     'header header'
     'sub-header sub-header'
@@ -305,6 +311,14 @@ async function getSnapshot() {
     'feed location'
     ;
     justify-content: center;
+    grid-template-rows: 44px;
+}
+
+#sub-nav {
+    width: 24px;
+    height: 24px;
+    grid-area: nav;
+    margin-left: 1rem;
 }
 
 .media {
@@ -367,6 +381,12 @@ async function getSnapshot() {
     padding: 0rem 1.5em;
     border-radius: 25px;
     background-color: var(--primary-brand-color);
+}
+
+.centered {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 #auth-modal {

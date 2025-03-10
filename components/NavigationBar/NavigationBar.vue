@@ -47,6 +47,7 @@
 <script setup lang="ts">
 
 import { ref, computed } from 'vue';
+import { useAuth } from '~/composables/useAuth';
 import { generateImageURL } from '~/utils/image-helpers';
 import { useSessionStore } from '~/stores/session-store';
 
@@ -54,6 +55,8 @@ import ProfileButton from '~/components/ProfileButton/ProfileButton.vue';
 
 const isOpen = ref(false);
 const session = useSessionStore();
+
+// const { user, isAuthenticated, logout } = useAuth()
 
 const userImageURL = computed(() => {
     return session.user?.imageURL ? generateImageURL(session.user.imageURL) : undefined;

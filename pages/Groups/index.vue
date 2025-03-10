@@ -1,6 +1,13 @@
 <template>
     <NavigationBar/>
     <main id="group-view">
+        <GroupLogoAndBanner 
+            class="media"
+            :sports="groupSports"
+            :logo-u-r-l="groupLogoURL" 
+            :banner-u-r-l="groupBannerURL" 
+            @clicked-share="handleGroupSharing"
+        />
         <!-- Selected Group Info -->
         <div v-if="selectedGroup" class="info" :style="{ 'margin-top': '1rem' }">
             <GroupIcon :type="groupType" :image="groupLogo" :size="4"/>
@@ -9,9 +16,6 @@
 
         <!-- Next Event Card -->
         <NextEventCard :event="nextEvent" class="event" @create-event="handleShowNewEventModal"/>
-
-        <!-- Navigation Card -->
-        <NavigationCard class="nav-card" :state="state"/>
 
         <!-- Feed -->
         <div id="feed-container">
@@ -67,12 +71,6 @@
                 @selectedGroupChanged="handleSelectedGroupChanged" 
             />
         </div>
-
-        <!-- Members Card -->
-        <div class="members" v-if="state !== VIEW_STATE.LOADING">
-            <h2>Members</h2>
-            <MembersListCard :members="members"/>
-        </div>
         
         <!-- New Post Modal -->
         <dialog id="new-post-modal" ref="new-post-modal" class="dialog">
@@ -95,10 +93,9 @@ import PostFeed from '@/components/Posts/PostFeed/PostFeed.vue';
 import GroupIcon from '@/components/Groups/GroupIcon/GroupIcon.vue';
 import NewPostView from '@/components/Posts/NewPostView/NewPostView.vue';
 import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
-import NavigationCard from '@/components/NavigationCard/NavigationCard.vue';
 import NextEventCard from '@/components/Events/NextEventCard/NextEventCard.vue';
 import GroupSelector from '@/components/Groups/GroupSelector/GroupSelector.vue';
-import MembersListCard from '@/components/Groups/MembersListCard/MembersListCard.vue';
+import GroupLogoAndBanner from '~/components/Groups/GroupLogoAndBanner/GroupLogoAndBanner.vue';
 
 const toast = useToast();
 const router = useRouter();
@@ -146,6 +143,18 @@ const postCardModalRef = useTemplateRef<HTMLDialogElement>('new-post-modal');
 
 const selectedGroup = computed(() => {
     return sessionStore.selectedGroup
+});
+
+const groupLogoURL = computed<string | undefined>(() => {
+    return selectedGroup.value?.club?.logo ?? selectedGroup.value?.organization?.logo;
+});
+
+const groupBannerURL = computed<string | undefined>(() => {
+    return selectedGroup.value?.club?.banner ?? selectedGroup.value?.organization?.banner;
+});
+
+const groupSports = computed<Array<string>>(() => {
+    return (selectedGroup.value?.club?.sports ?? selectedGroup.value?.organization?.sports) ?? [];
 });
 
 const state = computed<VIEW_STATE>(() => {

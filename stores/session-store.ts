@@ -10,7 +10,7 @@ import { Club } from '~/data/models/ClubModels';
 import { Event } from '~/data/models/EventModels';
 import { Venue } from '~/data/models/VenueModels';
 import { UserData } from '~/data/models/UserModels';
-import type { ChatRoom } from '~/data/models/ChatModels';
+import { ChatRoom } from '~/data/models/ChatModels';
 import { ChatService } from '~/data/services/ChatService';
 import { AuthService } from '~/data/services/AuthService';
 import { ClubService } from '~/data/services/ClubService';
@@ -21,7 +21,6 @@ import { Organization } from '../data/models/OrganizationModels';
 import { AUTH_STATUS, GROUP_TYPE, VIEW_STATE } from '~/data/Enums';
 import { LocationManager } from '../data/managers/LocationManager';
 import { GroupSelection, Location } from '../data/models/GenericModels';
-import { AuthenticationFacade } from '@/data/facades/AuthenticationFacade';
 import { OrganizationService } from '~/data/services/OrganizationService';
 
 export const useSessionStore = defineStore('session-store', () => {
@@ -31,7 +30,7 @@ export const useSessionStore = defineStore('session-store', () => {
     var hasLocation = ref(false);
     var location = new LocationManager();
 
-    var authenticator = new AuthenticationFacade();
+    const authStore = useAuthStore();
 
     var userService = new UserService();
     var clubService = new ClubService();
@@ -153,6 +152,13 @@ export const useSessionStore = defineStore('session-store', () => {
         return true;
     }
 
+    function handleNavigation() {
+        // Don't show loading screen during navigation if already loaded
+        if (hasLoaded.value) {
+            loadingState.value = VIEW_STATE.SUCCESS;
+        }
+    }
+
     async function load(): Promise<{ 
         user: UserData | undefined, 
         selections: GroupSelection[],
@@ -161,39 +167,91 @@ export const useSessionStore = defineStore('session-store', () => {
         clubs: Club[], 
         organizations: Organization[],
     }> {
-        const store = useModelStore();
-        const response = await userService.checkIn()
-
-        location.listenToLocationUpdates();
-        
-        const _clubs: Club[] = response?.clubs ?? [];
-        const _organizations: Organization[] = response?.organizations ?? [];
-        const _groups: GroupSelection[] = [];
-
-        // load in clubs
-        _clubs.forEach((c) => {
-            const group = new GroupSelection(GROUP_TYPE.CLUB, c, undefined)
-            _groups.push(group)
-        });
-        
-
-        // load in organizations
-        _organizations.forEach((o) => {
-            const group = new GroupSelection(GROUP_TYPE.ORGANIZATION, undefined, o)
-            _groups.push(group)
-        });
-
-        store.setClubs(_clubs);
-        store.setOrganizations(_organizations);
-
-        return {
-            user: response?.user,
-            selections: _groups,
-            selectedGroup: _groups[0],
-            hasLoaded: true,
-            clubs: _clubs,
-            organizations: _organizations,
+        try {
+            // Set loading state
+            loadingState.value = VIEW_STATE.LOADING;
             
+            const authStore = useAuthStore();
+            const store = useModelStore();
+            
+            // Initialize auth if needed
+            if (!authStore.isAuthInitialized) {
+                await authStore.initAuth();
+            }
+            
+            let userData: UserData | undefined;
+            let _clubs: Club[] = [];
+            let _organizations: Organization[] = [];
+            let _groups: GroupSelection[] = [];
+            
+            // First fetch user data if authenticated
+            if (authStore.isAuthenticated) {
+                try {
+                    const response = await userService.checkIn();
+                    userData = response?.user;
+                    _clubs = response?.clubs ?? [];
+                    _organizations = response?.organizations ?? [];
+                    
+                    // Process clubs and organizations
+                    _clubs.forEach((c) => {
+                        _groups.push(new GroupSelection(GROUP_TYPE.CLUB, c, undefined));
+                    });
+                    
+                    _organizations.forEach((o) => {
+                        _groups.push(new GroupSelection(GROUP_TYPE.ORGANIZATION, undefined, o));
+                    });
+                    
+                    // Update user and groups in session store
+                    user.value = userData;
+                    clubs.value = _clubs;
+                    organizations.value = _organizations;
+                    groups.value = _groups;
+                    selectedGroup.value = _groups.length > 0 ? _groups[0] : undefined;
+                    
+                    // Update model store
+                    store.setClubs(_clubs);
+                    store.setOrganizations(_organizations);
+                    
+                    // IMPORTANT: Set hasLoaded to true now that user data is available
+                    hasLoaded.value = true;
+                    
+                    // THEN initiate location services after user data is loaded
+                    await location.listenToLocationUpdates();
+                } catch (error) {
+                    console.error("Error loading user data:", error);
+                    hasLoaded.value = true;
+                    await location.listenToLocationUpdates();
+                }
+            } else {
+                // Not authenticated case
+                hasLoaded.value = true;
+                await location.listenToLocationUpdates();
+            }
+            
+            // Success state regardless of authentication
+            loadingState.value = VIEW_STATE.SUCCESS;
+            
+            return {
+                user: userData,
+                selections: _groups,
+                selectedGroup: _groups.length > 0 ? _groups[0] : undefined,
+                hasLoaded: true,
+                clubs: _clubs,
+                organizations: _organizations,
+            };
+        } catch (error) {
+            console.error("Fatal error in load function:", error);
+            hasLoaded.value = true;
+            loadingState.value = VIEW_STATE.FAILURE;
+            
+            return {
+                user: undefined,
+                selections: [],
+                selectedGroup: undefined,
+                hasLoaded: true,
+                clubs: [],
+                organizations: [],
+            };
         }
     }
 
@@ -201,7 +259,7 @@ export const useSessionStore = defineStore('session-store', () => {
      * Logs the user out and sends the browser back to signin
      */
     async function logout() {
-        await authenticator.signOut();
+        await authStore.signOut();
         await navigateTo('/signin');
     }
 
@@ -209,8 +267,8 @@ export const useSessionStore = defineStore('session-store', () => {
      * Deletes the user's account and sends the browser back to signin
      */
     async function deleteAccount() {
-        await authenticator.deleteAccount();
-        await navigateTo('signin');
+        await authStore.deleteAccount();
+        await navigateTo('/signin');
     }
 
     return {
@@ -248,6 +306,8 @@ export const useSessionStore = defineStore('session-store', () => {
 
         addGroup,
         removeGroup,
+
+        handleNavigation,
 
         load,
         logout,

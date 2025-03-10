@@ -95,5 +95,7 @@ export default defineNuxtConfig({
 					preset: Aura
 			}
 		}
-	}
+	},
+
+	spaLoadingTemplate: 'loading.html'
 });

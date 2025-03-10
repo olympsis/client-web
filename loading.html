@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html {{ HTML_ATTRS }}>
+    <head {{ HEAD_ATTRS }}>
+        {{ HEAD }}
+        <style>
+            #nuxt-loading {
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                display: flex;
+                z-index: 9999;
+                position: fixed;
+                align-items: center;
+                flex-direction: column;
+                justify-content: center;
+                transition: opacity 0.5s;
+                background-color: #262E57; /* Hardcoded primary brand color */
+            }
+            #nuxt-loading img {
+                width: 5rem;
+                height: 4rem;
+                margin: 1rem 0;
+            }
+            #nuxt-loading h1 {
+                margin: 0;
+                color: white;
+                font-weight: 900;
+                font-family: 'Archivo', sans-serif;
+            }
+            .fade-out {
+                opacity: 0;
+            }
+        </style>
+    </head>
+    <body {{ BODY_ATTRS }}>
+    <!-- Initial loading screen that shows immediately -->
+        <div id="nuxt-loading">
+            <img src="/images/logo.white.png" alt="Olympsis logo" onerror="this.style.display='none'">
+            <h1>OLYMPSIS</h1>
+        </div>
+        {{ APP }}
+
+        <!-- Script to handle loading screen -->
+        <script>
+            window.addEventListener('DOMContentLoaded', () => {
+                // Mark that the loading screen has been shown
+                window.__NUXT_LOADING_SHOWN__ = true;
+                console.log('DOMContentLoaded - loading screen should be visible');
+            });
+
+            // Debug: Check if loading is visible
+            window.addEventListener('load', () => {
+                console.log('Window loaded - checking if loading screen exists:', !!document.getElementById('nuxt-loading'));
+            });
+
+            // Function that can be called from Vue to hide the loader
+            window.hideNuxtLoading = function() {
+                const loader = document.getElementById('nuxt-loading');
+                if (loader) {
+                loader.classList.add('fade-out');
+                setTimeout(() => {
+                    if (loader.parentNode) {
+                    loader.parentNode.removeChild(loader);
+                    }
+                }, 500);
+                }
+            };
+        </script>
+    </body>
+</html>

@@ -160,6 +160,15 @@ const banner = computed<string | undefined>(() => {
         width: unset;
         margin-left: 1rem;
         margin-right: 1rem;
+        margin-bottom: 4rem;
+
+        #logo {
+            margin-top: 13rem;
+        }
+
+        #banner {
+            height: 17rem;
+        }
     }
 }
 </style>

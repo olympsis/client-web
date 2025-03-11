@@ -3,7 +3,7 @@
     <main id="profile-page">
         <div class="header">
             <div id="image">
-                <UserIcon :user="user" :size="10" class="icon"/>
+                <UserIcon :user="user" :size="8" class="icon"/>
                 <button class="action" @click="showEditModal">Edit Profile</button>
             </div>
             <div id="info">

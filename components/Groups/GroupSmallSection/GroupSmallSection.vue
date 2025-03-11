@@ -16,39 +16,70 @@
             </div>
         </div>
 
-        <div id="tags" v-if="group.tags?.length > 0">
+        <div id="tags" v-if="groupTags.length > 0">
             <h2>Group Tags</h2>
             <ul class="list">
-                <li v-for="tag in group.tags" class="tag">{{ tag }}</li>
+                <li v-for="tag in groupTags" class="tag">{{ tag }}</li>
             </ul>
         </div>
 
-        <div id="rules" v-if="group.rules?.length > 0">
+        <div id="rules" v-if="groupRules.length > 0">
             <h2>Group Rules</h2>
             <ul class="numbered-list">
-                <li v-for="tag in group.rules" class="rule">{{ tag }}</li>
+                <li v-for="tag in groupRules" class="rule">{{ tag }}</li>
             </ul>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { VIEW_STATE } from '~/data/Enums';
+import { GROUP_TYPE, VIEW_STATE } from '~/data/Enums';
+import type { Club } from '~/data/models/ClubModels';
 import { SnapshotService } from '~/data/services/SnapshotService';
+import { type Group, getGroupType } from '~/types/group';
 
-const props = defineProps({
-   group: { type: Object, required: true }
-});
+const model = defineModel<Group>('group', {required: true });
 
 const mapURL = ref<string | undefined> (undefined);
 const mapState = ref<VIEW_STATE>(VIEW_STATE.PENDING);
 
+const groupType = computed<GROUP_TYPE>(() => {
+    return getGroupType(model.value);
+});
+
+const groupTags = computed<Array<string>>(() => {
+    switch (groupType.value) {
+        case GROUP_TYPE.CLUB:
+            const _group = model.value as Club;
+            return _group.tags ?? [];
+        default:
+            return [];
+    }
+});
+
+const groupRules = computed<Array<string>>(() => {
+    switch (groupType.value) {
+        case GROUP_TYPE.CLUB:
+            const _group = model.value as Club;
+            return _group.rules ?? [];
+        default:
+            return [];
+    }
+});
+
+watch(model, () => {
+    fetchMapImage();
+});
+
 onMounted(() => {
     if (mapURL.value) return;
+    fetchMapImage();
+});
 
-    const city = props.group?.city ?? '';
-    const state = props.group?.state ?? '';
-    const country = props.group?.country ?? '';
+function fetchMapImage() {
+    const city = model.value.city ?? '';
+    const state = model.value.state ?? '';
+    const country = model.value?.country ?? '';
 
     mapState.value = VIEW_STATE.LOADING;
     
@@ -62,7 +93,7 @@ onMounted(() => {
             console.error(`Failed to load snapshot. Error: ${error}`);
             mapState.value = VIEW_STATE.FAILURE;
         });
-});
+}
 </script>
 
 <style scoped>

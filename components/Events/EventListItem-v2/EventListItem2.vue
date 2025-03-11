@@ -137,11 +137,12 @@ loadLocationData()
 
 <style scoped>
 #event-list-item {
+    cursor: pointer;
     min-width: 20rem;
     max-width: 23rem;
     position: relative;
-    list-style-type: none;
     border-radius: 10px;
+    list-style-type: none;
     box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
     background-color: var(--secondary-background-color);
 

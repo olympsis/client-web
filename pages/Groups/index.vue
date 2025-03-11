@@ -8,69 +8,20 @@
             @clicked-share="handleGroupSharing"
         />
 
-        <GroupInfo 
-            v-if="selectedGroup?.club || selectedGroup?.organization" 
-            :group="selectedGroup.club! ?? selectedGroup.organization!"
-        />
+        <!-- Group Info -->
+        <GroupInfo v-if="group" :group="group"/>
 
-        <GroupFeed v-if="selectedGroup" :group="selectedGroup.club! ?? selectedGroup.organization!"/>
-        <!-- Selected Group Info -->
-        <!-- <div v-if="selectedGroup" class="info" :style="{ 'margin-top': '1rem' }">
-            <GroupIcon :type="groupType" :image="groupLogo" :size="4"/>
-            <a class="name">{{ selectedGroup.club?.name ?? selectedGroup.organization?.name }}</a>
-        </div> -->
-
-        <!-- Next Event Card -->
-        <!-- <NextEventCard :event="nextEvent" class="event" @create-event="handleShowNewEventModal"/> -->
-
-        <!-- Feed -->
-        <!-- <div id="feed-container">
-            <div id="mobile-header" v-if="selectedGroup">
-                <h1 class="name">
-                    {{ selectedGroup.club?.name ?? selectedGroup.organization?.name }}
-                </h1>
-
-                <div id="mobile-actions">
-                    <button @click="menu?.toggle">
-                        <img class="action-button" src="@/assets/icons/plus/plus.white.svg">
-                    </button>
-                    <Menu ref="menu" id="overlay_menu" :model="items" :popup="true"></Menu>
-
-                    <button @click="handleGroupSharing">
-                        <img class="action-button" src="@/assets/icons/share/share.white.svg">
-                    </button>
-
-                    <button @click="router.push('/groups/settings')">
-                        <img src="@/assets/icons/gear/gear.white.svg">
-                    </button>
-                </div>
-            </div>
-
-            <NextEventCard :event="nextEvent" @create-event="handleShowNewEventModal"/>
-            <PostFeed ref="feed"/>
-        </div> -->
-
-        <!-- Group Actions -->
-        <!-- <div class="actions">
-            <img class="action-button" src="@/assets/icons/plus/plus.white.svg" @click="menu?.toggle">
-            <Menu ref="menu" id="overlay_menu" :model="items" :popup="true"></Menu>
-
-            <img
-                class="action-button"
-                src="@/assets/icons/share/share.white.svg" 
-                :style="{ 'margin-top': '0.3rem' }"
-                @click="handleGroupSharing"
-            >
-
-            <img 
-                class="action-button" 
-                src="@/assets/icons/gear/gear.white.svg" 
-                @click="router.push('/groups/settings')"
-            >
-        </div> -->
-        
         <!-- Groups Selector -->
         <GroupSelector/>
+
+        <!-- Next Event -->
+        <GroupNextEvent :event="nextEvent" :style="{ margin: '2rem 0rem' }"/>
+
+        <!-- Group small section -->
+        <GroupSmallSection v-if="group" :group="group"/>
+
+        <!-- Feed -->
+        <GroupFeed v-if="selectedGroup" :group="selectedGroup.club! ?? selectedGroup.organization!"/>
         
         <!-- New Post Modal -->
         <dialog id="new-post-modal" ref="new-post-modal" class="dialog">
@@ -81,6 +32,7 @@
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
+import { type Group } from '~/types/group';
 import { useToast } from 'primevue/usetoast';
 import { Event } from '@/data/models/EventModels';
 import { ref, computed, useTemplateRef } from 'vue';
@@ -88,15 +40,16 @@ import { GROUP_TYPE, VIEW_STATE } from '@/data/Enums';
 import { useSessionStore } from '@/stores/session-store';
 import { useGroupsViewModel } from '@/stores/groups-view-model';
 
-import Menu from 'primevue/menu';
 import PostFeed from '@/components/Posts/PostFeed/PostFeed.vue';
 import GroupInfo from '~/components/Groups/GroupInfo/GroupInfo.vue';
 import GroupFeed from '~/components/Groups/GroupFeed/GroupFeed.vue';
 import NewPostView from '@/components/Posts/NewPostView/NewPostView.vue';
 import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
-import NextEventCard from '@/components/Events/NextEventCard/NextEventCard.vue';
 import GroupSelector from '@/components/Groups/GroupSelector/GroupSelector.vue';
+import GroupNextEvent from '~/components/Groups/GroupNextEvent/GroupNextEvent.vue';
+import GroupSmallSection from '~/components/Groups/GroupSmallSection/GroupSmallSection.vue';
 import GroupLogoAndBanner from '~/components/Groups/GroupLogoAndBanner/GroupLogoAndBanner.vue';
+
 
 const toast = useToast();
 const router = useRouter();
@@ -105,30 +58,11 @@ const modelStore = useModelStore();
 const sessionStore = useSessionStore();
 const viewModel = useGroupsViewModel();
 
-const menu = useTemplateRef('menu');
+// const menu = useTemplateRef('menu');
 const feed = useTemplateRef<typeof PostFeed>('feed');
 
-const items = ref([
-    {
-        label: 'Create a New?',
-        items: [
-            {
-                label: 'Post',
-                icon: 'pi pi-plus',
-                command: () => {
-                    postCardModalRef.value?.show();
-                }
-            },
-            {
-                label: 'Event',
-                icon: 'pi pi-calendar',
-                command: () => {
-                    handleShowNewEventModal()
-                }
-            }
-        ]
-    }
-]);
+const showGroupSelector = ref(false);
+const postCardModalRef = useTemplateRef<HTMLDialogElement>('new-post-modal');
 
 /**
  * I truly do want it to fetch post data on anytime we navigate here.
@@ -138,9 +72,9 @@ onMounted(() => {
     viewModel.load();
 });
 
-const showGroupSelector = ref(false);
-
-const postCardModalRef = useTemplateRef<HTMLDialogElement>('new-post-modal');
+const group = computed<Group | undefined>(() => {
+    return selectedGroup?.value?.club ?? selectedGroup?.value?.organization;
+});
 
 const selectedGroup = computed(() => {
     return sessionStore.selectedGroup
@@ -168,37 +102,10 @@ const nextEvent = computed<Event | undefined>(() => {
         .mostRecentForClub(clubId);
 });
 
-const groups = computed(() => {
-    return sessionStore.groups
-});
-
-const groupType = computed(() => {
-    return sessionStore.selectedGroup?.type ?? GROUP_TYPE.CLUB;
-});
-
-const groupLogo = computed(() => {
-    const group = sessionStore.selectedGroup?.club ?? sessionStore.selectedGroup?.organization;
-    const image = group?.logo;
-    return image ?? '';
-});
-
-const members = computed(() => {
-    return (selectedGroup.value?.club?.members ?? selectedGroup.value?.organization?.members) ?? [];
-});
-
 const groupName = computed<string>(() => {
     const group = sessionStore.selectedGroup?.club ?? sessionStore.selectedGroup?.organization;
     return group?.name ?? 'Group';
 });
-
-function handleSelectedGroupChanged(event: any) {
-    showGroupSelector.value = false
-    viewModel.changeSelectedGroup(event.group);
-}
-
-function handleShowNewEventModal() {
-    router.push('/events/new');
-}
 
 async function handleGroupSharing() {
     const groupID = selectedGroup.value?.club?.id ?? selectedGroup.value?.organization?.id ?? '';
@@ -231,14 +138,15 @@ definePageMeta({
     grid-template-areas:
     'banner banner'
     'info groups'
-    'feed events'
+    'feed event'
     'feed location'
     'feed location'
     ;
     
+    width: 100%;
     cursor: pointer;
-    max-width: 58rem;
-    margin-top: 1rem;
+    padding-top: 1rem;
+    overflow-y: scroll;
     justify-content: center;
     grid-template-columns: 35rem 23rem;
 
@@ -399,6 +307,7 @@ definePageMeta({
         'feed'
         'feed';
         margin: 1rem;
+        max-width: 58rem;
         padding-left: unset;
         padding-right: unset;
         grid-template-columns: auto;

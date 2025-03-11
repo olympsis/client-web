@@ -70,7 +70,7 @@ function selectGroup(group: GroupSelection){
             margin: 0rem 1rem;
             font-weight: 600;
             font-style: normal;
-            font-size: 1.3rem;
+            font-size: 1rem;
             color: var(--primary-label-color);
         }
     }

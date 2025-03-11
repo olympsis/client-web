@@ -2,7 +2,11 @@
     <NavigationBar/>
     <main id="events">
         <div id="header">
-            <h1>Events</h1>
+            <h1>Events List</h1>
+
+            <div id="body">
+                <SearchBar v-model:value="searchText"/>
+            </div>
 
             <div id="actions">
                 <button @click="navigateToNewEvent">
@@ -17,19 +21,32 @@
             </div>
         </div>
 
-        <div id="sub-header">
-            <SearchBar v-model:value="searchText"/>
+        <div id="mobile-header">
+            <div id="title">
+                <h1>Events List</h1>
 
-            <div id="actions">
-                <!-- <button id="past-events-button" @click="fetchCompletedEvents">
-                    <img src="@/assets/icons/history/history.white.svg">
-                    Past Events
-                </button> -->
-                <EventDateButton v-model="selectedDate"/>
+                <div id="actions">
+                    <button @click="navigateToNewEvent">
+                        <img src="@/assets/icons/plus/plus.white.svg">
+                    </button>
+                    <button @click="">
+                        <img src="@/assets/icons/map/map.fill.svg">
+                    </button>
+                    <button @click="eventSettingsModalRef?.show()">
+                        <img src="@/assets/icons/gear/gear.fill.white.svg">
+                    </button>
+                </div>
             </div>
+
+            <SearchBar v-model:value="searchText" />
         </div>
 
-        <main id="events-body">
+        <div id="sub-header">
+            <SportsFilter v-model:model-value="selectedSports"/>
+            <!-- <EventDateButton v-model="selectedDate"/> -->
+        </div>
+
+        <div id="events-body">
             <div v-if="state === VIEW_STATE.LOADING" id="loader" class="spinner-loader"/>
 
             <div v-else-if="state === VIEW_STATE.SUCCESS && eventSections.length == 0" id="no-events" class="no-events">
@@ -54,7 +71,7 @@
                 <div>Failed to find Events</div>
                 <button class="button" @click="retryFetchEvents">Try Again</button>
             </div>
-        </main>
+        </div>
 
         <!-- Events Settings Modal -->
         <dialog id="event-settings-modal" ref="event-settings-modal" class="dialog">
@@ -65,7 +82,7 @@
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
-import { SPORTS, VIEW_STATE } from '@/data/Enums';
+import { SPORTS, stringToSport, VIEW_STATE } from '@/data/Enums';
 import { compareUTCNowToDateNormal } from '~/utils/time-helpers';
 import { useSessionStore } from '@/stores/session-store';
 import { EventService } from '@/data/services/EventService';
@@ -73,8 +90,8 @@ import { Event, EventSection } from '@/data/models/EventModels';
 import { computed, onMounted, ref, useTemplateRef, watch } from 'vue';
 
 import SearchBar from '@/components/SearchBar/SearchBar.vue';
+import SportsFilter from '~/components/SportsFilter/SportsFilter.vue';
 import EventListItem2 from '~/components/Events/EventListItem-v2/EventListItem2.vue';
-import EventDateButton from '@/components/Buttons/EventDateButton/EventDateButton.vue';
 import EventsSettings from '~/components/Dialog/Events/EventsSettings/EventsSettings.vue';
 
 const router = useRouter();
@@ -84,21 +101,34 @@ const eventService = new EventService();
 
 const events = ref<Event[]>([]);
 const searchText = ref<string>('');
-const selectedDate = ref<string>(Date.now().toLocaleString());
-
+const selectedSports: Ref<Array<SPORTS>> = ref([]);
 const eventSettingsModalRef = useTemplateRef<HTMLDialogElement>('event-settings-modal');
+
+const filteredEvents = computed<Array<Event>>(() => {
+    return events.value.filter((e) => {
+        var includesSport = e.sports?.find((s: string) => {
+            const _sport = stringToSport(s);
+            if (!_sport) return false;
+            return selectedSports.value.includes(_sport);
+        });
+
+        var containsSearch = e.title?.toLowerCase().includes(searchText.value.toLowerCase());
+
+        return e && includesSport && containsSearch;
+    });
+});
 
 const eventSections = computed<EventSection[]>(() => {
     const sections: EventSection[] = [];
-    events.value.filter((e) => e.title?.toLowerCase().includes(searchText.value.toLowerCase())).forEach((e) => {
+    filteredEvents.value.filter((e) => e.title?.toLowerCase().includes(searchText.value.toLowerCase())).forEach((e) => {
         const eventDate = new Date(e.startTime * 1000);
-        const eventDay = eventDate.getDate()  // Changed from getDay() to getDate()
+        const eventDay = eventDate.getDate();  // This change from getDay() was correct
         const eventMonth = eventDate.getMonth();
         const eventYear = eventDate.getFullYear();
 
         // Find if we have an existing section
         const existing = sections.find((s) => {
-            const sectionDay = s.date.getDate();  // Changed from getDay() to getDate()
+            const sectionDay = s.date.getDate();  // This change was correct too
             const sectionMonth = s.date.getMonth();
             const sectionYear = s.date.getFullYear();
 
@@ -119,27 +149,13 @@ const eventSections = computed<EventSection[]>(() => {
         }
     });
 
-    return sections;
+    // Use getTime() instead of getMilliseconds() to sort by the full timestamp
+    return sections
+        .sort((a, b) => a.date.getTime() - b.date.getTime());
 });
 
 function navigateToNewEvent() {
     router.push('/events/new');
-}
-
-function handleShowEventSettingsModal() {
-    if (eventSettingsModalRef.value) {
-        eventSettingsModalRef.value.show();
-    } else {
-        console.error('Failed to find event settings modal template reference.');
-    }
-}
-
-function handleHideEventSettingsModal() {
-    if (eventSettingsModalRef.value) {
-        eventSettingsModalRef.value.close();
-    } else {
-        console.error('Failed to find event settings modal template reference.');
-    }
 }
 
 async function fetchEvents(fetchCompleted: boolean = false) {
@@ -162,18 +178,6 @@ async function fetchEvents(fetchCompleted: boolean = false) {
     );
 
     return _events;
-}
-
-function fetchCompletedEvents() {
-    fetchEvents(true)
-        .then((resp) => {
-            events.value = resp;
-            state.value = VIEW_STATE.SUCCESS;
-        })
-        .catch((error) => {
-            console.error('Failed to get events. Error: ', error);
-            state.value = VIEW_STATE.FAILURE;
-        });
 }
 
 function retryFetchEvents() {
@@ -235,6 +239,12 @@ session.$subscribe((mutation: any, state) => {
 });
 
 onMounted(() => {
+    // Preselect user favorite sports
+    // TODO: Add the ability to remember selections
+    const user = session.user;
+    const sports: Array<SPORTS> = user?.sports ?? [];
+    selectedSports.value = sports;
+
     fetchEvents()
         .then((resp) => {
             events.value = resp;
@@ -255,7 +265,19 @@ definePageMeta({
 <style scoped>
 #events {
     width: 100%;
-    padding: 0rem 1rem;
+    display: grid;
+    height: 100dvh;
+    padding: 0rem 2rem;
+    overflow-y: scroll;
+    margin-top: 0.5rem;
+    justify-content: center;
+    grid-template-rows: 4rem 6rem auto auto auto;
+    grid-template-areas: 
+    "header"
+    "sub-header"
+    "list"
+    "list"
+    "list";
 
     #header {
         width: 100%;
@@ -263,12 +285,15 @@ definePageMeta({
         margin-top: 1rem;
         grid-area: header;
         align-items: center;
+        max-width: var(--desktop-max-width);
         justify-content: space-between;
 
-        h1 {
-            color: var(--primary-label-color);
+        #body {
+            width: 100%;
+            max-width: 35rem;
+            margin-right: 1rem;
         }
-
+        
         #actions {
             border-radius: 15px;
             padding: 0.5rem 0.5rem 0.25rem 0.5rem;
@@ -288,6 +313,10 @@ definePageMeta({
                 }
             }
         }
+    }
+
+    #mobile-header {
+        display: none;
     }
 
     #sub-header {
@@ -348,7 +377,7 @@ definePageMeta({
     }
 
     #events-body {
-
+        max-width: var(--desktop-max-width);
         #loader {
             margin: auto;
             padding-top: 5rem;
@@ -356,13 +385,7 @@ definePageMeta({
 
         #events-list {
             padding: 0;
-            overflow-y: scroll;
             list-style-type: none;
-            height: calc(100dvh - 12.5rem);
-
-            @media (max-width: 940px) {
-                height: calc(100dvh - 16.85rem);
-            }
 
             h2 {
                 font-weight: 500;
@@ -447,6 +470,56 @@ definePageMeta({
             color: white;
             margin: 1rem 0rem;
             background-color: var(--primary-brand-color);
+        }
+    }
+}
+
+@media (max-width: 940px) {
+    #events {
+        padding: 0rem 1rem;
+        grid-template-rows: 6.5rem 5rem auto auto auto;
+
+        #header {
+            display: none;
+        }
+        
+        #mobile-header {
+            display: flex;
+            flex-direction: column;
+
+            #title {
+                display: flex;
+                flex-direction: row;
+                margin: 0.5rem 0rem;
+                align-content: center;
+                justify-content: space-between;
+            }
+
+            #actions {
+                display: flex;
+                flex-direction: row;
+                border-radius: 15px;
+                padding: 0.5rem 0.5rem 0.25rem 0.5rem;
+                background-color: var(--primary-brand-color);
+
+                button {
+                    all: unset;
+                    width: 2rem;
+                    height: 2rem;
+                    cursor: pointer;
+                    margin: 0rem 0.5rem;
+
+                    img {
+                        width: 2rem;
+                        height: 2rem;
+                        align-self: center;
+                    }
+                }
+            }
+        }
+
+        #sub-header {
+            margin: unset;
         }
     }
 }

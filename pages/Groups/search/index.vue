@@ -1,6 +1,6 @@
 <template>
     <NavigationBar/>
-    <main id="groups-container">
+    <main id="groups-search">
         <div id="header">
             <h1>Explore Groups</h1>
 
@@ -159,13 +159,12 @@ onMounted(() => {
 </script>
 
 <style scoped>
-#groups-container {
+#groups-search {
     gap: 1rem;
     width: 100%;
     display: grid;
     height: 100dvh;
     margin: 0 auto;
-    overflow: hidden;
     padding: 0rem 2rem;
     overflow-y: scroll;
     justify-content: center;
@@ -186,8 +185,8 @@ onMounted(() => {
         width: 100%;
         display: flex;
         margin-top: 1rem;
-        align-items: center;
         grid-area: header;
+        align-items: center;
         justify-content: space-between;
 
         #body {
@@ -249,21 +248,7 @@ onMounted(() => {
     #sub-header {
         grid-area: sub-header;
     }
-
-    #tags {
-        grid-area: tags;
-    }
-
-    #sports {
-        grid-area: sports;
-    }
-
-    #nav {
-        grid-area: nav;
-        margin-top: auto;
-        margin-bottom: 1rem;
-    }
-
+    
     #list-wrapper {
         #search-bar {
             display: none;
@@ -291,7 +276,7 @@ onMounted(() => {
 
 
 @media (max-width: 940px) {
-    #groups-container {
+    #groups-search {
         grid-template-areas: 
             "header"
             "sub-header"

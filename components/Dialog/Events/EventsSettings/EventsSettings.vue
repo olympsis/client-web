@@ -1,7 +1,7 @@
 <template>
     <div id="event-settings-dialog" class="popup">
         <div class="header">
-            <button class="secondary button" @click="$emit('close')">
+            <button class="secondary button centered" @click="$emit('close')">
                 <source srcset="@/assets/icons/xmark/xmark.white.svg" media="(prefers-color-scheme: dark)">
                 <img src="@/assets/icons/xmark/xmark.svg">
             </button>
@@ -83,7 +83,7 @@ onMounted(() => {
         font-weight: bold;
         white-space: nowrap;
         border-radius: 10px;
-        padding: 0.5rem 1rem;
+        padding: 0.5rem;
         background-color: var(--secondary-background-color);
     }
 }

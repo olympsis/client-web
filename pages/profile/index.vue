@@ -1,6 +1,14 @@
 <template>
     <NavigationBar/>
     <main id="profile-page">
+        <div id="top">
+            <button @click="profileSettingsModal?.show()">
+                <picture class="centered">
+                    <source srcset="@/assets/icons/gear/gear.white.svg" media="(prefers-color-scheme: dark)">
+                    <img class="settings-icon" src="@/assets/icons/gear/gear.svg"/>
+                </picture>
+            </button>
+        </div>
         <div class="header">
             <div id="image">
                 <UserIcon :user="user" :size="8" class="icon"/>
@@ -43,27 +51,30 @@
             </Tabs>
         </div>
 
-        <!-- <div class="actions">
-            <h2>Settings</h2>
-            <button class="item"> Report an Issue </button>
-            <RouterLink to="/terms-of-use" class="item"> Terms of Service </RouterLink>
-            <RouterLink to="/privacy-policy" class="item"> Privacy Policy </RouterLink>
-            <button class="destructive-item" @click="handleLogout"> Log Out </button>
-            <button class="destructive-item" @click="handleDelete"> Delete Account </button>
-        </div> -->
-
+        <!-- Edit Profile -->
         <dialog id="edit-profile-modal" ref="edit-profile-modal" class="dialog">
             <EditProfileView @close="hideEditModal"/>
         </dialog>
+
+        <!-- Profile Settings -->
+         <dialog id="profile-settings-modal" ref="profile-settings-modal" class="dialog">
+            <ProfileSettings 
+                @close="profileSettingsModal?.close()"
+                @report=""
+                @logout="handleLogout"
+                @delete="handleDelete"
+            />
+         </dialog>
     </main>
 </template>
 
 <script setup lang="ts">
 
 import { computed } from 'vue';
-import { VIEW_STATE } from '@/data/Enums';
 import { Club } from '~/data/models/ClubModels';
+import { Event } from '~/data/models/EventModels';
 import { useSessionStore } from '@/stores/session-store';
+import { EventService } from '~/data/services/EventService';
 
 import Tab from 'primevue/tab';
 import Tabs from 'primevue/tabs';
@@ -75,21 +86,16 @@ import AwardsTab from '~/components/Profile/AwardsTab/AwardsTab.vue';
 import GroupsTab from '~/components/Profile/GroupsTab/GroupsTab.vue';
 import EventsTab from '~/components/Profile/EventsTab/EventsTab.vue';
 import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
+import ProfileSettings from '~/components/Profile/ProfileSettings/ProfileSettings.vue';
 import EditProfileView from '~/components/Modals/Profile/EditProfile/EditProfileView.vue';
-import { EventService } from '~/data/services/EventService';
-import type { Event } from '~/data/models/EventModels';
-
 
 const session = useSessionStore();
 const eventService = new EventService();
 const editProfileModal = useTemplateRef<HTMLDialogElement>('edit-profile-modal');
+const profileSettingsModal = useTemplateRef<HTMLDialogElement>('profile-settings-modal');
 
 const user = computed(() => {
     return session.user;
-})
-
-const state = computed<VIEW_STATE>(() => {
-    return VIEW_STATE.SUCCESS;
 });
 
 const userClubs = computed<Array<Club>>(() => {
@@ -141,12 +147,11 @@ async function fetchPastEvents() {
     session.pastEvents = _events.filter((e) => e.participants.find((u) => u.user?.uuid == user.value?.uuid));
 }
 
-
 useSeoMeta({
     title: () => 'Profile | Olympsis',
     ogTitle: () => 'Profile | Olympsis',
-    description: 'Join groups around the sports you love!',
-    ogDescription: 'Join groups around the sports you love'
+    description: 'Join groups built around the sports you love!',
+    ogDescription: 'Join groups built around the sports you love'
 });
 
 onMounted(() => {
@@ -180,6 +185,23 @@ onMounted(() => {
     padding-left: 3rem;
     padding-right: 3rem;
     flex-direction: column;
+
+    #top {
+        width: 100%;
+        display: flex;
+
+        button {
+            border: unset;
+            cursor: pointer;
+            margin-left: auto;
+            background-color: unset;
+
+            img {
+                width: 2rem;
+                height: 2rem;
+            }
+        }
+    }
 
    .header {
         display: flex;
@@ -326,6 +348,19 @@ onMounted(() => {
     backdrop-filter: blur(5px);
 
     #edit-profile-view {
+        border-radius: 20px;
+        max-width: 25rem !important;
+        box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+    }
+}
+
+#profile-settings-modal {
+    top: 0;
+    border: unset;
+    background: transparent;
+    backdrop-filter: blur(5px);
+
+    #profile-settings {
         border-radius: 20px;
         max-width: 25rem !important;
         box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;

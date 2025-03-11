@@ -14,6 +14,11 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
         await authStore.initAuth();
     }
     
+    // Load session data only if not already loaded
+    if (!sessionStore.hasLoaded) {
+        await sessionStore.load();
+    }
+
     // If this is navigation (not initial load) and we're already loaded, 
     // force success state and don't reload
     if (isNavigating && sessionStore.hasLoaded) {
@@ -30,11 +35,6 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
             path: '/signin',
             query: { redirect: to.fullPath }
         });
-    }
-    
-    // Load session data only if not already loaded
-    if (!sessionStore.hasLoaded) {
-        await sessionStore.load();
     }
     
     // Handle specific route types

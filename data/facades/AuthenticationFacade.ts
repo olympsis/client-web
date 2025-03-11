@@ -152,13 +152,12 @@ class AuthenticationFacade {
         if (!user) {
             throw new Error('No user is currently signed in');
         }
-      
-        await this.authService.deleteAccount();
 
         try {
             // Check if re-authentication is needed
             try {
                 await user.delete();
+                await this.authService.deleteAccount();
                 return true;
             } catch (error) {
                 // If requires re-authentication, continue to next part
@@ -189,7 +188,7 @@ class AuthenticationFacade {
             // Re-authenticate and delete
             await reauthenticateWithPopup(user, authProvider);
             await user.delete();
-            
+            await this.authService.deleteAccount();
             logEvent(this.analytics, 'account_deleted');
             return true;
         } catch (error) {

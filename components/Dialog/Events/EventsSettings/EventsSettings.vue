@@ -2,8 +2,10 @@
     <div id="event-settings-dialog" class="popup">
         <div class="header">
             <button class="secondary button centered" @click="$emit('close')">
-                <source srcset="@/assets/icons/xmark/xmark.white.svg" media="(prefers-color-scheme: dark)">
-                <img src="@/assets/icons/xmark/xmark.svg">
+                <picture>
+                    <source srcset="@/assets/icons/xmark/xmark.white.svg" media="(prefers-color-scheme: dark)">
+                    <img src="@/assets/icons/xmark/xmark.svg">
+                </picture>
             </button>
 
             <div class="title">
@@ -16,7 +18,6 @@
         </div>
 
         <div class="body">
-
             <div class="section">
                 <div class="header">Radius (Miles)</div>
                 <div class="sub-header">Search Radius from your location</div>

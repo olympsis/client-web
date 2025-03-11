@@ -220,6 +220,7 @@ export const useSessionStore = defineStore('session-store', () => {
                 } catch (error) {
                     console.error("Error loading user data:", error);
                     hasLoaded.value = true;
+                    await navigateTo('/signin');
                     await location.listenToLocationUpdates();
                 }
             } else {

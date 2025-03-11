@@ -17,7 +17,7 @@
         <EventsSection v-if="events.length != 0" :events="events"/>
 
         <!-- Nearby Venues List -->
-        <NearbyVenues class="nearby-venues" :venues="venues"/>
+        <NearbyVenues v-if="venues.length != 0" class="nearby-venues" :venues="venues"/>
     </main>
 </template>
 

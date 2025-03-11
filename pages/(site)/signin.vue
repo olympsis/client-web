@@ -6,13 +6,11 @@
         @apple="handleSignInWithApple" 
         @google="handleSignInWithGoogle"
     />
-    <Transition>
-        <CreateUserCard 
-            v-if="isSignedUp" 
-            @submit="handleAuthCompletion" 
-            :state="createState"
-        />
-    </Transition>
+    <CreateUserCard 
+		v-if="isSignedUp" 
+		@submit="handleAuthCompletion" 
+		:state="createState"
+	/>
   </main>
   <BottomBar/>
 </template>

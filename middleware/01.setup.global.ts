@@ -20,12 +20,8 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
         sessionStore.loadingState = VIEW_STATE.SUCCESS;
     }
     
-    // Handle public routes
-    if (to.meta.public) {
-        if (authStore.isAuthenticated && to.path === '/signin') {
-            return navigateTo('/home');
-        }
-        return;
+    if (authStore.isAuthenticated && to.path === '/signin') {
+        return navigateTo('/home');
     }
     
     // Handle protected routes

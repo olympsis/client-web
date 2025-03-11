@@ -48,7 +48,7 @@ export default defineNuxtConfig({
 		'/': {
 			redirect: '/signin'
 		},
-		'/signin': { prerender: true },
+		'/signin': { ssr: false },
 		'/about-us': { prerender: true },
 		'/contact-us': { prerender: true },
 		'/terms-of-use': { prerender: true },

@@ -61,6 +61,7 @@ import PostCommentsPopup from '../PostCommentsPopup/PostCommentsPopup.vue';
 import PostListItem from '@/components/Posts/PostListItem/PostListItem.vue';
 import PostListItemSkeleton from '../PostListItem/PostListItemSkeleton.vue';
 import type { Club } from '~/data/models/ClubModels';
+import type { Group } from '~/types/group';
 
 const session = useSessionStore();
 const viewModel = useGroupsViewModel();
@@ -73,11 +74,11 @@ const state = computed<VIEW_STATE>(() => {
 
 const posts = computed<Post[]>(() => {
     return viewModel.posts
-        .sort((a, b) => b.createdAt - a.createdAt);
+        .sort((a: Post, b: Post) => b.createdAt - a.createdAt);
 });
 
 function handleDeletedPost(id: string) {
-    const idx = viewModel.posts.findIndex((p) => p.id === id);
+    const idx = viewModel.posts.findIndex((p: Post) => p.id === id);
     if (idx !== -1) viewModel.posts.splice(idx, 1);
     viewModel.posts = viewModel.posts;
 }
@@ -93,13 +94,13 @@ function handleShowComments(event: { id: string }) {
     showCommentsDialog.value = true;
 }
 
-function loadPostsForClub(club: Club) {
-    viewModel?.loadPostsForClub(club);
+function loadPostsForGroup(group: Group) {
+    viewModel?.loadPostsForGroup(group);
 }
 
 defineExpose({
     handleNewPost,
-    loadPostsForClub
+    loadPostsForGroup
 });
 
 </script>

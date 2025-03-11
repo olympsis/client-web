@@ -2,23 +2,29 @@
     <NavigationBar/>
     <main id="group-view">
         <GroupLogoAndBanner 
-            class="media"
             :sports="groupSports"
             :logo-u-r-l="groupLogoURL" 
             :banner-u-r-l="groupBannerURL" 
             @clicked-share="handleGroupSharing"
         />
+
+        <GroupInfo 
+            v-if="selectedGroup?.club || selectedGroup?.organization" 
+            :group="selectedGroup.club! ?? selectedGroup.organization!"
+        />
+
+        <GroupFeed v-if="selectedGroup" :group="selectedGroup.club! ?? selectedGroup.organization!"/>
         <!-- Selected Group Info -->
-        <div v-if="selectedGroup" class="info" :style="{ 'margin-top': '1rem' }">
+        <!-- <div v-if="selectedGroup" class="info" :style="{ 'margin-top': '1rem' }">
             <GroupIcon :type="groupType" :image="groupLogo" :size="4"/>
             <a class="name">{{ selectedGroup.club?.name ?? selectedGroup.organization?.name }}</a>
-        </div>
+        </div> -->
 
         <!-- Next Event Card -->
-        <NextEventCard :event="nextEvent" class="event" @create-event="handleShowNewEventModal"/>
+        <!-- <NextEventCard :event="nextEvent" class="event" @create-event="handleShowNewEventModal"/> -->
 
         <!-- Feed -->
-        <div id="feed-container">
+        <!-- <div id="feed-container">
             <div id="mobile-header" v-if="selectedGroup">
                 <h1 class="name">
                     {{ selectedGroup.club?.name ?? selectedGroup.organization?.name }}
@@ -42,10 +48,10 @@
 
             <NextEventCard :event="nextEvent" @create-event="handleShowNewEventModal"/>
             <PostFeed ref="feed"/>
-        </div>
+        </div> -->
 
         <!-- Group Actions -->
-        <div class="actions">
+        <!-- <div class="actions">
             <img class="action-button" src="@/assets/icons/plus/plus.white.svg" @click="menu?.toggle">
             <Menu ref="menu" id="overlay_menu" :model="items" :popup="true"></Menu>
 
@@ -61,16 +67,10 @@
                 src="@/assets/icons/gear/gear.white.svg" 
                 @click="router.push('/groups/settings')"
             >
-        </div>
+        </div> -->
         
         <!-- Groups Selector -->
-        <div class="groups">
-            <h2>Groups</h2>
-            <GroupSelector 
-                :state="state"
-                @selectedGroupChanged="handleSelectedGroupChanged" 
-            />
-        </div>
+        <GroupSelector/>
         
         <!-- New Post Modal -->
         <dialog id="new-post-modal" ref="new-post-modal" class="dialog">
@@ -90,7 +90,8 @@ import { useGroupsViewModel } from '@/stores/groups-view-model';
 
 import Menu from 'primevue/menu';
 import PostFeed from '@/components/Posts/PostFeed/PostFeed.vue';
-import GroupIcon from '@/components/Groups/GroupIcon/GroupIcon.vue';
+import GroupInfo from '~/components/Groups/GroupInfo/GroupInfo.vue';
+import GroupFeed from '~/components/Groups/GroupFeed/GroupFeed.vue';
 import NewPostView from '@/components/Posts/NewPostView/NewPostView.vue';
 import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
 import NextEventCard from '@/components/Events/NextEventCard/NextEventCard.vue';
@@ -227,21 +228,19 @@ definePageMeta({
 #group-view {
     display: grid;
     overflow: hidden;
-    width: fit-content;
     grid-template-areas:
-    'name feed actions'
-    'event feed groups'
-    'chats feed members'
-    'footer feed members'
+    'banner banner'
+    'info groups'
+    'feed events'
+    'feed location'
+    'feed location'
     ;
     
-    gap: 2rem;
-    margin: 0 auto;
     cursor: pointer;
-    padding: 0rem 3rem;
-    height: calc(100dvh - 60px);
-    grid-template-rows: 6rem 16rem 23rem;
-    grid-template-columns: 25rem 35rem 25rem;
+    max-width: 58rem;
+    margin-top: 1rem;
+    justify-content: center;
+    grid-template-columns: 35rem 23rem;
 
     .info {
         grid-area: name;
@@ -391,108 +390,18 @@ definePageMeta({
     }
 }
 
-@media (max-width: 1530px) {
-    #group-view {
-        display: grid;
-        grid-template-areas:
-        'name feed'
-        'actions feed'
-        'event feed'
-        'groups feed'
-        'footer feed';
-        padding: 0rem 1rem;
-        grid-template-columns: 25rem 30rem;
-        grid-template-rows: 5rem 3.5rem 11rem 16rem auto;
-
-        #feed-container {
-            overflow-y: scroll;
-            height: 100vh;
-
-            #header {
-                display: none;
-                grid-area: header;
-                justify-content: space-between;
-                color: var(--primary-label-color);
-
-                h1 {
-                    font-weight: 900;
-                    overflow: hidden;
-                    white-space: nowrap;
-                    text-overflow: ellipsis;
-                }
-
-                #trailing {
-                    display: flex;
-                    align-items: center;
-
-                    #plus {
-                        width: 2rem;
-                        height: 2rem;
-                        cursor: pointer;
-                        margin: 0rem 0.5rem;
-
-                        img {
-                            width: 2rem;
-                            height: 2rem;
-                        }
-                    }
-
-                    #chats {
-                        width: 2rem;
-                        height: 2rem;
-                        cursor: pointer;
-                        margin: 0rem 0.5rem;
-                        margin-top: 0.2rem;
-
-                        img {
-                            width: 2rem;
-                            height: 2rem;
-                        }
-                    }
-
-                    #settings {
-                        width: 2rem;
-                        height: 2rem;
-                        cursor: pointer;
-                        margin: 0rem 0.5rem;
-
-                        img {
-                            width: 2rem;
-                            height: 2rem;
-                        }
-                    }
-                }
-            }
-        }
-
-        .members {
-            display: none;
-        }
-
-        .chats {
-            display: none;
-        }
-
-        .button {
-            display: none;
-        }
-
-        .actions {
-            margin: unset;
-        }
-    }
-}
-
 @media (max-width: 940px) {
     #group-view {
-        width: 100%;
         display: grid;
         grid-template-areas:
+        'banner'
+        'info'
         'feed'
         'feed';
+        margin: 1rem;
         padding-left: unset;
         padding-right: unset;
-        grid-template-columns: unset;
+        grid-template-columns: auto;
 
         #feed-container {
             #header {

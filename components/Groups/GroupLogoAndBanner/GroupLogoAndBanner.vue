@@ -53,6 +53,7 @@ const banner = computed<string | undefined>(() => {
 <style scoped>
 #group-logo-banner {
     width: 100%;
+    grid-area: banner;
     position: relative;
     margin-bottom: 5rem;
 

@@ -1,5 +1,5 @@
 <template>
-    <div id="club-events">
+    <div id="group-events">
         <ul id="list">
             <EventListItem2 v-for="event in events" :event="event" @click="router.push(`/events/${event.id}`)"/>
         </ul>
@@ -7,26 +7,27 @@
 </template>
 
 <script setup lang="ts">
+import type { Group } from '~/types/group';
 import { Club } from '~/data/models/ClubModels';
 import { Event } from '~/data/models/EventModels';
 
 import EventListItem2 from '~/components/Events/EventListItem-v2/EventListItem2.vue';
 
-const props = defineProps({
-    club: { type: Club, required: true }
-});
+const props = defineProps<{
+    group: Group
+}>();
 
 const router = useRouter();
 const session = useSessionStore();
 const events = ref<Array<Event>>([]);
 
 onMounted(() => {
-    events.value = session.events.filter((e) => e.organizers.find((o) => o.id == props.club.id));
+    events.value = session.events.filter((e) => e.organizers.find((o) => o.id == props.group.id));
 });
 </script>
 
 <style scoped>
-#club-events {
+#group-events {
     #list {
         gap: 1rem;
         display: flex;

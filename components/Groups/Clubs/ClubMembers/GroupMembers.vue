@@ -1,5 +1,5 @@
 <template>
-    <div id="club-members">
+    <div id="group-members">
         <SearchBar v-model:value="searchText"/>
         <ul id="list">
             <MemberListItem 
@@ -52,10 +52,11 @@ import SearchBar from '~/components/SearchBar/SearchBar.vue';
 import MemberListItem from '../../MemberListItem/MemberListItem.vue';
 import ChangeRankModal from '~/components/Modals/Groups/ChangeRank/ChangeRankModal.vue';
 import GroupKickModal from '~/components/Modals/Groups/GroupKickModal/GroupKickModal.vue';
+import type { Group } from '~/types/group';
 
-const props = defineProps({
-    club: { type: Club, required: true }
-});
+const props = defineProps<{
+    group: Group
+}>();
 
 const session = useSessionStore();
 
@@ -65,7 +66,7 @@ const searchText = ref<string>('');
 const selectedMember = ref<Member | undefined>(undefined);
 
 const members = computed<Member[]>(() => {
-    return searchText.value === '' ? (props.club.members ?? []) : (props.club.members?.filter((m) => m.user?.username?.toLocaleLowerCase().includes(searchText.value.toLocaleLowerCase())) ?? []);
+    return searchText.value === '' ? (props.group.members ?? []) : (props.group.members?.filter((m) => m.user?.username?.toLocaleLowerCase().includes(searchText.value.toLocaleLowerCase())) ?? []);
 });
 
 function handleChangeRank(event: { member: Member}) {
@@ -93,7 +94,4 @@ function handleKickedUser() {
 </script>
 
 <style scoped>
-#club-members {
-
-}
 </style>

@@ -1,18 +1,18 @@
 import { sampleClubs } from "~/data/dev-data/sample-clubs";
-import ClubMembers from "./ClubMembers.vue";
+import GroupMembers from "./GroupMembers.vue";
 import type { Meta, StoryObj } from "@storybook/vue3";
 
-const meta: Meta<typeof ClubMembers> = {
-    component: ClubMembers
+const meta: Meta<typeof GroupMembers> = {
+    component: GroupMembers
 };
   
 export default meta;
-type Story = StoryObj<typeof ClubMembers>;
+type Story = StoryObj<typeof GroupMembers>;
 
 export const Basic: Story = {
 name: "Group Feed",
 args: {
-    club: sampleClubs[0]
+    group: sampleClubs[0]
 },
 render: (args) => ({
     setup() {
@@ -20,8 +20,8 @@ render: (args) => ({
         ...args,
         };
     },
-    components: { ClubMembers },
-    template: '<ClubMembers :club="club"/>',
+    components: { GroupMembers },
+    template: '<GroupMembers :group="group"/>',
 }),
 tags: ["autodocs"],
 decorators: [],

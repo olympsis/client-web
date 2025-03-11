@@ -1,7 +1,22 @@
 <template>
     <div id="group-info">
         <div id="header">
-            <h1>{{ getGroupName(group) }}</h1>
+            <div id="title" @click="toggleSelector">
+                <h1>{{ getGroupName(group) }}</h1>
+                <picture ref="chevron">
+                    <source srcset="@/assets/icons/chevron/chevron.left.white.svg" media="(prefers-color-scheme: dark)">
+                    <img src="@/assets/icons/chevron/chevron.left.svg" class="chevron">
+                </picture>
+                <Popover ref="selector">
+                    <div class="flex flex-col gap-4">
+                        <div>
+                            <span class="font-medium block mb-2">Your Groups</span>
+                            <GroupSelectorPopover @selected-group-changed="toggleSelector"/>
+                        </div>
+                    </div>
+                </Popover>
+            </div>
+
             <div id="description">{{ getGroupDescription(group) }}</div>
         </div>
 
@@ -50,10 +65,16 @@ import { getMonthAndYear } from '#imports';
 import { Member } from '~/data/models/GenericModels';
 import { GROUP_TYPE, VIEW_STATE } from '~/data/Enums';
 
+import Popover from 'primevue/popover';
+import GroupMembersPeek from '../GroupMembersPeek/GroupMembersPeek.vue';
+import GroupSelectorPopover from '../GroupSelectorPopover/GroupSelectorPopover.vue';
+import TextButton from '~/components/Buttons/LoadingButtons/TextButton/TextButton.vue';
+
 const props = defineProps<{
     group: Group
 }>();
 
+const selector = ref();
 const session = useSessionStore();
 const buttonState = ref(VIEW_STATE.PENDING);
 
@@ -71,6 +92,10 @@ const groupMembers = computed<Member[]>(() => {
 const groupMembersString = computed<string>(() => {
     return groupMembers.value.length > 1 ? `${groupMembers.value.length} members` : `${groupMembers.value.length} member`;
 });
+
+const toggleSelector = (event: any) => {
+    selector.value.toggle(event);
+}
 
 /**
  * Send an application to the group
@@ -100,13 +125,17 @@ function apply() {
 </script>
 
 <style scoped>
+#group-info {
+    grid-area: info;
+}
 #header {
     width: 100%;
     padding: 1rem;
     max-width: 58rem;
-    grid-area: header;
 
-    h1 {
+    #title {
+        display: flex;
+        align-items: end;
         margin-bottom: 0.5rem;
     }
 }
@@ -154,5 +183,10 @@ function apply() {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.chevron {
+    rotate: -90deg;
+    margin-left: 0.5rem;
 }
 </style>

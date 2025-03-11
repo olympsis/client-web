@@ -18,8 +18,8 @@
                 background-color: #262E57; /* Hardcoded primary brand color */
             }
             #nuxt-loading img {
-                width: 5rem;
-                height: 4rem;
+                width: 8rem;
+                height: 6rem;
                 margin: 1rem 0;
             }
             #nuxt-loading h1 {
@@ -34,38 +34,10 @@
         </style>
     </head>
     <body {{ BODY_ATTRS }}>
-    <!-- Initial loading screen that shows immediately -->
         <div id="nuxt-loading">
             <img src="/images/logo.white.png" alt="Olympsis logo" onerror="this.style.display='none'">
             <h1>OLYMPSIS</h1>
         </div>
         {{ APP }}
-
-        <!-- Script to handle loading screen -->
-        <script>
-            window.addEventListener('DOMContentLoaded', () => {
-                // Mark that the loading screen has been shown
-                window.__NUXT_LOADING_SHOWN__ = true;
-                console.log('DOMContentLoaded - loading screen should be visible');
-            });
-
-            // Debug: Check if loading is visible
-            window.addEventListener('load', () => {
-                console.log('Window loaded - checking if loading screen exists:', !!document.getElementById('nuxt-loading'));
-            });
-
-            // Function that can be called from Vue to hide the loader
-            window.hideNuxtLoading = function() {
-                const loader = document.getElementById('nuxt-loading');
-                if (loader) {
-                loader.classList.add('fade-out');
-                setTimeout(() => {
-                    if (loader.parentNode) {
-                    loader.parentNode.removeChild(loader);
-                    }
-                }, 500);
-                }
-            };
-        </script>
     </body>
 </html>

@@ -18,10 +18,10 @@
                     <PostFeed ref="feed"/>
                 </TabPanel>
                 <TabPanel value="1">
-                    <ClubMembers :club="club"/>
+                    <GroupMembers :group="group"/>
                 </TabPanel>
                 <TabPanel value="2">
-                    <ClubEvents :club="club"/>
+                    <GroupEvents :group="group"/>
                 </TabPanel>
             </TabPanels>
         </Tabs>
@@ -29,34 +29,34 @@
 </template>
 
 <script setup lang="ts">
-import { Club } from '~/data/models/ClubModels';
 
 import Tab from 'primevue/tab';
 import Tabs from 'primevue/tabs';
 import TabList from 'primevue/tablist';
 import TabPanel from 'primevue/tabpanel';
 import TabPanels from 'primevue/tabpanels';
-import ClubEvents from '../Clubs/ClubEvents/ClubEvents.vue';
-import ClubMembers from '../Clubs/ClubMembers/ClubMembers.vue';
+import { type Group } from '~/types/group';
+import GroupEvents from '../Clubs/ClubEvents/GroupEvents.vue';
+import GroupMembers from '../Clubs/ClubMembers/GroupMembers.vue';
 import PostFeed from '~/components/Posts/PostFeed/PostFeed.vue';
 
-const props = defineProps({
-   club: { type: Club, required: true } 
-});
+const props = defineProps<{
+    group: Group
+}>();
 
 const feed = useTemplateRef<typeof PostFeed>('feed');
 onMounted(() => {
-    feed.value?.loadPostsForClub(props.club);
+    feed.value?.loadPostsForGroup(props.group);
 });
 </script>
 
 <style scoped>
 #feed {
-    width: 100vw;
     grid-area: feed;
     max-width: 35rem;
     padding: 0rem 1rem;
     overflow-x: scroll;
+    width: calc(100vw - 1rem);
 }
 @media(max-width: 940px) {
     #feed {

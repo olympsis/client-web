@@ -47,7 +47,7 @@
              </div>
         </div>
 
-        <GroupFeed v-if="club" :club="club"/>
+        <GroupFeed v-if="club" :group="club"/>
 
         <GroupSmallSection v-if="club" :group="club" class="small-section"/>
 
@@ -307,7 +307,7 @@ onMounted(() => {
     margin-top: 1rem;
     grid-template-areas:
     'nav nav'
-    'media media'
+    'banner banner'
     'header header'
     'sub-header sub-header'
     'feed location'
@@ -391,7 +391,7 @@ onMounted(() => {
     #group-detail {
         grid-template-areas:
         'nav nav'
-        'media media'
+        'banner banner'
         'header header'
         'sub-header sub-header'
         'feed feed'

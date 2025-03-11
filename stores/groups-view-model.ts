@@ -6,6 +6,7 @@ import { useSessionStore } from "./session-store";
 import { PostService } from "../data/services/PostService";
 import { GroupSelection } from "../data/models/GenericModels";
 import type { Club } from "~/data/models/ClubModels";
+import type { Group } from "~/types/group";
 
 export const useGroupsViewModel = defineStore('groups-view-model', () => {
     var state = ref(VIEW_STATE.LOADING);
@@ -46,9 +47,9 @@ export const useGroupsViewModel = defineStore('groups-view-model', () => {
         }
     }
 
-    function loadPostsForClub(club: Club) {
+    function loadPostsForGroup(group: Group) {
         state.value = VIEW_STATE.LOADING;
-        const id = club.id ?? '';
+        const id = group.id ?? '';
         loadNextPosts(id)
             .then((_posts) => {
                 posts.value = _posts;
@@ -110,7 +111,7 @@ export const useGroupsViewModel = defineStore('groups-view-model', () => {
 
         load,
         loadNextPosts,
-        loadPostsForClub,
+        loadPostsForGroup,
         changeSelectedGroup
     }
 });

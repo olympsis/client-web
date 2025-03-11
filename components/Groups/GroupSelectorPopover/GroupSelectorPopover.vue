@@ -1,35 +1,24 @@
 <template>
-    <div id="group-selector">
-        <h2>Your Groups</h2>
-        <ul id="group-list" v-if="state != VIEW_STATE.LOADING">
-            <div 
+    <div id="group-selector-popover">
+        <ul id="group-list">
+            <li 
                 v-for="group in groups" 
                 :key="group.id" 
-                :class="{ 'group-view': true, selected: sessionStore.selectedGroup?.id === group.id}" 
+                :class="{ 'group-view': true, selected: sessionStore.selectedGroup?.id === group.id }" 
                 @click="selectGroup(group)"
             >
                 <GroupIcon :type="group.type" :image="group.club?.logo ?? group.organization?.logo" :size=3 />
                 <a class="name">{{ group.club?.name ?? group.organization?.name }}</a>
-            </div>
+            </li>
         </ul>
-        <GroupSelectorSkeleton v-else/>
     </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import { VIEW_STATE } from '~/data/Enums';
-import { useSessionStore } from '~/stores/session-store';
+import GroupIcon from '../GroupIcon/GroupIcon.vue';
 import { GroupSelection } from '~/data/models/GenericModels';
 
-import GroupIcon from '../GroupIcon/GroupIcon.vue';
-import GroupSelectorSkeleton from './GroupSelectorSkeleton.vue';
-
 const sessionStore = useSessionStore();
-
-const state = computed(() => {
-    return sessionStore.loadingState;
-});
 
 const emit = defineEmits({
   selectedGroupChanged(payload: { group: GroupSelection }) {
@@ -56,18 +45,17 @@ function selectGroup(group: GroupSelection){
 </script>
 
 <style scoped>
-#group-selector {
-    padding: 1rem;
-    grid-area: groups;
+#group-selector-popover {
+    width: 25rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
     border-radius: 10px;
-    background-color: #F4F4F7;
-    border: rgb(0, 0, 0, 0.1) solid 1px;
     
     #group-list {
+        padding: 0;
         width: 100%; 
         height: 13rem;
         overflow-y: scroll;
-        padding: 0;
         list-style-type: none;
     }
 
@@ -76,7 +64,7 @@ function selectGroup(group: GroupSelection){
         cursor: pointer;
         flex-direction: row;
         align-items: center;
-        margin: 1rem 0.5rem;
+        margin: 1rem 1rem;
 
         .name {
             margin: 0rem 1rem;
@@ -90,7 +78,7 @@ function selectGroup(group: GroupSelection){
     .selected {
         padding: 0.25rem;
         border-radius: 13px;
-        border: rgb(0, 0, 0, 0.2) solid 1px;
+        border: var(--primary-label-color) solid 1px;
     }
 }
 </style>

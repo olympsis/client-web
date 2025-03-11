@@ -26,8 +26,8 @@ const router = useRouter();
     padding: 1rem;
     grid-area: event;
     border-radius: 10px;
-    background-color: #F4F4F7;
-    border: rgb(0, 0, 0, 0.2) solid 1px;
+    border: var(--component-border) solid 1px;
+    background-color: var(--secondary-background-color);
 
     h2 {
         margin-bottom: 1rem;

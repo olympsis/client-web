@@ -143,7 +143,7 @@ loadLocationData()
     position: relative;
     border-radius: 10px;
     list-style-type: none;
-    box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+    box-shadow: var(--component-border) 0px 1px 4px;
     background-color: var(--secondary-background-color);
 
     #header {

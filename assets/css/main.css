@@ -93,6 +93,7 @@
 
 	--navigation-label: #262E57;
 	--navigation-border: rgba(0, 0, 0, 0.15);
+	--component-border:  rgba(0, 0, 0, 0.20);
 
 	--home-icon: url('@/assets/icons/home/home.svg');
     --home-icon-selected: url('@/assets/icons/home/home.fill.svg');
@@ -127,6 +128,8 @@
 		--navigation-border: rgba(255, 255, 255, 0.15);
 		--icon-border-color: rgb(255, 255, 255, 0.1);
 
+		--component-border:  rgba(255, 255, 255, 0.20);
+
 		--home-icon: url('@/assets/icons/home/home.white.svg');
 		--home-icon-selected: url('@/assets/icons/home/home.fill.white.svg');
 
@@ -138,6 +141,7 @@
 
 		--chats-icon: url('@/assets/icons/bubble2/bubble.2.white.svg');
 		--chats-icon-selected: url('@/assets/icons/bubble2/bubble.2.fill.white.svg');
+		
 	}
 }
 

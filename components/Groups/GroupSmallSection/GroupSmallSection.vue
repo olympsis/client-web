@@ -103,7 +103,7 @@ function fetchMapImage() {
     grid-area: location;
     height: fit-content;
     border-radius: 16px;
-    border: rgb(0, 0, 0, 0.2) solid 1px;
+    border: var(--component-border) solid 1px;
     background-color: var(--secondary-background-color);
     #map {
         width: 100%;

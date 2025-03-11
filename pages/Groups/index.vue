@@ -169,8 +169,19 @@ definePageMeta({
         padding-left: unset;
         padding-right: unset;
         grid-template-columns: auto;
-
-        
     }
+
+    #group-selector {
+        display: none;
+    }
+
+    #group-next-event {
+        display: none;
+    }
+
+    #group-small-section {
+        display: none;
+    }
+
 }
 </style>

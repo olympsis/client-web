@@ -60,8 +60,8 @@ function selectGroup(group: GroupSelection){
     padding: 1rem;
     grid-area: groups;
     border-radius: 10px;
-    background-color: #F4F4F7;
-    border: rgb(0, 0, 0, 0.2) solid 1px;
+    border: var(--component-border) solid 1px;
+    background-color: var(--secondary-background-color);
     
     #group-list {
         width: 100%; 
@@ -90,7 +90,7 @@ function selectGroup(group: GroupSelection){
     .selected {
         padding: 0.25rem;
         border-radius: 13px;
-        border: rgb(0, 0, 0, 0.2) solid 1px;
+        border: var(--primary-label-color) solid 1px;
     }
 }
 </style>

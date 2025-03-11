@@ -47,6 +47,7 @@
              </div>
         </div>
 
+
         <GroupFeed v-if="club" :group="club"/>
 
         <GroupSmallSection v-if="club" :group="club" class="small-section"/>
@@ -328,7 +329,6 @@ onMounted(() => {
     margin-top: 1rem;
     max-width: 58rem;
     grid-area: media;
-    padding: 0rem 1rem;
 }
 
 #header {

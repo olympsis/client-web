@@ -155,5 +155,11 @@ const banner = computed<string | undefined>(() => {
             height: 24px;
         }
     }
+
+    @media (max-width: 940px) {
+        width: unset;
+        margin-left: 1rem;
+        margin-right: 1rem;
+    }
 }
 </style>

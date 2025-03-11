@@ -54,7 +54,6 @@ watch(model, (newVal, _) => {
     grid-area: feed;
     max-width: 35rem;
     padding: 0rem 1rem;
-    overflow-x: scroll;
     width: calc(100vw - 1rem);
 }
 @media(max-width: 940px) {

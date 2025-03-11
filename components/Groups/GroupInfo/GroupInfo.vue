@@ -1,9 +1,9 @@
 <template>
     <div id="group-info">
         <div id="header">
-            <div id="title" @click="toggleSelector">
+            <div id="title">
                 <h1>{{ getGroupName(group) }}</h1>
-                <picture ref="chevron">
+                <picture ref="chevron" @click="toggleSelector">
                     <source srcset="@/assets/icons/chevron/chevron.left.white.svg" media="(prefers-color-scheme: dark)">
                     <img src="@/assets/icons/chevron/chevron.left.svg" class="chevron">
                 </picture>
@@ -15,6 +15,13 @@
                         </div>
                     </div>
                 </Popover>
+
+                <button v-if="isMember" class="settings" @click="$emit('show-settings')">
+                    <picture class="centered">
+                        <source srcset="@/assets/icons/gear/gear.white.svg" media="(prefers-color-scheme: dark)">
+                        <img class="settings-icon" src="@/assets/icons/gear/gear.svg"/>
+                    </picture>
+                </button>
             </div>
 
             <div id="description">{{ getGroupDescription(group) }}</div>
@@ -26,8 +33,10 @@
                     <GroupMembersPeek :members="groupMembers"/>
                     <div :style="{ width: '100%', fontWeight: 'bold', marginLeft: '1rem' }">{{ groupMembersString }}</div>
                 </div>
+
                 <TextButton v-if="!isMember" text="Request to Join" success-text="Requested" failure-text="Failed" v-model="buttonState" @click="apply" class="action"/>
              </div>
+
              <div class="section">
                 <div id="info" :style="{ display: 'flex', gap: '1rem', margin: '1rem 0rem' }">
                     <div id="foundation">
@@ -73,6 +82,10 @@ import TextButton from '~/components/Buttons/LoadingButtons/TextButton/TextButto
 const model = defineModel<Group>('group', {
     required: true
 });
+
+const emit = defineEmits([
+    'show-settings'
+]);
 
 const selector = ref();
 const session = useSessionStore();
@@ -188,5 +201,23 @@ function apply() {
 .chevron {
     rotate: -90deg;
     margin-left: 0.5rem;
+}
+
+.centered {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.settings {
+    border: unset;
+    cursor: pointer;
+    margin-left: auto;
+    background-color: unset;
+}
+
+.settings-icon {
+    width: 2rem;
+    height: 2rem;
 }
 </style>

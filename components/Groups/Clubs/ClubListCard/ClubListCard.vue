@@ -143,6 +143,10 @@ function apply() {
     border-radius: var(--card-border-radius);
     background-color: var(--secondary-background-color);
 
+    @media (max-width: 940px) {
+        width: calc(100vw - 1rem);
+    }
+
     #body {
         height: 5rem;
         overflow-y: scroll;

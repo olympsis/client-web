@@ -9,7 +9,7 @@
             </div>
 
             <div id="trailing">
-                <picture id="plus" @click="handleOpenNewGroupDialog">
+                <picture id="plus" @click="router.push('/groups/new');">
                     <source srcset="@/assets/icons/plus/plus.white.svg" media="(prefers-color-scheme: dark)">
                     <img src="@/assets/icons/plus/plus.svg">
                 </picture>
@@ -21,12 +21,12 @@
             </div>
         </div>
 
-        <div id="header-mobile">
-            <div id="leading">
-                <h1>Groups</h1>
+        <div id="mobile-header">
+            <div id="title">
+                <h1>Explore Groups</h1>
 
                 <div id="trailing">
-                    <picture id="plus" @click="handleOpenNewGroupDialog">
+                    <picture id="plus" @click="router.push('/groups/new');">
                         <source srcset="@/assets/icons/plus/plus.white.svg" media="(prefers-color-scheme: dark)">
                         <img src="@/assets/icons/plus/plus.svg">
                     </picture>
@@ -37,11 +37,18 @@
                     </picture>
                 </div>
             </div>
+
+            <SearchBar v-model:value="searchText" />
+        </div>
+
+        <div id="sub-header">
+            <div>Filter By</div>
+            <SportsFilter v-model:model-value="selectedSports"/>
         </div>
 
         <div id="list-wrapper">
             <SearchBar v-model:value="searchText"/>
-            <ul id="list-container">
+            <ul id="list">
                 <ClubListCardTemplate v-if="state === VIEW_STATE.LOADING" v-for="_ in 10"/>
                 <ClubListCard v-else v-for="club in filteredClubs" :club="club" />
             </ul>
@@ -55,17 +62,15 @@ import type { Ref, ComputedRef } from 'vue';
 import { computed, ref, useTemplateRef } from 'vue';
 
 import { Club } from '@/data/models/ClubModels';
-import { VIEW_STATE } from '@/data/Enums';
+import { SPORTS, stringToSport, VIEW_STATE } from '@/data/Enums';
 import { GroupSelection, Location } from '@/data/models/GenericModels';
 
 import { useModelStore } from '@/stores/model-store';
 import { useSessionStore } from '@/stores/session-store';
 
 import SearchBar from '@/components/SearchBar/SearchBar.vue';
-import TagsListCard from '@/components/TagsListCard/TagsListCard.vue';
+import SportsFilter from '~/components/SportsFilter/SportsFilter.vue';
 import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
-import NavigationCard from '@/components/NavigationCard/NavigationCard.vue';
-import SportsListCard from '@/components/SportsListCard/SportsListCard.vue';
 import ClubListCard from '@/components/Groups/Clubs/ClubListCard/ClubListCard.vue';
 import ClubListCardTemplate from '@/components/Groups/Clubs/ClubListCardTemplate/ClubListCardTemplate.vue';
 
@@ -77,7 +82,7 @@ const state = ref(VIEW_STATE.SUCCESS);
 
 const searchText: Ref<string> = ref('');
 const selectedTags: Ref<Array<string>> = ref([]);
-const selectedSports: Ref<Array<string>> = ref([]);
+const selectedSports: Ref<Array<SPORTS>> = ref([]);
 
 // All of the clubs from the search results
 const clubs: Ref<Club[]> = ref([]);
@@ -86,7 +91,9 @@ const clubs: Ref<Club[]> = ref([]);
 const filteredClubs: ComputedRef<Club[]> = computed(() => {
     return clubs.value.filter((c) => {
         var includesSport = c.sports?.find((s: string) => {
-            return selectedSports.value.includes(s);
+            const _sport = stringToSport(s);
+            if (!_sport) return false;
+            return selectedSports.value.includes(_sport);
         });
 
         var includesTag = c.tags?.find((t) => {
@@ -134,23 +141,19 @@ async function fetchClubs(location: Location) {
     }
 }
 
-function handleSelectedTagsUpdate(event: { selectedTags: Array<string> }) {
-    selectedTags.value = event.selectedTags;
-}
-
-function handleSelectedSportsUpdate(event: { selectedSports: Array<string> }) {
-    selectedSports.value = event.selectedSports;
-}
-
-function handleOpenNewGroupDialog() {
-    router.push('/groups/new');
-}
-
 useSeoMeta({
-    title: () => 'Groups| Olympsis',
+    title: () => 'Groups | Olympsis',
     ogTitle: () => 'Groups | Olympsis',
-    description: 'Join groups around the sports you love!',
-    ogDescription: 'Join groups around the sports you love'
+    description: 'Join groups built around the sports you love!',
+    ogDescription: 'Join groups built around the sports you love!'
+});
+
+onMounted(() => {
+    // Preselect user favorite sports
+    // TODO: Add the ability to remember selections
+    const user = sessionStore.user;
+    const sports: Array<SPORTS> = user?.sports ?? [];
+    selectedSports.value = sports;
 });
 
 </script>
@@ -158,16 +161,21 @@ useSeoMeta({
 <style scoped>
 #groups-container {
     gap: 1rem;
+    width: 100%;
     display: grid;
     height: 100dvh;
     margin: 0 auto;
     overflow: hidden;
     padding: 0rem 2rem;
+    overflow-y: scroll;
+    justify-content: center;
+    grid-template-rows: 4rem 6rem auto auto auto;
     grid-template-areas: 
-    "header header"
-    "list list"
-    "list list"
-    "list list";
+    "header"
+    "sub-header"
+    "list"
+    "list"
+    "list";
 
     h1 {
         width: 100%;
@@ -185,56 +193,61 @@ useSeoMeta({
         #body {
             width: 100%;
             max-width: 35rem;
+            margin-right: 1rem;
+        }
+    }
+
+    #mobile-header {
+        display: none;
+    }
+
+    #trailing {
+        width: 7rem;
+        display: flex;
+        border-radius: 10px;
+        padding: 0.25rem 1rem;
+        justify-content: space-between;
+        background-color: var(--secondary-background-color);
+        
+        #plus {
+            width: 2rem;
+            height: 2rem;
+            cursor: pointer;
+
+            img {
+                width: 2rem;
+                height: 2rem;
+            }
         }
 
-        #trailing {
-            display: flex;
-            width: 7rem;
-            border-radius: 10px;
-            padding: 0.25rem 1rem;
-            justify-content: space-between;
-            background-color: var(--secondary-background-color);
-            
-            #plus {
-                width: 2rem;
-                height: 2rem;
-                cursor: pointer;
+        #chats {
+            width: 2rem;
+            height: 2rem;
+            cursor: pointer;
+            margin: 0rem 0.5rem;
+            margin-right: 0.5rem;
 
-                img {
-                    width: 2rem;
-                    height: 2rem;
-                }
+            img {
+                width: 2.2rem;
+                height: 2.2rem;
+                margin-top: 0.1rem;
             }
+        }
 
-            #chats {
+        #settings {
+            width: 2rem;
+            height: 2rem;
+            cursor: pointer;
+
+            img {
                 width: 2rem;
                 height: 2rem;
-                cursor: pointer;
-                margin: 0rem 0.5rem;
-                margin-right: 0.5rem;
-
-                img {
-                    width: 2.2rem;
-                    height: 2.2rem;
-                    margin-top: 0.1rem;
-                }
-            }
-
-            #settings {
-                width: 2rem;
-                height: 2rem;
-                cursor: pointer;
-
-                img {
-                    width: 2rem;
-                    height: 2rem;
-                }
             }
         }
     }
 
-    #header-mobile {
-        display: none;
+    #sub-header {
+        grid-area: sub-header;
     }
 
     #tags {
@@ -256,19 +269,18 @@ useSeoMeta({
             display: none;
         }
 
-        #list-container {
+        #list {
             display: grid;
             grid-area: list;
             row-gap: 0.5rem;
             list-style: none;
-            margin: 0rem auto;
             column-gap: 0.5rem;
             overflow-y: scroll;
             border-radius: 10px;
+            justify-content: center;
             grid-template-rows: 25rem;
             padding-inline-start: unset;
             grid-template-columns: 25rem 25rem;
-            height: calc(100dvh - 110px - 2rem);
 
             #search-bar {
                 display: none;
@@ -282,50 +294,49 @@ useSeoMeta({
     #groups-container {
         grid-template-areas: 
             "header"
+            "sub-header"
             "list"
             "list"
             "list";
         
-        max-width: 33rem;
-        padding: 0rem 1rem;
+        padding: unset;
         grid-template-rows: unset;
         margin: 1rem 0rem 0rem 0rem;
         grid-template-columns: auto;
+
+        #header {
+            display: none;
+        }
+        #trailing {
+            padding: 0.25rem 0.5rem;
+        }
+
+        #mobile-header {
+            display: flex;
+            grid-area: header;
+            flex-direction: column;
+            width: calc(100vw - 1rem);
+
+            #title {
+                display: flex;
+                margin-bottom: 0.5rem;
+            }
+        }
+
+        #sub-header {
+            width: calc(100vw - 1rem);
+        }
+
 
         #list-wrapper {
             #search-bar {
                 margin-right: unset;
             }
 
-            #list-container {
+            #list {
                 grid-template-columns: auto;
-                height: calc(100dvh - 110px - 2rem);
             }
         }
-
-        #tags {
-            display: none;
-        }
-
-        #sports {
-            display: none;
-        }
-
-        #nav {
-            display: none;
-        }
     }
-}
-
-#new-group-dialog {
-    top: 0;
-    z-index: 10;
-    width: 100%;
-    border: unset;
-    padding: unset;
-    margin: 0 auto;
-    border-radius: 10px;
-    background: transparent;
-    backdrop-filter: blur(5px);
 }
 </style>

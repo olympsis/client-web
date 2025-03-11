@@ -91,6 +91,8 @@
 	--button-border-radius: 10px;
 	--icon-border-color: rgb(0, 0, 0, 0.1);
 
+	--desktop-max-width: 58rem;
+
 	--navigation-label: #262E57;
 	--navigation-border: rgba(0, 0, 0, 0.15);
 	--component-border:  rgba(0, 0, 0, 0.20);

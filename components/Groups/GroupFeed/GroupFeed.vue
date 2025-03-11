@@ -40,14 +40,13 @@ import GroupEvents from '../Clubs/ClubEvents/GroupEvents.vue';
 import GroupMembers from '../Clubs/ClubMembers/GroupMembers.vue';
 import PostFeed from '~/components/Posts/PostFeed/PostFeed.vue';
 
-const props = defineProps<{
-    group: Group
-}>();
-
-const feed = useTemplateRef<typeof PostFeed>('feed');
-onMounted(() => {
-    feed.value?.loadPostsForGroup(props.group);
+const model = defineModel<Group>('group', {
+    required: true
 });
+const feed = useTemplateRef<typeof PostFeed>('feed');
+watch(model, (newVal, _) => {
+    feed.value?.loadPostsForGroup(newVal);
+}, { immediate: true });
 </script>
 
 <style scoped>

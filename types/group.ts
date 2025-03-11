@@ -8,12 +8,12 @@ export type Group = Club | Organization;
 
 // Helper function to determine if a Group is a Club
 export function isClub(group: Group): group is Club {
-  return (group as any).hasOwnProperty('parent');
+  return group.constructor === Club;
 }
 
 // Helper function to determine if a Group is an Organization
 export function isOrganization(group: Group): group is Organization {
-  return (group as any).hasOwnProperty('children');
+  return group.constructor === Organization;
 }
 
 // Helper function to get GROUP_TYPE enum value from a Group

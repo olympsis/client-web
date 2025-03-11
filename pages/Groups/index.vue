@@ -18,10 +18,10 @@
         <GroupNextEvent :event="nextEvent" :style="{ margin: '2rem 0rem' }"/>
 
         <!-- Group small section -->
-        <GroupSmallSection v-if="group" :group="group"/>
+        <GroupSmallSection v-if="group" :group="group" :style="{ marginBottom: '2rem' }"/>
 
         <!-- Feed -->
-        <GroupFeed v-if="selectedGroup" :group="selectedGroup.club! ?? selectedGroup.organization!"/>
+        <GroupFeed v-if="group" :group="group"/>
         
         <!-- New Post Modal -->
         <dialog id="new-post-modal" ref="new-post-modal" class="dialog">
@@ -31,12 +31,10 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router';
 import { type Group } from '~/types/group';
 import { useToast } from 'primevue/usetoast';
 import { Event } from '@/data/models/EventModels';
 import { ref, computed, useTemplateRef } from 'vue';
-import { GROUP_TYPE, VIEW_STATE } from '@/data/Enums';
 import { useSessionStore } from '@/stores/session-store';
 import { useGroupsViewModel } from '@/stores/groups-view-model';
 
@@ -50,18 +48,12 @@ import GroupNextEvent from '~/components/Groups/GroupNextEvent/GroupNextEvent.vu
 import GroupSmallSection from '~/components/Groups/GroupSmallSection/GroupSmallSection.vue';
 import GroupLogoAndBanner from '~/components/Groups/GroupLogoAndBanner/GroupLogoAndBanner.vue';
 
-
 const toast = useToast();
-const router = useRouter();
-
 const modelStore = useModelStore();
 const sessionStore = useSessionStore();
 const viewModel = useGroupsViewModel();
 
-// const menu = useTemplateRef('menu');
 const feed = useTemplateRef<typeof PostFeed>('feed');
-
-const showGroupSelector = ref(false);
 const postCardModalRef = useTemplateRef<HTMLDialogElement>('new-post-modal');
 
 /**
@@ -81,30 +73,25 @@ const selectedGroup = computed(() => {
 });
 
 const groupLogoURL = computed<string | undefined>(() => {
-    return selectedGroup.value?.club?.logo ?? selectedGroup.value?.organization?.logo;
+    return group.value?.logo;
 });
 
 const groupBannerURL = computed<string | undefined>(() => {
-    return selectedGroup.value?.club?.banner ?? selectedGroup.value?.organization?.banner;
+    return group.value?.banner;
 });
 
 const groupSports = computed<Array<string>>(() => {
-    return (selectedGroup.value?.club?.sports ?? selectedGroup.value?.organization?.sports) ?? [];
-});
-
-const state = computed<VIEW_STATE>(() => {
-    return viewModel.state;
+    return group.value?.sports ?? [];
 });
 
 const nextEvent = computed<Event | undefined>(() => {
-    const clubId = (selectedGroup.value?.club?.id ?? selectedGroup.value?.organization?.id) ?? '';
+    const clubId = group.value?.id ?? '';
     return modelStore.getAllEvents()
         .mostRecentForClub(clubId);
 });
 
 const groupName = computed<string>(() => {
-    const group = sessionStore.selectedGroup?.club ?? sessionStore.selectedGroup?.organization;
-    return group?.name ?? 'Group';
+    return group.value?.name ?? 'Olympsis Group';
 });
 
 async function handleGroupSharing() {
@@ -149,135 +136,6 @@ definePageMeta({
     overflow-y: scroll;
     justify-content: center;
     grid-template-columns: 35rem 23rem;
-
-    .info {
-        grid-area: name;
-        display: flex;
-        align-items: center;
-        flex-direction: row;
-        
-        a {
-            margin: 0rem 1rem;
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--primary-label-color);
-        }
-    }
-
-    .event {
-        grid-area: event;
-    }
-
-    .chats {
-        grid-area: chats;
-
-        h2 {
-            margin-bottom: 1rem;
-            color: var(--primary-label-color);
-        }
-        .list {
-            width: 25rem;
-            height: 15rem;
-            border-radius: 10px;
-            background-color: var(--secondary-background-color);
-        }
-    }
-
-    .nav-card {
-        margin-top: auto;
-        grid-area: footer;
-        margin-bottom: 4.5rem;
-    }
-
-    .feed {
-        grid-area: feed;
-    }
-    #feed-container {
-        height: 100dvh;
-        grid-area: feed;
-        overflow-y: scroll;
-
-        #header {
-            display: none;
-        }
-
-        #next-event {
-            display: none;
-        }
-    }
-
-    .actions {
-        grid-area: actions;
-        display: flex;
-        width: 25rem;
-        padding: 0.5rem;
-        margin-top: 1rem;
-        align-items: center;
-        height: fit-content;
-        border-radius: 10px;
-        justify-content: space-around;
-        background-color: var(--primary-brand-color);
-
-        .action-button {
-            width: 2rem;
-            height: 2rem;
-            cursor: pointer;
-        }
-    }
-
-    .groups {
-        grid-area: groups;
-
-        h2 {
-            font-weight: 600;
-            margin-bottom: 1rem;
-            color: var(--primary-label-color);
-        }
-    }
-
-    .members {
-        grid-area: members;
-
-        h2 {
-            margin-bottom: 1rem;
-            color: var(--primary-label-color);
-        }
-    }
-
-    .button {
-        display: none;
-    }
-}
-
-#mobile-header {
-    display: none;
-    grid-area: header;
-
-    h1 {
-        max-width: 55vw;
-        overflow: hidden;
-        white-space: none;
-        text-wrap: nowrap;
-        text-overflow: ellipsis;
-    }
-}
-
-#new-event-modal {
-    top: 0;
-    border: unset;
-    background: transparent;
-    backdrop-filter: blur(5px);
-
-    #new-event-card {
-        border-radius: 20px;
-        max-width: 35rem;
-        box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
-        background-color: var(--secondary-background-color);
-
-        @media (max-width: 940px) {
-            max-width: 25rem;
-        }
-    }
 }
 
 #new-post-modal {
@@ -312,83 +170,7 @@ definePageMeta({
         padding-right: unset;
         grid-template-columns: auto;
 
-        #feed-container {
-            #header {
-                display: flex;
-                margin: 1rem 1rem;
-            }
-
-            #next-event {
-                display: block;
-                margin: 0rem 1rem;
-            }
-        }
-        .info {
-            display: none;
-        }
-
-        .actions {
-            display: none;
-        }
-
-        .groups {
-            display: none;
-        }
-
-        .nav-card {
-            display: none;
-        }
-
-        .event {
-            display: none;
-        }
-
-        .members {
-            display: none;
-        }
-
-        .chats {
-            display: none;
-        }
-
-        .button {
-            display: inline-flex;
-            width: 5rem;
-            height: 5rem;
-            z-index: 10;
-        }
-    }
-
-    #mobile-header {
-        display: flex;
-        margin: 1rem;
-        align-items: center;
-        justify-content: space-between;
-
-        h1 {
-            color: var(--primary-label-color);
-        }
-
-        #mobile-actions {
-            display: flex;
-            border-radius: 15px;
-            padding: 0.5rem 0.5rem 0.5rem 0.5rem;
-            background-color: var(--primary-brand-color);
-
-            button {
-                all: unset;
-                width: 2rem;
-                height: 2rem;
-                cursor: pointer;
-                margin: 0rem 0.5rem;
-
-                img {
-                    width: 2rem;
-                    height: 2rem;
-                    align-self: center;
-                }
-            }
-        }
+        
     }
 }
 </style>

@@ -39,7 +39,7 @@
                         <div :style="{ marginLeft: '0.5rem' }">{{ `Created ${getMonthAndYear(group?.createdAt ?? 0)}` }}</div>
                     </div>
 
-                    <div v-if="getGroupType(group) === GROUP_TYPE.CLUB" id="visibility" >
+                    <div v-if="isClub(group)" id="visibility" >
                         <picture class="icon">
                             <source srcset="@/assets/icons/globe/globe.white.svg" media="(prefers-color-scheme: dark)">
                             <img src="@/assets/icons/globe/globe.svg">
@@ -55,24 +55,24 @@
 <script setup lang="ts">
 import { 
     type Group, 
-    getGroupType,
+    isClub,
     getGroupName,
     getGroupMembers,
     getGroupVisibility,
     getGroupDescription,
 } from '~/types/group';
+import { VIEW_STATE } from '~/data/Enums';
 import { getMonthAndYear } from '#imports';
 import { Member } from '~/data/models/GenericModels';
-import { GROUP_TYPE, VIEW_STATE } from '~/data/Enums';
 
 import Popover from 'primevue/popover';
 import GroupMembersPeek from '../GroupMembersPeek/GroupMembersPeek.vue';
 import GroupSelectorPopover from '../GroupSelectorPopover/GroupSelectorPopover.vue';
 import TextButton from '~/components/Buttons/LoadingButtons/TextButton/TextButton.vue';
 
-const props = defineProps<{
-    group: Group
-}>();
+const model = defineModel<Group>('group', {
+    required: true
+});
 
 const selector = ref();
 const session = useSessionStore();
@@ -86,7 +86,7 @@ const isMember = computed<Boolean>(() => {
 });
 
 const groupMembers = computed<Member[]>(() => {
-    return getGroupMembers(props.group);
+    return getGroupMembers(model.value);
 });
 
 const groupMembersString = computed<string>(() => {

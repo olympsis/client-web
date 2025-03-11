@@ -1,7 +1,7 @@
 <template>
     <div id="group-next-event">
         <h2>Next Event</h2>
-        <EventListItem2 v-if="event" :event="event" @click="router.push(`/events/${event.id}`)"/>
+        <EventListItem2 v-if="model" :event="model" @click="router.push(`/events/${model.id}`)"/>
         <div v-else id="no-event">
             <div>No Upcoming Events</div>
             <button @click="router.push('/events/new')">CREATE AN EVENT</button>
@@ -14,9 +14,9 @@ import { useRouter } from 'vue-router';
 import { Event } from '~/data/models/EventModels';
 import EventListItem2 from '~/components/Events/EventListItem-v2/EventListItem2.vue';
 
-defineProps<{
-    event: Event | undefined
-}>();
+const model = defineModel<Event | undefined>('event', {
+    required: true
+});
 
 const router = useRouter();
 </script>

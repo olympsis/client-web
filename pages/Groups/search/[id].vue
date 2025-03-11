@@ -8,6 +8,8 @@
                     <img src="@/assets/icons/chevron/chevron.left.svg"/>
                 </picture>
             </button>
+
+            <h3>Groups Search</h3>
         </div>
 
         <GroupLogoAndBanner :logo-u-r-l="groupLogoURL" :banner-u-r-l="groupBannerURL" :sports="club?.sports" class="media" @clicked-share="handleGroupSharing"/>
@@ -319,10 +321,15 @@ onMounted(() => {
 }
 
 #sub-nav {
-    width: 24px;
     height: 24px;
+    display: flex;
     grid-area: nav;
     margin-left: 1rem;
+    align-items: center;
+
+    h3 {
+        margin-left: 1rem;
+    }
 }
 
 .media {

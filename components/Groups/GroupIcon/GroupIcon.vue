@@ -1,5 +1,5 @@
 <template>
-    <div class="container" :style="{ width: `${size}rem`, height: `${size}rem`}">
+    <div id="group-icon" :style="{ width: `${size}rem`, height: `${size}rem`}">
         <img v-if="image" class="image" :style="{ width: `${size}rem`, height: `${size}rem`}" :src="logo" />
         <div v-else class="icon">
             <picture v-if="type === 'club'">
@@ -36,9 +36,12 @@ const logo = computed(() => {
 </script>
 
 <style scoped>
-.container {
-    background-color: var(--tertiary-background-color);
+#group-icon {
+    display: flex;
+    align-items: center;
     border-radius: 10px;
+    justify-content: center;
+    background-color: var(--tertiary-background-color);
 
     .image {
         border-radius: 10px;

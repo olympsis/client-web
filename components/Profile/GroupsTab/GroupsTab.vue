@@ -42,8 +42,8 @@ defineProps({
         width: 100%;
         display: grid;
         min-height: 10rem;
-        overflow-y: scroll;
         padding: 1rem 0rem;
+        overflow-y: scroll;
         align-items: center;
         grid-auto-flow: column;
         justify-content: center;
@@ -52,6 +52,13 @@ defineProps({
 
     .card {
         min-width: 20rem;
+    }
+
+    @media(max-width: 940px) {
+        .list {
+            overflow-y: unset;
+            grid-auto-flow: row;
+        }
     }
 }
 </style>

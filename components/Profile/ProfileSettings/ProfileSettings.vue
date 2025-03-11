@@ -36,17 +36,11 @@
                 Privacy Policy
             </RouterLink>
             <button class="destructive" @click="$emit('logout')">
-                <picture class="icon">
-                    <source srcset="@/assets/icons/door-open/door.open.fill.white.svg" media="(prefers-color-scheme: dark)">
-                    <img src="@/assets/icons/door-open/door.open.fill.svg">
-                </picture>
+                <img class="icon" src="@/assets/icons/door-open/door.open.fill.white.svg">
                 Log Out
             </button>
             <button class="destructive" @click="$emit('delete')">
-                <picture class="icon">
-                    <source srcset="@/assets/icons/trash/trash.white.svg" media="(prefers-color-scheme: dark)">
-                    <img src="@/assets/icons/trash/trash.svg">
-                </picture>
+                <img class="icon" src="@/assets/icons/trash/trash.white.svg">
                 Delete Account
             </button>
         </div>
@@ -64,6 +58,7 @@ defineEmits([
 
 <style scoped>
 #profile-settings {
+    background-color: var(--secondary-background-color);
     #header {
         button {
             margin-left: 1rem;

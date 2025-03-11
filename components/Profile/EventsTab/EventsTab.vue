@@ -26,5 +26,12 @@ const router = useRouter();
         padding: 1rem 0rem;
         overflow-y: scroll;
     }
+
+    @media(max-width: 940px) {
+        #list {
+            overflow-y: unset;
+            flex-direction: column;
+        }
+    }
 }
 </style>

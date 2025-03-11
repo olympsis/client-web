@@ -47,6 +47,10 @@ const feed = useTemplateRef<typeof PostFeed>('feed');
 watch(model, (newVal, _) => {
     feed.value?.loadPostsForGroup(newVal);
 }, { immediate: true });
+
+onMounted(() => {
+    feed.value?.loadPostsForGroup(model.value);
+});
 </script>
 
 <style scoped>

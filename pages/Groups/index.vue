@@ -354,7 +354,7 @@ definePageMeta({
         'info'
         'feed'
         'feed';
-        margin: 1rem;
+        margin: 0rem 1rem;
         max-width: 58rem;
         padding-left: unset;
         padding-right: unset;

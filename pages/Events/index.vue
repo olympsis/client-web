@@ -267,9 +267,8 @@ definePageMeta({
     width: 100%;
     display: grid;
     height: 100dvh;
-    padding: 0rem 2rem;
     overflow-y: scroll;
-    margin-top: 0.5rem;
+    padding: 1rem 2rem;
     justify-content: center;
     grid-template-rows: 4rem 6rem auto auto auto;
     grid-template-areas: 
@@ -476,7 +475,7 @@ definePageMeta({
 
 @media (max-width: 940px) {
     #events {
-        padding: 0rem 1rem;
+        padding: 1rem;
         grid-template-rows: 6.5rem 5rem auto auto auto;
 
         #header {
@@ -490,7 +489,7 @@ definePageMeta({
             #title {
                 display: flex;
                 flex-direction: row;
-                margin: 0.5rem 0rem;
+                margin-bottom: 0.5rem;
                 align-content: center;
                 justify-content: space-between;
             }

@@ -9,7 +9,7 @@
         />
 
         <!-- Group Info -->
-        <GroupInfo v-if="group" :group="group"/>
+        <GroupInfo v-if="group" :group="group" @show-settings="showSettingsModal"/>
 
         <!-- Groups Selector -->
         <GroupSelector/>
@@ -25,8 +25,42 @@
         
         <!-- New Post Modal -->
         <dialog id="new-post-modal" ref="new-post-modal" class="dialog">
-            <NewPostView  @close="postCardModalRef?.close()" @created="handleNewPost"/>
+            <NewPostView @close="postCardModalRef?.close()" @created="handleNewPost"/>
         </dialog>
+
+        <!-- Group Settings Modal -->
+        <dialog id="settings-modal" ref="settings-modal" class="dialog">
+            <GroupSettingsModal v-if="group" :group="group" @close="hideSettingsModal" @show-leave-modal="showLeaveModal" @show-delete-modal="showDeleteModal"/>
+        </dialog>
+
+        <!-- Leave Group Dialog -->
+        <dialog ref="leave-modal" id="leave-modal" class="dialog" v-if="selectedGroup">
+            <GroupLeaveModal :group="selectedGroup" @close="hideLeaveModal" @success="handleLeaveGroup"/>
+        </dialog>
+
+        <!-- Delete Group Dialog -->
+        <dialog ref="delete-modal" id="delete-modal" class="dialog" v-if="selectedGroup">
+            <GroupDeleteModal :group="selectedGroup" @close="hideDeleteModal" @success="handleLeaveGroup"/>
+        </dialog>
+
+        <!-- Kick Member Dialog -->
+        <dialog ref="kick-modal" id="kick-modal" class="dialog">
+            <GroupKickModal v-if="selectedMember" :member="selectedMember" @close="hideKickModal" @kicked="handleKickedUser"/>
+        </dialog>
+
+        <Dialog
+            ref="op"
+            v-if="selectedMember"
+            id="change-rank-dialog"
+            v-model:visible="showDialog"
+            blockScroll
+            position="center"
+            :style="{'width': '100%', 'max-width': '32rem', 'overflow-y': 'scroll', 'background-color': 'var(--primary-background-color)'}"
+        >
+            <template #container>
+                <ChangeRankModal :member="selectedMember" @close="showDialog = false"/>
+            </template>
+        </Dialog>
     </main>
 </template>
 
@@ -35,6 +69,7 @@ import { type Group } from '~/types/group';
 import { useToast } from 'primevue/usetoast';
 import { Event } from '@/data/models/EventModels';
 import { ref, computed, useTemplateRef } from 'vue';
+import { Member } from '~/data/models/GenericModels';
 import { useSessionStore } from '@/stores/session-store';
 import { useGroupsViewModel } from '@/stores/groups-view-model';
 
@@ -45,15 +80,27 @@ import NewPostView from '@/components/Posts/NewPostView/NewPostView.vue';
 import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
 import GroupSelector from '@/components/Groups/GroupSelector/GroupSelector.vue';
 import GroupNextEvent from '~/components/Groups/GroupNextEvent/GroupNextEvent.vue';
+import ChangeRankModal from '~/components/Modals/Groups/ChangeRank/ChangeRankModal.vue';
+import GroupKickModal from '~/components/Modals/Groups/GroupKickModal/GroupKickModal.vue';
 import GroupSmallSection from '~/components/Groups/GroupSmallSection/GroupSmallSection.vue';
+import GroupLeaveModal from '@/components/Modals/Groups/GroupLeaveModal/GroupLeaveModal.vue';
 import GroupLogoAndBanner from '~/components/Groups/GroupLogoAndBanner/GroupLogoAndBanner.vue';
+import GroupDeleteModal from '@/components/Modals/Groups/GroupDeleteModal/GroupDeleteModal.vue';
+import GroupSettingsModal from '~/components/Modals/Groups/GroupSettings/GroupSettingsModal.vue';
 
 const toast = useToast();
 const modelStore = useModelStore();
 const sessionStore = useSessionStore();
 const viewModel = useGroupsViewModel();
 
+const showDialog = ref(false);
+const selectedMember = ref<Member | undefined>(undefined);
+
 const feed = useTemplateRef<typeof PostFeed>('feed');
+const kickModalRef = useTemplateRef<HTMLDialogElement>('kick-modal');
+const leaveModalRef = useTemplateRef<HTMLDialogElement>('leave-modal');
+const deleteModalRef = useTemplateRef<HTMLDialogElement>('delete-modal');
+const settingsModalRef = useTemplateRef<HTMLDialogElement>('settings-modal');
 const postCardModalRef = useTemplateRef<HTMLDialogElement>('new-post-modal');
 
 /**
@@ -90,10 +137,6 @@ const nextEvent = computed<Event | undefined>(() => {
         .mostRecentForClub(clubId);
 });
 
-const groupName = computed<string>(() => {
-    return group.value?.name ?? 'Olympsis Group';
-});
-
 async function handleGroupSharing() {
     const groupID = selectedGroup.value?.club?.id ?? selectedGroup.value?.organization?.id ?? '';
     await navigator.clipboard.writeText(`https://olympsis.com/groups/search/${groupID}`);
@@ -105,9 +148,101 @@ function handleNewPost(event: any) {
     postCardModalRef.value?.close();
 }
 
+function showSettingsModal() {
+    if (settingsModalRef.value) {
+        settingsModalRef.value.show();
+    } else {
+        console.error('Failed to find settings dialog template reference.');
+    }
+}
+
+function hideSettingsModal() {
+    if (settingsModalRef.value) {
+        settingsModalRef.value.close();
+    } else {
+        console.error('Failed to find settings dialog template reference.');
+    }
+}
+
+function showLeaveModal() {
+    if (leaveModalRef.value) {
+        hideDeleteModal();
+        leaveModalRef.value.show();
+    } else {
+        console.error('Failed to find Leave Dialog template reference.');
+    }
+}
+
+function hideLeaveModal() {
+    if (leaveModalRef.value) {
+        leaveModalRef.value.close();
+    } else {
+        console.error('Failed to find Leave Dialog template reference.');
+    }
+}
+
+function showDeleteModal() {
+    if (deleteModalRef.value) {
+        hideLeaveModal();
+        deleteModalRef.value.show();
+    } else {
+        console.error('Failed to find Delete Dialog template reference.');
+    }
+}
+
+function hideDeleteModal() {
+    if (deleteModalRef.value) {
+        deleteModalRef.value.close();
+    } else {
+        console.error('Failed to find Delete Dialog template reference.');
+    }
+}
+
+function showKickModal() {
+    if (kickModalRef.value) {
+        kickModalRef.value.show();
+    } else {
+        console.error('Failed to find Kick Dialog template reference.');
+    }
+}
+
+function hideKickModal() {
+    if (kickModalRef.value) {
+        kickModalRef.value.close();
+    } else {
+        console.error('Failed to find Kick Dialog template reference.');
+    }
+}
+
+function handleLeaveGroup() {
+    sessionStore.removeGroup(selectedGroup.value?.id ?? '');
+}
+
+function handleChangeRank(event: { member: Member}) {
+    selectedMember.value = event.member;
+    showDialog.value = true;
+}
+
+function handleRemoveUser(event: { member: Member}) {
+    selectedMember.value = event.member;
+    showKickModal();
+}
+
+function handleKickedUser() {
+    hideKickModal();
+    if (!selectedMember.value) return;
+    const selectedGroup = sessionStore.selectedGroup?.club ?? sessionStore.selectedGroup?.organization;
+    if (!selectedGroup) return;
+
+    const idx = selectedGroup.members?.findIndex((m) => m.id === selectedMember.value?.id) ?? -1;
+    if (idx != undefined && idx == -1) return;
+
+    selectedGroup.members?.splice(idx, 1);
+}
+
 useSeoMeta({
-    title: () => `${groupName.value} | Olympsis`,
-    ogTitle: () => `${groupName.value} | Olympsis`,
+    title: () => `${group.value?.name} | Olympsis`,
+    ogTitle: () => `${group.value?.name} | Olympsis`,
     description: 'Join groups around the sports you love!',
     ogDescription: 'Join groups around the sports you love'
 });
@@ -115,7 +250,6 @@ useSeoMeta({
 definePageMeta({
     key: route => route.fullPath
 });
-
 </script>
 
 <style scoped>
@@ -153,6 +287,62 @@ definePageMeta({
         @media (max-width: 940px) {
             max-width: 25rem;
         }
+    }
+}
+
+#settings-modal {
+    top: 0;
+    border: unset;
+    background: transparent;
+    backdrop-filter: blur(5px);
+
+    #group-settings-modal {
+        border-radius: 20px;
+        max-width: 25rem !important;
+        box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+        background-color: var(--secondary-background-color);
+    }
+}
+
+#leave-modal {
+    top: 0;
+    border: unset;
+    background: transparent;
+    backdrop-filter: blur(5px);
+
+    #group-leave-modal {
+        border-radius: 20px;
+        max-width: 25rem !important;
+        box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+        background-color: var(--secondary-background-color);
+    }
+}
+
+#delete-modal {
+    top: 0;
+    border: unset;
+    background: transparent;
+    backdrop-filter: blur(5px);
+
+    #group-delete-modal {
+        border-radius: 20px;
+        max-width: 25rem !important;
+        box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+        background-color: var(--secondary-background-color);
+    }
+}
+
+#kick-modal {
+    top: 0;
+    border: unset;
+    background: transparent;
+    backdrop-filter: blur(5px);
+
+    #group-kick-modal {
+        border-radius: 20px;
+        max-width: 25rem !important;
+        box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+        background-color: var(--secondary-background-color);
     }
 }
 

@@ -195,11 +195,12 @@ a:any-link:active {
 }
 
 .button {
-    all: unset;
+	all: unset;
     cursor: pointer;
     padding: 0.5rem;
     height: fit-content;
     border-radius: 10px;
+	border: var(--component-border) solid 1px;
     background-color: var(--secondary-background-color);
 
     &:hover {
@@ -212,5 +213,11 @@ a:any-link:active {
 
 	&:disabled {
 		background-color: var(--olympsis-gray) !important;
+	}
+
+	picture {
+		display: flex;
+		align-items: center;
+		justify-content: center;
 	}
 }

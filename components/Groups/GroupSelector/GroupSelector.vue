@@ -1,6 +1,15 @@
 <template>
     <div id="group-selector">
-        <h2>Your Groups</h2>
+        <div id="header">
+            <h2>Your Groups</h2>
+
+            <button class="button" @click="router.push('/groups/search')">
+                <picture>
+                    <source srcset="@/assets/icons/search/search.white.svg" media="(prefers-color-scheme: dark)">
+                    <img src="@/assets/icons/search/search.svg">
+                </picture>
+            </button>
+        </div>
         <ul id="group-list" v-if="state != VIEW_STATE.LOADING">
             <div 
                 v-for="group in groups" 
@@ -25,6 +34,7 @@ import { GroupSelection } from '~/data/models/GenericModels';
 import GroupIcon from '../GroupIcon/GroupIcon.vue';
 import GroupSelectorSkeleton from './GroupSelectorSkeleton.vue';
 
+const router = useRouter();
 const sessionStore = useSessionStore();
 
 const state = computed(() => {
@@ -63,6 +73,12 @@ function selectGroup(group: GroupSelection){
     border: var(--component-border) solid 1px;
     background-color: var(--secondary-background-color);
     
+    #header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
     #group-list {
         width: 100%; 
         height: 13rem;

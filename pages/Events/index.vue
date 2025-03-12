@@ -93,6 +93,7 @@ import SearchBar from '@/components/SearchBar/SearchBar.vue';
 import SportsFilter from '~/components/SportsFilter/SportsFilter.vue';
 import EventListItem2 from '~/components/Events/EventListItem-v2/EventListItem2.vue';
 import EventsSettings from '~/components/Dialog/Events/EventsSettings/EventsSettings.vue';
+import { Location } from '~/data/models/GenericModels';
 
 const router = useRouter();
 const session = useSessionStore();
@@ -163,9 +164,19 @@ async function fetchEvents(fetchCompleted: boolean = false) {
 
     let _events: Event[];
     const sports = session.user?.sports.join(',') ?? 'all'
-    const location = session.lastKnownLocation;
-
-    if (!location) throw('Failed to get location. IMPLEMENT BETTER FALLBACK');
+    let location = session.lastKnownLocation;
+    if (!location) { 
+        location = new Location(
+            40.76553,
+            -73.97770,
+            'Manhattan',
+            'New York',
+            'NY',
+            '',
+            'United States',
+            'US'
+        );
+    }
 
     _events = await eventService.getEvents(
         location.latitude, 

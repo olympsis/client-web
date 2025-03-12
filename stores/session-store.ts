@@ -147,12 +147,6 @@ export const useSessionStore = defineStore('session-store', () => {
         }
     }
 
-    // async function requestLocation(): Promise<boolean> {
-    //     const resp = await location.requestLocationPermission();
-    //     if (resp == 'denied') { return false; }
-    //     return true;
-    // }
-
     function handleNavigation() {
         // Don't show loading screen during navigation if already loaded
         if (hasLoaded.value) {

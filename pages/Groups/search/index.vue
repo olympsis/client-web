@@ -151,6 +151,13 @@ async function fetchClubs() {
     }
 }
 
+sessionStore.$subscribe((mutation: any, state) => {
+    const payload = mutation.payload;
+    if (payload?.lastKnownLocation) {
+        fetchClubs();
+    }
+});
+
 useSeoMeta({
     title: () => 'Groups | Olympsis',
     ogTitle: () => 'Groups | Olympsis',

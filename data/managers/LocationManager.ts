@@ -69,6 +69,7 @@ export class LocationManager {
      * @returns A promise that resolves to a Location object
      */
     public async getPositionWithTimeout(): Promise<{ location: Location, permissionState: PermissionState }> {
+        const session = useSessionStore();
         const { $locationDialog } = useNuxtApp();
         const permissionState = await this.hasLocationAccess();
         
@@ -97,9 +98,13 @@ export class LocationManager {
 
             if (permission === 'manual') {
                 this.storeFallBackLocation(location);
-            } else {
-                this.storeLastKnownLocation(location);
             }
+
+            this.storeLastKnownLocation(location);
+
+            session.$patch({
+                lastKnownLocation: location
+            });
 
             return {
                 location,
@@ -121,9 +126,14 @@ export class LocationManager {
             
             const { latitude, longitude } = position.coords;
             this.storeLastKnownLocation(new Location(latitude, longitude));
+            const loc = new Location(latitude, longitude);
+            
+            session.$patch({
+                lastKnownLocation: loc
+            });
 
             return { 
-                location: new Location(latitude, longitude), 
+                location: loc, 
                 permissionState 
             };
         } catch (error) {

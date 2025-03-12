@@ -130,7 +130,7 @@
 </template>
 
 <script setup lang="ts">
-
+import * as Sentry from "@sentry/nuxt";
 import { computed, ref, watch, onMounted } from 'vue';
 import type { Ref, ComputedRef } from 'vue';
 import { useModelStore } from '@/stores/model-store';
@@ -495,7 +495,7 @@ function removeVenue(venue: VenueDescriptor) {
         model.value.splice(index, 1);
         randomKey.value += 1;
     } else {
-        console.error(`Failed to remove venue(${venue.name}) from selected list`);
+        Sentry.captureMessage(`Failed to remove venue(${venue.name}) from selected list`);
     }
 }
 

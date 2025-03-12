@@ -18,6 +18,7 @@
 </template>
 
 <script setup lang="ts">
+import * as Sentry from "@sentry/nuxt";
 import { VIEW_STATE } from '~/data/Enums';
 import { Event } from '~/data/models/EventModels';
 import type { Venue } from '~/data/models/VenueModels';
@@ -75,7 +76,7 @@ onMounted(() => {
             mapState.value = VIEW_STATE.SUCCESS;
         })
         .catch((error) => {
-            console.error(`Failed to load snapshot. Error: ${error}`);
+            Sentry.captureException(error);
             mapState.value = VIEW_STATE.FAILURE;
         });
 });

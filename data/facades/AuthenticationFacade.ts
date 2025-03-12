@@ -9,6 +9,8 @@ import {
     type Auth
 } from "firebase/auth";
 
+import * as Sentry from '@sentry/nuxt';
+
 import type { UserDTO } from "../models/UserModels";
 
 import { AuthRequest } from "../models/AuthModels";
@@ -67,6 +69,10 @@ class AuthenticationFacade {
             }
             return response;
         } catch(error: any) {
+            Sentry.withScope((scope) => {
+                scope.setExtra('action', 'apple_signin');
+                Sentry.captureException(error);
+            });
             console.error(`Failed to sign user in with Apple. Error Code (${error.code}): ${error.message}`);
             return null;
         }
@@ -107,7 +113,11 @@ class AuthenticationFacade {
             }
             return response;
         } catch(error: any) {
-            console.error(`Failed to sign user in with Apple. Error Code (${error.code}): ${error.message}`);
+            Sentry.withScope((scope) => {
+                scope.setExtra('action', 'google_signin');
+                Sentry.captureException(error);
+            });
+            console.error(`Failed to sign user in with Google. Error Code (${error.code}): ${error.message}`);
             return null;
         }
     }
@@ -123,6 +133,10 @@ class AuthenticationFacade {
             logEvent(this.analytics, 'signup_completed')
             return true;
         } catch (error) {
+            Sentry.withScope((scope) => {
+                scope.setExtra('action', 'complete_signup');
+                Sentry.captureException(error);
+            });
             console.error(`Failed to complete signup. Error: ${error}`);
             return false;
         }
@@ -150,6 +164,10 @@ class AuthenticationFacade {
             
             return true;
         } catch (error) {
+            Sentry.withScope((scope) => {
+                scope.setExtra('action', 'signout');
+                Sentry.captureException(error);
+            });
             console.error("Error during signOut:", error);
             return true; // Return true to allow UI to update anyway
         }

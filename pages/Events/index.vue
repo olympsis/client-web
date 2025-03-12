@@ -84,6 +84,7 @@
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
+import * as Sentry from '@sentry/nuxt';
 import { VIEW_STATE } from '@/data/Enums';
 import { useSessionStore } from '@/stores/session-store';
 import { EventService } from '@/data/services/EventService';
@@ -214,8 +215,47 @@ function retryFetchEvents() {
             state.value = VIEW_STATE.FAILURE;
             const config = useRuntimeConfig();
             if (config.public.MODE !== 'dev') return;
+
             console.error('Failed to get events. Error: ', error);
+            Sentry.withScope((scope) => {
+                scope.setExtra('action', 'fetch_events');
+                Sentry.captureException(error);
+            });
         });
+}
+
+async function handleSettingsChanged(event: { radius: number, sports: any}) {
+    eventSettingsModalRef.value?.close();
+    state.value = VIEW_STATE.LOADING;
+
+    let _events: Event[];
+    const radius = event.radius * 1609;
+    const sports = event.sports.value.map((s: any) => s.valueOf()).join(',');
+    const location = session.lastKnownLocation;
+
+    if (!location) throw('Failed to get location. IMPLEMENT BETTER FALLBACK');
+
+    try {
+        _events = await eventService.getEvents(
+            location.latitude, 
+            location.longitude, 
+            radius, // Radius of lookup
+            sports, // Sports involved
+            'pending, live', // Status of events
+            0,
+            100
+        );
+
+        events.value = _events;
+        state.value = VIEW_STATE.SUCCESS;
+    } catch (error) {
+        state.value = VIEW_STATE.FAILURE;
+        console.error('Failed to fetch events. Error: ' + error);
+        Sentry.withScope((scope) => {
+            scope.setExtra('action', 'fetch_events');
+            Sentry.captureException(error);
+        });
+    }
 }
 
 useSeoMeta({
@@ -250,6 +290,10 @@ onMounted(() => {
         })
         .catch((error) => {
             console.error('Failed to get events. Error: ', error);
+            Sentry.withScope((scope) => {
+                scope.setExtra('action', 'fetch_events');
+                Sentry.captureException(error);
+            });
             state.value = VIEW_STATE.FAILURE;
         });
 });

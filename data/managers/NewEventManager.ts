@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
+import * as Sentry from '@sentry/nuxt';
 import { EventService } from "../services/EventService";
 import { MEDIA_TYPE, EVENT_VISIBILITY } from '../Enums';
 import { useSessionStore } from "@/stores/session-store";
@@ -132,6 +133,10 @@ export class NewEventManager {
         } catch(error) {
             // Only delete the uploaded image on error if it's a custom uploaded one
             if (dao.mediaURL && isCustomImage) await this.uploadService.deleteImage(dao.mediaURL, 'olympsis-event-images');
+            Sentry.withScope((scope) => {
+                scope.setExtra('action', 'create_event');
+                Sentry.captureException(error);
+            });
             console.error(`Failed to create new event. Error: ${error}`)
             return null;
         }

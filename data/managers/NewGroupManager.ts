@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
+import * as Sentry from '@sentry/nuxt';
 import { UserSnippet } from "../models/UserModels";
 import { Club, ClubDao } from "../models/ClubModels";
 import { useModelStore } from "@/stores/model-store";
@@ -126,7 +127,11 @@ export class NewGroupManager {
             const name = `${uuidv4()}.jpeg`;
             return await this.uploadService.uploadImage(blob, name, bucket);
         } catch (error) {
-            console.error('Failed to upload image. Error: ', error)
+            console.error('Failed to upload image. Error: ', error);
+            Sentry.withScope((scope) => {
+                scope.setExtra('action', 'upload_group_image');
+                Sentry.captureException(error);
+            });
             throw('Failed to upload image');
         }
     }
@@ -138,38 +143,52 @@ export class NewGroupManager {
      * @returns 
      */
     public async createNewGroup(dao: ClubDao | OrganizationDao) : Promise <string | null> {
-        if (dao instanceof ClubDao) {
-            if (dao.logo) {
-                const resp = await this.handleImageUpload(dao.logo, 'olympsis-club-images');
-                dao.logo = resp.url?.replace(/^olympsis-/, '');
+        try {
+            if (dao instanceof ClubDao) {
+                if (dao.logo) {
+                    const resp = await this.handleImageUpload(dao.logo, 'olympsis-club-images');
+                    dao.logo = resp.url?.replace(/^olympsis-/, '');
+                }
+                if (dao.banner) {
+                    const resp = await this.handleImageUpload(dao.banner, 'olympsis-club-images');
+                    dao.banner = resp.url?.replace(/^olympsis-/, '');
+                }
+                const id = await this.clubService.createClub(dao);
+                if (id) {
+                    return id;
+                }
+    
+                Sentry.withScope((scope) => {
+                    scope.setExtra('action', 'create_group');
+                    Sentry.captureMessage('Failed to create new group.')
+                });
+                return null;
+            } else if (dao instanceof OrganizationDao) {
+                if (dao.logo) {
+                    const resp = await this.handleImageUpload(dao.logo, 'olympsis-org-images');
+                    dao.logo = resp.url?.replace(/^olympsis-/, '');
+                }
+                if (dao.banner) {
+                    const resp = await this.handleImageUpload(dao.banner, 'olympsis-org-images');
+                    dao.banner = resp.url?.replace(/^olympsis-/, '');
+                }
+                const id = await this.organizationService.createOrganization(dao);
+                if (id) {
+                    return id;
+                }
+    
+                Sentry.withScope((scope) => {
+                    scope.setExtra('action', 'create_group');
+                    Sentry.captureMessage('Failed to create new group.')
+                });
+                return null;
             }
-            if (dao.banner) {
-                const resp = await this.handleImageUpload(dao.banner, 'olympsis-club-images');
-                dao.banner = resp.url?.replace(/^olympsis-/, '');
-            }
-            const id = await this.clubService.createClub(dao);
-            if (id) {
-                return id;
-            }
-
-            return null;
-        } else if (dao instanceof OrganizationDao) {
-            if (dao.logo) {
-                const resp = await this.handleImageUpload(dao.logo, 'olympsis-org-images');
-                dao.logo = resp.url?.replace(/^olympsis-/, '');
-            }
-            if (dao.banner) {
-                const resp = await this.handleImageUpload(dao.banner, 'olympsis-org-images');
-                dao.banner = resp.url?.replace(/^olympsis-/, '');
-            }
-            const id = await this.organizationService.createOrganization(dao);
-            if (id) {
-                return id;
-            }
-
-            return null;
+        } catch (error) {
+            Sentry.withScope((scope) => {
+                scope.setExtra('action', 'create_group');
+                Sentry.captureException(error);
+            });
         }
-
         return null;
     }
 

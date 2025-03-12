@@ -24,3 +24,5 @@ logs
 !.env.example
 
 *storybook.log
+# Sentry Config File
+.env.sentry-build-plugin

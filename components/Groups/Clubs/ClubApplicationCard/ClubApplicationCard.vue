@@ -24,6 +24,7 @@ import { computed, type ComputedRef, ref, type Ref } from 'vue';
 import { useSessionStore } from '@/stores/session-store';
 import { ClubApplication, ClubApplicationDao } from '@/data/models/ClubModels';
 
+import * as Sentry from "@sentry/nuxt";
 import UserIcon from '@/components/UserIcon/UserIcon.vue';
 import TextButton from '@/components/Buttons/LoadingButtons/TextButton/TextButton.vue';
 
@@ -72,7 +73,8 @@ function handleApplicationResponse(status: string) {
                     }, 500);
                 }
             })
-            .catch(() => {
+            .catch((error) => {
+                Sentry.captureException(error);
                 buttonState.value = VIEW_STATE.FAILURE;
             });
     } else {

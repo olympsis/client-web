@@ -68,6 +68,7 @@
 
 <script setup lang="ts">
 import { type Ref, ref } from 'vue';
+import * as Sentry from "@sentry/nuxt";
 import { LocaleService } from '@/data/services/LocaleService';
 import { AdministrativeArea, Country, SubAdministrativeArea } from '@/data/models/GenericModels';
 
@@ -114,6 +115,7 @@ async function fetchCountries() {
 			loading.value = false	
 		}
     } catch (error) {
+		Sentry.captureException(error);
         console.error('Error fetching countries:', error)
     } finally {
         loading.value = false
@@ -128,6 +130,7 @@ async function fetchStates() {
 			states.value = resp.sort((a, b) => a.name.localeCompare(b.name));;
 		}
 	} catch (error) {
+		Sentry.captureException(error);
 		console.error('Error fetching administrative areas:', error)
 	} finally {
 
@@ -142,6 +145,7 @@ async function fetchCities() {
 			cities.value = resp.sort((a, b) => a.name.localeCompare(b.name));;
 		}
 	} catch (error) {
+		Sentry.captureException(error);
 		console.error('Error fetching administrative areas:', error)
 	} finally {
 

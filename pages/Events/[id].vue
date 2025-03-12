@@ -207,6 +207,11 @@ async function handleResponse(response: number) {
     } catch(error) {
         primaryState.value = VIEW_STATE.PENDING;
         console.error(`Failed to add participant. Error: ${error}`);
+        Sentry.withScope((scope) => {
+            scope.setExtra('action', 'rsvp');
+            scope.setExtra('event', event.value.id);
+            Sentry.captureException(error);
+        });
         return;
     }
 }

@@ -33,6 +33,7 @@
 </template>
 
 <script setup lang="ts">
+import * as Sentry from "@sentry/nuxt";
 import { GROUP_TYPE, VIEW_STATE } from '~/data/Enums';
 import type { Club } from '~/data/models/ClubModels';
 import { SnapshotService } from '~/data/services/SnapshotService';
@@ -90,6 +91,7 @@ function fetchMapImage() {
             mapState.value = VIEW_STATE.SUCCESS;
         })
         .catch((error) => {
+            Sentry.captureException(error);
             console.error(`Failed to load snapshot. Error: ${error}`);
             mapState.value = VIEW_STATE.FAILURE;
         });

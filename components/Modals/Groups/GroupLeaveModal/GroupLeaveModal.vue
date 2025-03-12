@@ -31,6 +31,7 @@ import { ClubService } from '@/data/services/ClubService';
 import { GroupSelection } from '@/data/models/GenericModels';
 import { OrganizationService } from '@/data/services/OrganizationService';
 
+import * as Sentry from '@sentry/nuxt';
 import TextButton from '@/components/Buttons/LoadingButtons/TextButton/TextButton.vue';
 
 const emit = defineEmits([
@@ -68,11 +69,21 @@ function handleLeaveGroup() {
                                 state.value = VIEW_STATE.PENDING;
                             }, 200);
                         } else {
+                            Sentry.withScope((scope) => {
+                                scope.setExtra('action', 'leave_club');
+                                Sentry.captureMessage(`Failed to leave club. ID: ${props.group.club?.id}`);
+                            });
+                            state.value = VIEW_STATE.FAILURE;
                             emit('close');
                             state.value = VIEW_STATE.PENDING;
                         }
                     })
                     .catch((error) => {
+                        Sentry.withScope((scope) => {
+                            scope.setExtra('action', 'leave_club');
+                            scope.setExtra('message', `Failed to leave club ${props.group.club?.id}.`);
+                            Sentry.captureException(error);
+                        });
                         console.error(`Failed to leave club ${props.group.club?.id}. Error: ${error}`);
                         emit('close');
                         state.value = VIEW_STATE.PENDING;
@@ -92,12 +103,21 @@ function handleLeaveGroup() {
                                 state.value = VIEW_STATE.PENDING;
                             }, 200);
                         } else {
+                            Sentry.withScope((scope) => {
+                                scope.setExtra('action', 'leave_organization');
+                                Sentry.captureMessage(`Failed to leave organization. ID: ${props.group.organization?.id}`);
+                            });
                             state.value = VIEW_STATE.FAILURE;
                             emit('close');
                             state.value = VIEW_STATE.PENDING;
                         }
                     })
                     .catch((error) => {
+                        Sentry.withScope((scope) => {
+                            scope.setExtra('action', 'leave_organization');
+                            scope.setExtra('message', `Failed to leave organization: ${props.group.organization?.id}.`);
+                            Sentry.captureException(error);
+                        });
                         console.error(`Failed to leave organization: ${props.group.organization?.id}.  Error: ${error}`);
                         state.value = VIEW_STATE.FAILURE;
                         emit('close');

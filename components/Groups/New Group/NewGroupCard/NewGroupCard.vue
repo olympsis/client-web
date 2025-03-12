@@ -78,6 +78,8 @@ import { Organization } from '@/data/models/OrganizationModels';
 import { GROUP_VISIBILITY, SPORTS, VIEW_STATE } from '~/data/Enums';
 import { NewGroupManager, NEW_GROUP_ERROR } from '@/data/managers/NewGroupManager';
 
+import * as Sentry from "@sentry/nuxt";
+
 import GroupTypePicker from '../GroupTypePicker/GroupTypePicker.vue';
 import LocalePicker from '@/components/LocalePicker/LocalePicker.vue';
 import MultiSportsPicker from '@/components/MultiSportsPicker/MultiSportsPicker.vue';
@@ -202,6 +204,7 @@ function createNewGroup() {
                         })
                         .catch((error: any) => {
                             state.value = VIEW_STATE.FAILURE;
+                            Sentry.captureException(error);
                             console.error(`Failed to create group. Error ${error}`);
                         });
                 }

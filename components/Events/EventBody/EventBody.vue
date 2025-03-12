@@ -17,7 +17,7 @@
 <script setup lang="ts">
 import { Event } from '~/data/models/EventModels';
 import { Venue } from '~/data/models/VenueModels';
-import { AUTH_STATUS, EVENT_PENDING_STATE, EVENT_STATE, VIEW_STATE } from '~/data/Enums';
+import { EVENT_PENDING_STATE, EVENT_STATE, VIEW_STATE } from '~/data/Enums';
 
 import CarBlockButton from '~/components/Buttons/BlockImageButton/CarBlockButton.vue';
 import GlobeBlockButton from '~/components/Buttons/BlockImageButton/GlobeBlockButton.vue';
@@ -37,11 +37,13 @@ const emit = defineEmits([
     'open-rsvp',
     'open-settings'
 ]);
+
+const auth = useAuth();
 const session = useSessionStore();
 const primaryState = ref<VIEW_STATE>(VIEW_STATE.PENDING);
 
 const isAuthenticated = computed<boolean>(() => {
-    return session.authStatus === AUTH_STATUS.authenticated;
+    return auth.isAuthenticated.value;
 });
 
 const eventState = computed<EVENT_STATE>(() => {

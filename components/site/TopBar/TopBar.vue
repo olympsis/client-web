@@ -22,13 +22,15 @@
 import { ref } from 'vue'
 import { AUTH_STATUS } from '~/data/Enums';
 
-const isOpen = ref(false);
+const auth = useAuth();
 const route = useRoute();
 const router = useRouter();
 const session = useSessionStore();
 
+const isOpen = ref(false);
+
 const isAuthenticated = computed<boolean>(() => {
-    return session.authStatus === AUTH_STATUS.authenticated;
+    return auth.isAuthenticated.value;
 });
 
 const primaryText = computed<string>(() => {

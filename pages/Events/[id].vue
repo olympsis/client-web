@@ -60,6 +60,7 @@ import { computed, ref, type Ref, useTemplateRef, } from 'vue';
 import { Organization } from '@/data/models/OrganizationModels';
 import { Participant, ParticipantDao } from '@/data/models/GenericModels';
 
+import * as Sentry from '@sentry/nuxt';
 import EventBody from '~/components/Events/EventBody/EventBody.vue';
 import EventMedia from '~/components/Events/EventMedia/EventMedia.vue';
 import EventHeader from '~/components/Events/EventHeader/EventHeader.vue';
@@ -209,7 +210,7 @@ async function handleResponse(response: number) {
         console.error(`Failed to add participant. Error: ${error}`);
         Sentry.withScope((scope) => {
             scope.setExtra('action', 'rsvp');
-            scope.setExtra('event', event.value.id);
+            scope.setExtra('event', event.value?.id);
             Sentry.captureException(error);
         });
         return;

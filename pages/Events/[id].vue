@@ -47,29 +47,27 @@
 </template>
 
 <script setup lang="ts">
-import { EVENT_VISIBILITY, GROUP_ROLE, VIEW_STATE } from '@/data/Enums';
+import { 
+    AUTH_STATUS, 
+    EVENT_PENDING_STATE, 
+    EVENT_STATE, 
+} from '@/data/Enums';
+
+import { VIEW_STATE } from '@/data/Enums';
 import { useToast } from 'primevue/usetoast';
 import { Club } from '@/data/models/ClubModels';
 import { useRoute, useRouter } from 'vue-router';
-import { generateImageURL } from '~/utils/image-helpers';
 import { Venue } from '@/data/models/VenueModels';
 import { Event } from '@/data/models/EventModels';
 import { getDirections } from '~/utils/map-helpers';
 import { useModelStore } from '@/stores/model-store';
 import { UserSnippet } from '@/data/models/UserModels';
 import { useSessionStore } from '@/stores/session-store';
+import { generateImageURL } from '~/utils/image-helpers';
 import { getAnalytics, logEvent } from "firebase/analytics";
 import { Organization } from '@/data/models/OrganizationModels';
 import { Participant, ParticipantDao } from '@/data/models/GenericModels';
 import { computed, onMounted, ref, type Ref, useTemplateRef, } from 'vue';
-import { 
-    AUTH_STATUS, 
-    EVENT_PENDING_STATE, 
-    EVENT_SKILL_LEVEL, 
-    EVENT_STATE, 
-    GROUP_TYPE,
-    eventSkillLevelToNumber, 
-} from '@/data/Enums';
 
 import EventBody from '~/components/Events/EventBody/EventBody.vue';
 import EventMedia from '~/components/Events/EventMedia/EventMedia.vue';
@@ -79,15 +77,12 @@ import EventOrganizers from '~/components/Events/EventOrganizers/EventOrganizers
 
 import AuthModal from '@/components/Auth/AuthModal/AuthModal.vue';
 import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
-import CarBlockButton from '~/components/Buttons/BlockImageButton/CarBlockButton.vue';
-import GlobeBlockButton from '~/components/Buttons/BlockImageButton/GlobeBlockButton.vue';
 import EventRSVPModal from '@/components/Modals/Events/EventRSVPModal/EventRSVPModal.vue';
 import EventParticipantsPeek from '@/components/Events/EventParticipants/EventParticipants.vue';
-import EllipsisBlockButton from '~/components/Buttons/BlockImageButton/EllipsisBlockButton.vue';
-import EventPrimaryButton from '@/components/Buttons/EventPrimaryButton/EventPrimaryButton.vue';
 import EventDetailSettingsModal from '@/components/Modals/Events/EventDetailSettingsModal/EventDetailSettingsModal.vue';
 import EventParticipantsListModal from '@/components/Modals/Events/EventParticipantsListModal/EventParticipantsListModal.vue';
 
+const auth = useAuth();
 const toast = useToast();
 const route = useRoute();
 const router = useRouter();
@@ -98,12 +93,10 @@ const clubs: Ref<Array<Club>> = ref([]);
 const venues: Ref<Array<Venue>> = ref([]);
 const orgs: Ref<Array<Organization>> = ref([]);
 
-const state = ref<VIEW_STATE>(VIEW_STATE.PENDING);
 const failed: Ref<boolean | undefined> = ref(false);
 const primaryState = ref<VIEW_STATE>(VIEW_STATE.PENDING);
             
 const event: Ref<Event | undefined> = ref(undefined);
-const timeElapsed: Ref<string> = ref('');
 
 const authModal = useTemplateRef<HTMLDialogElement>('auth-modal');
 const rsvpModal = useTemplateRef<HTMLDialogElement>('rsvp-modal');
@@ -119,29 +112,7 @@ const eventID = computed<string>(() => {
  */
 
 const isAuthenticated = computed<boolean>(() => {
-    return session.authStatus === AUTH_STATUS.authenticated;
-});
-
-const isAdmin = computed<boolean>(() => {
-    const uuid = session.user?.uuid;
-    const adminGroups = session.groups.filter((g) => {
-        const group = g.club ?? g.organization;
-        if (!group) return false;
-        return group.members?.find((m) => m.user?.uuid === uuid && m.role !== GROUP_ROLE.MEMBER);
-    });
-    return adminGroups.find((g) => {
-        const group = g.club ?? g.organization;
-        if (!group) return false;
-        return event.value?.organizers.find((o) => o.id === group.id);
-    }) != undefined;
-});
-
-const isShareable = computed<boolean>(() => {
-    if (isAdmin.value == true) {
-        return true;
-    } else {
-        return event.value?.visibility === EVENT_VISIBILITY.PUBLIC;
-    }
+    return auth.isAuthenticated.value;
 });
 
 const eventState = computed<EVENT_STATE>(() => {
@@ -172,252 +143,8 @@ const eventBody = computed<string>(() => {
     return event.value?.body ?? 'Join olympsis to find sports events near you!';
 });
 
-const eventStatusText = computed<string>(() => {
-    const minParticipants = event.value?.minParticipants;
-
-    if (eventState.value === EVENT_STATE.COMPLETED) {
-        return 'Ended'
-    } else if (eventState.value === EVENT_STATE.LIVE) {
-        return 'Live'
-    } else if (minParticipants && minParticipants < (event.value?.participants?.length ?? 0)) {
-        return 'Pending';
-    } else {
-        return 'Game On!'
-    }
-});
-
 const eventImageURL = computed<string | undefined>(() => {
     return event.value?.imageURL ? generateImageURL(event.value?.imageURL) : undefined;
-});
-
-const organizers = computed<string>(() => {
-    const arr = event.value?.organizers;
-    const names: string[] = [];
-
-    if (arr && (clubs.value.length != 0 || orgs.value.length != 0)) {
-        arr.forEach((organizer) => {
-            switch(organizer.type) {
-                default:// Club
-                    const c = clubs.value.find((c) => { return c.id == organizer.id });
-                    if (c?.name) {
-                        names.push(c?.name);
-                    }
-                case 1:// Org
-                    const o = orgs.value.find((o) => { return o.id == organizer.id });
-                    if (o?.name) {
-                        names.push(o.name);
-                    }
-            }
-        });
-    }
-
-    if (names.length == 1) {
-        return names[0];
-    } else if (names.length == 2) {
-        return `${names[0]} and ${names[1]}`
-    } else if (names.length > 2) {
-        return `${names[0]} and ${names.length - 1} others`;
-    } else {
-        return 'Unknown Group'
-    }
-});
-
-const venueName = computed<string>(() => {
-    const names: string[] = [];
-    const descriptors = event.value?.venues;
-    if (descriptors) {
-        descriptors.forEach((d) => {
-            const venue = venues.value.find((v) => { return v.id == d.id });
-            if (venue) {
-                if (venue.name) {
-                    names.push(venue.name);
-                }
-            } else if(d.name) {
-                names.push(d.name);
-            }
-        });
-    }
-
-    if (names.length == 1) {
-        return names[0];
-    } else if (names.length > 1) {
-        return `${names[0]} & ${names.length-1} more`
-    } else {
-        return 'Unknown Venue';
-    }
-});
-
-const venueLocation = computed<string>(() => {
-    const cities: Map<string, number> = new Map();
-    const states: Map<string, number> = new Map();
-    const countries: Map<string, number> = new Map();
-
-    const descriptors = event.value?.venues;
-    if (descriptors) {
-        descriptors.forEach((d) => {
-            const venue = venues.value.find((v) => { return v.id == d.id });
-            if (venue) {
-                const city = venue.city;
-                const state = venue.state;
-                const country = venue.country;
-
-                if (city) {
-                    const exists = cities.get(city);
-                    if (exists) {
-                        cities.set(city, exists + 1)
-                    } else {
-                        cities.set(city, 1);
-                    }
-                }
-
-                if (state) {
-                    const exists = states.get(state);
-                    if (exists) {
-                        states.set(state, exists + 1)
-                    } else {
-                        states.set(state, 1);
-                    }
-                }
-
-                if (country) {
-                    const exists = countries.get(country);
-                    if (exists) {
-                        countries.set(country, exists + 1)
-                    } else {
-                        countries.set(country, 1);
-                    }
-                }
-            } else {
-                const city = d.city;
-                const state = d.state;
-                const country = d.country;
-
-                if (city) {
-                    const exists = cities.get(city);
-                    if (exists) {
-                        cities.set(city, exists + 1)
-                    } else {
-                        cities.set(city, 1);
-                    }
-                }
-
-                if (state) {
-                    const exists = states.get(state);
-                    if (exists) {
-                        states.set(state, exists + 1)
-                    } else {
-                        states.set(state, 1);
-                    }
-                }
-
-                if (country) {
-                    const exists = countries.get(country);
-                    if (exists) {
-                        countries.set(country, exists + 1)
-                    } else {
-                        countries.set(country, 1);
-                    }
-                }
-            }
-        });
-    }
-
-    if (cities.size > 1) {
-        if (states.size > 1) {
-            if (countries.size > 1) {
-                const names: string[] = [];
-                countries.forEach((v, k) => {
-                    names.push(k);
-                });
-
-                return names.join(' & ');
-            }
-            const iterator = countries.keys();
-            return iterator.next().value ?? 'Unknown Location';
-        }
-        const iterator = states.keys();
-        const iterator2 = countries.keys();
-        const state = iterator.next().value;
-        const country = iterator2.next().value;
-    
-        if (state && country) {
-            return `${state}, ${country}`;
-        } else {
-            return 'Unknown Location';
-        }
-    } else {
-        const iterator = cities.keys();
-        const iterator2 = states.keys();
-        const state = iterator2.next().value;
-        const city = iterator.next().value;
-
-        if (city && state) {
-            return `${city}, ${state}`;
-        } else {
-            return 'Unknown Location';
-        }
-    }
-});
-
-const eventDate = computed<string>(() => {
-    return event.value?.timeToString() ?? '';
-});
-
-const eventDescription = computed<string>(() => {
-    return event.value?.body ?? '';
-});
-
-const eventStartStopTime = computed<string>(() => {
-    if (eventState.value === EVENT_STATE.PENDING) {
-        return event.value?.startTimeToString() ?? 'Unknown';
-    } else {
-        const stopTime = event.value?.stopTime;
-        if (stopTime) { // If we do have a stop time continue
-            return event.value?.stopTimeToString() ?? 'Unknown';
-        } else { // If we don't we just add 2hrs to the start time
-            const startTime = event.value?.startTime;
-            if (startTime) {
-                return event.value?.stopTimeToString() ?? 'Unknown';
-            } else {
-                return 'Unknown';
-            }
-        }
-    }
-});
-
-const eventParticipants = computed<string>(() => {
-    if (event.value?.maxParticipants) {
-        return `${event.value?.participants?.length ?? 0}/${event.value?.maxParticipants}`;
-    } else {
-        return `${event.value?.participants?.length ?? 0}/∞`;
-    }
-});
-
-const eventDifficulty = computed<string>(() => {
-    return event.value?.level.valueOf() ?? 'any level';
-});
-
-const eventVisibility = computed<string>(() => {
-    const s = event.value?.visibility ?? 'public'
-    return String(s[0]).toUpperCase() + String(s).slice(1);
-});
-
-const eventSkillLabel = computed<number>(() => {
-    return eventSkillLevelToNumber(event.value?.level ?? EVENT_SKILL_LEVEL.ANY_LEVEL) + 1;
-});
-
-const hasResponded = computed<boolean>(() => {
-    return event.value?.participants?.find((p) => {
-        return p.user?.uuid === session.user?.uuid;
-    }) !== undefined;
-});
-
-const participantsPeekText = computed<string>(() => {
-    if (eventState.value == EVENT_STATE.COMPLETED) {
-        return 'See who attended...';
-    } else {
-        return 'See who\'s going...';
-    }
 });
 
 /**

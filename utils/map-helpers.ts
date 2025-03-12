@@ -65,6 +65,7 @@ async function getMapkitServerToken() : Promise<string> {
         )
         if (response.ok) {
             const json = await response.json();
+            session.mapKitServerToken = json['accessToken'];
             return json['accessToken'];
         } else {
             throw(`Status Code: ${response.status}`);

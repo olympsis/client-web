@@ -56,21 +56,19 @@
                         <!-- Venues Search -->
                         <div v-else>
                             <div id="search-container">
-                                <button @click="toggleCustomLocation" :class="{ 'custom-location-text': isCustomLocation }" > Use custom location </button>
                                 <SearchBar v-model:value="searchText" :class="{ 'custom-location': isCustomLocation }"/>
-                                <p id="venues-count-label" v-if="!isCustomLocation">{{ venuesCount }}</p>
+                                <p id="venues-count-label">{{ venuesCount }}</p>
                             </div>
 
-                            <div id="search-results">
-                                <div v-if="!isCustomLocation" v-for="venue in venues" class="venue-result" @click="selectVenue(venue)">
-                                    <div class="name">{{ venue.name }}</div>
+                            <ul id="search-results">
+                                <li v-for="venue in venues" class="venue-result" @click="selectVenue(venue)">
+                                    <div class="title">
+                                        <div class="name">{{ venue.name }}</div>
+                                        <img v-if="venue.type === 'internal'" src="@/assets/icons/checkmark/checkmark.tertiary.svg">
+                                    </div>
                                     <div class="location">{{ `${venue.city}, ${venue.state}` }}</div>
-                                </div>
-                                <div v-if="isCustomLocation" v-for="venue in venuesResult" class="venue-result" @click="selectVenue(venue)">
-                                    <div class="name">{{ venue.name }}</div>
-                                    <div class="location">{{ `${venue.city}, ${venue.state}` }}</div>
-                                </div>
-                            </div>
+                                </li>
+                            </ul>
                         </div>
                     </ScrollPanel>
                 </div>
@@ -109,22 +107,6 @@ const pickerText: ComputedRef<string> = computed(() => {
 });
 
 const venues: ComputedRef<VenueDescriptor[]> = computed(() => {
-
-    // STORYBOOK TESTING DATA
-    // const list: VenueDescriptor[] =  DEV_VENUES.map((v: Venue) => {
-    //     return VenueDescriptor.decode({
-    //         'type': 'internal',
-    //         'id': v.id,
-    //         'name': v.name,
-    //         'city': v.city,
-    //         'state': v.state,
-    //         'country': v.country
-    //     });
-    // });
-
-    // return list.filter((v: VenueDescriptor) => { return v.name?.toLowerCase().includes(searchText.value.toLowerCase()) });
-    // END OF TEST DATA
-
     const arr: VenueDescriptor[] = modelStore.getAllVenues().map((v) => {
         return VenueDescriptor.decode({
             'type': 'internal',
@@ -135,7 +117,12 @@ const venues: ComputedRef<VenueDescriptor[]> = computed(() => {
             'country': v.country
         });
     })
-    return arr.filter((v: VenueDescriptor) => { return v.name?.toLowerCase().includes(searchText.value.toLowerCase()) });
+    arr.push(...venuesResult.value);
+
+    return arr.filter((v: VenueDescriptor) => { 
+        if (v.type !== 'internal') return true;
+        return v.name?.toLowerCase().includes(searchText.value.toLowerCase());
+     });
 });
 const venuesResult: Ref<VenueDescriptor[]> = ref([]);
 const venuesCount: ComputedRef<string> = computed(() => {
@@ -144,21 +131,19 @@ const venuesCount: ComputedRef<string> = computed(() => {
 
 let debounceTimeout: number | null = null;
 watch(searchText, (newValue, oldValue) => {
-    if (isCustomLocation.value == true) {
-        if (debounceTimeout !== null) {
-            clearTimeout(debounceTimeout);
-        }
-
-        // Set a new debounce timeout
-        debounceTimeout = window.setTimeout(async () => {
-            if (newValue) {
-                debounceTimeout = null;
-                venuesResult.value = await lookUpCustomVenuesByName(newValue);
-            } else {
-                venuesResult.value = []
-            }
-        }, 500);
+    if (debounceTimeout !== null) {
+        clearTimeout(debounceTimeout);
     }
+
+    // Set a new debounce timeout
+    debounceTimeout = window.setTimeout(async () => {
+        if (newValue) {
+            debounceTimeout = null;
+            venuesResult.value = await lookUpCustomVenuesByName(newValue);
+        } else {
+            venuesResult.value = []
+        }
+    }, 500);
 });
 
 function dismissModal(callback: () => void) {
@@ -198,11 +183,10 @@ async function lookUpCustomVenuesByName(name: string): Promise<VenueDescriptor[]
     let searchLocation = '';
     const userLocation = sessionStore.lastKnownLocation;
     if (userLocation) {
-        searchLocation = `${userLocation?.latitude}, ${userLocation?.latitude}`
+        searchLocation = `${userLocation?.latitude},${userLocation?.longitude}`
     }
-    const poiCategories = 'Park,Golf,Basketball,FitnessCenter,RockClimbing,Skiing,Soccer,Stadium,Tennis,Volleyball';
-    const resultCategories = 'Poi'
-    const response = await fetch(`https://maps-api.apple.com/v1/search?q=${name}&includePoiCategories=${poiCategories}&resultTypeFilter=${resultCategories}&userLocation=${searchLocation}`, 
+    const resultCategories = 'poi, pointOfInterest'
+    const response = await fetch(`https://maps-api.apple.com/v1/search?q=${name}&resultTypeFilter=${resultCategories}&userLocation=${searchLocation}`, 
         {
             headers: {
                 'Authorization': `Bearer ${mapkitToken}`
@@ -212,7 +196,6 @@ async function lookUpCustomVenuesByName(name: string): Promise<VenueDescriptor[]
 
     const data = await response.json();
     const results = data['results'];
-
     return results.map((r: any) => {
         return new VenueDescriptor(
             'external',
@@ -354,11 +337,21 @@ async function lookUpCustomVenuesByName(name: string): Promise<VenueDescriptor[]
 
         #search-results {
             .venue-result {
+                padding: 0;
                 margin: 1rem;
                 cursor: pointer;
+                list-style-type: none;
 
-                .name {
+                .title {
+                    display: flex;
+                    align-items: center;
                     color: var(--primary-label-color);
+
+                    img {
+                        width: 1rem;
+                        height: 1rem;
+                        margin-left: 0.5rem;
+                    }
                 }
                 .location {
                     color: gray;

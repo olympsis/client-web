@@ -179,6 +179,7 @@ function apply() {
 
         #sports {
             padding: 0;
+            gap: 0.5rem;
             display: flex;
             margin: 0.5rem;
             position: absolute;

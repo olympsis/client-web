@@ -29,16 +29,16 @@ const session = useSessionStore();
 const emit = defineEmits(['allowed', 'denied', 'error']);
 
 async function requestUserLocation() {
-    try {
-        const isAllowed = await session.requestLocation();
-        if (isAllowed) {
-            emit('allowed');
-        } else {
-            emit('denied');
-        }
-    } catch (error) {
-        emit('error', error);
-    }
+    // try {
+    //     const isAllowed = await session.requestLocation();
+    //     if (isAllowed) {
+    //         emit('allowed');
+    //     } else {
+    //         emit('denied');
+    //     }
+    // } catch (error) {
+    //     emit('error', error);
+    // }
 }
 </script>
 

@@ -1,6 +1,6 @@
 <template>
     <NavigationBar/>
-    <main id="group-detail">
+    <div id="group-detail">
         <div id="sub-nav">
             <button class="button" @click="handleBackNavigation">
                 <picture class="centered">
@@ -14,41 +14,7 @@
 
         <GroupLogoAndBanner :logo-u-r-l="groupLogoURL" :banner-u-r-l="groupBannerURL" :sports="club?.sports" class="media" @clicked-share="handleGroupSharing"/>
 
-        <div id="header">
-            <h1>{{ club?.name }}</h1>
-            <div id="description">{{ club?.description }}</div>
-        </div>
-
-        <div id="sub-header">
-             <div class="section">
-                <div id="members">
-                    <GroupMembersPeek :members="groupMembers"/>
-                    <div :style="{ width: '100%', fontWeight: 'bold', marginLeft: '1rem' }">{{ groupMembersString }}</div>
-                </div>
-                <TextButton v-if="!isMember" text="Request to Join" success-text="Requested" failure-text="Failed" v-model="buttonState" @click="apply" class="action"/>
-             </div>
-             <div class="section">
-                <div id="info" :style="{ display: 'flex', gap: '1rem', margin: '1rem 0rem' }">
-                    <div id="foundation">
-                        <picture class="icon">
-                            <source srcset="@/assets/icons/calendar/calendar.month.white.svg" media="(prefers-color-scheme: dark)">
-                            <img src="@/assets/icons/calendar/calendar.month.svg">
-                        </picture>
-
-                        <div :style="{ marginLeft: '0.5rem' }">{{ `Created ${getMonthAndYear(club?.createdAt ?? 0)}` }}</div>
-                    </div>
-
-                    <div id="visibility">
-                        <picture class="icon">
-                            <source srcset="@/assets/icons/globe/globe.white.svg" media="(prefers-color-scheme: dark)">
-                            <img src="@/assets/icons/globe/globe.svg">
-                        </picture>
-                        <div :style="{ textTransform: 'capitalize', marginLeft: '0.5rem' }">{{ `${groupVisibility} Community` }}</div>
-                    </div>
-                </div>
-             </div>
-        </div>
-
+        <GroupInfo v-if="club" :group="club" @show-auth="showAuthModal"/>
 
         <GroupFeed v-if="club" :group="club"/>
 
@@ -58,13 +24,12 @@
         <dialog id="auth-modal" ref="auth-modal" class="dialog">
             <AuthModal class="auth-card" @cancel="hideAuthModal" @user-authenticated="handleNewUserAuthentication"/>
         </dialog>
-    </main>
+    </div>
 </template>
 
 <script setup lang="ts">
 
 import { computed, ref } from 'vue';
-import { getAuth } from 'firebase/auth';
 import { useToast } from 'primevue/usetoast';
 import { Club } from '@/data/models/ClubModels';
 import { useRoute, useRouter } from 'vue-router';
@@ -72,14 +37,13 @@ import { Member } from '@/data/models/GenericModels';
 import { AUTH_STATUS, VIEW_STATE } from '@/data/Enums';
 import { useSessionStore } from '@/stores/session-store';
 import { ClubService } from '@/data/services/ClubService';
+import { formatRelativeTime } from '~/utils/time-helpers';
 import { SnapshotService } from '~/data/services/SnapshotService';
-import { formatRelativeTime, getMonthAndYear } from '~/utils/time-helpers';
 
 import AuthModal from '~/components/Auth/AuthModal/AuthModal.vue';
 import GroupFeed from '~/components/Groups/GroupFeed/GroupFeed.vue';
+import GroupInfo from '~/components/Groups/GroupInfo/GroupInfo.vue';
 import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
-import TextButton from '~/components/Buttons/LoadingButtons/TextButton/TextButton.vue';
-import GroupMembersPeek from '@/components/Groups/GroupMembersPeek/GroupMembersPeek.vue';
 import GroupSmallSection from '~/components/Groups/GroupSmallSection/GroupSmallSection.vue';
 import GroupLogoAndBanner from '@/components/Groups/GroupLogoAndBanner/GroupLogoAndBanner.vue';
 
@@ -89,7 +53,6 @@ const router = useRouter();
 const session = useSessionStore();
 const service = new ClubService();
 const modelStore = useModelStore();
-const buttonState = ref(VIEW_STATE.PENDING);
 
 const club = ref<Club | undefined>(undefined);
 const mapURL = ref<string | undefined> (undefined);
@@ -105,15 +68,6 @@ const authModal = useTemplateRef<HTMLDialogElement>('auth-modal');
 
 const isAuthenticated = computed<boolean>(() => {
     return session.authStatus === AUTH_STATUS.authenticated;
-});
-
-const mapStateString = computed<string>(() => {
-    switch (mapState.value) {
-        case VIEW_STATE.FAILURE:
-            return 'Failed to load map';
-        default:
-            return 'Loading Map..';
-        }
 });
 
 const groupID = computed<string>(() => {
@@ -138,38 +92,10 @@ const groupBannerURL = computed<string | undefined>(() => {
     return club.value?.banner;
 });
 
-const groupLocation = computed<string>(() => {
-    if (!club.value) return 'Unknown, Unknown';
-    const subAdmin = club.value.city;
-    const adminArea = club.value.state;
-    return `${subAdmin}, ${adminArea}`;
-});
-
-const groupVisibility = computed<string>(() => {
-    return club.value?.visibility ?? 'public';
-});
-
-const groupHistory = computed<string>(() => {
-    if (!club.value?.createdAt) return 'Unknown';
-    return 'Created ' + formatRelativeTime(club.value.createdAt);
-});
-
 const groupMembers = computed<Member[]>(() => {
     if (!club.value?.members) return [];
     return club.value.members;
 });
-
-const groupMembersString = computed<string>(() => {
-    if (!club.value?.members) return 'Unknown';
-    return club.value.members.length > 1 ? `${club.value.members.length} members` : `${club.value.members.length} member`;
-});
-
-const isMember = computed<Boolean>(() => {
-    const uuid = session.user?.uuid;
-    if (!uuid) return false;
-
-    return groupMembers.value.find((m) => m.user?.uuid === uuid) !== undefined;
-})
 
 /**
  * FUNCTIONS
@@ -312,7 +238,7 @@ onMounted(() => {
     'nav nav'
     'banner banner'
     'header header'
-    'sub-header sub-header'
+    'info info'
     'feed location'
     'feed location'
     ;
@@ -400,7 +326,7 @@ onMounted(() => {
         'nav nav'
         'banner banner'
         'header header'
-        'sub-header sub-header'
+        'info info'
         'feed feed'
         'feed feed'
         ;

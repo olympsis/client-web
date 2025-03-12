@@ -78,8 +78,8 @@ import ClubListCardTemplate from '@/components/Groups/Clubs/ClubListCardTemplate
 const router = useRouter();
 const modelStore = useModelStore();
 const sessionStore = useSessionStore();
-const state = ref(VIEW_STATE.SUCCESS);
 
+const state = ref(VIEW_STATE.SUCCESS);
 const searchText: Ref<string> = ref('');
 const selectedTags: Ref<Array<string>> = ref([]);
 const selectedSports: Ref<Array<SPORTS>> = ref([]);
@@ -89,7 +89,14 @@ const clubs: Ref<Club[]> = ref([]);
 
 // Filters clubs based on our selected sports, tags and name if we have one
 const filteredClubs: ComputedRef<Club[]> = computed(() => {
-    return clubs.value.filter((c) => {
+    return clubs.value
+    .filter((c) => { // Filter out user's clubs
+        return !sessionStore.groups.some((g) => {
+            const groupID = g.club?.id ?? g.organization?.id;
+            return groupID === c.id;
+        });
+    })
+    .filter((c) => { // Filter by other criteria
         var includesSport = c.sports?.find((s: string) => {
             const _sport = stringToSport(s);
             if (!_sport) return false;
@@ -117,27 +124,30 @@ const filteredClubs: ComputedRef<Club[]> = computed(() => {
 // Load clubs from memory if we have any
 // If we don't and we already have the location then fetch it
 clubs.value = modelStore.getAllClubs();
-if (clubs.value.length < 1) {
-    if (sessionStore.lastKnownLocation) {
-        fetchClubs(sessionStore.lastKnownLocation)
-    }
-}
 
-// Listen to location changes to update data
-sessionStore.$subscribe((mutation: any, state) => {
-    const payload = mutation.payload;
-    if (payload?.lastKnownLocation) {
-        fetchClubs(payload.lastKnownLocation)
-    }
-});
-
-async function fetchClubs(location: Location) {
+async function fetchClubs() {
     state.value = VIEW_STATE.LOADING;
-    const response = await sessionStore.clubService.getClubs(location.administrativeArea ?? 'New York City', location.country ?? 'United States');
+    let location = sessionStore.lastKnownLocation;
+    if (!location) { 
+        location = new Location(
+            40.76553,
+            -73.97770,
+            'Manhattan',
+            'New York',
+            'NY',
+            '',
+            'United States',
+            'US'
+        );
+    }
+
+    const response = await sessionStore.clubService.getClubs(location.administrativeArea ?? 'New York', location.country ?? 'United States');
     if (response) {
-        clubs.value = response.clubs
         modelStore.setClubs(response.clubs);
+        clubs.value = modelStore.getAllClubs();
         state.value = VIEW_STATE.SUCCESS;
+    } else {
+        state.value = VIEW_STATE.FAILURE;
     }
 }
 
@@ -154,6 +164,8 @@ onMounted(() => {
     const user = sessionStore.user;
     const sports: Array<SPORTS> = user?.sports ?? [];
     selectedSports.value = sports;
+
+    fetchClubs()
 });
 
 </script>

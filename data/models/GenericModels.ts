@@ -641,15 +641,15 @@ enum PermissionState {
     NotSupported = "not_supported"
 }
 
-class Location {
-    latitude: number
-    longitude: number
-    locality: string | undefined
-    administrativeArea: string | undefined
-    administrativeAreaCode: string | undefined
-    postCode: string | undefined
-    country: string | undefined
-    countryCode: string | undefined
+class Location extends Codable<Location> {
+    latitude: number;
+    longitude: number;
+    locality: string | undefined;
+    administrativeArea: string | undefined;
+    administrativeAreaCode: string | undefined;
+    postCode: string | undefined;
+    country: string | undefined;
+    countryCode: string | undefined;
 
     constructor(
         lat: number,
@@ -661,6 +661,7 @@ class Location {
         country?: string,
         countryCode?: string
     ) {
+        super();
         this.latitude = lat;
         this.longitude = long;
         this.locality = locale;
@@ -669,6 +670,71 @@ class Location {
         this.postCode = postCode;
         this.country = country;
         this.countryCode = countryCode;
+    }
+
+    static override decode<Location>(data: { [key: string]: any }): Location {
+        const object = Object();
+
+        if (data) {
+            if (data['latitude'] !== undefined) {
+                object['latitude'] = data['latitude'];
+            }
+            if (data['longitude'] !== undefined) {
+                object['longitude'] = data['longitude'];
+            }
+            if (data['locality'] !== undefined) {
+                object['locality'] = data['locality'];
+            }
+            if (data['administrative_area'] !== undefined) {
+                object['administrativeArea'] = data['administrative_area'];
+            }
+            if (data['administrative_area_code'] !== undefined) {
+                object['administrativeAreaCode'] = data['administrative_area_code'];
+            }
+            if (data['post_code'] !== undefined) {
+                object['postCode'] = data['post_code'];
+            }
+            if (data['country'] !== undefined) {
+                object['country'] = data['country'];
+            }
+            if (data['country_code'] !== undefined) {
+                object['countryCode'] = data['country_code'];
+            }
+        }
+
+        Object.setPrototypeOf(object, Location.prototype);
+        return object;
+    }
+
+    override encode(): { [key: string]: any; } {
+        const data: { [key: string]: any; } = {};
+        
+        if (this.latitude !== undefined) {
+            data['latitude'] = this.latitude;
+        }
+        if (this.longitude !== undefined) {
+            data['longitude'] = this.longitude;
+        }
+        if (this.locality !== undefined) {
+            data['locality'] = this.locality;
+        }
+        if (this.administrativeArea !== undefined) {
+            data['administrative_area'] = this.administrativeArea;
+        }
+        if (this.administrativeAreaCode !== undefined) {
+            data['administrative_area_code'] = this.administrativeAreaCode;
+        }
+        if (this.postCode !== undefined) {
+            data['post_code'] = this.postCode;
+        }
+        if (this.country !== undefined) {
+            data['country'] = this.country;
+        }
+        if (this.countryCode !== undefined) {
+            data['country_code'] = this.countryCode;
+        }
+    
+        return data;
     }
 }
 

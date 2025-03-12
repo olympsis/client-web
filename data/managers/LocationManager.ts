@@ -8,7 +8,7 @@ import type { Event } from "~/data/models/EventModels";
 
 /**
  * Location Manager handles all location events and features.
- * Talks with browser api and reacts to location updates and fetches necessary data.
+ * Talks with browser api to get permission state.
  */
 export class LocationManager {
     public lastKnownLocation: Location | undefined;
@@ -25,38 +25,6 @@ export class LocationManager {
         'United States',
         'US'
     );
-
-    /**
-     * Requests location access from the user
-     * 
-     * @returns a promise containing the permission state
-     */
-    public async requestLocationPermission(): Promise<PermissionState> {
-        return new Promise((resolve, reject) => {
-            navigator.permissions
-                .query({ name: 'geolocation' })
-                .then((permissionStatus) => {
-                    if (permissionStatus.state === 'granted') {
-                        resolve('granted');
-                    } else if (permissionStatus.state === 'prompt') {
-                        navigator.geolocation.getCurrentPosition(
-                            () => {
-                                resolve('granted');
-                            },
-                            () => {
-                                resolve('denied');
-                            },
-                            { enableHighAccuracy: true }
-                        );
-                    } else {
-                        resolve('denied');
-                    }
-                })
-                .catch((error) => {
-                    reject(error);
-                });
-        });
-    }
   
     /**
      * Checks the browser to see if we have location access
@@ -100,15 +68,43 @@ export class LocationManager {
      * 
      * @returns A promise that resolves to a Location object
      */
-    private async getPositionWithTimeout(): Promise<{ location: Location, permissionState: PermissionState }> {
+    public async getPositionWithTimeout(): Promise<{ location: Location, permissionState: PermissionState }> {
+        const { $locationDialog } = useNuxtApp();
         const permissionState = await this.hasLocationAccess();
         
-        // If permissions denied, return fallback immediately
         if (permissionState === 'denied') {
             return { 
-                location: this.genericFallBackLocation, 
+                location: this._handleLocationFallback(), 
                 permissionState 
             };
+        } else if (permissionState === 'prompt') {
+
+            /**
+             * We check if the user requested for a manual position in the past by checking the store
+             */
+            const fallBack = this.retrieveFallBackLocation();
+            if (fallBack) {
+                return {
+                    location: fallBack,
+                    permissionState
+                }
+            }
+
+            const { location, permission } = await $locationDialog({
+                skipPermission: false,
+                clickOutsideToClose: true
+            });
+
+            if (permission === 'manual') {
+                this.storeFallBackLocation(location);
+            } else {
+                this.storeLastKnownLocation(location);
+            }
+
+            return {
+                location,
+                permissionState
+            }
         }
         
         // Create a promise that rejects after timeout
@@ -124,6 +120,8 @@ export class LocationManager {
             ]);
             
             const { latitude, longitude } = position.coords;
+            this.storeLastKnownLocation(new Location(latitude, longitude));
+
             return { 
                 location: new Location(latitude, longitude), 
                 permissionState 
@@ -134,7 +132,7 @@ export class LocationManager {
             console.log('Using fallback location due to:', errorMessage);
             
             return { 
-                location: this.genericFallBackLocation, 
+                location: this._handleLocationFallback(), 
                 permissionState: permissionState === 'granted' ? 'granted' : 'denied' 
             };
         }
@@ -282,4 +280,114 @@ export class LocationManager {
 			console.error('Failed to fetch nearby data:', error);
 		}
 	}
+
+    /**
+     * STORAGE FUNCTIONS
+     * Helpers in storing data to local storage
+     */
+
+    /**
+     * Stores the fallBackLocation in localStorage
+     * @param location The Location object to store
+     */
+    public storeFallBackLocation(location: Location): void {
+        try {
+            const locationData = location.encode();
+            const locationJson = JSON.stringify(locationData);
+            localStorage.setItem('fallBackLocation', locationJson);
+        } catch (error) {
+            console.error('Error storing fallBackLocation in local storage:', error);
+        }
+    }
+
+    /**
+     * Retrieves the fallBackLocation from localStorage
+     * @returns A Location object if found, otherwise null
+     */
+    public retrieveFallBackLocation(): Location | null {
+        try {
+            const locationJson = localStorage.getItem('fallBackLocation');
+            
+            if (!locationJson) {
+                return null;
+            }
+            
+            const locationData = JSON.parse(locationJson);
+            return Location.decode(locationData);
+        } catch (error) {
+            console.error('Error retrieving fallBackLocation from local storage:', error);
+            return null;
+        }
+    }
+
+        /**
+     * Stores the lastKnownLocation in localStorage
+     * @param location The Location object to store
+     */
+    public storeLastKnownLocation(location: Location): void {
+        try {
+            const locationData = location.encode();
+            const locationJson = JSON.stringify(locationData);
+            localStorage.setItem('lastKnownLocation', locationJson);
+        } catch (error) {
+            console.error('Error storing lastKnownLocation in local storage:', error);
+        }
+    }
+
+    /**
+     * Retrieves the lastKnownLocation from localStorage
+     * @returns A Location object if found, otherwise null
+     */
+    public retrieveLastKnownLocation(): Location | null {
+        try {
+            const locationJson = localStorage.getItem('lastKnownLocation');
+            
+            if (!locationJson) {
+                return null;
+            }
+            
+            const locationData = JSON.parse(locationJson);
+            return Location.decode(locationData);
+        } catch (error) {
+            console.error('Error retrieving lastKnownLocation from local storage:', error);
+            return null;
+        }
+    }
+
+    /**
+     * PRIVATE FUNCTIONS
+     */
+
+    /**
+     * Figures out which location fallback to return.
+     * We have a user defined fallback location
+     * A last known location if the user prefers that we prompt
+     * And a generic fallback location which is in the city
+     * @returns 
+     */
+    private _handleLocationFallback() : Location {
+        // If we do have a user defined fallback location use it
+        const storedLocation = this.retrieveFallBackLocation();
+        if (storedLocation) {
+            return storedLocation;
+        }
+
+        // If we have a last known location we use it
+        const lastKnownLocation = this.retrieveLastKnownLocation();
+        if (lastKnownLocation) {
+            lastKnownLocation;
+        }
+
+        // If not then we return with a generic fallback location
+        return new Location(
+            40.76553,
+            -73.97770,
+            'Manhattan',
+            'New York',
+            'NY',
+            '',
+            'United States',
+            'US'
+        );
+    }
 }

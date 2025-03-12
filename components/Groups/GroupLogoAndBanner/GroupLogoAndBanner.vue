@@ -127,8 +127,8 @@ const banner = computed<string | undefined>(() => {
 
     #list {
         top: 0;
-        gap: 1rem;
         padding: 0;
+        gap: 0.5rem;
         margin: 1rem;
         display: flex;
         position: absolute;

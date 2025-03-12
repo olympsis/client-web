@@ -31,6 +31,7 @@ export const useSessionStore = defineStore('session-store', () => {
     var location = new LocationManager();
 
     const authStore = useAuthStore();
+    const modelStore = useModelStore();
 
     var userService = new UserService();
     var clubService = new ClubService();
@@ -146,11 +147,11 @@ export const useSessionStore = defineStore('session-store', () => {
         }
     }
 
-    async function requestLocation(): Promise<boolean> {
-        const resp = await location.requestLocationPermission();
-        if (resp == 'denied') { return false; }
-        return true;
-    }
+    // async function requestLocation(): Promise<boolean> {
+    //     const resp = await location.requestLocationPermission();
+    //     if (resp == 'denied') { return false; }
+    //     return true;
+    // }
 
     function handleNavigation() {
         // Don't show loading screen during navigation if already loaded
@@ -170,9 +171,6 @@ export const useSessionStore = defineStore('session-store', () => {
         try {
             // Set loading state
             loadingState.value = VIEW_STATE.LOADING;
-            
-            const authStore = useAuthStore();
-            const store = useModelStore();
             
             // Initialize auth if needed
             if (!authStore.isAuthInitialized) {
@@ -209,24 +207,24 @@ export const useSessionStore = defineStore('session-store', () => {
                     selectedGroup.value = _groups.length > 0 ? _groups[0] : undefined;
                     
                     // Update model store
-                    store.setClubs(_clubs);
-                    store.setOrganizations(_organizations);
+                    modelStore.setClubs(_clubs);
+                    modelStore.setOrganizations(_organizations);
                     
                     // IMPORTANT: Set hasLoaded to true now that user data is available
                     hasLoaded.value = true;
                     
                     // THEN initiate location services after user data is loaded
-                    await location.listenToLocationUpdates();
+                    // await location.listenToLocationUpdates();
                 } catch (error) {
                     console.error("Error loading user data:", error);
                     hasLoaded.value = true;
                     await navigateTo('/signin');
-                    await location.listenToLocationUpdates();
+                    // await location.listenToLocationUpdates();
                 }
             } else {
                 // Not authenticated case
                 hasLoaded.value = true;
-                await location.listenToLocationUpdates();
+                // await location.listenToLocationUpdates();
             }
             
             // Success state regardless of authentication
@@ -253,6 +251,50 @@ export const useSessionStore = defineStore('session-store', () => {
                 clubs: [],
                 organizations: [],
             };
+        }
+    }
+
+    async function loadVenuesAndEvents() {
+        const coords = await location.getPositionWithTimeout();
+        lastKnownLocation.value = coords.location;
+
+        const store = useModelStore();
+        const authStore = useAuthStore();
+        
+        // Define proper type for the event data response
+        type EventDataResponse = { venues: Venue[], events: Event[] } | null;
+        
+        // Check if we can fetch venue/event data
+        if (!authStore.isAuthenticated || !user.value?.sports || user.value?.sports.length === 0) {
+            console.log('Skipping venue data fetch: User not authenticated or sports preferences not available');
+            return;
+        }
+        
+        try {
+            // Get sports from user data - ensure it exists
+            const sports = user.value?.sports.map((s) => s.valueOf()).join(',');
+            
+            // Fetch nearby data with user sports preferences
+            const eventDataResponse = await eventService.getNearbyData(
+                coords.location.latitude, 
+                coords.location.longitude, 
+                1000000, 
+                sports
+            ) as EventDataResponse;
+            
+            // Process venue and event data
+            if (eventDataResponse) {
+                const _venues = eventDataResponse.venues ?? [];
+                const _events = eventDataResponse.events ?? [];
+                
+                store.setVenues(_venues);
+                store.setEvents(_events);
+
+                venues.value = _venues;
+                events.value = _events;
+            }
+        } catch (error) {
+            console.error('Failed to fetch venues and events near user:', error);
         }
     }
 
@@ -311,9 +353,10 @@ export const useSessionStore = defineStore('session-store', () => {
         handleNavigation,
 
         load,
+        loadVenuesAndEvents,
         logout,
         deleteAccount,
-        requestLocation,
+        // requestLocation,
         checkAuthorizationStatus
     }
 });

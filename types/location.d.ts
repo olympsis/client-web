@@ -1,0 +1,1 @@
+export type OlympsisLocationPermissions = 'allowed' | 'prompt' | 'denied' | 'manual';

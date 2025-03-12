@@ -245,4 +245,10 @@ function handleCityChange() {
 .cities-list li:last-child {
   	border-bottom: none;
 }
+
+select {
+	height: 2rem;
+	border: unset;
+	background-color: var(--p-toast-secondary-background);
+}
 </style>

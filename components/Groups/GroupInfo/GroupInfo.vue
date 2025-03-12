@@ -3,7 +3,7 @@
         <div id="header">
             <div id="title">
                 <h1>{{ getGroupName(group) }}</h1>
-                <picture ref="chevron" @click="toggleSelector">
+                <picture v-if="isMember" ref="chevron" @click="toggleSelector">
                     <source srcset="@/assets/icons/chevron/chevron.left.white.svg" media="(prefers-color-scheme: dark)">
                     <img src="@/assets/icons/chevron/chevron.left.svg" class="chevron">
                 </picture>
@@ -31,7 +31,7 @@
              <div class="section">
                 <div id="members">
                     <GroupMembersPeek :members="groupMembers"/>
-                    <div :style="{ width: '100%', fontWeight: 'bold', marginLeft: '1rem' }">{{ groupMembersString }}</div>
+                    <div :style="{ width: '100%', fontWeight: 'bold', marginLeft: '1rem', whiteSpace: 'nowrap' }">{{ groupMembersString }}</div>
                 </div>
 
                 <TextButton v-if="!isMember" text="Request to Join" success-text="Requested" failure-text="Failed" v-model="buttonState" @click="apply" class="action"/>
@@ -78,17 +78,21 @@ import Popover from 'primevue/popover';
 import GroupMembersPeek from '../GroupMembersPeek/GroupMembersPeek.vue';
 import GroupSelectorPopover from '../GroupSelectorPopover/GroupSelectorPopover.vue';
 import TextButton from '~/components/Buttons/LoadingButtons/TextButton/TextButton.vue';
+import { ClubService } from '~/data/services/ClubService';
 
 const model = defineModel<Group>('group', {
     required: true
 });
 
 const emit = defineEmits([
+    'show-auth',
     'show-settings'
 ]);
 
+const auth = useAuth();
 const selector = ref();
 const session = useSessionStore();
+const clubService = new ClubService();
 const buttonState = ref(VIEW_STATE.PENDING);
 
 const isMember = computed<Boolean>(() => {
@@ -114,26 +118,25 @@ const toggleSelector = (event: any) => {
  * Send an application to the group
  */
 function apply() {
-    // if (!isAuthenticated.value) {
-    //     showAuthModal();
-    //     return;
-    // }
+    if (!auth.isAuthenticated) {
+        emit('show-auth');
+        return;
+    }
 
-    // if (viewState.value === VIEW_STATE.LOADING) return;
-    // if (actionState.value === VIEW_STATE.LOADING) return;
-    // actionState.value = VIEW_STATE.LOADING;
+    if (buttonState.value === VIEW_STATE.LOADING) return;
+    buttonState.value = VIEW_STATE.LOADING;
 
-    // service.applyToClub('')
-    //     .then((hasApplied: boolean) => {
-    //         if (hasApplied) {
-    //             actionState.value = VIEW_STATE.SUCCESS;
-    //         } else {
-    //             actionState.value = VIEW_STATE.FAILURE;
-    //         }
-    //     })
-    //     .catch(() => {
-    //         actionState.value = VIEW_STATE.FAILURE;
-    //     });
+    clubService.applyToClub('')
+        .then((hasApplied: boolean) => {
+            if (hasApplied) {
+                buttonState.value = VIEW_STATE.SUCCESS;
+            } else {
+                buttonState.value = VIEW_STATE.FAILURE;
+            }
+        })
+        .catch(() => {
+            buttonState.value = VIEW_STATE.FAILURE;
+        });
 }
 </script>
 

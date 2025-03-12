@@ -20,21 +20,7 @@ const props = defineProps({
 });
 
 const members: ComputedRef<Member[]> = computed(() => {
-    // De-reference from event's participants array
-    const array: Member[] = props.members?.map((x) => x) ?? []
-    const length = array.length;
-    for (let i = 0; i < 5 - length; ++i) {
-        let ptp: Member = Member.decode({
-            'id': `${i}`,
-            'role': 'member',
-            'joined_at': Math.floor(Date.now() / 1000)
-        });
-        if (ptp) {
-            array.push(ptp)
-        }
-    }
-
-    return array;
+    return props.members ?? [];
 });
 
 </script>

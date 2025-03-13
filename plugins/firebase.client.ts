@@ -1,4 +1,4 @@
-import { getAuth } from "firebase/auth";
+import { browserSessionPersistence, getAuth, inMemoryPersistence, setPersistence } from "firebase/auth";
 import { initializeApp } from 'firebase/app';
 import { getAnalytics } from "firebase/analytics";
 
@@ -15,14 +15,21 @@ export default defineNuxtPlugin(nuxtApp => {
         messagingSenderId: config.public.FB_MESSAGING_SENDER_ID
     };
     
-    const app = initializeApp(firebaseConfig)
-
+    const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const analytics = getAnalytics(app);
 
+    // const isPrivateBrowsing = !detectPrivateBrowsing();
+    // setPersistence(auth, isPrivateBrowsing ? inMemoryPersistence : browserSessionPersistence)
+    //     .then(() => {
+    //         console.log("Firebase persistence set successfully");
+    //     })
+    //     .catch((error) => {
+    //         console.error("Error setting persistence:", error);
+    //     });
+
     nuxtApp.provide('auth', auth);
     nuxtApp.vueApp.provide('auth', auth);
-
     nuxtApp.provide('analytics', analytics);
     nuxtApp.vueApp.provide('analytics', analytics);
 });

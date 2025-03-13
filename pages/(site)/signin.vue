@@ -16,10 +16,10 @@
 </template>
 
 <script setup lang="ts">
+import { navigateTo } from '#app';
 import { ref, type Ref } from 'vue';
 import { VIEW_STATE } from '~/data/Enums';
 import { UserDTO } from '~/data/models/UserModels';
-import { useSessionStore } from '~/stores/session-store';
 import { AuthenticationFacade } from '~/data/facades/AuthenticationFacade';
 
 import TopBar from '~/components/site/TopBar/TopBar.vue';
@@ -27,6 +27,7 @@ import BottomBar from '~/components/site/BottomBar/BottomBar.vue';
 import CreateUserCard from '~/components/Auth/CreateUserCard/CreateUserCard.vue';
 import AuthenticationCard from '~/components/Auth/AuthenticationCard/AuthenticationCard.vue';
 
+const auth = useAuth();
 const session = useSessionStore();
 const authenticator = new AuthenticationFacade();
 
@@ -34,42 +35,32 @@ const isSignedUp: Ref<boolean> = ref(false);
 const createState = ref(VIEW_STATE.PENDING);
 
 async function handleSignInWithApple() {
-	const response = await authenticator.signInWithApple();
+	const response = await auth.signInWithApple();
 	if (response) { 
 		if (response?.isNewUser) { 
 			isSignedUp.value = true;
 		} else {
-			session.checkAuthorizationStatus();
-			const handler = session.$subscribe((_, state) => {
-				handler();
-				if (state.user) {
-					if (state.user.clubs?.length != 0 || state.user.organizations?.length != 0) {
-						navigateTo('/groups');
-						return;
-					}
-				}
-				navigateTo('/groups/search');
+			auth.resetState();
+			session.resetSession();
+			await navigateTo({
+				path: '/home',
+				query: { from: '/signin' } 
 			});
 		}
 	}
 }
 
 async function handleSignInWithGoogle() {
-	const response = await authenticator.signInWithGoogle();
-	if (response) { 
+	const response = await auth.signInWithGoogle();
+	if (response) {
 		if (response?.isNewUser) { 
 			isSignedUp.value = true;
 		} else {
-			session.checkAuthorizationStatus();
-			const handler = session.$subscribe((_, state) => {
-				handler();
-				if (state.user) {
-					if (state.user.clubs?.length != 0 || state.user.organizations?.length != 0) {
-						navigateTo('/groups');
-						return;
-					}
-				}
-				navigateTo('/groups/search');
+			auth.resetState();
+			session.resetSession();
+			await navigateTo({
+				path: '/home',
+				query: { from: '/signin' } 
 			});
 		}
 	}
@@ -84,8 +75,13 @@ async function handleAuthCompletion(event: any) {
 
   const created = await authenticator.completeUserSignUp(userData);
   if (created) {
-      createState.value = VIEW_STATE.SUCCESS;
-      session.checkAuthorizationStatus();
+		createState.value = VIEW_STATE.SUCCESS;
+		auth.resetState();
+		session.resetSession();
+		await navigateTo({
+			path: '/groups/search',
+			query: { from: '/signin' } 
+		});
   } else {
       createState.value = VIEW_STATE.PENDING;
   }

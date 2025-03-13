@@ -38,6 +38,10 @@ export const useAuthStore = defineStore('auth', () => {
             });
         });
     }
+
+    function resetState() {
+        isAuthInitialized.value = false;
+    }
   
     async function signInWithGoogle() {
         try {
@@ -98,6 +102,7 @@ export const useAuthStore = defineStore('auth', () => {
 
         // Actions
         initAuth,
+        resetState,
         signInWithGoogle,
         signInWithApple,
         signOut,

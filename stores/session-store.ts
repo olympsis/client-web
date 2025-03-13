@@ -206,9 +206,6 @@ export const useSessionStore = defineStore('session-store', () => {
                     
                     // IMPORTANT: Set hasLoaded to true now that user data is available
                     hasLoaded.value = true;
-                    
-                    // THEN initiate location services after user data is loaded
-                    // await location.listenToLocationUpdates();
                 } catch (error) {
                     console.error("Error loading user data:", error);
                     hasLoaded.value = true;
@@ -292,6 +289,10 @@ export const useSessionStore = defineStore('session-store', () => {
         }
     }
 
+    function resetSession() {
+        hasLoaded.value = false;
+    }
+
     /**
      * Logs the user out and sends the browser back to signin
      */
@@ -347,10 +348,10 @@ export const useSessionStore = defineStore('session-store', () => {
         handleNavigation,
 
         load,
+        resetSession,
         loadVenuesAndEvents,
         logout,
         deleteAccount,
-        // requestLocation,
         checkAuthorizationStatus
     }
 });

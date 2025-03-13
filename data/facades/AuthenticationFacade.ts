@@ -134,11 +134,24 @@ class AuthenticationFacade {
      */
     async signOut(): Promise<boolean> {
         try {
-            await this.auth.signOut()
-            logEvent(this.analytics, 'signout');
+            // Create a timeout promise that resolves after 5 seconds
+            const timeoutPromise = new Promise<void>((resolve) => {
+                setTimeout(() => {
+                   console.log("Firebase signOut timed out, proceeding anyway");
+                   resolve();
+                }, 5000);
+            });
+            
+            // Race the signOut operation against the timeout
+            await Promise.race([
+                this.auth.signOut(),
+                timeoutPromise
+            ]);
+            
             return true;
         } catch (error) {
-            return false;
+            console.error("Error during signOut:", error);
+            return true; // Return true to allow UI to update anyway
         }
     }
 

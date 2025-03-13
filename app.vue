@@ -32,7 +32,7 @@ onMounted(async () => {
 useHead({
 	htmlAttrs: {
 		lang: "en"
-	}
+	},
 });
 </script>
 

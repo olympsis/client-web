@@ -1,25 +1,6 @@
 import { AUTH_STATUS } from "~/data/Enums";
 import type { RouteLocationNormalizedGeneric } from "vue-router";
 
-function handleAuthorizationStatus(subscription: () => void, state: any, to: RouteLocationNormalizedGeneric) {
-	subscription();
-	return handleRoutes(state, to);
-}
-
-function handleRoutes(state: any, to: RouteLocationNormalizedGeneric) {
-	if (to.fullPath.includes('/signin') || 
-		to.fullPath.includes('/home')
-	){
-		return handleHomeRoutes(state, to);
-	} else if (to.fullPath.includes('/groups')) {
-		return handleGroupsRoutes(state, to);
-	} else if (to.fullPath.includes('/events')) {
-		return handleEventRoutes(state, to);
-	} else if (to.fullPath.includes('/profile')) {
-		return handleProfileRoutes(state, to);
-	}
-}
-
 function handleHomeRoutes(status: any, to: RouteLocationNormalizedGeneric) {
 	if (status.authStatus === AUTH_STATUS.authenticated) {
 		if (to.fullPath.includes('/signin')) {
@@ -32,28 +13,23 @@ function handleHomeRoutes(status: any, to: RouteLocationNormalizedGeneric) {
 	}
 }
 
-function handleGroupsRoutes(sessionStore: any, to: RouteLocationNormalizedGeneric) {
-	if (to.fullPath !== '/groups/search' && sessionStore.groups.length == 0 && !to.fullPath.match(/\/groups\/search\/(\d+)/)) {
+function handleGroupsRoutes(to: RouteLocationNormalizedGeneric) {
+	const authStore = useAuthStore();
+	if (to.fullPath !== '/groups/search' && !to.fullPath.match(/\/groups\/search\/(\d+)/)) {
 		return navigateTo('/groups/search');
 	}
 }
 
-function handleEventRoutes(status: any, to: RouteLocationNormalizedGeneric) {
-    if (status.authStatus !== AUTH_STATUS.authenticated && !to.fullPath.match(/\/events\/(\d+)/)) {
+function handleEventRoutes(to: RouteLocationNormalizedGeneric) {
+	const authStore = useAuthStore();
+    if (!authStore.isAuthenticated && to.fullPath.includes('/events/new')) {
 		return navigateTo('/signin');
     }
-}
-
-function handleProfileRoutes(status: any, to: RouteLocationNormalizedGeneric) {
-	if (status.authStatus !== AUTH_STATUS.authenticated) {
-		return navigateTo('/signin');
-	}
 }
 
 export {
     handleRoutes,
     handleHomeRoutes,
     handleEventRoutes,
-    handleGroupsRoutes,
-    handleAuthorizationStatus
+    handleGroupsRoutes
 }

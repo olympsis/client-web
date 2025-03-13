@@ -1,4 +1,6 @@
 import { VIEW_STATE } from "~/data/Enums";
+import { useSessionStore } from "../stores/session-store";
+import { useAuthStore } from "../stores/auth-store";
 
 export default defineNuxtRouteMiddleware(async (to, from) => {
     if (import.meta.server) return;
@@ -13,9 +15,18 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     if (!authStore.isAuthInitialized) {
         await authStore.initAuth();
     }
+
+    // // Check if we're coming from signin page and going to a protected route
+    // const isPostSignIn = from.path === '/signin' && to.path !== '/signin';
+    
+    // // If we're navigating right after login, add a small delay to ensure auth state is updated
+    // if (isPostSignIn) {
+    //     await new Promise(resolve => setTimeout(resolve, 5000));
+    //     await authStore.initAuth();
+    // }
     
     // Load session data only if not already loaded
-    if (!sessionStore.hasLoaded) {
+    if (authStore.isAuthInitialized && !sessionStore.hasLoaded) {
         await sessionStore.load();
     }
 
@@ -25,20 +36,32 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
         sessionStore.loadingState = VIEW_STATE.SUCCESS;
     }
     
+    // If authenticated user tries to access signin, redirect to home
     if (authStore.isAuthenticated && to.path === '/signin') {
         return navigateTo('/home');
     }
     
-    // Handle protected routes
-    if (!authStore.isAuthenticated) {
+    // Handle /groups path redirection rule
+    if (to.path.startsWith('/groups')) {
+        const isGroupsSearchPattern = to.path === '/groups/search' || to.path.match(/^\/groups\/search\/(\d+)$/);
+        if (!isGroupsSearchPattern && sessionStore.user?.clubs?.length == 0) {
+            return navigateTo('/groups/search');
+        }
+    }
+    
+    // Define public routes that don't require authentication
+    const isPublicRoute = to.path === '/signin' ||
+                            to.path === '/contact-us' ||
+                            to.path === '/terms-of-use' ||
+                            to.path === '/privacy-policy' ||
+                            to.path.match(/^\/events\/(\d+)$/) !== null || 
+                            to.path.match(/^\/groups\/search\/(\d+)$/) !== null;
+    
+    // Redirect unauthenticated users from non-public routes
+    if (!authStore.isAuthenticated && !isPublicRoute) {
         return navigateTo({
             path: '/signin',
             query: { redirect: to.fullPath }
         });
-    }
-    
-    // Handle specific route types
-    if (to.path.startsWith('/groups')) {
-        return handleGroupsRoutes(sessionStore, to);
     }
 });

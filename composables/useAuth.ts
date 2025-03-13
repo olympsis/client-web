@@ -16,6 +16,7 @@ export function useAuth() {
     // Methods
     const { 
         initAuth,
+        resetState,
         signInWithGoogle,
         signInWithApple,
         signOut,
@@ -32,6 +33,7 @@ export function useAuth() {
 
         // Methods
         initAuth,
+        resetState,
         signInWithGoogle,
         signInWithApple,
         signOut,

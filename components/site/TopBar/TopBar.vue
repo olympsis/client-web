@@ -6,10 +6,10 @@
             <NuxtLink id="link" to="/privacy-policy" active-class="selected-link" class="link" @click="hideMenu"> Privacy Policy </NuxtLink>
             <NuxtLink id="link2" to="/terms-of-use" active-class="selected-link" class="link" @click="hideMenu"> Terms of Use </NuxtLink>
             <NuxtLink id="link2" to="/contact-us" active-class="selected-link" class="link" @click="hideMenu"> Contact Us </NuxtLink>
-            <div v-if="isOpen" @click="handlePrimaryButton" :class="{ selected: route.fullPath === '/signin' }" class="button">{{ primaryText }}</div>
+            <div v-if="isOpen" @click="handlePrimaryButton" :class="{ selected: route.fullPath.includes('/signin') }" class="button">{{ primaryText }}</div>
         </div>
 
-        <div id="signin" @click="handlePrimaryButton" :class="{ selected: route.fullPath === '/signin' }" class="button">{{ primaryText }}</div>
+        <div id="signin" @click="handlePrimaryButton" :class="{ selected: route.fullPath.includes('/signin') }" class="button">{{ primaryText }}</div>
 
         <div class="hamburger" :class="{ 'open': isOpen }" @click="toggleMenu">
             <span class="hamburger__top-bun"></span>
@@ -105,6 +105,7 @@ function handlePrimaryButton() {
     margin: 0rem 1rem;
     border-radius: 10px;
     padding: 0.3rem 1rem;
+    background-color: unset;
     border: 2px solid white;
 }
 

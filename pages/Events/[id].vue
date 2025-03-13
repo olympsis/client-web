@@ -64,7 +64,6 @@ import { useModelStore } from '@/stores/model-store';
 import { UserSnippet } from '@/data/models/UserModels';
 import { useSessionStore } from '@/stores/session-store';
 import { generateImageURL } from '~/utils/image-helpers';
-import { getAnalytics, logEvent } from "firebase/analytics";
 import { Organization } from '@/data/models/OrganizationModels';
 import { Participant, ParticipantDao } from '@/data/models/GenericModels';
 import { computed, onMounted, ref, type Ref, useTemplateRef, } from 'vue';
@@ -397,13 +396,6 @@ watch(data, (newData) => {
         })
     }
 }, { immediate: true });
-
-onMounted(() => {
-    if (session.authStatus !== AUTH_STATUS.authenticated) {
-        const analytics = getAnalytics();
-        logEvent(analytics, 'guest_user_visit', { page: 'event_detail' });
-    }
-});
 </script>
 
 <style scoped>

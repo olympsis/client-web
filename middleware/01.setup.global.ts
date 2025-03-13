@@ -16,15 +16,6 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
         await authStore.initAuth();
     }
 
-    // // Check if we're coming from signin page and going to a protected route
-    // const isPostSignIn = from.path === '/signin' && to.path !== '/signin';
-    
-    // // If we're navigating right after login, add a small delay to ensure auth state is updated
-    // if (isPostSignIn) {
-    //     await new Promise(resolve => setTimeout(resolve, 5000));
-    //     await authStore.initAuth();
-    // }
-    
     // Load session data only if not already loaded
     if (authStore.isAuthInitialized && !sessionStore.hasLoaded) {
         await sessionStore.load();
@@ -54,8 +45,8 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
                             to.path === '/contact-us' ||
                             to.path === '/terms-of-use' ||
                             to.path === '/privacy-policy' ||
-                            to.path.match(/^\/events\/(\d+)$/) !== null || 
-                            to.path.match(/^\/groups\/search\/(\d+)$/) !== null;
+                            to.path.match(/^\/events\/([a-zA-Z0-9]+)$/) !== null || 
+                            to.path.match(/^\/groups\/search\/([a-zA-Z0-9]+)$/) !== null;
     
     // Redirect unauthenticated users from non-public routes
     if (!authStore.isAuthenticated && !isPublicRoute) {

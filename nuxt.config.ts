@@ -92,8 +92,12 @@ export default defineNuxtConfig({
 	primevue: {
 		options: {
 			theme: {
-					preset: Aura
+				preset: Aura
 			}
+		},
+		components: {
+			prefix: 'Prime',
+			exclude: ['Editor', 'Form', 'Chart', 'FormField']
 		}
 	},
 

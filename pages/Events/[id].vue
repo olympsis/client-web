@@ -115,26 +115,6 @@ const isAuthenticated = computed<boolean>(() => {
     return auth.isAuthenticated.value;
 });
 
-const eventState = computed<EVENT_STATE>(() => {
-    const timestamp = Math.floor(new Date().getTime() / 1000);
-    const thirtyMinutesAgo = timestamp - (30 * 60);
-    const twoHoursAgo = timestamp - (2 * 60 * 60);
-
-    const startTime = (event.value?.startTime) ?? 0;
-    const stopTime = (event.value?.stopTime) ?? 0;
-
-    if (
-        (stopTime !== 0 && stopTime < timestamp) ||
-        (startTime !== 0 && startTime < twoHoursAgo)
-    ) {
-        return EVENT_STATE.COMPLETED;
-    } else if (startTime !== undefined && startTime < thirtyMinutesAgo) {
-        return EVENT_STATE.LIVE;
-    } else {
-        return EVENT_STATE.PENDING;
-    }
-});
-
 const eventTitle = computed<string>(() => {
     return event.value?.title ?? 'Olympsis Events';
 });
@@ -249,49 +229,6 @@ async function handleResponse(response: number) {
     }
 }
 
-async function cancelRSVPResponse() {
-    let index = event.value?.participants?.findIndex((p) => {
-        return p.user?.uuid === session.user?.uuid;
-    });
-
-    if (index != undefined && index !== -1) {
-        try {
-            if (event.value?.id) {
-                primaryState.value = VIEW_STATE.LOADING;
-
-                if (await session.eventService.removeParticipant(event.value?.id)) {
-                    event.value?.participants?.splice(index, 1);
-                    primaryState.value = VIEW_STATE.PENDING;
-                }
-            }
-        } catch(error) {
-            primaryState.value = VIEW_STATE.PENDING;
-            console.log(`Failed to remove participant. Error: ${error}`);
-            return;
-        }
-    }
-}
-
-function openMaps() {
-    if (event.value?.venues) {
-        let coordinates: Array<Number>;
-        const descriptor = event.value?.venues[0];
-        if (descriptor) {
-            if (descriptor.location?.coordinates) {
-                getDirections(descriptor.location.coordinates)
-            } else {
-                const venue = venues.value.find((v: any) => {
-                    return v.id == descriptor.id;
-                });
-
-                if (venue && venue.location?.coordinates) {
-                    getDirections(venue.location?.coordinates)
-                }
-            }
-        }
-    }
-}
-
 function handleOpenParticipantsModal() {
     if (!isAuthenticated.value) {
         showAuthModal();
@@ -324,44 +261,6 @@ function handleCloseSettingsModal() {
     }
 }
 
-function handleEventSharing() {
-    navigator.clipboard.writeText(window.location.href);
-    showCopiedToast()
-}
-
-function getPendingEventState(): EVENT_PENDING_STATE {
-    const user = session.user;
-    const participants = event.value?.participants ?? [];
-    if (user) {
-        if (participants?.find((p) => p.user?.uuid === user?.uuid)) {
-            return EVENT_PENDING_STATE.CANCEL;
-        }
-    }
-    if (event.value?.maxParticipants && participants?.length >= event.value?.maxParticipants) {
-        return EVENT_PENDING_STATE.WAITLIST;
-    } else {
-        return EVENT_PENDING_STATE.RSVP;
-    }
-}
-
-function handlePrimaryAction() {
-    // We only have primary actions when an event isn't live or completed
-    if (eventState.value === EVENT_STATE.PENDING) {
-        const _state = getPendingEventState();
-        switch (_state) {
-            case EVENT_PENDING_STATE.CANCEL:
-                cancelRSVPResponse();
-                break;
-            case EVENT_PENDING_STATE.WAITLIST:
-                showRSVPModal();
-                break;
-            case EVENT_PENDING_STATE.RSVP:
-                showRSVPModal();
-                break;
-        }
-    }
-}
-
 function handleNewUserAuthentication() {
     session.checkAuthorizationStatus();
     hideAuthModal();
@@ -369,18 +268,6 @@ function handleNewUserAuthentication() {
 
 function showCopiedToast() {
     toast.add({ severity: 'secondary', summary: 'Link Copied', detail: 'You\'ve copied the link to this event', life: 3000 });
-}
-
-function handleBackNavigation() {
-    const previousRoute = router.options.history.state.back;
-    
-    if (!isAuthenticated.value) {
-        router.push('/signin');
-    } else if (previousRoute === '/groups') {
-        router.push('/groups');
-    } else {
-        router.push('/events');
-    }
 }
 
 async function loadEventData(id: string) {

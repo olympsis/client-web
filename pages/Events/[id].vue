@@ -261,7 +261,8 @@ function handleCloseSettingsModal() {
 }
 
 function handleNewUserAuthentication() {
-    session.checkAuthorizationStatus();
+    auth.initAuth();
+    session.init();
     hideAuthModal();
 }
 

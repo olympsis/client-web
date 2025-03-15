@@ -47,6 +47,7 @@ import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
 import GroupSmallSection from '~/components/Groups/GroupSmallSection/GroupSmallSection.vue';
 import GroupLogoAndBanner from '@/components/Groups/GroupLogoAndBanner/GroupLogoAndBanner.vue';
 
+const auth = useAuth();
 const toast = useToast();
 const route = useRoute();
 const router = useRouter();
@@ -67,7 +68,7 @@ const authModal = useTemplateRef<HTMLDialogElement>('auth-modal');
  */
 
 const isAuthenticated = computed<boolean>(() => {
-    return session.authStatus === AUTH_STATUS.authenticated;
+    return auth.isAuthenticated.value;
 });
 
 const groupID = computed<string>(() => {
@@ -150,7 +151,8 @@ function handleBackNavigation(){
 }
 
 function handleNewUserAuthentication() {
-    session.checkAuthorizationStatus();
+    auth.initAuth();
+    session.init();
     hideAuthModal();
 }
 

@@ -1,7 +1,3 @@
-import {
-    type Auth, 
-} from 'firebase/auth';
-
 import { ref, type Ref } from 'vue';
 import { defineStore } from 'pinia'
 import { useRouter } from 'vue-router';
@@ -9,16 +5,16 @@ import { useModelStore } from './model-store';
 import { Club } from '~/data/models/ClubModels';
 import { Event } from '~/data/models/EventModels';
 import { Venue } from '~/data/models/VenueModels';
-import { UserData } from '~/data/models/UserModels';
+import { CheckIn, UserData } from '~/data/models/UserModels';
 import { ChatRoom } from '~/data/models/ChatModels';
+import { GROUP_TYPE, VIEW_STATE } from '~/data/Enums';
 import { ChatService } from '~/data/services/ChatService';
-import { AuthService } from '~/data/services/AuthService';
 import { ClubService } from '~/data/services/ClubService';
 import { UserService } from '~/data/services/UserService';
 import { VenueService } from '~/data/services/VenueService';
 import { EventService } from '~/data/services/EventService';
+import { Announcement } from '~/data/models/AnnouncementModels';
 import { Organization } from '../data/models/OrganizationModels';
-import { AUTH_STATUS, GROUP_TYPE, VIEW_STATE } from '~/data/Enums';
 import { LocationManager } from '../data/managers/LocationManager';
 import { GroupSelection, Location } from '../data/models/GenericModels';
 import { OrganizationService } from '~/data/services/OrganizationService';
@@ -27,7 +23,6 @@ export const useSessionStore = defineStore('session-store', () => {
 
     var router = useRouter();
     var hasLoaded = ref(false);
-    var hasLocation = ref(false);
     var location = new LocationManager();
 
     const authStore = useAuthStore();
@@ -43,10 +38,10 @@ export const useSessionStore = defineStore('session-store', () => {
     var user = ref<UserData | undefined>();
 
     var events = ref<Event[]>([]);
-    var pastEvents = ref<Event[]>([]);
-    
     var venues = ref<Venue[]>([]);
-
+    var pastEvents = ref<Event[]>([]);
+    var announcements = ref<Announcement[]>([]);
+    
     var clubs = ref<Club[]>([]);
     var organizations = ref<Organization[]>([]);
 
@@ -56,195 +51,60 @@ export const useSessionStore = defineStore('session-store', () => {
     var chatRooms = ref<ChatRoom[]>([]);
 
     var lastKnownLocation: Ref<Location | undefined> = ref(undefined);
-    var authStatus: Ref<AUTH_STATUS> = ref(AUTH_STATUS.unknown);
     var loadingState: Ref<VIEW_STATE> = ref(VIEW_STATE.PENDING);
 
     var mapkitToken: Ref<string | undefined> = ref(undefined);
-    var mapKitServerToken: Ref<string | undefined> = ref(undefined); 
+    var mapKitServerToken: Ref<string | undefined> = ref(undefined);
 
-    var announcements: Ref<string[]> = ref([
-        "https://storage.googleapis.com/olympsis-feed-images/072bb74c-bebe-449d-9d1f-efe26b974081.jpg",
-        "https://storage.googleapis.com/olympsis-feed-images/89b037d3-e4d6-4e65-86a4-27ef09983489.jpg"
-    ]);
-    
-    function checkAuthorizationStatus() {
-        const nuxtApp = useNuxtApp();
-        const auth = nuxtApp.$auth as Auth;
-        const session = useSessionStore();
-        const unsubscribe = auth.onAuthStateChanged(async (_user) => {
-            if (_user) { // We only load data if there is no user data in memory and we get user update
-                try {
-                    load()
-                        .then((response: {
-                            user: UserData | undefined, 
-                            selections: GroupSelection[],
-                            selectedGroup: GroupSelection | undefined, 
-                            hasLoaded: boolean, 
-                            clubs: Club[], 
-                            organizations: Organization[],
-                        }) => {
-                            session.$patch({
-                                authStatus: AUTH_STATUS.authenticated,
-                                loadingState: VIEW_STATE.SUCCESS,
-                                user: response.user,
-                                groups: response.selections,
-                                selectedGroup: response.selectedGroup,
-                                hasLoaded: response.hasLoaded,
-                                clubs: response.clubs,
-                                organizations: response.organizations,
-                            });
-                        });
-                } catch(error) {
-                     // We will most likely need to restart/reload the page.
-                     // So we unsubscribe if we fail here.
-                    unsubscribe();
-                    console.error(error);
-                    session.$patch({
-                        authStatus: AUTH_STATUS.unauthenticated,
-                        loadingState: VIEW_STATE.FAILURE
-                    });
-                }
-            } else {
-                // User needs to login.
-                // We don't want the auth listener right now
-                unsubscribe();
-                session.$patch({
-                    authStatus: AUTH_STATUS.unauthenticated,
-                    loadingState: VIEW_STATE.SUCCESS
-                });
-            }
-        }, (error) => {
-            // We will most likely need to restart/reload the page.
-            // So we unsubscribe if we fail here.
-            unsubscribe();
-            session.$patch({
-                authStatus: AUTH_STATUS.unknown,
-                loadingState: VIEW_STATE.FAILURE
-            });
-            console.error(`Failed to check user status. Error: ${error}`);
-        });
-    }
-
-    function addGroup(group: GroupSelection) {
-        if (groups.value) {
-            groups.value.push(group);
-        } else {
-            groups.value = [group];
-        }
-        selectedGroup.value = group;
-    }
-
-    function removeGroup(id: string) {
-        const index = groups.value.findIndex((g) => g.id === id );
-        if (index !== -1) {
-            groups.value.splice(index, 1);
-            if (groups.value.length != 0) {
-                selectedGroup.value = groups.value[0];
-            } else {
-                selectedGroup.value = undefined;
-                router.push('/groups');
-            }
-        }
-    }
-
-    function handleNavigation() {
-        // Don't show loading screen during navigation if already loaded
-        if (hasLoaded.value) {
-            loadingState.value = VIEW_STATE.SUCCESS;
-        }
-    }
-
-    async function load(): Promise<{ 
-        user: UserData | undefined, 
-        selections: GroupSelection[],
-        selectedGroup: GroupSelection | undefined, 
-        hasLoaded: boolean, 
-        clubs: Club[], 
-        organizations: Organization[],
-    }> {
+    /**
+     * Initializes the session by checking in user
+     */
+    async function init() {
         try {
-            // Set loading state
+            // Set app-wide loading state
             loadingState.value = VIEW_STATE.LOADING;
-            
+
             // Initialize auth if needed
             if (!authStore.isAuthInitialized) {
                 await authStore.initAuth();
             }
-            
-            let userData: UserData | undefined;
-            let _clubs: Club[] = [];
-            let _organizations: Organization[] = [];
-            let _groups: GroupSelection[] = [];
-            
-            // First fetch user data if authenticated
-            if (authStore.isAuthenticated) {
-                try {
-                    const response = await userService.checkIn();
-                    userData = response?.user;
-                    _clubs = response?.clubs ?? [];
-                    _organizations = response?.organizations ?? [];
-                    
-                    // Process clubs and organizations
-                    _clubs.forEach((c) => {
-                        _groups.push(new GroupSelection(GROUP_TYPE.CLUB, c, undefined));
-                    });
-                    
-                    _organizations.forEach((o) => {
-                        _groups.push(new GroupSelection(GROUP_TYPE.ORGANIZATION, undefined, o));
-                    });
-                    
-                    // Update user and groups in session store
-                    user.value = userData;
-                    clubs.value = _clubs;
-                    organizations.value = _organizations;
-                    groups.value = _groups;
-                    selectedGroup.value = _groups.length > 0 ? _groups[0] : undefined;
-                    
-                    // Update model store
-                    modelStore.setClubs(_clubs);
-                    modelStore.setOrganizations(_organizations);
-                    
-                    // IMPORTANT: Set hasLoaded to true now that user data is available
-                    hasLoaded.value = true;
-                } catch (error) {
-                    console.error("Error loading user data:", error);
-                    hasLoaded.value = true;
-                    await navigateTo('/signin');
-                    // await location.listenToLocationUpdates();
-                }
-            } else {
-                // Not authenticated case
-                hasLoaded.value = true;
-                // await location.listenToLocationUpdates();
+
+            /**
+             * If we fail to authenticate for any reason we should re-route to the login page.
+             * What could possibly go wrong...
+             */
+            if (!authStore.isAuthenticated) {
+                navigateTo({ path: '/signin' });
+            };
+
+            // Make Check In request to server
+            const resp = await userService.checkIn();
+            if (!resp) throw('Failed to get check in data. Response from server is undefined.');
+
+            // Log out user if we fail to get user data
+            if (!resp.user) {
+                await logout();
             }
-            
-            // Success state regardless of authentication
-            loadingState.value = VIEW_STATE.SUCCESS;
-            
-            return {
-                user: userData,
-                selections: _groups,
-                selectedGroup: _groups.length > 0 ? _groups[0] : undefined,
-                hasLoaded: true,
-                clubs: _clubs,
-                organizations: _organizations,
-            };
-        } catch (error) {
-            console.error("Fatal error in load function:", error);
+
+            // Load in user data
+            user.value = resp.user;
+
+            // Load in Groups Data
+            _loadGroupData(resp);
+
+
+            // Set has loaded to true
             hasLoaded.value = true;
+            loadingState.value = VIEW_STATE.SUCCESS;
+        } catch (error) {
             loadingState.value = VIEW_STATE.FAILURE;
-            
-            return {
-                user: undefined,
-                selections: [],
-                selectedGroup: undefined,
-                hasLoaded: true,
-                clubs: [],
-                organizations: [],
-            };
+            console.error(`Failed to init session store. Checking in user failed. Error: ${error}`);
         }
     }
 
+    /**
+     * Loads in the venues and events near the user
+     */
     async function loadVenuesAndEvents() {
         const coords = await location.getPositionWithTimeout();
         lastKnownLocation.value = coords.location;
@@ -289,6 +149,41 @@ export const useSessionStore = defineStore('session-store', () => {
         }
     }
 
+    /**
+     * Adds a new group to the session
+     * 
+     * @param group - the group to be added
+     */
+    function addGroup(group: GroupSelection) {
+        if (groups.value) {
+            groups.value.push(group);
+        } else {
+            groups.value = [group];
+        }
+        selectedGroup.value = group;
+    }
+
+    /**
+     * Removes a group from the session
+     * 
+     * @param id - the group's id to remove
+     */
+    function removeGroup(id: string) {
+        const index = groups.value.findIndex((g) => g.id === id );
+        if (index !== -1) {
+            groups.value.splice(index, 1);
+            if (groups.value.length != 0) {
+                selectedGroup.value = groups.value[0];
+            } else {
+                selectedGroup.value = undefined;
+                router.push('/groups');
+            }
+        }
+    }
+
+    /**
+     * Clears out the session data
+     */
     function resetSession() {
         hasLoaded.value = false;
     }
@@ -309,9 +204,29 @@ export const useSessionStore = defineStore('session-store', () => {
         await navigateTo('/signin');
     }
 
+    /**
+     * Load in the clubs and organizations into groups
+     * Set the selected group from saved data or the first group in the list
+     * 
+     * @param data CheckIn data from the server
+     */
+    function _loadGroupData(data: CheckIn) {
+        // Load in groups
+        data.clubs?.forEach((c) => groups.value.push(new GroupSelection(GROUP_TYPE.CLUB, c, undefined)));
+        data.organizations?.forEach((o) => groups.value.push(new GroupSelection(GROUP_TYPE.ORGANIZATION, undefined, o)));
+
+        // Set Selected Group
+        // TODO: - REMEMBER LAST SELECTED GROUP
+        selectedGroup.value = groups.value.at(0);
+
+        // Add club & organization data to model store
+        if (data.clubs) modelStore.setClubs(data.clubs);
+        if (data.organizations) modelStore.setOrganizations(data.organizations);
+    }
+
     return {
+        init,
         hasLoaded,
-        hasLocation,
         user,
         
         events,
@@ -327,7 +242,6 @@ export const useSessionStore = defineStore('session-store', () => {
 
         chatRooms,
 
-        authStatus,
         loadingState,
         announcements,
         lastKnownLocation,
@@ -345,13 +259,9 @@ export const useSessionStore = defineStore('session-store', () => {
         addGroup,
         removeGroup,
 
-        handleNavigation,
-
-        load,
         resetSession,
         loadVenuesAndEvents,
         logout,
-        deleteAccount,
-        checkAuthorizationStatus
+        deleteAccount
     }
 });

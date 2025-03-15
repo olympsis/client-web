@@ -18,7 +18,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
 
     // Load session data only if not already loaded
     if (authStore.isAuthInitialized && !sessionStore.hasLoaded) {
-        await sessionStore.load();
+        await sessionStore.init();
     }
 
     // If this is navigation (not initial load) and we're already loaded, 

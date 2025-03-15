@@ -51,7 +51,8 @@ export const useSessionStore = defineStore('session-store', () => {
     var chatRooms = ref<ChatRoom[]>([]);
 
     var lastKnownLocation: Ref<Location | undefined> = ref(undefined);
-    var loadingState: Ref<VIEW_STATE> = ref(VIEW_STATE.PENDING);
+    var loadingState = ref<VIEW_STATE>(VIEW_STATE.PENDING);
+    var locationState = ref<VIEW_STATE>(VIEW_STATE.PENDING);
 
     var mapkitToken: Ref<string | undefined> = ref(undefined);
     var mapKitServerToken: Ref<string | undefined> = ref(undefined);
@@ -106,6 +107,7 @@ export const useSessionStore = defineStore('session-store', () => {
      * Loads in the venues and events near the user
      */
     async function loadVenuesAndEvents() {
+        locationState.value = VIEW_STATE.LOADING;
         const coords = await location.getPositionWithTimeout();
         lastKnownLocation.value = coords.location;
 
@@ -144,7 +146,10 @@ export const useSessionStore = defineStore('session-store', () => {
                 venues.value = _venues;
                 events.value = _events;
             }
+
+            locationState.value = VIEW_STATE.SUCCESS;
         } catch (error) {
+            locationState.value = VIEW_STATE.FAILURE;
             console.error('Failed to fetch venues and events near user:', error);
         }
     }
@@ -243,6 +248,7 @@ export const useSessionStore = defineStore('session-store', () => {
         chatRooms,
 
         loadingState,
+        locationState,
         announcements,
         lastKnownLocation,
 

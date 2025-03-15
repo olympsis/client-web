@@ -14,10 +14,10 @@
         <AnnouncementsGallery class="announcements"/>
 
         <!-- Next Events -->
-        <EventsSection v-if="events.length != 0" :events="events"/>
+        <EventsSection v-if="events.length != 0 || state == VIEW_STATE.LOADING" :state="state" :events="events"/>
 
         <!-- Nearby Venues List -->
-        <NearbyVenues v-if="venues.length != 0" class="nearby-venues" :venues="venues"/>
+        <NearbyVenues v-if="venues.length != 0 || state == VIEW_STATE.LOADING" class="nearby-venues" :state="state" :venues="venues"/>
     </main>
 </template>
 
@@ -43,7 +43,7 @@ const modelStore = useModelStore();
 const sessionStore = useSessionStore();
 
 const state = computed<VIEW_STATE>(() => {
-    return sessionStore.loadingState;
+    return sessionStore.locationState;
 });
 
 const events = computed<Event[]>(() => {

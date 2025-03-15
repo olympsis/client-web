@@ -73,6 +73,7 @@ import { Member } from '~/data/models/GenericModels';
 import { useSessionStore } from '@/stores/session-store';
 import { useGroupsViewModel } from '@/stores/groups-view-model';
 
+import Dialog from 'primevue/dialog';
 import PostFeed from '@/components/Posts/PostFeed/PostFeed.vue';
 import GroupInfo from '~/components/Groups/GroupInfo/GroupInfo.vue';
 import GroupFeed from '~/components/Groups/GroupFeed/GroupFeed.vue';

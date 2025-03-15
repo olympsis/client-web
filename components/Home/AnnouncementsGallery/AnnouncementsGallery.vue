@@ -3,14 +3,17 @@
         <h3>Announcements</h3>
         <Galleria 
             v-if="state !== VIEW_STATE.LOADING" 
-            :value="images" 
+            :value="announcements" 
             :showThumbnails="false" 
             :showItemNavigators="true"
+            class="galleria"
             :pt="{
                 nextButton: (options) => ({
                     style: {
+                        'z-index': '10',
                         'width': '3rem',
-                        'height': '3rem'
+                        'height': '3rem',
+                        'margin-right': '1rem'
                     }
                 }),
                 nextIcon: (options) => ({
@@ -21,8 +24,10 @@
                 }),
                 prevButton: (options) => ({
                     style: {
+                        'z-index': '10',
                         'width': '3rem',
-                        'height': '3rem'
+                        'height': '3rem',
+                        'margin-left': '1rem'
                     }
                 }),
                 prevIcon: (options) => ({
@@ -34,11 +39,18 @@
             }"
         >
             <template #item="slotProps">
-                <img :src="slotProps.item" class="image" />
+                <div id="announcement">
+                    <img :src="generateImageURL(slotProps.item.mediaURL)" class="image" />
+                    <div id="info">
+                        <div class="title" :style="{}">{{ slotProps.item.title }}</div>
+                        <div class="subtitle" :style="{}">{{ slotProps.item.subtitle }}</div>
+                        <button class="action" :style="{}">{{ slotProps.item.actionButton.text }}</button>
+                    </div>
+                </div>
             </template>
         </Galleria>
 
-        <Skeleton v-if="state === VIEW_STATE.LOADING" class="mb-2 image" style="width: 45vw; height: 84vh;"></Skeleton>
+        <Skeleton v-if="state === VIEW_STATE.LOADING" id="skeleton" class="mb-2 image"></Skeleton>
     </div>
 </template>
 
@@ -49,22 +61,32 @@ import Galleria from 'primevue/galleria';
 
 import { VIEW_STATE } from "~/data/Enums";
 import { useSessionStore } from "~/stores/session-store";
+import { type Announcement } from "~/data/models/AnnouncementModels";
+import { AnnouncementService } from "~/data/services/AnnouncementService";
 
-const sessionStore = useSessionStore()
+const session = useSessionStore();
+const service = new AnnouncementService();
+const state = ref<VIEW_STATE>(VIEW_STATE.PENDING);
 
-const state = computed<VIEW_STATE>(() => {
-    return sessionStore.loadingState;
+const announcements = computed<Announcement[]>(() => {
+    return session.announcements;
 });
 
-const images = computed<string[]>(() => {
-    return sessionStore.announcements;
-})
+onMounted(async() => {
+    if (session.announcements.length > 0) return;
+    state.value = VIEW_STATE.LOADING;
+
+    const resp = await service.getAnnouncements();
+    if (!resp) return;
+
+    session.announcements = resp.announcements;
+    state.value = VIEW_STATE.SUCCESS;
+});
 </script>
 
 <style scoped>
 #announcements-gallery {
     width: 100%;
-    height: 100%;
     grid-area: main;
     overflow: hidden;
     margin: 2rem 0rem;
@@ -77,24 +99,95 @@ const images = computed<string[]>(() => {
     h3 {
         margin-left: 1rem;
         margin-bottom: 1rem;        
-        color: var(--primary-label-color);
         font-family: 'Inter';
+        color: var(--primary-label-color);
     } 
+
+    #skeleton {
+        margin: 0rem 1rem;
+        border-radius: 18px;
+        width: auto !important;
+        height: 32.5rem !important;
+    }
+
+    #announcement {
+        width: 100%;
+        height: 32.5rem;
+    }
+
+    #info {
+        top: 0;
+        right: 0;
+        width: 100%;
+        height: 100%;
+        padding: 2rem;
+        display: flex;
+        position: absolute;
+        flex-direction: column;
+    }
 
     .image {
         width: 100%;
-        height: auto;
-        object-fit: contain;
+        height: 32.5rem;
+        object-fit: cover;
+        position: relative;
         border-radius: 10px;
     }
 
+    .title {
+        width: 70%;
+        color: white;
+        font-weight: bold;
+        font-size: xx-large;
+        font-family: 'Archivo';
+        text-shadow: 0px 0px 8px rgba(38,46,87,0.5);
+    }
+
+    .subtitle {
+        width: 70%;
+        color: white;
+        font-size: x-large;
+        margin-top: 0.5rem;
+        font-weight: normal;
+        text-shadow: 0px 0px 8px rgba(38,46,87,0.5);
+    }
+
+    .action {
+        color: white;
+        cursor: pointer;
+        margin-top: auto;
+        font-weight: bold;
+        font-size: large;
+        border-radius: 18px;
+        margin-bottom: 1rem;
+        padding: 0.5rem 1rem;
+        align-self: flex-end;
+        justify-self: flex-end;
+        background-color: var(--primary-brand-color);
+    }
+
     @media (max-width: 970px) {
+        #announcement {
+            height: 28rem;
+            margin: 0rem 0.5rem;
+        }
+        
         .image {
-            width: 100%;
-            height: auto;
-            border: unset;
-            border-radius: unset;
+            height: 28rem;
+        }
+
+        .title {
+            width: 90%;
+        }
+
+        .subtitle {
+            width: 90%;
+        }
+
+        .action {
+
         }
     }
+
 }
 </style>

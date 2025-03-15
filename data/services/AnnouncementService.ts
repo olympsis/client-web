@@ -19,7 +19,7 @@ export class AnnouncementService {
      * 
      * @returns a promise containing an array of announcements
      */
-    async getAnnouncements(): Promise<AuthResponse | null> {
+    async getAnnouncements(): Promise<AnnouncementsResponse | null> {
         let headers = new Map<string, string>();
 
         const endpoint = new Endpoint("/v1/announcements");

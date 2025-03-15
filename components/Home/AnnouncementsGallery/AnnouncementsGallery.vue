@@ -44,7 +44,7 @@
                     <div id="info">
                         <div class="title" :style="{}">{{ slotProps.item.title }}</div>
                         <div class="subtitle" :style="{}">{{ slotProps.item.subtitle }}</div>
-                        <button class="action" :style="{}">{{ slotProps.item.actionButton.text }}</button>
+                        <button class="action" :style="{}" @click="navigateTo(slotProps.item.actionButton.url)">{{ slotProps.item.actionButton.text }}</button>
                     </div>
                 </div>
             </template>

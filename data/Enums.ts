@@ -352,9 +352,81 @@ enum VIEW_STATE {
     FAILURE
 }
 
+/**
+ * Enum for announcement text emphasis options
+ */
+enum TEXT_EMPHASIS {
+    TITLE = 'title',
+    SUBTITLE = 'subtitle',
+    EQUAL = 'equal'
+}
+
+function textEmphasisFromString(value: string): TEXT_EMPHASIS {
+    switch (value) {
+        case 'subtitle': return TEXT_EMPHASIS.SUBTITLE;
+        case 'equal': return TEXT_EMPHASIS.EQUAL;
+        default: return TEXT_EMPHASIS.TITLE;
+    }
+}
+
+function textEmphasisToString(value: TEXT_EMPHASIS): string {
+    return value;
+}
+
+/**
+ * Enum for announcement visibility scope
+ */
+enum ANNOUNCEMENT_SCOPE {
+    LOCAL = 'local',
+    GLOBAL = 'global',
+    APPLICATION_WIDE = 'application-wide'
+}
+
+function scopeFromString(value: string): ANNOUNCEMENT_SCOPE {
+    switch (value) {
+        case 'local': return ANNOUNCEMENT_SCOPE.LOCAL;
+        case 'application-wide': return ANNOUNCEMENT_SCOPE.APPLICATION_WIDE;
+        default: return ANNOUNCEMENT_SCOPE.GLOBAL;
+    }
+}
+
+function scopeToString(value: ANNOUNCEMENT_SCOPE): string {
+    return value;
+}
+
+/**
+ * Enum for announcement status
+ */
+enum ANNOUNCEMENT_STATUS {
+    PENDING = 'pending',
+    IN_REVIEW = 'in-review',
+    ACTIVE = 'active',
+    EXPIRED = 'expired'
+}
+
+function statusFromString(value: string): ANNOUNCEMENT_STATUS {
+    switch (value) {
+        case 'in-review': return ANNOUNCEMENT_STATUS.IN_REVIEW;
+        case 'active': return ANNOUNCEMENT_STATUS.ACTIVE;
+        case 'expired': return ANNOUNCEMENT_STATUS.EXPIRED;
+        default: return ANNOUNCEMENT_STATUS.PENDING;
+    }
+}
+
+function statusToString(value: ANNOUNCEMENT_STATUS): string {
+    return value;
+}
+
 export {
     AUTH_STATUS,
     APPLICATION_STATUS,
+    ANNOUNCEMENT_SCOPE,
+    scopeFromString,
+    scopeToString,
+
+    ANNOUNCEMENT_STATUS,
+    statusFromString,
+    statusToString,
 
     CHAT_ROOM_TYPE,
     CHAT_MESSAGE_TYPE,
@@ -394,6 +466,10 @@ export {
     sportToString,
     stringToSport,
     sportsInternalImages,
+
+    TEXT_EMPHASIS,
+    textEmphasisFromString,
+    textEmphasisToString,
 
     VIEW_SIZE,
     VIEW_STATE

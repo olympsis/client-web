@@ -70,7 +70,6 @@ useSeoMeta({
     description: 'Join Olympsis to find sports events around you!',
     ogDescription: 'Join Olympsis to find sports events around you!'
 });
-
 </script>
 
 <style scoped>
@@ -88,7 +87,7 @@ useSeoMeta({
         'venues venues'
         'events events';
     grid-template-columns: 25rem 28rem;
-    grid-template-rows: 3rem auto auto auto auto auto;
+    grid-template-rows: 3rem auto 38rem auto auto auto;
 
     #header {
         display: flex;
@@ -167,8 +166,8 @@ useSeoMeta({
         'events';
         width: 100vw;
         padding: 1rem 0rem;
-        grid-template-rows: unset;
         grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto 35rem auto auto;
     }
 }
 </style>

@@ -159,11 +159,13 @@ onMounted(async() => {
         margin-top: auto;
         font-weight: bold;
         font-size: large;
-        border-radius: 18px;
+        font-style: italic;
+        border-radius: 30px;
         margin-bottom: 1rem;
-        padding: 0.5rem 1rem;
         align-self: flex-end;
         justify-self: flex-end;
+        padding: 0.75rem 1.5rem;
+        text-transform: uppercase;
         background-color: var(--primary-brand-color);
     }
 

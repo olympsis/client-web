@@ -91,7 +91,7 @@ import { computed, onMounted, ref, useTemplateRef, watch } from 'vue';
 
 import SearchBar from '@/components/SearchBar/SearchBar.vue';
 import SportsFilter from '~/components/SportsFilter/SportsFilter.vue';
-import EventListItem2 from '~/components/Events/EventListItem-v2/EventListItem2.vue';
+import EventListItem2 from '~/components/Events/EventListItem/EventListItem.vue';
 import EventsSettings from '~/components/Dialog/Events/EventsSettings/EventsSettings.vue';
 import { Location } from '~/data/models/GenericModels';
 
@@ -122,14 +122,13 @@ const filteredEvents = computed<Array<Event>>(() => {
 const eventSections = computed<EventSection[]>(() => {
     const sections: EventSection[] = [];
     filteredEvents.value.filter((e) => e.title?.toLowerCase().includes(searchText.value.toLowerCase())).forEach((e) => {
-        const eventDate = new Date(e.startTime * 1000);
-        const eventDay = eventDate.getDate();  // This change from getDay() was correct
-        const eventMonth = eventDate.getMonth();
-        const eventYear = eventDate.getFullYear();
+        const eventDay = e.startTime.getDate();
+        const eventMonth = e.startTime.getMonth();
+        const eventYear = e.startTime.getFullYear();
 
         // Find if we have an existing section
         const existing = sections.find((s) => {
-            const sectionDay = s.date.getDate();  // This change was correct too
+            const sectionDay = s.date.getDate();
             const sectionMonth = s.date.getMonth();
             const sectionYear = s.date.getFullYear();
 
@@ -142,8 +141,8 @@ const eventSections = computed<EventSection[]>(() => {
             existing.events.push(e);
         } else {
             const newSection = new EventSection(
-                eventDate,
-                compareUTCNowToDateNormal(eventDate),
+                e.startTime,
+                compareUTCNowToDateNormal(e.startTime),
                 [e]
             );
             sections.push(newSection);
@@ -181,7 +180,7 @@ async function fetchEvents(fetchCompleted: boolean = false) {
     _events = await eventService.getEvents(
         location.latitude, 
         location.longitude, 
-        64373, // Radius of lookup
+        64373,
         sports, // Sports involved
         fetchCompleted ? 'ended' : 'pending, live', // Status of events
         0,

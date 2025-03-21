@@ -24,8 +24,8 @@
             </picture>
 
             <div class="info">
-                <div class="header">{{  event.timeToString() }}</div>
-                <div class="sub-header">{{ event.startTimeToString() + " - " + event.stopTimeToString() }}</div>
+                <div class="header">{{  dateToString(event.startTime) }}</div>
+                <div class="sub-header">{{ timeToString(event.startTime) + " - " + timeToString(event.stopTime) }}</div>
             </div>
         </div>
 

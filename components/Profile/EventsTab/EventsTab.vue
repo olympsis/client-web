@@ -8,7 +8,7 @@
 
 <script setup lang="ts">
 import { Event } from '~/data/models/EventModels';
-import EventListItem2 from '~/components/Events/EventListItem-v2/EventListItem2.vue';
+import EventListItem2 from '~/components/Events/EventListItem/EventListItem.vue';
 
 defineProps({
     events: { type: Array<Event>, required: true }

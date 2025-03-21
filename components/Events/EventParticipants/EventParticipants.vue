@@ -29,19 +29,19 @@ const props = defineProps({
 });
 
 const eventState = computed<EVENT_STATE>(() => {
-    const timestamp = Math.floor(new Date().getTime() / 1000);
-    const thirtyMinutesAgo = timestamp - (30 * 60);
-    const twoHoursAgo = timestamp - (2 * 60 * 60);
+    const now = new Date().getTime();
+    const thirtyMinutesAgo = now - (30 * 60 * 1000);
+    const twoHoursAgo = now - (2 * 60 * 60 * 1000);
 
-    const startTime = (props.event?.startTime) ?? 0;
-    const stopTime = (props.event?.stopTime) ?? 0;
+    const startTime = props.event?.startTime ? props.event.startTime.getTime() : 0;
+    const stopTime = props.event?.stopTime ? props.event.stopTime.getTime() : 0;
 
     if (
-        (stopTime !== 0 && stopTime < timestamp) ||
+        (stopTime !== 0 && stopTime < now) ||
         (startTime !== 0 && startTime < twoHoursAgo)
     ) {
         return EVENT_STATE.COMPLETED;
-    } else if (startTime !== undefined && startTime < thirtyMinutesAgo) {
+    } else if (startTime !== 0 && startTime < thirtyMinutesAgo) {
         return EVENT_STATE.LIVE;
     } else {
         return EVENT_STATE.PENDING;

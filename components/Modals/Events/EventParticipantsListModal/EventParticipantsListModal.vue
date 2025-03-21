@@ -68,7 +68,7 @@ const participants = computed<Participant[]>(() => {
 });
 
 const waitList = computed<Participant[]>(() => {
-    return props.event.waitList.filter((p) => {
+    return props.event.participantsWaitlist.filter((p) => {
         return p.user?.username?.toLocaleLowerCase().includes(searchValue.value.toLocaleLowerCase())
     });
 });

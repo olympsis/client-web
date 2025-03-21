@@ -4,14 +4,14 @@ Array.prototype.userNextEvents = function <T extends Event>(this: T[], uuid: str
     if (this.length === 0) return undefined;
     return this
         .filter((e) => e.participants?.some((participant) => participant.user?.uuid === uuid))
-        .sort((a, b) => a.startTime - b.startTime);
+        .sort((a, b) => a.startTime.getTime() - b.startTime.getTime());
 };
 
 Array.prototype.mostRecentForUser = function <T extends Event>(this: T[], uuid: string): T | undefined {
     if (this.length === 0) return undefined;
     return this
         .filter((e) => e.participants?.some((participant) => participant.user?.uuid === uuid))
-        .sort((a, b) => a.startTime - b.startTime)
+        .sort((a, b) => a.startTime.getTime() - b.startTime.getTime())
         .at(0);
 };
 
@@ -19,7 +19,7 @@ Array.prototype.mostRecentForClub = function<T extends Event>(this: T[], id: str
     if (this.length == 0) return undefined;
     return this
         .filter((e) => e.organizers?.find((o) => o.id === id))
-        .sort((a, b) => a.startTime - b.startTime)
+        .sort((a, b) => a.startTime.getTime() - b.startTime.getTime())
         .at(0);
 }
   
@@ -30,7 +30,7 @@ Array.prototype.filterByGroupID = function <T extends Event>(this: T[], id: stri
         (event) => { 
             return event.organizers?.some((organizer) => organizer.id === id)
         }
-    ).sort((a, b) => a.startTime - b.startTime)
+    ).sort((a, b) => a.startTime.getTime() - b.startTime.getTime())
   
     return filtered;
 };

@@ -1,3 +1,32 @@
+function timeToString(date: Date): string {	
+	let hours = date.getHours();
+	const minutes = date.getMinutes().toString().padStart(2, '0');
+	const m = hours >= 12 ? 'PM' : 'AM';
+	
+	// Convert 24h to 12h format
+	hours = hours % 12;
+	hours = hours ? hours : 12; // Handle midnight (0) as 12
+
+	return `${hours}:${minutes} ${m}`;
+}
+
+function dateToString(date: Date): string {
+	const currentDate = new Date();
+	const formatter = new Intl.DateTimeFormat('en-US', { dateStyle: 'medium' });
+
+	if (isToday(date)) {
+		return 'Today';
+	} else if (isTomorrow(date)) {
+		return 'Tomorrow';
+	} else if (isThisWeek(date, currentDate)) {
+		return date.toLocaleDateString('en-US', { weekday: 'long' });
+	} else if (isThisYear(date, currentDate)) {
+		return formatter.format(date);
+	} else {
+		return formatter.format(date);
+	}
+}
+
 function calculateTimeAgo(timestamp: number, verbose: boolean = true): string {
   const currentTime = Date.now() / 1000;
   const timeDifference = currentTime - timestamp;
@@ -56,7 +85,7 @@ function getMonthAndYear(timestamp: number): string {
 	
 	// Return formatted string
 	return `${month} ${year}`;
-  }
+}
 
 function areDatesOnSameDay(date1: Date, date2: Date): boolean {
     const year1 = date1.getFullYear();
@@ -160,7 +189,44 @@ function formatRelativeTime(timestamp: number): string {
 	return `just now ${formattedDate}`;
 }
 
+function isToday(date: Date): boolean {
+	const today = new Date();
+	return (
+		date.getDate() === today.getDate() &&
+		date.getMonth() === today.getMonth() &&
+		date.getFullYear() === today.getFullYear()
+	);
+}
+
+function isTomorrow(date: Date): boolean {
+	const tomorrow = new Date();
+	tomorrow.setDate(tomorrow.getDate() + 1);
+	return (
+		date.getDate() === tomorrow.getDate() &&
+		date.getMonth() === tomorrow.getMonth() &&
+		date.getFullYear() === tomorrow.getFullYear()
+	);
+}
+
+function isThisWeek(date: Date, currentDate: Date): boolean {
+	const currentWeekStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() - currentDate.getDay());
+	const currentWeekEnd = new Date(currentWeekStart.getFullYear(), currentWeekStart.getMonth(), currentWeekStart.getDate() + 6);
+	return date >= currentWeekStart && date <= currentWeekEnd;
+}
+
+function isThisYear(date: Date, currentDate: Date): boolean {
+	return date.getFullYear() === currentDate.getFullYear();
+}
+
 export {
+	isToday,
+	isTomorrow,
+	isThisWeek,
+	isThisYear,
+
+	timeToString,
+	dateToString,
+
 	getMonthAndYear,
   	calculateTimeAgo,
   	areDatesOnSameDay,

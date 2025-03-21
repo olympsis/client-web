@@ -213,17 +213,19 @@ class VenueDescriptor {
 }
 
 class Participant extends Codable<Participant> {
-    id: string | undefined;
+    id: string;
     user: UserSnippet | undefined;
-    status: EVENT_RSVP_STATUS | undefined;
-    createdAt: number | undefined;
+    status: EVENT_RSVP_STATUS;
+    createdAt: Date;
 
     constructor(
+        id: string = uuidv4(),
         user: UserSnippet | undefined,
-        status: EVENT_RSVP_STATUS | undefined,
-        createdAt: number | undefined
+        status: EVENT_RSVP_STATUS,
+        createdAt: Date
     ) {
         super();
+        this.id = id;
         this.user = user;
         this.status = status;
         this.createdAt = createdAt;
@@ -233,18 +235,14 @@ class Participant extends Codable<Participant> {
         const object = Object();
 
         if (data) {
-            if (data['id']) {
-                object['id'] = data['id'];
-            }
+            object['id'] = data['id'];
+
             if (data['user']) {
                 object['user'] = UserSnippet.decode(data['user']);
             }
-            if (data['status']) {
-                object['status'] = numberToEventRSVP(data['status']);
-            }
-            if (data['created_at']) {
-                object['createdAt'] = data['created_at'];
-            }
+
+            object['status'] = numberToEventRSVP(data['status']);
+            object['createdAt'] = new Date(data['created_at']);
         }
 
         Object.setPrototypeOf(object, Participant.prototype);
@@ -273,19 +271,19 @@ class Participant extends Codable<Participant> {
 
 class ParticipantDao extends Codable<ParticipantDao> {
     id: string | undefined
-    uuid: string | undefined
+    userID: string | undefined
     status: number | undefined
     createdAt: string | undefined
 
     constructor(
         id: string | undefined,
-        uuid: string | undefined,
+        userID: string | undefined,
         status: number | undefined,
         createdAt: string | undefined,
     ) {
         super();
         this.id = id
-        this.uuid = uuid
+        this.userID = userID
         this.status = status
         this.createdAt = createdAt
     }
@@ -297,8 +295,8 @@ class ParticipantDao extends Codable<ParticipantDao> {
             if (data['id']) {
                 object['id'] = data['id'];
             }
-            if (data['uuid']) {
-                object['uuid'] = data['uuid'];
+            if (data['user_id']) {
+                object['userID'] = data['user_id'];
             }
             if (data['status']) {
                 object['status'] = data['status'];
@@ -318,8 +316,8 @@ class ParticipantDao extends Codable<ParticipantDao> {
         if (this.id) {
             data['id'] = this.id;
         }
-        if (this.uuid) {
-            data['uuid'] = this.uuid;
+        if (this.userID) {
+            data['user_id'] = this.userID;
         }
         if (this.status) {
             data['status'] = this.status;

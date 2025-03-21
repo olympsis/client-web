@@ -11,7 +11,7 @@ import type { Group } from '~/types/group';
 import { Club } from '~/data/models/ClubModels';
 import { Event } from '~/data/models/EventModels';
 
-import EventListItem2 from '~/components/Events/EventListItem-v2/EventListItem2.vue';
+import EventListItem2 from '~/components/Events/EventListItem/EventListItem.vue';
 
 const props = defineProps<{
     group: Group

@@ -12,7 +12,7 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
 import { Event } from '~/data/models/EventModels';
-import EventListItem2 from '~/components/Events/EventListItem-v2/EventListItem2.vue';
+import EventListItem2 from '~/components/Events/EventListItem/EventListItem.vue';
 
 const model = defineModel<Event | undefined>('event', {
     required: true

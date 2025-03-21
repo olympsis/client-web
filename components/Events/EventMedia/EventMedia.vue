@@ -6,7 +6,7 @@
         <div id="share" @click="handleEventSharing">
             <img src="@/assets/icons/share/share.white.svg" alt="share button icon">
         </div>
-        <img id="media" alt="The event's media. An image or video flyer." :src="generateImageURL(event.imageURL)">
+        <img id="media" alt="The event's media. An image or video flyer." :src="generateImageURL(event.mediaURL)">
     </div>
 </template>
 

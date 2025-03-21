@@ -1,32 +1,56 @@
 <template>
-    <div id="event-list-item" @click="$emit('selected', { event: event })">
-        <img :src="image" class="image"/>
-        <div class="event-info">
-            <h1 class="title">{{ event.title }}</h1>
-            <h2 class="venue" v-if="state !== VIEW_STATE.LOADING">{{ venueName }}</h2>
-            <div v-else class="venue-loading"></div>
-        </div>
-        <div class="event-status">
-            <a class="status">{{ statusString }}</a>
-            <a class="time"> {{ event.timeToString() }}</a>
-            <div id="participants">
-                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
-                    <path d="M40-160v-112q0-34 17.5-62.5T104-378q62-31 126-46.5T360-440q66 0 130 15.5T616-378q29 15 46.5 43.5T680-272v112H40Zm720 0v-120q0-44-24.5-84.5T666-434q51 6 96 20.5t84 35.5q36 20 55 44.5t19 53.5v120H760ZM360-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47Zm400-160q0 66-47 113t-113 47q-11 0-28-2.5t-28-5.5q27-32 41.5-71t14.5-81q0-42-14.5-81T544-792q14-5 28-6.5t28-1.5q66 0 113 47t47 113Z"/>
-                </svg>
-                <a> {{ event.participants?.length ?? 0 }}</a>
+    <li id="event-list-item" @click="$emit('selected', { event: event })">
+        <!-- Event Image -->
+        <div id="header">
+            <img class="image" :src="image">
+            <div id="sports">
+                <div v-for="sport in event.sports" class="sport">{{ sport }}</div>
             </div>
         </div>
-    </div>
+
+        <!-- Bottom Bar (Event Details) -->
+        <div id="details">
+            <!-- Right Side -->
+            <div id="detail-left">
+                <div id="title"> {{ event.title }} </div>
+                <div id="location">
+                    <picture :style="{ height: '1rem', width: '1rem', marginRight: '0.25rem' }">
+                        <source srcset="@/assets/icons/pin-drop/pin.drop.white.svg" media="(prefers-color-scheme: dark)"> 
+                        <img class="location-pin" src="@/assets/icons/pin-drop/pin.drop.svg"> 
+                    </picture>
+                    <div id="location-name">{{ venueName }}</div>
+                </div>
+                <div id="start-date">
+                    <picture :style="{ height: '1rem', width: '1rem', marginRight: '0.25rem' }">
+                        <source srcset="@/assets/icons/calendar/calendar.white.svg" media="(prefers-color-scheme: dark)"> 
+                        <img class="calendar" src="@/assets/icons/calendar/calendar.svg"> 
+                    </picture>
+                    <div id="date">
+                        {{ timeToString(event.startTime) }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Left Side -->
+            <div id="detail-right">
+                <div id="status">{{ statusString }}</div>
+                <div id="participants">
+                    <picture>
+                        <source srcset="@/assets/icons/group/group.white.svg" media="(prefers-color-scheme: dark)"> 
+                        <img class="location-pin" src="@/assets/icons/group/group.svg"> 
+                    </picture>
+                    <div id="count">{{ event.participants.length }}</div>
+                </div>
+            </div>
+        </div>
+    </li>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
 import { EVENT_STATE, VIEW_STATE } from '~/data/Enums';
-import type { Ref, ComputedRef } from 'vue';
-import { generateImageURL } from '~/utils/image-helpers';
 import { Event } from '~/data/models/EventModels';
-import { Venue } from '~/data/models/VenueModels';
-import { useModelStore } from '@/stores/model-store';
+import type { Venue } from '~/data/models/VenueModels';
+import { generateImageURL } from '~/utils/image-helpers';
 
 const emit = defineEmits(
     ["selected"]
@@ -48,8 +72,8 @@ const statusString = computed<string>(() => {
 });
 const updateStatus = () => {
     const now = Date.now();
-    const startTime = new Date(props.event.startTime * 1000).getTime();
-    const endTime = new Date(props.event.stopTime * 1000).getTime();
+    const startTime = props.event.startTime.getTime();
+    const endTime = props.event.stopTime.getTime();
     
     if (now < startTime) {
         status.value = EVENT_STATE.PENDING;
@@ -68,7 +92,7 @@ onUnmounted(() => {
 
 const state = ref(VIEW_STATE.LOADING);
 const image = computed(() => {
-    return props.event.imageURL ? generateImageURL(props.event.imageURL) : undefined;
+    return props.event.mediaURL ? generateImageURL(props.event.mediaURL) : undefined;
 });
 
 const venues: Ref<Venue[]> = ref([]);
@@ -109,216 +133,107 @@ loadLocationData()
         venues.value.push(...response);
         state.value = VIEW_STATE.SUCCESS;
     });
-
 </script>
 
 <style scoped>
 #event-list-item {
-    display: flex;
-    height: 8rem;
-    padding: 1rem;
     cursor: pointer;
+    min-width: 20rem;
+    max-width: 23rem;
+    position: relative;
     border-radius: 10px;
+    list-style-type: none;
+    box-shadow: var(--component-border) 0px 1px 4px;
     background-color: var(--secondary-background-color);
-    flex-direction: row;
 
-    .image {
-        width: 6rem;
-        height: 6rem;
-        flex-shrink: 0;
-        object-fit: cover;
-        border-radius: 10px;
-        object-position: center;
-    }
-
-    .event-info {
-        display: block;
-        width: 13rem;
-        margin: 0.5rem 1rem;
-
-        @media (max-width: 940px) {
-            width: 18rem;
+    #header {
+        #sports {
+            top: 1rem;
+            left: 1rem;
+            display: flex;
+            position: absolute;
         }
 
-        @media (max-width: 600px) {
-            width: 13rem;
+        .sport {
+            color: white;
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+            border-radius: 20px;
+            /* background-color: black; */
+            text-transform: capitalize;
+            background-blend-mode: hard-light;
+
+            border-radius: 20px;
+            backdrop-filter: blur(20px);
+            background: rgba(0, 0, 0, 0.56);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid gray;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
         }
 
-        @media (max-width: 500px) {
-            width: 7rem;
-        }
-
-        @media (max-width: 400px) {
-            width: 5rem;
-        }
-
-        .title {
-            flex: 1;
-            font-size: 1.2rem;
-            overflow: hidden;
-            font-weight: normal;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            color: var(--primary-label-color);
-        }
-        .venue {
-            color: gray;
-            font-size: 1rem;
-            overflow: hidden;
-            margin: 0.5rem 0rem;
-            font-weight: normal;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-        }
-
-        .venue-loading {
-            height: 1rem;
-            border-radius: 5px;
-            margin: 0.5rem 0rem;
-            background-color: gray;
+        .image {
+            width: 100%;
+            height: 24rem;
+            object-fit: cover;
+            border-radius: 10px 10px 0px 0px;
         }
     }
 
-    .event-status {
-        flex: 0;
+    #details {
         display: flex;
-        margin-left: auto;
-        margin-top: 0.5rem;
-        flex-direction: column;
-        align-items: flex-end;
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 0.5rem 1rem 0.75rem 1rem;
 
-        .status {
-            font-weight: 600;
-            font-size: 1rem;
-            color: var(--primary-label-color);
-        }
-        .time {
-            font-size: 0.8rem;
-            margin: 0.2rem 0rem;
-            white-space: nowrap;
-            color: var(--primary-label-color);
-        }
-        #participants {
-            display: flex;
-            font-weight: 500;
-            font-size: 1.5em;
-            margin: 0.5rem 0rem;
-            align-items: center;
-            color: var(--primary-label-color);
+        #detail-left {
+            #title {
+                font-weight: 600;
+                font-size: 1.1rem;
+                margin-bottom: 0.5rem;
+            }
 
-            svg {
-                width: 1.6rem;
-                height: 1.6rem;
-                margin: 0rem 0.5rem;
+            #location {
+                display: flex;
+                font-size: 0.95rem;
+                align-items: center;
+
+                .location-pin {
+                    width: 1rem;
+                    height: 1rem;
+                }
+            }
+
+            #start-date {
+                opacity: 0.5;
+                display: flex;
+                font-size: 0.95rem;
+                align-items: center;
+
+                .calendar {
+                    width: 1rem;
+                    height: 1rem;
+                }
+            }
+        }
+
+        #detail-right {
+            #status {
+                font-size: 0.9rem;
+                font-weight: 600;
+                margin: 0.25rem 0rem;
+            }
+
+            #participants {
+                display: flex;
+                align-items: center;
+                flex-direction: row;
+                justify-content: end;
+
+                #count {
+                    margin-left: 0.25rem;
+                }
             }
         }
     }
-}
-
-@media (max-width: 940px) {
-.wrapper {
-    height: 6rem;
-
-    .image {
-        width: 4rem;
-        height: 4rem;
-    }
-
-    .event-info {
-        width: 7rem;
-        margin: 0.5rem 1rem;
-
-        .title {
-            flex: 1;
-            font-size: 1rem;
-        }
-        .field {
-            color: gray;
-            font-size: 0.8rem;
-            margin: 0.2rem 0rem;
-        }
-    }
-
-    .event-status {
-        .status {
-            font-weight: 600;
-            font-size: 0.8rem;
-            color: var(--primary-label-color);
-        }
-        .time {
-            font-size: 0.6rem;
-            margin: 0.2rem 0rem;
-            white-space: nowrap;
-            color: var(--primary-label-color);
-        }
-        #participants {
-            display: flex;
-            font-weight: 500;
-            font-size: 1rem;
-            margin: 0.5rem 0rem;
-            align-items: center;
-            color: var(--primary-label-color);
-
-            svg {
-                width: 1rem;
-                height: 1rem;
-                margin: 0rem 0.5rem;
-            }
-        }
-    }
-}
-}
-
-@media (max-width: 400px) {
-.wrapper {
-    height: 4rem;
-
-    .image {
-        width: 3rem;
-        height: 3rem;
-    }
-
-    .event-info {
-        margin: 0.4rem 0.8rem;
-
-        .title {
-            flex: 1;
-            font-size: 0.9rem;
-        }
-        .field {
-            color: gray;
-            font-size: 0.7rem;
-            margin: 0.2rem 0rem;
-        }
-    }
-
-    .event-status {
-        .status {
-            font-weight: 600;
-            font-size: 0.7rem;
-            color: var(--primary-label-color);
-        }
-        .time {
-            font-size: 0.5rem;
-            margin: 0.2rem 0rem;
-            white-space: nowrap;
-            color: var(--primary-label-color);
-        }
-        #participants {
-            display: flex;
-            font-weight: 500;
-            font-size: 0.9rem;
-            margin: 0.5rem 0rem;
-            align-items: center;
-            color: var(--primary-label-color);
-
-            svg {
-                width: 1rem;
-                height: 1rem;
-                margin: 0rem 0.5rem;
-            }
-        }
-    }
-}
 }
 </style>

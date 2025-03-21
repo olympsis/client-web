@@ -29,6 +29,174 @@ enum CHAT_MESSAGE_TYPE {
     VENUE = 'venue'
 }
 
+enum COMPETITION_FORMAT {
+    // General Team Sports
+    BRACKET = 'bracket',
+    LEAGUE = 'league',
+    ROUND_ROBIN = 'round_robin',
+    SINGLE_ELIMINATION = 'single_elimination',
+    DOUBLE_ELIMINATION = 'double_elimination',
+    BEST_OF_3 = 'best_of_3',
+    BEST_OF_5 = 'best_of_5',
+    WINNER_STAYS_ON = 'winner_stays_on',
+    
+    // Team Formats
+    VERSUS_2 = '2v2',
+    VERSUS_3 = '3v3',
+    VERSUS_5 = '5v5',
+    VERSUS_6 = '6v6',
+    VERSUS_7 = '7v7',
+    VERSUS_8 = '8v8',
+    VERSUS_9 = '9v9',
+    VERSUS_10 = '10v10',
+    VERSUS_11 = '11v11',
+    
+    // Individual Sports
+    TIME_TRIAL = 'time_trial',
+    
+    // Running
+    SPRINT = 'sprint',
+    LONG_DISTANCE = 'long_distance',
+    RELAY = 'relay',
+    
+    // Cycling
+    ROAD_RACE = 'road_race',
+    CRITERIUM = 'criterium',
+    STAGE_RACE = 'stage_race',
+    
+    // Golf
+    STROKE_PLAY = 'stroke_play',
+    MATCH_PLAY = 'match_play',
+    SCRAMBLE = 'scramble',
+    BEST_BALL = 'best_ball',
+    STABLEFORD = 'stableford',
+    SKINS_GAME = 'skins_game',
+    ALTERNATE_SHOT = 'alternate_shot',
+    SHAMBLE = 'shamble',
+    MODIFIED_STABLEFORD = 'modified_stableford',
+    SCRATCH = 'scratch',
+    
+    // Climbing
+    BOULDERING = 'bouldering',
+    LEAD_CLIMBING = 'lead_climbing',
+    SPEED_CLIMBING = 'speed_climbing'
+}
+
+function stringToCompetitionFormat(formatString: string): COMPETITION_FORMAT {
+    switch (formatString.toLowerCase()) {
+      // General Team Sports
+      case 'bracket':
+        return COMPETITION_FORMAT.BRACKET;
+      case 'league':
+        return COMPETITION_FORMAT.LEAGUE;
+      case 'round_robin':
+      case 'round robin':
+        return COMPETITION_FORMAT.ROUND_ROBIN;
+      case 'single_elimination':
+      case 'single elimination':
+        return COMPETITION_FORMAT.SINGLE_ELIMINATION;
+      case 'double_elimination':
+      case 'double elimination':
+        return COMPETITION_FORMAT.DOUBLE_ELIMINATION;
+      case 'best_of_3':
+      case 'best of 3':
+      case 'bo3':
+        return COMPETITION_FORMAT.BEST_OF_3;
+      case 'best_of_5':
+      case 'best of 5':
+      case 'bo5':
+        return COMPETITION_FORMAT.BEST_OF_5;
+      case 'winner_stays_on':
+      case 'winner stays on':
+        return COMPETITION_FORMAT.WINNER_STAYS_ON;
+      
+      // Team Formats
+      case '2v2':
+        return COMPETITION_FORMAT.VERSUS_2;
+      case '3v3':
+        return COMPETITION_FORMAT.VERSUS_3;
+      case '5v5':
+        return COMPETITION_FORMAT.VERSUS_5;
+      case '6v6':
+        return COMPETITION_FORMAT.VERSUS_6;
+      case '7v7':
+        return COMPETITION_FORMAT.VERSUS_7;
+      case '8v8':
+        return COMPETITION_FORMAT.VERSUS_8;
+      case '9v9':
+        return COMPETITION_FORMAT.VERSUS_9;
+      case '10v10':
+        return COMPETITION_FORMAT.VERSUS_10;
+      case '11v11':
+        return COMPETITION_FORMAT.VERSUS_11;
+      
+      // Individual Sports
+      case 'time_trial':
+      case 'time trial':
+        return COMPETITION_FORMAT.TIME_TRIAL;
+      
+      // Running
+      case 'sprint':
+        return COMPETITION_FORMAT.SPRINT;
+      case 'long_distance':
+      case 'long distance':
+        return COMPETITION_FORMAT.LONG_DISTANCE;
+      case 'relay':
+        return COMPETITION_FORMAT.RELAY;
+      
+      // Cycling
+      case 'road_race':
+      case 'road race':
+        return COMPETITION_FORMAT.ROAD_RACE;
+      case 'criterium':
+        return COMPETITION_FORMAT.CRITERIUM;
+      case 'stage_race':
+      case 'stage race':
+        return COMPETITION_FORMAT.STAGE_RACE;
+      
+      // Golf
+      case 'stroke_play':
+      case 'stroke play':
+        return COMPETITION_FORMAT.STROKE_PLAY;
+      case 'match_play':
+      case 'match play':
+        return COMPETITION_FORMAT.MATCH_PLAY;
+      case 'scramble':
+        return COMPETITION_FORMAT.SCRAMBLE;
+      case 'best_ball':
+      case 'best ball':
+        return COMPETITION_FORMAT.BEST_BALL;
+      case 'stableford':
+        return COMPETITION_FORMAT.STABLEFORD;
+      case 'skins_game':
+      case 'skins game':
+        return COMPETITION_FORMAT.SKINS_GAME;
+      case 'alternate_shot':
+      case 'alternate shot':
+        return COMPETITION_FORMAT.ALTERNATE_SHOT;
+      case 'shamble':
+        return COMPETITION_FORMAT.SHAMBLE;
+      case 'modified_stableford':
+      case 'modified stableford':
+        return COMPETITION_FORMAT.MODIFIED_STABLEFORD;
+      case 'scratch':
+        return COMPETITION_FORMAT.SCRATCH;
+      
+      // Climbing
+      case 'bouldering':
+        return COMPETITION_FORMAT.BOULDERING;
+      case 'lead_climbing':
+      case 'lead climbing':
+        return COMPETITION_FORMAT.LEAD_CLIMBING;
+      case 'speed_climbing':
+      case 'speed climbing':
+        return COMPETITION_FORMAT.SPEED_CLIMBING;
+      
+      default:
+        throw new Error(`Unknown competition format: ${formatString}`);
+    }
+}
+
 enum CROP_SHAPE {
     SQUARE='square',
     LANDSCAPE='landscape',
@@ -200,6 +368,40 @@ function numberToGroupType(type: number): GROUP_TYPE {
 enum GROUP_VISIBILITY {
     PUBLIC='public',
     PRIVATE='private'
+}
+
+enum MEDIA_TYPE {
+    IMAGE='image',
+    VIDEO='video'
+}
+
+function stringToMediaType(value: string): MEDIA_TYPE {
+    switch (value) {
+        default:
+            return MEDIA_TYPE.IMAGE;
+        case 'video': 
+            return MEDIA_TYPE.VIDEO;
+    }
+}
+
+enum RSVP_STATUS {
+    YES=1,
+    MAYBE=0
+}
+
+function rsvpStatusToNumber(status: RSVP_STATUS): number {
+    return status;
+}
+
+function numberToRsvpStatus(num: number): RSVP_STATUS {
+    switch (num) {
+        case 1:
+            return RSVP_STATUS.YES;
+        case 0:
+            return RSVP_STATUS.MAYBE;
+        default:
+            return RSVP_STATUS.MAYBE;
+    }
 }
 
 /**
@@ -430,6 +632,10 @@ export {
 
     CHAT_ROOM_TYPE,
     CHAT_MESSAGE_TYPE,
+    
+    COMPETITION_FORMAT,
+    stringToCompetitionFormat,
+
     CROP_SHAPE,
     
     EVENT_PENDING_STATE,
@@ -461,6 +667,9 @@ export {
     numberToGroupType,
     
     GROUP_VISIBILITY,
+
+    MEDIA_TYPE,
+    stringToMediaType,
 
     SPORTS,
     sportToString,

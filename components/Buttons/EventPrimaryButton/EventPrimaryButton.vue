@@ -77,8 +77,8 @@ const eventState = computed<EVENT_STATE>(() => {
     const twoHoursAgo = timestamp - (2 * 60 * 60);
     
     // Get start and stop times, ensuring they're treated as seconds
-    const startTime = (event.value?.startTime ?? 0);
-    const stopTime = (event.value?.stopTime ?? 0);
+    const startTime = (event.value?.startTime.getTime() ?? 0);
+    const stopTime = (event.value?.stopTime.getTime() ?? 0);
 
     if (
         (stopTime !== 0 && stopTime < timestamp) ||
@@ -95,19 +95,13 @@ const eventState = computed<EVENT_STATE>(() => {
 const pendingState = computed<EVENT_PENDING_STATE>(() => {
     const user = session.user;
     const participants = event.value?.participants;
-    const waitlist = event.value?.waitList;
     if (user) {
         const participant = participants?.find((p) => p.user?.uuid === user?.uuid);
         if (participant !== undefined) {
             return EVENT_PENDING_STATE.CANCEL;
         }
-
-        const listed = waitlist?.find((p) => p.user?.uuid === user?.uuid);
-        if (listed !== undefined) {
-            return EVENT_PENDING_STATE.CANCEL;
-        }
     }
-    if (event.value?.maxParticipants && (participants?.length ?? 0) >= event.value?.maxParticipants) {
+    if (event.value?.participantsConfig?.maxParticipants && (participants?.length ?? 0) >= event.value?.participantsConfig?.maxParticipants) {
         return EVENT_PENDING_STATE.WAITLIST;
     } else {
         return EVENT_PENDING_STATE.RSVP;

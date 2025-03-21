@@ -51,8 +51,8 @@ const eventState = computed<EVENT_STATE>(() => {
     const thirtyMinutesAgo = timestamp - (30 * 60);
     const twoHoursAgo = timestamp - (2 * 60 * 60);
 
-    const startTime = (event.value?.startTime) ?? 0;
-    const stopTime = (event.value?.stopTime) ?? 0;
+    const startTime = (event.value?.startTime.getTime()) ?? 0;
+    const stopTime = (event.value?.stopTime.getTime()) ?? 0;
 
     if (
         (stopTime !== 0 && stopTime < timestamp) ||
@@ -102,7 +102,7 @@ function getPendingEventState(): EVENT_PENDING_STATE {
             return EVENT_PENDING_STATE.CANCEL;
         }
     }
-    if (event.value?.maxParticipants && participants?.length >= event.value?.maxParticipants) {
+    if (event.value?.participantsConfig?.maxParticipants && participants?.length >= event.value?.participantsConfig?.maxParticipants) {
         return EVENT_PENDING_STATE.WAITLIST;
     } else {
         return EVENT_PENDING_STATE.RSVP;

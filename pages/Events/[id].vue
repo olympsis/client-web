@@ -123,7 +123,7 @@ const eventBody = computed<string>(() => {
 });
 
 const eventImageURL = computed<string | undefined>(() => {
-    return event.value?.imageURL ? generateImageURL(event.value?.imageURL) : undefined;
+    return event.value?.mediaURL ? generateImageURL(event.value?.mediaURL) : undefined;
 });
 
 /**
@@ -196,7 +196,7 @@ async function handleResponse(response: number) {
         'id': `${111}`,
         'status': response,
         'user': snippet,
-        'created_at': Math.floor(Date.now() / 1000)
+        'created_at': Date.now()
     });
     
     try {
@@ -210,15 +210,8 @@ async function handleResponse(response: number) {
         if (event.value?.id) {
             primaryState.value = VIEW_STATE.LOADING;
             if (await session.eventService.addParticipant(event.value.id, dao)) {
-                if (event.value.maxParticipants) {
-                    if (event.value.participants.length >= event.value.maxParticipants) {
-                        event.value.waitList.push(ptp);
-                        primaryState.value = VIEW_STATE.PENDING;
-                    }
-                } else {
-                    event.value?.participants.push(ptp)
-                    primaryState.value = VIEW_STATE.PENDING;
-                }
+                event.value?.participants.push(ptp)
+                primaryState.value = VIEW_STATE.PENDING;
             }
         }
     } catch(error) {

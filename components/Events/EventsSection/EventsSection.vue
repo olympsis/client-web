@@ -21,7 +21,7 @@ import { VIEW_STATE } from '~/data/Enums';
 import { Event } from '~/data/models/EventModels';
 
 import Skeleton from 'primevue/skeleton';
-import EventListItem2 from '../EventListItem-v2/EventListItem2.vue';
+import EventListItem2 from '../EventListItem/EventListItem.vue';
 
 defineProps({
     title: { type: String, default: "Your Next Events" },

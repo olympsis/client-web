@@ -1,95 +1,125 @@
-import { Club } from "./ClubModels";
 import { Codable } from "./Models";
 import { Venue } from "./VenueModels";
-import { UserSnippet } from "./UserModels";  
-import { Organization } from "./OrganizationModels";
+import { UserSnippet } from "./UserModels";
 import { VenueDescriptor, Organizer, Participant, GroupSelection } from "./GenericModels";
 import { 
-    type EVENT_TYPE,
+    isToday,
+    isTomorrow,
+    isThisWeek,
+    isThisYear
+} from "#imports";
+import { 
     EVENT_VISIBILITY, 
-    EVENT_SKILL_LEVEL, 
-    eventTypeToNumber, 
-    numberToEventType, 
-    eventSkillLevelToNumber, 
-    eventVisibilityToNumber, 
-    numberToEventSkillLevel, 
+    MEDIA_TYPE,
+    COMPETITION_FORMAT,
+    eventVisibilityToNumber,  
     numberToEventVisibility,
-    GROUP_TYPE, 
+    GROUP_TYPE,
+    stringToMediaType,
+    stringToCompetitionFormat, 
 } from "../Enums";
-  
+
 class Event extends Codable<Event> {
     id: string;
-    type: EVENT_TYPE;
-    poster: UserSnippet | undefined;
+    poster?: UserSnippet;
     organizers: Organizer[];
     venues: VenueDescriptor[];
-    imageURL: string;
+
+    mediaURL: string;
+    mediaType: MEDIA_TYPE;
+
     title: string;
     body: string;
+    tags: string[];
     sports: string[];
-    level: EVENT_SKILL_LEVEL;
     
-    startTime: number;
-    stopTime: number;
-    
-    minParticipants: number | undefined;
-    maxParticipants: number | undefined;
+    startTime: Date;
+    stopTime: Date;
+
+    formatConfig?: EventFormatConfig;
+
     participants: Participant[];
-    waitList: Participant[];
+    participantsWaitlist: Participant[];
+    participantsConfig?: ParticipantsConfig;
+    participantsCount?: number;
+
+    teams: Team[];
+    teamsWaitlist: Team[];
+    teamsConfig?: TeamsConfig;
+    teamsCount?: number;
     
     visibility: EVENT_VISIBILITY;
-    externalLink: string | undefined;
-    createdAt: number;
+    externalLink?: string;
+    isSensitive: boolean;
 
-    isRecurring: boolean;
+    createdAt: Date;
+    updatedAt?: Date;
+    cancelledAt?: Date;
+
+    recurrenceConfig?: EventRecurrenceConfig;
 
     constructor(
         id: string,
-        type: EVENT_TYPE,
         poster: UserSnippet | undefined,
         organizers: Organizer[],
         venues: VenueDescriptor[],
-        imageURL: string,
+        mediaURL: string,
+        mediaType: MEDIA_TYPE,
         title: string,
         body: string,
+        tags: string[],
         sports: string[],
-        level: EVENT_SKILL_LEVEL,
-        startTime: number,
-        stopTime: number,
-        minParticipants: number | undefined,
-        maxParticipants: number | undefined,
-        participants: Participant[],
-        waitList: Participant[],
+        startTime: Date,
+        stopTime: Date,
         visibility: EVENT_VISIBILITY,
-        externalLink: string | undefined,
-        createdAt: number,
-        isRecurring?: boolean,
+        createdAt: Date,
+        updatedAt: Date,
+        isSensitive: boolean,
+        participants: Participant[],
+        participantsWaitlist: Participant[],
+        participantsConfig: ParticipantsConfig,
+        teams: Team[],
+        teamsWaitlist: Team[],
+        teamsConfig?: TeamsConfig,
+        formatConfig?: EventFormatConfig,
+        externalLink?: string,
+        cancelledAt?: Date,
+        recurrenceConfig?: EventRecurrenceConfig
     ){
         super();
         this.id = id;
-        this.type = type;
         this.poster = poster;
         this.organizers = organizers;
         this.venues = venues;
-        this.imageURL = imageURL;
+        this.mediaURL = mediaURL;
+        this.mediaType = mediaType;
+        
         this.title = title;
         this.body = body;
         this.sports = sports;
-        this.level = level;
+        this.tags = tags;
+        
+        this.formatConfig = formatConfig;
         
         this.startTime = startTime;
         this.stopTime = stopTime;
         
-        this.minParticipants = minParticipants;
-        this.maxParticipants = maxParticipants;
         this.participants = participants;
-        this.waitList = waitList;
+        this.participantsWaitlist = participantsWaitlist;
+        this.participantsConfig = participantsConfig;
+
+        this.teams = teams;
+        this.teamsWaitlist = teamsWaitlist;
+        this.teamsConfig = teamsConfig;
 
         this.visibility = visibility;
         this.externalLink = externalLink;
-        this.createdAt = createdAt;
+        this.isSensitive = isSensitive;
 
-        this.isRecurring = isRecurring ?? false;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.cancelledAt = cancelledAt;
+        this.recurrenceConfig = recurrenceConfig;
     }
   
     static override decode<Event>(data: { [key: string]: any }): Event {
@@ -97,28 +127,52 @@ class Event extends Codable<Event> {
 
         if (data) {
             object['id'] = data['id'];
-            object['type'] = numberToEventType(data['type']);
             object['poster'] = data['poster'] ? UserSnippet.decode(data['poster']) : undefined;
             object['organizers'] = data['organizers'] ? data['organizers'].map((org: any) => Organizer.decode(org)) : [];
             object['venues'] = data['venues'] ? data['venues'].map((v: any) => VenueDescriptor.decode(v)) : [];
-            object['imageURL'] = data['image_url'];
+            
+            // Media
+            object['mediaURL'] = data['media_url'];
+            object['mediaType'] = stringToMediaType(data['media_type']);
+            
             object['title'] = data['title'];
             object['body'] = data['body'];
-            object['sports'] = data['sports'];
-            object['level'] = numberToEventSkillLevel(data['level']);
-            object['startTime'] = data['start_time'];
-            object['stopTime'] = data['stop_time'];
-            object['minParticipants'] = data['min_participants'];
-            object['maxParticipants'] = data['max_participants'];
-            object['participants'] = data['participants'] ? data['participants'].map((participant: any) => Participant.decode(participant)) : [];
-            object['waitList'] = data['wait_list'] ? data['wait_list'].map((participant: any) => Participant.decode(participant)) : [];
+            object['sports'] = data['sports'] || [];
+            object['tags'] = data['tags'] || [];
+            
+            // Format config
+            object['formatConfig'] = data['format_config'] ? EventFormatConfig.decode(data['format_config']) : undefined;
+            
+            // Dates
+            object['startTime'] = new Date(data['start_time']);
+            object['stopTime'] = new Date(data['stop_time']);
+            
+            // Participants data
+            object['participants'] = data['participants'] ? data['participants'].map((p: any) => Participant.decode(p)) : [];
+            object['participantsWaitlist'] = data['participants_waitlist'] ? data['participants_waitlist'].map((p: any) => Participant.decode(p)) : [];
+            object['participantsConfig'] = data['participants_config'] ? ParticipantsConfig.decode(data['participants_config']) : new ParticipantsConfig();
+            
+            // Teams data
+            object['teams'] = data['teams'] ? data['teams'].map((t: any) => Team.decode(t)) : [];
+            object['teamsWaitlist'] = data['teams_waitlist'] ? data['teams_waitlist'].map((t: any) => Team.decode(t)) : [];
+            object['teamsConfig'] = data['teams_config'] ? TeamsConfig.decode(data['teams_config']) : undefined;
+            
             object['visibility'] = numberToEventVisibility(data['visibility']);
-            object['clubs'] = data['clubs'] ? data['clubs'].map((club: any) => Club.decode(club)) : [];
-            object['organizations'] = data['organizations'] ? data['organizations'].map((org: any) => Organization.decode(org)) : [];
             object['externalLink'] = data['external_link'];
-            object['createdAt'] = data['created_at'];
-
-            object['isRecurring'] = data['is_recurring'];
+            object['isSensitive'] = data['is_sensitive'] || false;
+            
+            // Time variables
+            object['createdAt'] = new Date(data['created_at']);
+            if (data['updated_at']) {
+                object['updatedAt'] = new Date(data['updated_at']);
+            }
+            
+            if (data['canceled_at']) {
+                object['cancelledAt'] = new Date(data['cancelled_at']);
+            }
+            
+            // Recurrence configurations
+            object['recurrenceConfig'] = data['recurrence_config'] ? EventRecurrenceConfig.decode(data['recurrence_config']) : undefined;
         }
 
         Object.setPrototypeOf(object, Event.prototype);
@@ -131,10 +185,6 @@ class Event extends Codable<Event> {
         if (this.id) {
             data['id'] = this.id;
         }
-
-        if (this.type) {
-            data['type'] = eventTypeToNumber(this.type);
-        }
         if (this.poster) {
             data['poster'] = this.poster.encode();
         }
@@ -144,218 +194,195 @@ class Event extends Codable<Event> {
         if (this.venues) {
             data['venues'] = this.venues.map((v) => v.encode());
         }
-        if (this.imageURL) {
-            data['image_url'] = this.imageURL;
+        
+        if (this.mediaURL) {
+            data['media_url'] = this.mediaURL;
         }
+        if (this.mediaType) {
+            data['media_type'] = this.mediaType.valueOf();
+        }
+        
         if (this.title) {
             data['title'] = this.title;
         }
         if (this.body) {
             data['body'] = this.body;
         }
+        if (this.tags) {
+            data['tags'] = this.tags.map((t) => t.valueOf());
+        }
         if (this.sports) {
             data['sports'] = this.sports.map((s) => s.valueOf());
         }
-        if (this.level !== undefined) {
-            data['level'] = eventSkillLevelToNumber(this.level);
+        
+        if (this.formatConfig) {
+            data['format_config'] = this.formatConfig.encode();
         }
+        
+        // Dates
         if (this.startTime) {
             data['start_time'] = this.startTime;
         }
         if (this.stopTime) {
             data['stop_time'] = this.stopTime;
         }
-        if (this.minParticipants) {
-            data['min_participants'] = this.minParticipants;
-        }
-        if (this.maxParticipants) {
-            data['max_participants'] = this.maxParticipants;
-        }
+        
+        // Participants data
         if (this.participants) {
             data['participants'] = this.participants.map((p) => p.encode());
         }
-        if (this.waitList) {
-            data['wait_list'] = this.waitList.map((p) => p.encode());
+        if (this.participantsWaitlist) {
+            data['participants_waitlist'] = this.participantsWaitlist.map((p) => p.encode());
         }
+        if (this.participantsConfig) {
+            data['participants_config'] = this.participantsConfig.encode();
+        }
+        
+        // Teams data
+        if (this.teams) {
+            data['teams'] = this.teams.map((t) => t.encode());
+        }
+        if (this.teamsWaitlist) {
+            data['teams_waitlist'] = this.teamsWaitlist.map((t) => t.encode());
+        }
+        if (this.teamsConfig) {
+            data['teams_config'] = this.teamsConfig.encode();
+        }
+        
         if (this.visibility) {
             data['visibility'] = eventVisibilityToNumber(this.visibility);
         }
         if (this.externalLink) {
             data['external_link'] = this.externalLink;
         }
+        
+        data['is_sensitive'] = this.isSensitive;
+        
         if (this.createdAt) {
             data['created_at'] = this.createdAt;
         }
-
-        if (this.isRecurring) {
-            data['is_recurring'] = this.isRecurring;
+        if (this.updatedAt) {
+            data['updated_at'] = this.updatedAt;
+        }
+        if (this.cancelledAt) {
+            data['cancelled_at'] = this.cancelledAt;
+        }
+        
+        if (this.recurrenceConfig) {
+            data['recurrence_config'] = this.recurrenceConfig.encode();
         }
 
         return data;
     }
 
-    public timeToString(): string {
-        if (!this.startTime) {
-            return 'Unknown';
-        }
-
-        const currentDate = new Date();
-        const timestamp = this.startTime * 1000;
-        const formatter = new Intl.DateTimeFormat('en-US', { dateStyle: 'medium' });
-
-        const eventStartDate = new Date(timestamp);
-        if (this.isToday(eventStartDate)) {
-            return 'Today';
-        } else if (this.isTomorrow(eventStartDate)) {
-            return 'Tomorrow';
-        } else if (this.isThisWeek(eventStartDate, currentDate)) {
-            return eventStartDate.toLocaleDateString('en-US', { weekday: 'long' });
-        } else if (this.isThisYear(eventStartDate, currentDate)) {
-            return formatter.format(eventStartDate);
-        } else {
-            return formatter.format(eventStartDate);
-        }
-    }
-  
-    public timeToHourAndMinute() : string {
-        const date = new Date(this.startTime ?? 0);
-        date.setUTCHours(0, 0, 0, 0);
-
-        const hours = 12;
-        const minutes = '00';
-        const med = 'AM';
-
-        return `${hours}:${minutes} ${med}`;
+    /**
+     * Checks wether or not an event is a recurring event by looking at the event's format configuration is competition value.
+     * @returns boolean indicating status
+     */
+    isCompetition(): boolean {
+        return !!this.formatConfig?.isCompetition;
     }
 
-    public startTimeToString(): string {
-        const date = new Date(this.startTime * 1000);
-        let hours = date.getHours();
-        const minutes = date.getMinutes().toString().padStart(2, '0');
-        const m = hours >= 12 ? 'PM' : 'AM';
-        
-        // Convert 24h to 12h format
-        hours = hours % 12;
-        hours = hours ? hours : 12; // Handle midnight (0) as 12
-    
-        return `${hours}:${minutes} ${m}`;
-    }
-    
-    public stopTimeToString(): string {
-        const date = new Date(this.stopTime * 1000);
-        let hours = date.getHours();
-        const minutes = date.getMinutes().toString().padStart(2, '0');
-        const m = hours >= 12 ? 'PM' : 'AM';
-        
-        // Convert 24h to 12h format
-        hours = hours % 12;
-        hours = hours ? hours : 12; // Handle midnight (0) as 12
-    
-        return `${hours}:${minutes} ${m}`;
+    /**
+     * Checks wether or not an event is a recurring event by looking to see if a recurrence config exists
+     * @returns boolean indicating status
+     */
+    isRecurringEvent(): boolean {
+        return !!this.recurrenceConfig;
     }
 
-    public timeDifferenceToString(): string {
-      if (!this.startTime) {
-        return '00:00 am';
-      }
-  
-      const currentDate = new Date();
-      const dateFormatter = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric', hourCycle: 'h12' });
-      const date = new Date(this.startTime * 1000);
-  
-      const timeDifference = Math.floor((currentDate.getTime() - this.startTime * 1000) / 1000);
-  
-      if (timeDifference < 60) {
-        return `${timeDifference} secs`;
-      } else if (timeDifference < 3600) {
-        const minutes = Math.floor(timeDifference / 60);
-        return `${minutes} mins`;
-      } else if (timeDifference < 86400 * 12) {
-        return `${dateFormatter.format(date)} mins`;
-      } else {
-        const days = Math.floor(timeDifference / 86400);
-        return `${days} days`;
-      }
+    /**
+     * Returns the event's configuration minimum participants
+     * @returns 
+     */
+    getMinParticipants(): number {
+        return this.participantsConfig?.minParticipants ?? 0;
     }
-  
-    public isToday(date: Date): boolean {
-      const today = new Date();
-      return (
-        date.getDate() === today.getDate() &&
-        date.getMonth() === today.getMonth() &&
-        date.getFullYear() === today.getFullYear()
-      );
+
+    /**
+     * Returns the event's configuration maximum participants
+     * @returns
+     */
+    getMaxParticipants(): number {
+        return this.participantsConfig?.maxParticipants ?? 0;
     }
-  
-    public isTomorrow(date: Date): boolean {
-      const tomorrow = new Date();
-      tomorrow.setDate(tomorrow.getDate() + 1);
-      return (
-        date.getDate() === tomorrow.getDate() &&
-        date.getMonth() === tomorrow.getMonth() &&
-        date.getFullYear() === tomorrow.getFullYear()
-      );
+
+    /**
+     * Returns the event's configuration minimum teams
+     * @returns 
+     */
+    getMinTeams(): number {
+        return this.teamsConfig?.maxTeams ?? 0;
     }
-  
-    public isThisWeek(date: Date, currentDate: Date): boolean {
-      const currentWeekStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() - currentDate.getDay());
-      const currentWeekEnd = new Date(currentWeekStart.getFullYear(), currentWeekStart.getMonth(), currentWeekStart.getDate() + 6);
-      return date >= currentWeekStart && date <= currentWeekEnd;
-    }
-  
-    public isThisYear(date: Date, currentDate: Date): boolean {
-      return date.getFullYear() === currentDate.getFullYear();
+
+    /**
+     * Returns the event's configuration maximum teams
+     * @returns
+     */
+    getMaxTeams(): number {
+        return this.teamsConfig?.minTeams  ?? 0;
     }
 }
 
+// Updated EventDao class
 class EventDao extends Codable<EventDao> {
-    type: EVENT_TYPE | undefined;
-    poster: string | undefined;
-    organizers: Organizer[] | undefined;
-    venues: VenueDescriptor[] | undefined;
-    imageURL: string | undefined;
-    title: string | undefined;
-    body: string | undefined;
-    sports: string[] | undefined;
-    level: EVENT_SKILL_LEVEL | undefined;
-    startTime: number | undefined;
-    stopTime: number | undefined;
-    minParticipants: number | undefined;
-    maxParticipants: number | undefined;
-    participants: Participant[] | undefined;
-    visibility: EVENT_VISIBILITY | undefined;
-    createdAt: number | undefined;
-    externalLink: string | undefined;
+    posterId?: string;
+    organizers?: Organizer[];
+    venues?: VenueDescriptor[];
+    
+    mediaURL?: string;
+    mediaType?: MEDIA_TYPE;
+    
+    title?: string;
+    body?: string;
+    sports?: string[];
+    tags?: string[];
+    
+    formatConfig?: EventFormatConfig;
+    
+    startTime?: number;
+    stopTime?: number;
+    
+    participantsConfig?: ParticipantsConfig;
+    teamsConfig?: TeamsConfig;
+    
+    visibility?: EVENT_VISIBILITY;
+    externalLink?: string;
+    isSensitive?: boolean;
+    
+    createdAt?: number;
+    updatedAt?: number;
+    cancelledAt?: number;
+    
+    recurrenceConfig?: EventRecurrenceConfig;
 
     constructor(
-      type: EVENT_TYPE | undefined,
-      visibility: EVENT_VISIBILITY | undefined,
-      poster: string | undefined,
-      organizers: GroupSelection[] | undefined,
-      venues: VenueDescriptor[] | undefined,
-      imageURL: string | undefined,
-      title: string | undefined,
-      body: string | undefined,
-      sports: string[] | undefined,
-      level: EVENT_SKILL_LEVEL | undefined,
-      startTime: Date | undefined,
-      stopTime: Date | undefined,
-      minParticipants: number | undefined,
-      maxParticipants: number | undefined,
-      participants: Participant[] | undefined
+        posterId?: string,
+        organizers?: GroupSelection[],
+        venues?: VenueDescriptor[],
+        mediaURL?: string,
+        mediaType?: MEDIA_TYPE,
+        title?: string,
+        body?: string,
+        sports?: string[],
+        tags?: string[],
+        formatConfig?: EventFormatConfig,
+        startTime?: Date,
+        stopTime?: Date,
+        participantsConfig?: ParticipantsConfig,
+        teamsConfig?: TeamsConfig,
+        visibility?: EVENT_VISIBILITY,
+        externalLink?: string,
+        isSensitive?: boolean,
+        cancelledAt?: Date,
+        recurrenceConfig?: EventRecurrenceConfig
     ) {
         super();
-        if (type) {
-            this.type = type;
-        }
         
-        if (poster) {
-            this.poster = poster;
-        }
+        this.posterId = posterId;
         
         if (organizers) {
             this.organizers = organizers?.map((o) => {
-                
                 return new Organizer(
                     o.type === GROUP_TYPE.CLUB ? 0 : 1,
                     o.club?.id ?? o.organization?.id
@@ -363,63 +390,41 @@ class EventDao extends Codable<EventDao> {
             });
         }
         
-        if (venues) {
-            this.venues = venues;
-        }
-
-        if (imageURL) {
-            this.imageURL = imageURL;
-        }
+        this.venues = venues;
+        this.mediaURL = mediaURL;
+        this.mediaType = mediaType;
+        this.title = title;
+        this.body = body;
+        this.sports = sports;
+        this.tags = tags;
+        this.formatConfig = formatConfig;
         
-        if (title) {
-            this.title = title;
-        }
-        
-        if (body) {
-            this.body = body;
-        }
-
-        if (sports) {
-            this.sports = sports
-        }
-        
-        if (level != undefined) {
-            this.level = level;
-        }
-
         if (startTime) {
             this.startTime = Math.floor(startTime.getTime() / 1000);
         }
-
+        
         if (stopTime) {
             this.stopTime = Math.floor(stopTime.getTime() / 1000);
         }
-
-        if (minParticipants) {
-            this.minParticipants = minParticipants
+        
+        this.participantsConfig = participantsConfig;
+        this.teamsConfig = teamsConfig;
+        this.visibility = visibility;
+        this.externalLink = externalLink;
+        this.isSensitive = isSensitive;
+        
+        if (cancelledAt) {
+            this.cancelledAt = Math.floor(cancelledAt.getTime() / 1000);
         }
-
-        if (maxParticipants) {
-            this.maxParticipants = maxParticipants;
-        }
-
-        if (participants) {
-            this.participants = participants;
-        }
-
-        if (visibility) {
-            this.visibility = visibility
-        }
+        
+        this.recurrenceConfig = recurrenceConfig;
     }
 
     override encode(): { [key: string]: any } {
         const data: { [key: string]: any } = {};
 
-        if (this.type) {
-            data['type'] = eventTypeToNumber(this.type);
-        }
-        if (this.poster) {
-            data['poster'] = this.poster;
+        if (this.posterId) {
+            data['poster_id'] = this.posterId;
         }
         if (this.organizers) {
             data['organizers'] = this.organizers.map((org: Organizer) => org.encode());
@@ -427,9 +432,14 @@ class EventDao extends Codable<EventDao> {
         if (this.venues) {
             data['venues'] = this.venues.map((v) => v.encode());
         }
-        if (this.imageURL) {
-            data['image_url'] = this.imageURL;
+        
+        if (this.mediaURL) {
+            data['media_url'] = this.mediaURL;
         }
+        if (this.mediaType) {
+            data['media_type'] = this.mediaType.valueOf();
+        }
+        
         if (this.title) {
             data['title'] = this.title;
         }
@@ -439,29 +449,50 @@ class EventDao extends Codable<EventDao> {
         if (this.sports) {
             data['sports'] = this.sports.map((s) => s.valueOf());
         }
-        if (this.level !== undefined) {
-            data['level'] = eventSkillLevelToNumber(this.level);
+        if (this.tags) {
+            data['tags'] = this.tags.map((t) => t.valueOf());
         }
+        
+        if (this.formatConfig) {
+            data['format_config'] = this.formatConfig.encode();
+        }
+        
         if (this.startTime) {
             data['start_time'] = this.startTime;
         }
         if (this.stopTime) {
             data['stop_time'] = this.stopTime;
         }
-        if (this.minParticipants) {
-            data['min_participants'] = this.minParticipants;
+        
+        if (this.participantsConfig) {
+            data['participants_config'] = this.participantsConfig.encode();
         }
-        if (this.maxParticipants) {
-            data['max_participants'] = this.maxParticipants;
+        if (this.teamsConfig) {
+            data['teams_config'] = this.teamsConfig.encode();
         }
-        if (this.visibility) {
+        
+        if (this.visibility !== undefined) {
             data['visibility'] = eventVisibilityToNumber(this.visibility);
         }
         if (this.externalLink) {
             data['external_link'] = this.externalLink;
         }
+        if (this.isSensitive !== undefined) {
+            data['is_sensitive'] = this.isSensitive;
+        }
+        
         if (this.createdAt) {
             data['created_at'] = this.createdAt;
+        }
+        if (this.updatedAt) {
+            data['updated_at'] = this.updatedAt;
+        }
+        if (this.cancelledAt) {
+            data['cancelled_at'] = this.cancelledAt;
+        }
+        
+        if (this.recurrenceConfig) {
+            data['recurrence_config'] = this.recurrenceConfig.encode();
         }
     
         return data;
@@ -486,7 +517,7 @@ class EventsResponse {
       object['events'] = data.events.map((p: {[key: string]: any}) => {
           return Event.decode(p)
       });
-      object['totalEvents'] = data['total_events'].length ?? 0;
+      object['totalEvents'] = data['total_events'] ?? 0;
 
       Object.setPrototypeOf(object, EventsResponse.prototype)
 
@@ -540,26 +571,32 @@ class EventSection {
 
 class NewEventDao extends Codable<NewEventDao> {
     event: EventDao
-    includeHost?: Boolean
-    recurrenceOptions?: RecurrenceOptions
+    includeHost?: boolean
+    recurrence?: RecurrenceOptions
 
     constructor(
         event: EventDao,
         includeHost?: boolean,
-        recurrenceOptions?: RecurrenceOptions
+        recurrence?: RecurrenceOptions
     ) {
         super();
         this.event = event;
         this.includeHost = includeHost;
-        this.recurrenceOptions = recurrenceOptions;
+        this.recurrence = recurrence;
     }
 
     override encode(): { [key: string]: any } {
         const data: { [key: string]: any } = {};
 
         data['event'] = this.event.encode();
-        data['include_host'] = this.includeHost ?? false;
-        data['recurrence'] = this.recurrenceOptions?.encode();
+        
+        if (this.includeHost !== undefined) {
+            data['include_host'] = this.includeHost;
+        }
+        
+        if (this.recurrence) {
+            data['recurrence'] = this.recurrence.encode();
+        }
 
         return data
     }
@@ -592,6 +629,473 @@ class RecurrenceOptions extends Codable<RecurrenceOptions> {
     }
 }
 
+class EventRecurrenceConfig extends Codable<EventRecurrenceConfig> {
+    recurrenceRule?: string;
+    recurrenceEnd?: number;
+    parentEventId?: string;
+    deletedInstances?: string[];
+
+    constructor(
+        recurrenceRule?: string,
+        recurrenceEnd?: number,
+        parentEventId?: string,
+        deletedInstances?: string[]
+    ) {
+        super();
+        this.recurrenceRule = recurrenceRule;
+        this.recurrenceEnd = recurrenceEnd;
+        this.parentEventId = parentEventId;
+        this.deletedInstances = deletedInstances;
+    }
+
+    static override decode<EventRecurrenceConfig>(data: { [key: string]: any }): EventRecurrenceConfig {
+        const object = Object();
+
+        if (data) {
+            object['recurrenceRule'] = data['recurrence_rule'];
+            object['recurrenceEnd'] = data['recurrence_end'];
+            object['parentEventId'] = data['parent_event_id'];
+            object['deletedInstances'] = data['deleted_instances'];
+        }
+
+        Object.setPrototypeOf(object, EventRecurrenceConfig.prototype);
+        return object;
+    }
+
+    override encode(): { [key: string]: any } {
+        const data: { [key: string]: any } = {};
+
+        if (this.recurrenceRule) {
+            data['recurrence_rule'] = this.recurrenceRule;
+        }
+        if (this.recurrenceEnd !== undefined) {
+            data['recurrence_end'] = this.recurrenceEnd;
+        }
+        if (this.parentEventId) {
+            data['parent_event_id'] = this.parentEventId;
+        }
+        if (this.deletedInstances) {
+            data['deleted_instances'] = this.deletedInstances;
+        }
+
+        return data;
+    }
+}
+
+class ParticipantsConfig extends Codable<ParticipantsConfig> {
+    hasWaitlist?: boolean;
+    minParticipants?: number;
+    maxParticipants?: number;
+
+    constructor(
+        hasWaitlist?: boolean,
+        minParticipants?: number,
+        maxParticipants?: number
+    ) {
+        super();
+        this.hasWaitlist = hasWaitlist;
+        this.minParticipants = minParticipants;
+        this.maxParticipants = maxParticipants;
+    }
+
+    static override decode<ParticipantsConfig>(data: { [key: string]: any }): ParticipantsConfig {
+        const object = Object();
+
+        if (data) {
+            object['hasWaitlist'] = data['has_waitlist'];
+            object['minParticipants'] = data['min_participants'];
+            object['maxParticipants'] = data['max_participants'];
+        }
+
+        Object.setPrototypeOf(object, ParticipantsConfig.prototype);
+        return object;
+    }
+
+    override encode(): { [key: string]: any } {
+        const data: { [key: string]: any } = {};
+
+        if (this.hasWaitlist !== undefined) {
+            data['has_waitlist'] = this.hasWaitlist;
+        }
+        if (this.minParticipants !== undefined) {
+            data['min_participants'] = this.minParticipants;
+        }
+        if (this.maxParticipants !== undefined) {
+            data['max_participants'] = this.maxParticipants;
+        }
+
+        return data;
+    }
+}
+
+class TeamsConfig extends Codable<TeamsConfig> {
+    hasWaitlist?: boolean;
+    minTeams?: number;
+    maxTeams?: number;
+    maxTeamSize?: number;
+
+    constructor(
+        hasWaitlist?: boolean,
+        minTeams?: number,
+        maxTeams?: number,
+        maxTeamSize?: number
+    ) {
+        super();
+        this.hasWaitlist = hasWaitlist;
+        this.minTeams = minTeams;
+        this.maxTeams = maxTeams;
+        this.maxTeamSize = maxTeamSize;
+    }
+
+    static override decode<TeamsConfig>(data: { [key: string]: any }): TeamsConfig {
+        const object = Object();
+
+        if (data) {
+            object['hasWaitlist'] = data['has_waitlist'];
+            object['minTeams'] = data['min_teams'];
+            object['maxTeams'] = data['max_teams'];
+            object['maxTeamSize'] = data['max_team_size'];
+        }
+
+        Object.setPrototypeOf(object, TeamsConfig.prototype);
+        return object;
+    }
+
+    override encode(): { [key: string]: any } {
+        const data: { [key: string]: any } = {};
+
+        if (this.hasWaitlist !== undefined) {
+            data['has_waitlist'] = this.hasWaitlist;
+        }
+        if (this.minTeams !== undefined) {
+            data['min_teams'] = this.minTeams;
+        }
+        if (this.maxTeams !== undefined) {
+            data['max_teams'] = this.maxTeams;
+        }
+        if (this.maxTeamSize !== undefined) {
+            data['max_team_size'] = this.maxTeamSize;
+        }
+
+        return data;
+    }
+}
+
+class EventFormatConfig extends Codable<EventFormatConfig> {
+    isCompetition?: boolean;
+    isCompetitionGame?: boolean;
+    parentCompetitionId?: string;
+    competitionState?: string;
+    
+    format?: COMPETITION_FORMAT;
+    rounds?: number;
+    currentRound?: number;
+    bracketData?: any;
+    
+    registrationStart?: number;
+    registrationEnd?: number;
+    allowLateRegistration?: boolean;
+
+    constructor(
+        isCompetition?: boolean,
+        isCompetitionGame?: boolean,
+        parentCompetitionId?: string,
+        competitionState?: string,
+        format?: COMPETITION_FORMAT,
+        rounds?: number,
+        currentRound?: number,
+        bracketData?: any,
+        registrationStart?: number,
+        registrationEnd?: number,
+        allowLateRegistration?: boolean
+    ) {
+        super();
+        this.isCompetition = isCompetition;
+        this.isCompetitionGame = isCompetitionGame;
+        this.parentCompetitionId = parentCompetitionId;
+        this.competitionState = competitionState;
+        this.format = format;
+        this.rounds = rounds;
+        this.currentRound = currentRound;
+        this.bracketData = bracketData;
+        this.registrationStart = registrationStart;
+        this.registrationEnd = registrationEnd;
+        this.allowLateRegistration = allowLateRegistration;
+    }
+
+    static override decode<EventFormatConfig>(data: { [key: string]: any }): EventFormatConfig {
+        const object = Object();
+
+        if (data) {
+            object['isCompetition'] = data['is_competition'];
+            object['isCompetitionGame'] = data['is_competition_game'];
+            object['parentCompetitionId'] = data['parent_competition_id'];
+            object['competitionState'] = data['competition_state'];
+            object['format'] = data['format'] !== undefined ? stringToCompetitionFormat(data['format']) : undefined;
+            object['rounds'] = data['rounds'];
+            object['currentRound'] = data['current_round'];
+            object['bracketData'] = data['bracket_data'];
+            object['registrationStart'] = data['registration_start'];
+            object['registrationEnd'] = data['registration_end'];
+            object['allowLateRegistration'] = data['allow_late_registration'];
+        }
+
+        Object.setPrototypeOf(object, EventFormatConfig.prototype);
+        return object;
+    }
+
+    override encode(): { [key: string]: any } {
+        const data: { [key: string]: any } = {};
+
+        if (this.isCompetition !== undefined) {
+            data['is_competition'] = this.isCompetition;
+        }
+        if (this.isCompetitionGame !== undefined) {
+            data['is_competition_game'] = this.isCompetitionGame;
+        }
+        if (this.parentCompetitionId) {
+            data['parent_competition_id'] = this.parentCompetitionId;
+        }
+        if (this.competitionState) {
+            data['competition_state'] = this.competitionState;
+        }
+        if (this.format !== undefined) {
+            data['format'] = this.format.valueOf();
+        }
+        if (this.rounds !== undefined) {
+            data['rounds'] = this.rounds;
+        }
+        if (this.currentRound !== undefined) {
+            data['current_round'] = this.currentRound;
+        }
+        if (this.bracketData !== undefined) {
+            data['bracket_data'] = this.bracketData;
+        }
+        if (this.registrationStart !== undefined) {
+            data['registration_start'] = this.registrationStart;
+        }
+        if (this.registrationEnd !== undefined) {
+            data['registration_end'] = this.registrationEnd;
+        }
+        if (this.allowLateRegistration !== undefined) {
+            data['allow_late_registration'] = this.allowLateRegistration;
+        }
+
+        return data;
+    }
+}
+
+
+class Team extends Codable<Team> {
+    id: string;
+    name: string;
+    members: Participant[];
+    eventId: string;
+    createdAt: number;
+
+    constructor(
+        id: string,
+        name: string,
+        members: Participant[],
+        eventId: string,
+        createdAt: number
+    ) {
+        super();
+        this.id = id;
+        this.name = name;
+        this.members = members;
+        this.eventId = eventId;
+        this.createdAt = createdAt;
+    }
+
+    static override decode<Team>(data: { [key: string]: any }): Team {
+        const object = Object();
+
+        if (data) {
+            object['id'] = data['id'];
+            object['name'] = data['name'];
+            object['members'] = data['members'] ? data['members'].map((m: any) => Participant.decode(m)) : [];
+            object['eventId'] = data['event_id'];
+            object['createdAt'] = data['created_at'];
+        }
+
+        Object.setPrototypeOf(object, Team.prototype);
+        return object;
+    }
+
+    override encode(): { [key: string]: any } {
+        const data: { [key: string]: any } = {};
+
+        if (this.id) {
+            data['id'] = this.id;
+        }
+        if (this.name) {
+            data['name'] = this.name;
+        }
+        if (this.members) {
+            data['members'] = this.members.map((m) => m.encode());
+        }
+        if (this.eventId) {
+            data['event_id'] = this.eventId;
+        }
+        if (this.createdAt) {
+            data['created_at'] = this.createdAt;
+        }
+
+        return data;
+    }
+}
+
+class TeamDao extends Codable<TeamDao> {
+    id?: string;
+    name?: string;
+    members?: Participant[];
+    eventId?: string;
+    createdAt?: number;
+
+    constructor(
+        id?: string,
+        name?: string,
+        members?: Participant[],
+        eventId?: string,
+        createdAt?: number
+    ) {
+        super();
+        this.id = id;
+        this.name = name;
+        this.members = members;
+        this.eventId = eventId;
+        this.createdAt = createdAt;
+    }
+
+    override encode(): { [key: string]: any } {
+        const data: { [key: string]: any } = {};
+
+        if (this.id) {
+            data['id'] = this.id;
+        }
+        if (this.name) {
+            data['name'] = this.name;
+        }
+        if (this.members) {
+            data['members'] = this.members.map((m) => m.encode());
+        }
+        if (this.eventId) {
+            data['event_id'] = this.eventId;
+        }
+        if (this.createdAt) {
+            data['created_at'] = this.createdAt;
+        }
+
+        return data;
+    }
+}
+
+class EventComment extends Codable<EventComment> {
+    id: string;
+    user?: UserSnippet;
+    text: string;
+    eventId: string;
+    createdAt: number;
+
+    constructor(
+        id: string,
+        text: string,
+        eventId: string,
+        createdAt: number,
+        user?: UserSnippet
+    ) {
+        super();
+        this.id = id;
+        this.user = user;
+        this.text = text;
+        this.eventId = eventId;
+        this.createdAt = createdAt;
+    }
+
+    static override decode<EventComment>(data: { [key: string]: any }): EventComment {
+        const object = Object();
+
+        if (data) {
+            object['id'] = data['id'];
+            object['user'] = data['user'] ? UserSnippet.decode(data['user']) : undefined;
+            object['text'] = data['text'];
+            object['eventId'] = data['event_id'];
+            object['createdAt'] = data['created_at'];
+        }
+
+        Object.setPrototypeOf(object, EventComment.prototype);
+        return object;
+    }
+
+    override encode(): { [key: string]: any } {
+        const data: { [key: string]: any } = {};
+
+        if (this.id) {
+            data['id'] = this.id;
+        }
+        if (this.user) {
+            data['user'] = this.user.encode();
+        }
+        if (this.text) {
+            data['text'] = this.text;
+        }
+        if (this.eventId) {
+            data['event_id'] = this.eventId;
+        }
+        if (this.createdAt) {
+            data['created_at'] = this.createdAt;
+        }
+
+        return data;
+    }
+}
+
+class EventCommentDao extends Codable<EventCommentDao> {
+    id?: string;
+    userId?: string;
+    text?: string;
+    eventId: string;
+    createdAt?: number;
+
+    constructor(
+        eventId: string,
+        id?: string,
+        userId?: string,
+        text?: string,
+        createdAt?: number
+    ) {
+        super();
+        this.id = id;
+        this.userId = userId;
+        this.text = text;
+        this.eventId = eventId;
+        this.createdAt = createdAt;
+    }
+
+    override encode(): { [key: string]: any } {
+        const data: { [key: string]: any } = {};
+
+        if (this.id) {
+            data['id'] = this.id;
+        }
+        if (this.userId) {
+            data['user_id'] = this.userId;
+        }
+        if (this.text) {
+            data['text'] = this.text;
+        }
+        if (this.eventId) {
+            data['event_id'] = this.eventId;
+        }
+        if (this.createdAt) {
+            data['created_at'] = this.createdAt;
+        }
+
+        return data;
+    }
+}
+
 export {
     Event,
     EventDao,
@@ -600,5 +1104,17 @@ export {
     LocationResponse,
     
     NewEventDao,
-    RecurrenceOptions
+    RecurrenceOptions,
+
+    ParticipantsConfig,
+    TeamsConfig,
+    
+    EventFormatConfig,
+    EventRecurrenceConfig,
+    
+    Team,
+    TeamDao,
+
+    EventComment,
+    EventCommentDao
 }

@@ -48,8 +48,7 @@ export class EventService {
         headers.set('Authorization', token);
 
         let query = new Map<string, string>();
-        query.set("latitude", String(latitude));
-        query.set("longitude", String(longitude));
+        query.set("location", `${String(longitude)},${String(latitude)}`);
         query.set("radius", String(radius));
         query.set("sports", sports);
         query.set("status", status);

@@ -82,7 +82,6 @@ import { createVNode, watch, onMounted, ref, render, computed, type Ref, type Co
 import EventsListModal from '@/components/Events/EventsListModal/EventsListModal.vue';
 import VenueDetailCard from '@/components/Venues/VenueDetailCard/VenueDetailCard.vue';
 import VenueAnnotation from '@/components/Venues/VenueAnnotation/VenueAnnotation.vue';
-import NewEventCard from '@/components/Events/New Event/NewEventView/NewEventView.vue';
 import NoGroupWarning from '@/components/Dialog/NoGroupWarning/NoGroupWarning.vue';
 import { useRoute } from 'vue-router';
 

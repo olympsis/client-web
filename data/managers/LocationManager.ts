@@ -91,24 +91,34 @@ export class LocationManager {
                 }
             }
 
-            const { location, permission } = await $locationDialog({
-                skipPermission: false,
-                clickOutsideToClose: true
-            });
-
-            if (permission === 'manual') {
-                this.storeFallBackLocation(location);
-            }
-
-            this.storeLastKnownLocation(location);
-
-            session.$patch({
-                lastKnownLocation: location
-            });
-
-            return {
-                location,
-                permissionState
+            try {
+                const { location, permission } = await $locationDialog({
+                    skipPermission: false,
+                    clickOutsideToClose: true
+                });
+    
+                if (permission === 'manual') {
+                    this.storeFallBackLocation(location);
+                }
+    
+                this.storeLastKnownLocation(location);
+    
+                session.$patch({
+                    lastKnownLocation: location
+                });
+    
+                return {
+                    location,
+                    permissionState
+                }
+            } catch {
+                const fallBack = this.retrieveFallBackLocation();
+                if (fallBack) {
+                    return {
+                        location: fallBack,
+                        permissionState: 'denied'
+                    }
+                }
             }
         }
         
@@ -248,8 +258,7 @@ export class LocationManager {
 		
 		// Always update location in session state
 		session.$patch({
-			lastKnownLocation: location,
-			hasLocation: permission === 'granted' || permission === 'prompt'
+			lastKnownLocation: location
 		});
 		
 		// Define proper type for the event data response

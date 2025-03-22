@@ -77,6 +77,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { UserDTO } from '~/data/models/UserModels';
 import type { CroppedMedia } from '~/data/GlobalData';
+import { UserService } from '~/data/services/UserService';
 import { UploadService } from "@/data/services/UploadService";
 import { CROP_SHAPE, SPORTS, VIEW_STATE } from '~/data/Enums';
 
@@ -86,6 +87,7 @@ import MultiSportsPicker from '~/components/MultiSportsPicker/MultiSportsPicker.
 
 
 const session = useSessionStore();
+const service = new UserService();
 const emits = defineEmits(['close']);
 const uploadService = new UploadService();
 
@@ -209,7 +211,7 @@ async function updateUserProfile() {
 
     // Update user data
     try {
-        const resp = await session.userService.updateUserData(update)
+        const resp = await service.updateUserData(update)
         if (resp) {
             session.user = resp;
             viewState.value = VIEW_STATE.PENDING;

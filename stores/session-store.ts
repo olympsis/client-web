@@ -28,7 +28,6 @@ export const useSessionStore = defineStore('session-store', () => {
     const authStore = useAuthStore();
     const modelStore = useModelStore();
 
-    var userService = new UserService();
     var clubService = new ClubService();
     var orgService = new OrganizationService();
     var venueService = new VenueService();
@@ -79,7 +78,8 @@ export const useSessionStore = defineStore('session-store', () => {
             };
 
             // Make Check In request to server
-            const resp = await userService.checkIn();
+            const service = new UserService();
+            const resp = await service.checkIn();
             if (!resp) throw('Failed to get check in data. Response from server is undefined.');
 
             // Log out user if we fail to get user data
@@ -92,7 +92,6 @@ export const useSessionStore = defineStore('session-store', () => {
 
             // Load in Groups Data
             _loadGroupData(resp);
-
 
             // Set has loaded to true
             hasLoaded.value = true;
@@ -255,7 +254,6 @@ export const useSessionStore = defineStore('session-store', () => {
         mapkitToken,
         mapKitServerToken,
 
-        userService,
         clubService,
         orgService,
         eventService,

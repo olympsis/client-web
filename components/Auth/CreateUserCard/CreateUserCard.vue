@@ -38,11 +38,13 @@
 import { ref, type Ref, watch } from 'vue';
 import { SPORTS, VIEW_STATE } from '@/data/Enums';
 import { useSessionStore } from '@/stores/session-store';
+import { UserService } from '~/data/services/UserService';
 
 import SportIconLabel from '@/components/SportIconLabel/SportIconLabel.vue';
 import TextButton from '@/components/Buttons/LoadingButtons/TextButton/TextButton.vue';
 
 const session = useSessionStore();
+const service = new UserService();
 const emits = defineEmits([ 'submit' ]);
 const model = defineModel('state', { default: VIEW_STATE.PENDING });
 
@@ -96,7 +98,7 @@ function handleSelectedSport(sport: any) {
 async function checkUsernameAvailability() {
     state.value = VIEW_STATE.LOADING;
 
-    const isAvailable = await session.userService.usernameAvailability(username.value)
+    const isAvailable = await service.usernameAvailability(username.value)
     if (isAvailable) {
         state.value = VIEW_STATE.SUCCESS;
     } else {

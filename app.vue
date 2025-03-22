@@ -14,17 +14,25 @@ import { SpeedInsights } from "@vercel/speed-insights/nuxt";
 
 import Toast from 'primevue/toast';
 import LocationDialog from './components/System/LocationDialog/LocationDialog.vue';
+import { SystemService } from './data/services/SystemService';
 
 onMounted(async () => {
 	const auth = useAuth();
 	const session = useSessionStore();
-	
+
+	try {
+		const systemService = new SystemService();
+		const config = await systemService.getConfig();
+	} catch(error) {
+		console.error("Something Unexpected Happened!")
+	}
+
 	/**
 	 * We fetch venues and events nearby on first app load if user is authenticated.
 	 * We have other views that will be available to the public such as /events
 	 * That page will fetch events data by itself if someone isn't authenticated and is visiting the site.
 	 */
-	if (auth.isAuthenticated) {
+		if (auth.isAuthenticated) {
 		await session.loadVenuesAndEvents();
 	}
 })

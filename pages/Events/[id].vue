@@ -47,26 +47,19 @@
 </template>
 
 <script setup lang="ts">
-import { 
-    AUTH_STATUS, 
-    EVENT_PENDING_STATE, 
-    EVENT_STATE, 
-} from '@/data/Enums';
-
 import { VIEW_STATE } from '@/data/Enums';
 import { useToast } from 'primevue/usetoast';
 import { Club } from '@/data/models/ClubModels';
 import { useRoute, useRouter } from 'vue-router';
 import { Venue } from '@/data/models/VenueModels';
 import { Event } from '@/data/models/EventModels';
-import { getDirections } from '~/utils/map-helpers';
 import { useModelStore } from '@/stores/model-store';
 import { UserSnippet } from '@/data/models/UserModels';
 import { useSessionStore } from '@/stores/session-store';
 import { generateImageURL } from '~/utils/image-helpers';
 import { Organization } from '@/data/models/OrganizationModels';
 import { Participant, ParticipantDao } from '@/data/models/GenericModels';
-import { computed, onMounted, ref, type Ref, useTemplateRef, } from 'vue';
+import { computed, ref, type Ref, useTemplateRef, } from 'vue';
 
 import EventBody from '~/components/Events/EventBody/EventBody.vue';
 import EventMedia from '~/components/Events/EventMedia/EventMedia.vue';
@@ -82,9 +75,7 @@ import EventDetailSettingsModal from '@/components/Modals/Events/EventDetailSett
 import EventParticipantsListModal from '@/components/Modals/Events/EventParticipantsListModal/EventParticipantsListModal.vue';
 
 const auth = useAuth();
-const toast = useToast();
 const route = useRoute();
-const router = useRouter();
 const session = useSessionStore();
 const modelStore = useModelStore();
 
@@ -257,10 +248,6 @@ function handleNewUserAuthentication() {
     auth.initAuth();
     session.init();
     hideAuthModal();
-}
-
-function showCopiedToast() {
-    toast.add({ severity: 'secondary', summary: 'Link Copied', detail: 'You\'ve copied the link to this event', life: 3000 });
 }
 
 async function loadEventData(id: string) {

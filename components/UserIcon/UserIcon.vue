@@ -8,7 +8,7 @@
             @error="onImageError"
         />
         <div v-else class="icon"  :style="{ width: `${size}rem`, height: `${size}rem`}">
-            <picture>
+            <picture :style="{width: '20px'}">
                 <source srcset="@/assets/icons/person/person.white.svg" media="(prefers-color-scheme: dark)"/>
                 <img :style="{ width: `${size/2}rem`, height: `${size/2}rem`}" src="@/assets/icons/person/person.svg" class="action-button">
             </picture>

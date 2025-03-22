@@ -858,6 +858,84 @@ class ChangeRoleRequest extends Codable<ChangeRoleRequest> {
     }
 }
 
+class Tag extends Codable<Tag> {
+    name: string
+
+    constructor(
+        name: string
+    ) {
+        super();
+        this.name = name;
+    }
+
+    static override decode<Tag>(data: { [key: string]: any }): Tag {
+        const object = Object();
+
+        if(data) {
+            object['name'] = data['name'];
+        }
+
+        Object.setPrototypeOf(object, Tag.prototype);
+        return object;
+    }
+}
+
+class Sport extends Codable<Sport> {
+    name: string;
+    images: string[];
+
+    constructor(
+        name: string,
+        images: string[]
+    ) {
+        super();
+        this.name = name;
+        this.images = images;
+    }
+
+    static override decode<Sport>(data: { [key: string]: any }): Sport {
+        const object = Object();
+
+        if(data) {
+            object['name'] = data['name'];
+            object['images'] = data['images'];
+        }
+
+        Object.setPrototypeOf(object, Sport.prototype);
+        return object;
+    }
+}
+
+class ApplicationConfig extends Codable<ApplicationConfig> {
+    tags: Tag[];
+    sports: any[];
+
+    constructor(
+        tags: Tag[],
+        sports: Sport[]
+    ) {
+        super();
+        this.tags = tags;
+        this.sports = sports;
+    }
+
+    static override decode<ApplicationConfig>(data: { [key: string]: any }): ApplicationConfig {
+        const object = Object();
+
+        if (data) {
+            object['tags'] = data['tags'].map((t: {[key: string]: any}) => {
+                return Tag.decode(t);
+            });
+            object['sports'] = data['sports'].map((s: {[key: string]: any}) => {
+                return Sport.decode(s);
+            });
+        }
+
+        Object.setPrototypeOf(object, ApplicationConfig.prototype);
+        return object;
+    }
+}
+
 export {
     Comment,
     CommentDao,
@@ -888,4 +966,8 @@ export {
     ChangeRoleRequest,
     AdministrativeArea,
     SubAdministrativeArea,
+
+    Tag,
+    Sport,
+    ApplicationConfig,
 }

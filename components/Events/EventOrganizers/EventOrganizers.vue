@@ -2,6 +2,13 @@
     <div id="event-organizers">
         <h2>Hosted by</h2>
         <ul id="list">
+            <li id="poster" class="organizer">
+                <UserIcon
+                    :user="event.poster"
+                    :size="2.5"
+                />
+                <div id="name">{{ event.poster?.username ?? 'olympsis-user' }}</div>
+            </li>
             <li v-for="organizer in organizers" class="organizer">
                 <GroupBadge :type="organizer.type" :imageURL="organizer.imageURL" :size="2.5" />
                 <div id="name">{{ organizer.name }}</div>
@@ -51,6 +58,16 @@ const organizers = computed<Array<{ type: number, name: String, imageURL: string
         padding: 0;
         margin-top: 0.5rem;
         list-style-type: none;
+
+        li {
+            margin: 0.5rem 0rem;
+        }
+    }
+
+    #poster {
+        #user-icon {
+            border: var(--olympsis-light-gray) solid 2px;
+        }
     }
 
     .organizer {

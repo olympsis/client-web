@@ -1,11 +1,10 @@
-import { ref, type Ref } from 'vue';
 import { defineStore } from 'pinia'
+import { ref, type Ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useModelStore } from './model-store';
 import { Club } from '~/data/models/ClubModels';
 import { Event } from '~/data/models/EventModels';
 import { Venue } from '~/data/models/VenueModels';
-import { CheckIn, UserData } from '~/data/models/UserModels';
 import { ChatRoom } from '~/data/models/ChatModels';
 import { GROUP_TYPE, VIEW_STATE } from '~/data/Enums';
 import { ChatService } from '~/data/services/ChatService';
@@ -13,13 +12,17 @@ import { ClubService } from '~/data/services/ClubService';
 import { UserService } from '~/data/services/UserService';
 import { VenueService } from '~/data/services/VenueService';
 import { EventService } from '~/data/services/EventService';
+import { CheckIn, UserData } from '~/data/models/UserModels';
 import { Announcement } from '~/data/models/AnnouncementModels';
 import { Organization } from '../data/models/OrganizationModels';
 import { LocationManager } from '../data/managers/LocationManager';
-import { GroupSelection, Location } from '../data/models/GenericModels';
 import { OrganizationService } from '~/data/services/OrganizationService';
+import { GroupSelection, Location, Sport, Tag } from '../data/models/GenericModels';
 
 export const useSessionStore = defineStore('session-store', () => {
+
+    var tags = ref<Tag[]>([]);
+    var sports = ref<Sport[]>([]);
 
     var router = useRouter();
     var hasLoaded = ref(false);
@@ -49,9 +52,9 @@ export const useSessionStore = defineStore('session-store', () => {
 
     var chatRooms = ref<ChatRoom[]>([]);
 
-    var lastKnownLocation: Ref<Location | undefined> = ref(undefined);
     var loadingState = ref<VIEW_STATE>(VIEW_STATE.PENDING);
     var locationState = ref<VIEW_STATE>(VIEW_STATE.PENDING);
+    var lastKnownLocation: Ref<Location | undefined> = ref(undefined);
 
     var mapkitToken: Ref<string | undefined> = ref(undefined);
     var mapKitServerToken: Ref<string | undefined> = ref(undefined);
@@ -233,6 +236,9 @@ export const useSessionStore = defineStore('session-store', () => {
         hasLoaded,
         user,
         
+        tags,
+        sports,
+
         events,
         pastEvents,
 

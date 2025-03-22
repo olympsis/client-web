@@ -23,6 +23,8 @@ onMounted(async () => {
 	try {
 		const systemService = new SystemService();
 		const config = await systemService.getConfig();
+		session.tags = config.tags;
+		session.sports = config.sports;
 	} catch(error) {
 		console.error("Something Unexpected Happened!")
 	}

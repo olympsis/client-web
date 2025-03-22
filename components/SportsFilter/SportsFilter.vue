@@ -1,35 +1,35 @@
 <template>
     <ul id="sports-filter">
-        <li v-for="sport in sports" :class="{ sport: true, selected: model.find((s) => s == sport) !== undefined }" @click="handleSelectedSport(sport)">
-            {{ sport }}
+        <li v-for="sport in sports" :class="{ sport: true, selected: model.find((s) => s.name == sport.name) !== undefined }" @click="handleSelectedSport(sport)">
+            {{ sport.name }}
         </li>
     </ul>
 </template>
 
 <script setup lang="ts">
-import { SPORTS } from '@/data/Enums';
+import { Sport } from '~/data/models/GenericModels';
 
 const session = useSessionStore();
 
-const model = defineModel<Array<SPORTS>>({ 
+const model = defineModel<Array<Sport>>({ 
     default: [] 
 });
 
-const sports = computed<Array<SPORTS>>(() => {
+const sports = computed<Array<Sport>>(() => {
     const user = session.user;
-    if (!user) return Object.values(SPORTS);
-    if (!user.sports || user.sports.length === 0) return Object.values(SPORTS);
+    if (!user) return session.sports;
+    if (!user.sports || user.sports.length === 0) return session.sports;
     
     const userSportsSet = new Set(user.sports);
     
     // Get all sports from enum and sort them
-    return Object.values(SPORTS).sort((a, b) => {
+    return session.sports.sort((a, b) => {
         // If user has sport A but not B, A should come first
-        if (userSportsSet.has(a) && !userSportsSet.has(b)) {
+        if (userSportsSet.has(a.name) && !userSportsSet.has(b.name)) {
             return -1;
         }
         // If user has sport B but not A, B should come first
-        if (!userSportsSet.has(a) && userSportsSet.has(b)) {
+        if (!userSportsSet.has(a.name) && userSportsSet.has(b.name)) {
             return 1;
         }
         // If both or neither sports are in user's list, maintain original order
@@ -38,7 +38,7 @@ const sports = computed<Array<SPORTS>>(() => {
     });
 });
 
-function handleSelectedSport(sport: SPORTS) {
+function handleSelectedSport(sport: Sport) {
     const index = model.value.findIndex((s) => s === sport)
     if (index !== -1) {
         model.value.splice(index, 1);
@@ -52,11 +52,10 @@ function handleSelectedSport(sport: SPORTS) {
 #sports-filter {
     gap: 1rem;
     padding: 0;
+    columns: 2;
     width: 100%;
-    display: flex;
     padding: 1rem 0rem;
     overflow-x: scroll;
-    flex-direction: row;
     list-style-type: none;
     max-width: var(--desktop-max-width);
 
@@ -65,7 +64,9 @@ function handleSelectedSport(sport: SPORTS) {
         cursor: pointer;
         align-items: center;
         border-radius: 16px;
-        padding: 0.15rem 1rem;
+        white-space: nowrap;
+        margin-bottom: 0.5rem;
+        padding: 0.25rem 0.75rem;
         justify-content: center;
         text-transform: capitalize;
         border: var(--component-border) solid 1px;

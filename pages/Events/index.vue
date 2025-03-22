@@ -42,8 +42,21 @@
         </div>
 
         <div id="sub-header">
-            <SportsFilter v-model:model-value="selectedSports"/>
-            <!-- <EventDateButton v-model="selectedDate"/> -->
+            <button id="filter" @click="showFilter = true">
+                <div id="text">Filters</div>
+                <picture :style="{height: '24px'}">
+                    <source srcset="@/assets/icons/filter/filter.white.svg" media="(prefers-color-scheme: dark)">
+                    <img src="@/assets/icons/filter/filter.svg">
+                </picture>
+            </button>
+
+            <Drawer v-model:visible="showFilter" position="right">
+                <div class="section-header" :style="{fontWeight: 'bold'}">Sports</div>
+                <SportsFilter v-model:model-value="selectedSports"/>
+
+                <div class="section-header" :style="{fontWeight: 'bold'}">Tags</div>
+                <TagsFilter v-model:model-value="selectedTags"/>
+            </Drawer>
         </div>
 
         <div id="events-body">
@@ -82,18 +95,20 @@
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
-import { SPORTS, stringToSport, VIEW_STATE } from '@/data/Enums';
-import { compareUTCNowToDateNormal } from '~/utils/time-helpers';
+import { VIEW_STATE } from '@/data/Enums';
 import { useSessionStore } from '@/stores/session-store';
 import { EventService } from '@/data/services/EventService';
+import { Location, Sport, Tag } from '~/data/models/GenericModels';
+import { computed, onMounted, ref, useTemplateRef } from 'vue';
 import { Event, EventSection } from '@/data/models/EventModels';
-import { computed, onMounted, ref, useTemplateRef, watch } from 'vue';
+import { compareUTCNowToDateNormal } from '~/utils/time-helpers';
 
+import Drawer from 'primevue/drawer';
 import SearchBar from '@/components/SearchBar/SearchBar.vue';
+import TagsFilter from '~/components/TagsFilter/TagsFilter.vue';
 import SportsFilter from '~/components/SportsFilter/SportsFilter.vue';
 import EventListItem2 from '~/components/Events/EventListItem/EventListItem.vue';
 import EventsSettings from '~/components/Dialog/Events/EventsSettings/EventsSettings.vue';
-import { Location } from '~/data/models/GenericModels';
 
 const router = useRouter();
 const session = useSessionStore();
@@ -102,15 +117,15 @@ const eventService = new EventService();
 
 const events = ref<Event[]>([]);
 const searchText = ref<string>('');
-const selectedSports: Ref<Array<SPORTS>> = ref([]);
+const showFilter = ref<boolean>(false);
+const selectedTags: Ref<Array<Tag>> = ref([]);
+const selectedSports: Ref<Array<Sport>> = ref([]);
 const eventSettingsModalRef = useTemplateRef<HTMLDialogElement>('event-settings-modal');
 
 const filteredEvents = computed<Array<Event>>(() => {
     return events.value.filter((e) => {
         var includesSport = e.sports?.find((s: string) => {
-            const _sport = stringToSport(s);
-            if (!_sport) return false;
-            return selectedSports.value.includes(_sport);
+            return selectedSports.value.find((sp) => sp.name == s);
         });
 
         var containsSearch = e.title?.toLowerCase().includes(searchText.value.toLowerCase());
@@ -251,9 +266,13 @@ session.$subscribe((mutation: any, state) => {
 onMounted(() => {
     // Preselect user favorite sports
     // TODO: Add the ability to remember selections
-    const user = session.user;
-    const sports: Array<SPORTS> = user?.sports ?? [];
-    selectedSports.value = sports;
+    const session = useSessionStore();
+    session.user?.sports?.forEach((s) => {
+        const found = session.sports.find((sp) => sp.name == s);
+        if (found) {
+            selectedSports.value.push(found);
+        }
+    })
 
     fetchEvents()
         .then((resp) => {
@@ -331,11 +350,25 @@ definePageMeta({
     #sub-header {
         display: flex;
         margin: 0.5rem 0rem;
-        justify-content: space-between;
 
-        #search-bar {
-            max-width: 35rem;
-            grid-area: search;
+        #filter {
+            display: flex;
+            height: 2.5rem;
+            cursor: pointer;
+            margin-left: auto;
+            width: fit-content;
+            border-radius: 18px;
+            align-items: center;
+            padding: 0.15rem 1rem;
+            justify-content: center;
+            border: var(--component-border) solid 1px;
+            background-color: var(--secondary-background-color);
+
+            #text {
+                font-size: 1rem;
+                font-weight: 500;
+                margin-right: 0.5rem;
+            }
         }
 
         #actions {
@@ -343,22 +376,6 @@ definePageMeta({
             margin-left: 1rem;    
             grid-area: actions;
 
-            #past-events-button {
-                border: unset;
-                display: flex;
-                color: white;
-                cursor: pointer;
-                font-size: 1rem;
-                margin: 0rem 1rem;
-                align-items: center;
-                border-radius: 10px;
-                padding: 0rem 0.5rem;
-
-                img {
-                    margin-right: 0.25rem;
-                }
-                background-color: var(--olympsis-gray);
-            }
         }
 
         @media (max-width: 940px) {
@@ -367,12 +384,6 @@ definePageMeta({
             grid-template-areas: 
             'actions'
             'search';
-
-            #search-bar {
-                max-width: unset;
-                margin: 1rem 0rem;
-                width: calc(100dvw - 2rem);
-            }
             
             #actions {
                 margin-left: auto;

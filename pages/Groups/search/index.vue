@@ -42,8 +42,21 @@
         </div>
 
         <div id="sub-header">
-            <div>Filter By</div>
-            <SportsFilter v-model:model-value="selectedSports"/>
+            <button id="filter" @click="showFilter = true">
+                <div id="text">Filters</div>
+                <picture :style="{height: '24px'}">
+                    <source srcset="@/assets/icons/filter/filter.white.svg" media="(prefers-color-scheme: dark)">
+                    <img src="@/assets/icons/filter/filter.svg">
+                </picture>
+            </button>
+
+            <Drawer v-model:visible="showFilter" position="right">
+                <div class="section-header" :style="{fontWeight: 'bold'}">Sports</div>
+                <SportsFilter v-model:model-value="selectedSports"/>
+
+                <div class="section-header" :style="{fontWeight: 'bold'}">Tags</div>
+                <TagsFilter v-model:model-value="selectedTags"/>
+            </Drawer>
         </div>
 
         <div id="list-wrapper">
@@ -63,11 +76,12 @@ import { computed, ref, useTemplateRef } from 'vue';
 
 import { Club } from '@/data/models/ClubModels';
 import { SPORTS, stringToSport, VIEW_STATE } from '@/data/Enums';
-import { GroupSelection, Location } from '@/data/models/GenericModels';
+import { GroupSelection, Location, Sport, Tag } from '@/data/models/GenericModels';
 
 import { useModelStore } from '@/stores/model-store';
 import { useSessionStore } from '@/stores/session-store';
 
+import Drawer from 'primevue/drawer';
 import SearchBar from '@/components/SearchBar/SearchBar.vue';
 import SportsFilter from '~/components/SportsFilter/SportsFilter.vue';
 import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
@@ -81,8 +95,9 @@ const sessionStore = useSessionStore();
 
 const state = ref(VIEW_STATE.SUCCESS);
 const searchText: Ref<string> = ref('');
-const selectedTags: Ref<Array<string>> = ref([]);
-const selectedSports: Ref<Array<SPORTS>> = ref([]);
+const showFilter = ref<boolean>(false);
+const selectedTags: Ref<Array<Tag>> = ref([]);
+const selectedSports: Ref<Array<Sport>> = ref([]);
 
 // All of the clubs from the search results
 const clubs: Ref<Club[]> = ref([]);
@@ -98,13 +113,11 @@ const filteredClubs: ComputedRef<Club[]> = computed(() => {
     })
     .filter((c) => { // Filter by other criteria
         var includesSport = c.sports?.find((s: string) => {
-            const _sport = stringToSport(s);
-            if (!_sport) return false;
-            return selectedSports.value.includes(_sport);
+            return selectedSports.value.find((sp) => sp.name == s);
         });
 
         var includesTag = c.tags?.find((t) => {
-            return selectedTags.value.includes(t);
+            return selectedTags.value.find((tg) => tg.name == t);
         });
 
         var containsSearch = c.name?.toLowerCase().includes(searchText.value.toLowerCase());
@@ -168,9 +181,13 @@ useSeoMeta({
 onMounted(() => {
     // Preselect user favorite sports
     // TODO: Add the ability to remember selections
-    const user = sessionStore.user;
-    const sports: Array<SPORTS> = user?.sports ?? [];
-    selectedSports.value = sports;
+    const session = useSessionStore();
+    session.user?.sports?.forEach((s) => {
+        const found = session.sports.find((sp) => sp.name == s);
+        if (found) {
+            selectedSports.value.push(found);
+        }
+    })
 
     fetchClubs()
 });
@@ -187,7 +204,7 @@ onMounted(() => {
     padding: 0rem 2rem;
     overflow-y: scroll;
     justify-content: center;
-    grid-template-rows: 4rem 6rem auto auto auto;
+    grid-template-rows: 4rem auto auto auto auto;
     grid-template-areas: 
     "header"
     "sub-header"
@@ -212,6 +229,31 @@ onMounted(() => {
             width: 100%;
             max-width: 35rem;
             margin-right: 1rem;
+        }
+    }
+
+    #sub-header {
+        display: flex;
+        margin: 0.5rem 0rem;
+
+        #filter {
+            display: flex;
+            height: 2.5rem;
+            cursor: pointer;
+            margin-left: auto;
+            width: fit-content;
+            border-radius: 18px;
+            align-items: center;
+            padding: 0.15rem 1rem;
+            justify-content: center;
+            border: var(--component-border) solid 1px;
+            background-color: var(--secondary-background-color);
+
+            #text {
+                font-size: 1rem;
+                font-weight: 500;
+                margin-right: 0.5rem;
+            }
         }
     }
 

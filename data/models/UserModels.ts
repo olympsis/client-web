@@ -15,7 +15,7 @@ class UserData extends Codable<UserData> {
     clubs: string[] | undefined;
     hometown: number[] | undefined;
     organizations: string[] | undefined;
-    sports: SPORTS[] = [];
+    sports: string[] = [];
     deviceToken: string | undefined;
     
     static override decode<UserData>(data: { [key: string]: any }): UserData {
@@ -53,9 +53,7 @@ class UserData extends Codable<UserData> {
                 object['organizations'] = data['organizations'];
             }
             if (data['sports']) {
-                object['sports'] = Array(...data['sports']).map((s: string) => {
-                    return stringToSport(s);
-                });
+                object['sports'] = data['sports'];
             }
             if (data['device_token']) {
                 object['deviceToken'] = data['device_token'];

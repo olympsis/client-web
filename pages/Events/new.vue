@@ -34,11 +34,8 @@
 
             <!-- Config -->
             <div id="event-type-config">
-                <EventTypePicker v-model:model-value="eventType"/>
-                
+                <EventTypePicker v-model:model-value="eventType" :style="{marginRight: '0.5rem'}"/>
                 <EventVisibilityPicker v-model:model-value="eventVisibility"/>
-                
-                <EventSkillLevelPicker v-model:model-value="eventSkillLevel"/>
             </div>
 
             <div id="note">
@@ -47,7 +44,8 @@
 
             <!-- Sports Picker -->
             <div id="event-sports-picker">
-                <MultiSportsPicker v-model:model-value="eventSports"/>
+                <div class="label">Event Sport</div>
+                <MultiSportsPicker v-model:model-value="eventSports" :sports="session.sports"/>
             </div>
 
             <!-- Organizers Picker -->
@@ -154,13 +152,13 @@
                 <div :class="{ 
                     label: newEventError !== NEW_EVENT_ERROR.NO_VENUES, 
                     error: newEventError === NEW_EVENT_ERROR.NO_VENUES 
-                }"> Venue(s) <div class="asterisk">*</div> </div>
-                <div class="sub-label"> The location for this event </div>
+                }"> Location(s) <div class="asterisk">*</div> </div>
+                <div class="sub-label"> Select your event's location(s) </div>
                 <EventVenuesPicker v-model:model-value="eventVenues"/>
             </div>
 
             <!-- Image Picker -->
-            <div id="event-image-picker">
+            <div id="event-image-picker" v-if="eventSports.length > 0">
                 <EventImagePicker v-model:selected-sport="eventSport" v-model:selected-image="eventImage" />
             </div>
 
@@ -205,10 +203,11 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { useToast } from 'primevue/usetoast';
-import { SPORTS, VIEW_STATE, EVENT_RECURRENCE_FREQUENCY } from '~/data/Enums';
-import { GroupSelection, VenueDescriptor } from '~/data/models/GenericModels';
-import { EVENT_SKILL_LEVEL, EVENT_TYPE, EVENT_VISIBILITY } from '~/data/Enums';
+import { EVENT_TYPE, EVENT_VISIBILITY } from '~/data/Enums';
+import { VIEW_STATE, EVENT_RECURRENCE_FREQUENCY, MEDIA_TYPE } from '~/data/Enums';
 import { NEW_EVENT_ERROR, NewEventManager } from '~/data/managers/NewEventManager';
+import { GroupSelection, Sport, Tag, VenueDescriptor } from '~/data/models/GenericModels';
+import { EventFormatConfig, ParticipantsConfig, RecurrenceOptions } from '~/data/models/EventModels';
 
 import DatePicker from 'primevue/datepicker';
 import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
@@ -219,40 +218,42 @@ import BoldTextButton from '~/components/Buttons/LoadingButtons/BoldTextButton/B
 import EventVenuesPicker from '~/components/Events/New Event/EventVenuesPicker/EventVenuesPicker.vue';
 import EventAdvancedSettings from '~/components/Events/New Event/EventAdvancedSettings/EventAdvancedSettings.vue';
 import EventVisibilityPicker from '~/components/Events/New Event/EventVisibilityPicker/EventVisibilityPicker.vue';
-import EventSkillLevelPicker from '~/components/Events/New Event/EventSkillLevelPicker/EventSkillLevelPicker.vue';
 import EventOrganizersPicker from '~/components/Events/New Event/EventOrganizersPicker/EventOrganizersPicker.vue';
 import EventRecurrenceSettings from '~/components/Modals/Events/EventRecurrenceModal/EventRecurrenceSettings.vue';
 import EventExternalLinkSetting from '~/components/Modals/Events/EventExternalLinkSetting/EventExternalLinkSetting.vue';
 import EventParticipantsLimitSettings from '~/components/Modals/Events/EventParticipantsLimitSettings/EventParticipantsLimitSettings.vue';
-import { RecurrenceOptions } from '~/data/models/EventModels';
+
 
 const toast = useToast();
 const router = useRouter();
+const session = useSessionStore();
 const state = ref<VIEW_STATE>(VIEW_STATE.PENDING);
 const manager: NewEventManager = new NewEventManager();
 const newEventError = ref<NEW_EVENT_ERROR | null>(null);
 
-const eventSport = computed<SPORTS>(() => {
-    return eventSports.value[0] ?? SPORTS.RUNNING;
+const eventSport = computed<Sport>(() => {
+    return eventSports.value[0];
 });
 
 const eventTitle = ref<string>('');
 const eventImage = ref<string>('');
 const eventDescription = ref<string>('');
+
+const eventTags = ref<Tag[]>([]);
+const eventSports = ref<Sport[]>([]);
 const eventExternalLink = ref<string>('');
-const eventMinParticipants = ref<number>(0);
-const eventMaxParticipants = ref<number>(0);
+
 const eventGroups = ref<GroupSelection[]>([]);
 const eventVenues = ref<VenueDescriptor[]>([]);
-const eventSports = ref<SPORTS[]>([SPORTS.RUNNING]);
 const eventType = ref<EVENT_TYPE>(EVENT_TYPE.REGULAR);
 const eventVisibility = ref<EVENT_VISIBILITY>(EVENT_VISIBILITY.PUBLIC);
-const eventSkillLevel = ref<EVENT_SKILL_LEVEL>(EVENT_SKILL_LEVEL.ANY_LEVEL);
 
 const eventStartDate = ref<Date>(new Date());
 const eventEndDate = ref<Date>(new Date(eventStartDate.value.getTime() + (60 * 60 * 1000)));
 
 const eventRecurrenceEndDate = ref<Date | undefined>(undefined);
+const eventFormatConfig = ref<EventFormatConfig | undefined>(undefined);
+const participantsConfig = ref<ParticipantsConfig | undefined>(undefined);
 const eventRecurrenceFrequency = ref<EVENT_RECURRENCE_FREQUENCY | undefined>(undefined);
 
 const settingsModalRef = useTemplateRef<HTMLDialogElement>('settings-modal');
@@ -263,64 +264,73 @@ const externalLinkModalRef = useTemplateRef<HTMLDialogElement>('external-link-mo
 function createNewEvent() {
     state.value = VIEW_STATE.LOADING;
 
-    const isInvalid = manager.validateNewEventData(
-        eventTitle.value,
-        eventDescription.value,
-        eventGroups.value,
-        eventVenues.value,
-        eventImage.value,
-        eventStartDate.value,
-        eventEndDate.value
-    );
-    
-    if (isInvalid != null) {
-        newEventError.value = isInvalid;
-        state.value = VIEW_STATE.PENDING;
-    } else {
-        newEventError.value = null;
-        const data = manager.generateNewEventData(
-            eventType.value,
-            eventVisibility.value,
-            eventSkillLevel.value,
-            eventGroups.value,
-            [eventSport.value], // TODO: SUPPORT MULTI-SPORTS EVENTS HERE
+    try {
+        const isInvalid = manager.validateNewEventData(
             eventTitle.value,
             eventDescription.value,
+            eventGroups.value,
             eventVenues.value,
-            eventStartDate.value,
-            eventEndDate.value,
             eventImage.value,
-            eventMinParticipants.value,
-            eventMaxParticipants.value
+            eventStartDate.value,
+            eventEndDate.value
         );
+        
+        if (isInvalid != null) {
+            newEventError.value = isInvalid;
+            state.value = VIEW_STATE.PENDING;
+        } else {
+            newEventError.value = null;
+            const data = manager.generateNewEventData(
+                eventVisibility.value,
+                eventGroups.value,
+                eventTags.value,
+                [eventSport.value],
+                eventTitle.value,
+                eventDescription.value,
+                eventVenues.value,
+                eventStartDate.value,
+                eventEndDate.value,
+                MEDIA_TYPE.IMAGE,
+                eventImage.value,
+                eventFormatConfig.value,
+                participantsConfig.value,
+                undefined,
+                eventExternalLink.value
+            );
 
-        if (data) {
-            let opts: RecurrenceOptions | undefined;
-            if (eventRecurrenceFrequency.value != undefined && eventRecurrenceEndDate.value != undefined) {
-                opts = new RecurrenceOptions(
-                    eventRecurrenceFrequency.value,
-                    eventRecurrenceEndDate.value.getTime() / 1000,
-                    1
-                )
+            if (data) {
+                let opts: RecurrenceOptions | undefined;
+                if (eventRecurrenceFrequency.value != undefined && eventRecurrenceEndDate.value != undefined) {
+                    opts = new RecurrenceOptions(
+                        eventRecurrenceFrequency.value,
+                        eventRecurrenceEndDate.value,
+                        1
+                    )
+                }
+                
+                manager.createNewEvent(data, opts)
+                    .then((id: string | null) => {
+                        if (!id) throw('No ID returned by the server.')
+                        state.value = VIEW_STATE.SUCCESS;
+                        setTimeout(() => {
+                            router.push(`/events/${id}`);
+                        }, 500);
+                    })
+                    .catch((error: any) => {
+                        state.value = VIEW_STATE.FAILURE;
+                        console.error('Failed to create event. Error: ', error);
+                        toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to create event!', life: 3000 });
+                        setTimeout(() => {
+                            state.value = VIEW_STATE.PENDING;
+                        }, 250);
+                    });
             }
-            
-            manager.createNewEvent(data, opts)
-                .then((id: string | null) => {
-                    if (!id) throw('No ID returned by the server.')
-                    state.value = VIEW_STATE.SUCCESS;
-                    setTimeout(() => {
-                        router.push(`/events/${id}`);
-                    }, 500);
-                })
-                .catch((error: any) => {
-                    state.value = VIEW_STATE.FAILURE;
-                    console.error('Failed to create event. Error: ', error);
-                    toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to create event!', life: 3000 });
-                    setTimeout(() => {
-                        state.value = VIEW_STATE.PENDING;
-                    }, 250);
-                });
         }
+    } catch(error) {
+        state.value = VIEW_STATE.FAILURE;
+        // URGENT: DEV ENV ONLY
+        console.error(`Failed to create event. Error: ${error}`);
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Could not create event!', life: 3000 });
     }
 }
 
@@ -361,11 +371,16 @@ function handleSetExternalLink(event: { link: string }) {
     eventExternalLink.value = event.link;
 }
 
-function handleLimitParticipants(event: { min: number, max: number }) {
+function handleLimitParticipants(event: { min: number, max: number, hasWaitlist: boolean }) {
     participantModalRef.value?.close();
-    eventMinParticipants.value = event.min;
-    eventMaxParticipants.value = event.max;
+    participantsConfig.value = new ParticipantsConfig(event.hasWaitlist, event.min, event.max);
 }
+
+onMounted(() => {
+    if (session.sports.length > 0) {
+        eventSports.value.push(session.sports[0])
+    }
+});
 
 useSeoMeta({
     title: () => 'New Event | Olympsis',
@@ -409,14 +424,10 @@ useSeoMeta({
         }
 
         #event-type-config {
-            margin: 0.5rem 1rem;
+            gap: 0.5rem;
             display: flex;
             max-width: 22rem;
-            justify-content: space-between;
-
-            .spacer {
-                margin: 0rem 0.5rem;
-            }
+            margin: 0.5rem 1rem;
         }
 
         #note {
@@ -500,39 +511,40 @@ useSeoMeta({
 
 .event-section {
     margin: 1rem;
+}
 
-    .label {
-        display: flex;
-        color: var(--primary-label-color);
-    }
+.label {
+    display: flex;
+    font-weight: 500;
+    color: var(--primary-label-color);
+}
 
-    .sub-label {
-        color: gray;
-        font-size: 0.8rem;
-        margin-bottom: 0.4rem;
-    }
+.sub-label {
+    color: gray;
+    font-size: 0.8rem;
+    margin-bottom: 0.4rem;
+}
 
-    .text-input {
-        width: 100%;
-        height: 2.5rem;
-        border: unset;
-        font-size: 1.3rem;
-        padding: 0rem 0.5rem;
-        border-radius: 10px;
-        color: var(--primary-label-color);
-        background-color: var(--secondary-background-color);
-    }
+.text-input {
+    width: 100%;
+    height: 2.5rem;
+    border: unset;
+    font-size: 1.3rem;
+    padding: 0rem 0.5rem;
+    border-radius: 10px;
+    color: var(--primary-label-color);
+    background-color: var(--secondary-background-color);
+}
 
-    .text-large {
-        width: 100%;
-        height: 6rem;
-        border: unset;
-        padding: 0.5rem;
-        font-size: 1.3rem;
-        border-radius: 10px;
-        color: var(--primary-label-color);
-        background-color: var(--secondary-background-color);
-    }
+.text-large {
+    width: 100%;
+    height: 6rem;
+    border: unset;
+    padding: 0.5rem;
+    font-size: 1.3rem;
+    border-radius: 10px;
+    color: var(--primary-label-color);
+    background-color: var(--secondary-background-color);
 }
 
 .error {
@@ -547,6 +559,10 @@ useSeoMeta({
 
 .asterisk {
     color: var(--tertiary-brand-color);
+}
+
+#event-sports-picker {
+    margin: 0rem 1rem;
 }
 
 #settings-modal{

@@ -73,11 +73,11 @@ class Event extends Codable<Event> {
         stopTime: Date,
         visibility: EVENT_VISIBILITY,
         createdAt: Date,
-        updatedAt: Date,
+        updatedAt: Date | undefined,
         isSensitive: boolean,
         participants: Participant[],
         participantsWaitlist: Participant[],
-        participantsConfig: ParticipantsConfig,
+        participantsConfig: ParticipantsConfig | undefined,
         teams: Team[],
         teamsWaitlist: Team[],
         teamsConfig?: TeamsConfig,
@@ -340,8 +340,8 @@ class EventDao extends Codable<EventDao> {
     
     formatConfig?: EventFormatConfig;
     
-    startTime?: number;
-    stopTime?: number;
+    startTime?: Date;
+    stopTime?: Date;
     
     participantsConfig?: ParticipantsConfig;
     teamsConfig?: TeamsConfig;
@@ -400,11 +400,11 @@ class EventDao extends Codable<EventDao> {
         this.formatConfig = formatConfig;
         
         if (startTime) {
-            this.startTime = Math.floor(startTime.getTime() / 1000);
+            this.startTime = startTime
         }
         
         if (stopTime) {
-            this.stopTime = Math.floor(stopTime.getTime() / 1000);
+            this.stopTime = stopTime
         }
         
         this.participantsConfig = participantsConfig;
@@ -604,12 +604,12 @@ class NewEventDao extends Codable<NewEventDao> {
 
 class RecurrenceOptions extends Codable<RecurrenceOptions> {
     pattern: string
-    endTime: number
+    endTime: Date
     interval: number
 
     constructor(
         pattern: string,
-        endTime: number,
+        endTime: Date,
         interval: number
     ) {
         super();
@@ -622,7 +622,7 @@ class RecurrenceOptions extends Codable<RecurrenceOptions> {
         const data: { [key: string]: any } = {};
 
         data['pattern'] = this.pattern;
-        data['end_time'] = this.endTime;
+        data['end_time'] = this.endTime.toString();
         data['interval'] = this.interval;
 
         return data;
@@ -631,13 +631,13 @@ class RecurrenceOptions extends Codable<RecurrenceOptions> {
 
 class EventRecurrenceConfig extends Codable<EventRecurrenceConfig> {
     recurrenceRule?: string;
-    recurrenceEnd?: number;
+    recurrenceEnd?: Date;
     parentEventId?: string;
     deletedInstances?: string[];
 
     constructor(
         recurrenceRule?: string,
-        recurrenceEnd?: number,
+        recurrenceEnd?: Date,
         parentEventId?: string,
         deletedInstances?: string[]
     ) {
@@ -669,7 +669,7 @@ class EventRecurrenceConfig extends Codable<EventRecurrenceConfig> {
             data['recurrence_rule'] = this.recurrenceRule;
         }
         if (this.recurrenceEnd !== undefined) {
-            data['recurrence_end'] = this.recurrenceEnd;
+            data['recurrence_end'] = this.recurrenceEnd.toString();
         }
         if (this.parentEventId) {
             data['parent_event_id'] = this.parentEventId;
@@ -792,8 +792,8 @@ class EventFormatConfig extends Codable<EventFormatConfig> {
     currentRound?: number;
     bracketData?: any;
     
-    registrationStart?: number;
-    registrationEnd?: number;
+    registrationStart?: Date;
+    registrationEnd?: Date;
     allowLateRegistration?: boolean;
 
     constructor(
@@ -805,8 +805,8 @@ class EventFormatConfig extends Codable<EventFormatConfig> {
         rounds?: number,
         currentRound?: number,
         bracketData?: any,
-        registrationStart?: number,
-        registrationEnd?: number,
+        registrationStart?: Date,
+        registrationEnd?: Date,
         allowLateRegistration?: boolean
     ) {
         super();
@@ -872,10 +872,10 @@ class EventFormatConfig extends Codable<EventFormatConfig> {
             data['bracket_data'] = this.bracketData;
         }
         if (this.registrationStart !== undefined) {
-            data['registration_start'] = this.registrationStart;
+            data['registration_start'] = this.registrationStart.toString();
         }
         if (this.registrationEnd !== undefined) {
-            data['registration_end'] = this.registrationEnd;
+            data['registration_end'] = this.registrationEnd.toString();
         }
         if (this.allowLateRegistration !== undefined) {
             data['allow_late_registration'] = this.allowLateRegistration;
@@ -884,7 +884,6 @@ class EventFormatConfig extends Codable<EventFormatConfig> {
         return data;
     }
 }
-
 
 class Team extends Codable<Team> {
     id: string;

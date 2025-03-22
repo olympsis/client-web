@@ -183,7 +183,7 @@ onMounted(() => {
     // TODO: Add the ability to remember selections
     const session = useSessionStore();
     session.user?.sports?.forEach((s) => {
-        const found = session.sports.find((sp) => sp.name == s);
+        const found = session.sports.find((sp) => sp.name.includes(s));
         if (found) {
             selectedSports.value.push(found);
         }

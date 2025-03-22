@@ -123,14 +123,26 @@ const selectedSports: Ref<Array<Sport>> = ref([]);
 const eventSettingsModalRef = useTemplateRef<HTMLDialogElement>('event-settings-modal');
 
 const filteredEvents = computed<Array<Event>>(() => {
-    return events.value.filter((e) => {
+    return events.value.filter((e) => { // Filter by other criteria
         var includesSport = e.sports?.find((s: string) => {
-            return selectedSports.value.find((sp) => sp.name == s);
+            return selectedSports.value.find((sp) => sp.name.includes(s));
+        });
+
+        var includesTag = e.tags?.find((t) => {
+            return selectedTags.value.find((tg) => tg.name.includes(t));
         });
 
         var containsSearch = e.title?.toLowerCase().includes(searchText.value.toLowerCase());
 
-        return e && includesSport && containsSearch;
+        if (selectedSports.value.length > 0 && selectedTags.value.length > 0) {
+            return includesSport && includesTag && containsSearch;
+        } else if (selectedSports.value.length > 0 && selectedTags.value.length == 0) {
+            return includesSport && containsSearch;
+        } else if (selectedSports.value.length == 0 && selectedTags.value.length > 0) {
+            return includesTag && containsSearch;
+        } else {
+            return e && containsSearch;
+        }
     });
 });
 
@@ -268,7 +280,7 @@ onMounted(() => {
     // TODO: Add the ability to remember selections
     const session = useSessionStore();
     session.user?.sports?.forEach((s) => {
-        const found = session.sports.find((sp) => sp.name == s);
+        const found = session.sports.find((sp) => sp.name.includes(s));
         if (found) {
             selectedSports.value.push(found);
         }

@@ -9,7 +9,7 @@
                 Limit Participants
             </div>
 
-            <button class="primary button" @click="$emit('done', { min, max })">
+            <button class="primary button" @click="$emit('done', { min, max, hasWaitlist })">
                 Done
             </button>
         </div>
@@ -42,14 +42,30 @@
                     <input type="number" v-model="max"/>
                 </div>
             </div>
+
+            <div class="section">
+                <div class="header">
+                    Add a Waitlist
+                </div>
+                <div class="sub-header">
+                    Allow extra participants to join if spots open up.
+                </div>
+
+                <div id="input" :style="{marginTop: '0.5rem'}">
+                    <ToggleSwitch v-model="hasWaitlist"/>
+                </div>
+            </div>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
 import Slider from 'primevue/slider';
+import ToggleSwitch from 'primevue/toggleswitch';
+
 const min = ref<number>(0);
 const max = ref<number>(0);
+const hasWaitlist = ref<boolean>(false);
 </script>
 
 <style scoped>

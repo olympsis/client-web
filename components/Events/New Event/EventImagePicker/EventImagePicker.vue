@@ -52,12 +52,13 @@ import { SPORTS, sportsInternalImages} from '~/data/Enums';
 
 import Dialog from 'primevue/dialog';
 import MediaPicker from '@/components/MediaPicker/MediaPicker.vue';
+import type { Sport } from '~/data/models/GenericModels';
 
-const selectedSport = defineModel('selectedSport', { default: SPORTS.SOCCER });
+const selectedSport = defineModel<Sport>('selectedSport', { required: true });
 const selectedImage = defineModel('selectedImage', { default: '' });
 
 const images: ComputedRef<string[]> = computed(() => {
-    return sportsInternalImages(selectedSport.value)
+    return selectedSport.value.images;
 });
 
 const fileInput: ShallowRef<HTMLInputElement | null> =  useTemplateRef('file-input');
@@ -68,7 +69,7 @@ const mediaCropShape = ref(CROP_SHAPE.PORTRAIT);
 const uploadedMediaURL = ref<string | undefined>(undefined);
 
 watch(selectedSport, (newValue, _) => {
-    const imageList = sportsInternalImages(newValue);
+    const imageList = selectedSport.value.images;
     const first = imageList[0];
     if (uploadedMediaURL.value) {
         selectedImage.value = uploadedMediaURL.value;

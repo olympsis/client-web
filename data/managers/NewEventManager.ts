@@ -1,17 +1,13 @@
-import { SPORTS } from '../Enums';
 import { v4 as uuidv4 } from 'uuid';
-import { UserSnippet } from "../models/UserModels";
-import { useModelStore } from "@/stores/model-store";
-import { Event, EventDao, NewEventDao, RecurrenceOptions } from "../models/EventModels";
 import { EventService } from "../services/EventService";
+import { MEDIA_TYPE, EVENT_VISIBILITY } from '../Enums';
 import { useSessionStore } from "@/stores/session-store";
 import { UploadService } from "../services/UploadService";
-import { EVENT_RSVP_STATUS, EVENT_SKILL_LEVEL, EVENT_TYPE, EVENT_VISIBILITY } from '../Enums';
-import { Participant, type GroupSelection, type VenueDescriptor } from "../models/GenericModels";
+import { Sport, Tag, type GroupSelection, type VenueDescriptor } from "../models/GenericModels";
+import { EventDao, EventFormatConfig, NewEventDao, ParticipantsConfig, RecurrenceOptions, TeamsConfig } from "../models/EventModels";
 
 export class NewEventManager {
 
-    private modelStore = useModelStore();
     private sessionStore = useSessionStore();
     private eventService = new EventService();
     private uploadService = new UploadService();
@@ -59,44 +55,47 @@ export class NewEventManager {
      * @returns an EventDao object if successful or null if an error occurred
      */
     public generateNewEventData(
-        type: EVENT_TYPE,
         visibility: EVENT_VISIBILITY,
-        skillLevel: EVENT_SKILL_LEVEL,
         organizers: GroupSelection[],
-        sports: SPORTS[],
+        tags: Tag[],
+        sports: Sport[],
         title: string,
         description: string,
         venues: VenueDescriptor[],
         startDate: Date,
-        endDate: Date | undefined,
-        imageURL: string,
-        minParticipants: number | undefined,
-        maxParticipants: number | undefined
-    ) : EventDao | null {
+        endDate: Date,
+        mediaType: MEDIA_TYPE,
+        mediaURL: string,
+        formatConfig?: EventFormatConfig,
+        participantsConfig?: ParticipantsConfig,
+        teamsConfig?: TeamsConfig,
+        externalLink?: string
+    ) : EventDao {
         const user = this.sessionStore.user;
         const uuid = user?.uuid;
 
         if (uuid) {
             return new EventDao(
-                type,
-                visibility,
-                uuid,
+                undefined,
                 organizers,
                 venues,
-                imageURL,
+                mediaURL,
+                mediaType,
                 title,
                 description,
-                sports,
-                skillLevel,
+                sports.map((s: Sport) => s.name.split(' ')[1]),
+                tags.map((t: Tag) => t.name.split(' ')[1]),
+                formatConfig,
                 startDate,
                 endDate,
-                minParticipants,
-                maxParticipants,
-                undefined   
+                participantsConfig,
+                teamsConfig,
+                visibility,
+                externalLink
             );
         }
 
-        return null;
+        throw('Failed to find user data. Cannot create event object.');
     }
 
     /**
@@ -108,12 +107,12 @@ export class NewEventManager {
     public async createNewEvent(dao: EventDao, opts?: RecurrenceOptions) : Promise <string | null> {
         let isCustomImage = false;
         try {
-            if (!dao.imageURL) throw('Event Image Required!');
+            if (!dao.mediaURL) throw('Event Image Required!');
 
             // Upload event image if it's needed
-            const img = await this.uploadEventImage(dao.imageURL);
+            const img = await this.uploadEventImage(dao.mediaURL);
             if (img) {
-                dao.imageURL = img;
+                dao.mediaURL = img;
                 isCustomImage = true;
             }
 
@@ -132,60 +131,10 @@ export class NewEventManager {
             }
         } catch(error) {
             // Only delete the uploaded image on error if it's a custom uploaded one
-            if (dao.imageURL && isCustomImage) await this.uploadService.deleteImage(dao.imageURL, 'olympsis-event-images');
+            if (dao.mediaURL && isCustomImage) await this.uploadService.deleteImage(dao.mediaURL, 'olympsis-event-images');
             console.error(`Failed to create new event. Error: ${error}`)
             return null;
         }
-    }
-
-    /**
-     * Creates the carbon copy of the new event model pushed to the server client side.
-     * 
-     * @param id - the new model's id
-     * @param dao - the object used to create the new model server-side
-     */
-    public generateNewEventModel(id: string, dao: EventDao) : Event {
-        const user = this.sessionStore.user;
-        
-        const timestamp = Math.floor(new Date().getTime() / 1000);
-
-        const snippet = new UserSnippet(
-            user?.uuid,
-            user?.username ?? 'olympsis-user',
-            user?.imageURL
-        );
-
-        const participant = new Participant(
-            snippet,
-            EVENT_RSVP_STATUS.YES,
-            timestamp
-        );
-        
-        const event =  new Event(
-            id,
-            dao.type ?? EVENT_TYPE.REGULAR,
-            snippet,
-            dao.organizers ?? [],
-            dao.venues ?? [],
-            dao.imageURL ?? '',
-            dao.title ?? 'Olympsis Event',
-            dao.body ?? 'Olympsis Event Body',
-            dao.sports ?? [],
-            dao.level ?? EVENT_SKILL_LEVEL.ANY_LEVEL,
-            dao.startTime ?? 0,
-            dao.stopTime ?? 0,
-            dao.minParticipants,
-            dao.maxParticipants,
-            [participant],
-            [],
-            dao.visibility ?? EVENT_VISIBILITY.PUBLIC,
-            dao.externalLink,
-            timestamp ?? 0,
-        );
-
-        this.modelStore.setEvent(event);
-
-        return event;
     }
 
     /**

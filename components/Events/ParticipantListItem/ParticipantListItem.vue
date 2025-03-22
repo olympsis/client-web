@@ -29,6 +29,7 @@
 import { EVENT_RSVP_STATUS } from '~/data/Enums';
 import { Participant } from '~/data/models/GenericModels';
 
+import Menu from 'primevue/menu';
 import UserIcon from '@/components/UserIcon/UserIcon.vue';
 
 const props = defineProps({

@@ -47,19 +47,18 @@
 </template>
 
 <script setup lang="ts">
+import { useRoute } from 'vue-router';
 import { VIEW_STATE } from '@/data/Enums';
-import { useToast } from 'primevue/usetoast';
 import { Club } from '@/data/models/ClubModels';
-import { useRoute, useRouter } from 'vue-router';
 import { Venue } from '@/data/models/VenueModels';
 import { Event } from '@/data/models/EventModels';
 import { useModelStore } from '@/stores/model-store';
 import { UserSnippet } from '@/data/models/UserModels';
 import { useSessionStore } from '@/stores/session-store';
 import { generateImageURL } from '~/utils/image-helpers';
+import { computed, ref, type Ref, useTemplateRef, } from 'vue';
 import { Organization } from '@/data/models/OrganizationModels';
 import { Participant, ParticipantDao } from '@/data/models/GenericModels';
-import { computed, ref, type Ref, useTemplateRef, } from 'vue';
 
 import EventBody from '~/components/Events/EventBody/EventBody.vue';
 import EventMedia from '~/components/Events/EventMedia/EventMedia.vue';

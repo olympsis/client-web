@@ -46,7 +46,7 @@
             <div id="sports" class="section">
                 <div class="title">Sports</div>
                 <div class="sub-title">What athletic activities are you into?</div>
-                <MultiSportsPicker :multi-select="true" v-model:model-value="userSports"/>
+                <MultiSportsPicker :multi-select="true" :sports="session.sports" v-model:model-value="userSports"/>
             </div>
 
             <div id="hometown" class="section">
@@ -76,14 +76,15 @@
 <script setup lang="ts">
 import { v4 as uuidv4 } from 'uuid';
 import { UserDTO } from '~/data/models/UserModels';
+import { CROP_SHAPE, VIEW_STATE } from '~/data/Enums';
 import type { CroppedMedia } from '~/data/GlobalData';
 import { UserService } from '~/data/services/UserService';
 import { UploadService } from "@/data/services/UploadService";
-import { CROP_SHAPE, SPORTS, VIEW_STATE } from '~/data/Enums';
 
 import MediaPicker from '~/components/MediaPicker/MediaPicker.vue';
 import LocalePicker from '~/components/LocalePicker/LocalePicker.vue';
 import MultiSportsPicker from '~/components/MultiSportsPicker/MultiSportsPicker.vue';
+import type { Sport } from '~/data/models/GenericModels';
 
 
 const session = useSessionStore();
@@ -94,7 +95,7 @@ const uploadService = new UploadService();
 const bio = ref<string>('');
 const username = ref<string>('');
 const homeTownCoordinates = ref<number[]>([]);
-const userSports = ref<SPORTS[]>([SPORTS.RUNNING]);
+const userSports = ref<Sport[]>([]);
 const viewState = ref<VIEW_STATE>(VIEW_STATE.PENDING);
 
 const imageInputRef = useTemplateRef<HTMLInputElement>('image-input');
@@ -182,7 +183,9 @@ async function updateUserProfile() {
         update.bio = bio.value;
     }
 
-    update.sports = userSports.value.map((s) => s.valueOf());
+    update.sports = userSports.value.map((s) => {
+        return s.name.split(' ')[1]
+    });
 
     if (homeTownCoordinates.value.length > 0) {
         update.hometown = homeTownCoordinates.value;
@@ -233,7 +236,12 @@ onMounted(() => {
 
     bio.value = user.bio ?? '';
     username.value = user.username ?? 'olympsis-user';
-    userSports.value = user.sports ?? []
+    user.sports.forEach((s) => {
+        const found = session.sports.find((sp) => sp.name.includes(s));
+        if (found) {
+            userSports.value.push(found);
+        }
+    })
 
     if (user.imageURL) {
         profileImageURL.value = generateImageURL(user.imageURL);

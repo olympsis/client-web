@@ -10,13 +10,6 @@
                         <img src="@/assets/icons/chevron/chevron.left.svg"/>
                     </picture>
                 </button>
-
-                <button class="button" @click="settingsModalRef?.show()">
-                    <picture class="centered">
-                        <source srcset="@/assets/icons/gear/gear.white.svg" media="(prefers-color-scheme: dark)">
-                        <img src="@/assets/icons/gear/gear.svg"/>
-                    </picture>
-                </button>
             </div>
 
             <!-- Title -->
@@ -45,6 +38,7 @@
             <!-- Sports Picker -->
             <div id="event-sports-picker">
                 <div class="label">Event Sport</div>
+                <div class="sub-label"> Choose the event's sport activity </div>
                 <MultiSportsPicker v-model:model-value="eventSports" :sports="session.sports"/>
             </div>
 
@@ -147,7 +141,7 @@
             <!-- Venues Picker -->
             <div id="event-venue-picker" 
                 :class="{ 'event-section': true }"
-                :style="{ marginTop: '2.5rem '}"
+                :style="{ margin: 'unset', marginTop: '2.5rem', marginBottom: '1rem' }"
             >
                 <div :class="{ 
                     label: newEventError !== NEW_EVENT_ERROR.NO_VENUES, 
@@ -162,41 +156,48 @@
                 <EventImagePicker v-model:selected-sport="eventSport" v-model:selected-image="eventImage" />
             </div>
 
+            <!-- Event Tags -->
+            <div id="event-tags-picker">
+                <div class="label">Event Tags</div>
+                <div class="sub-label"> Tags make your event easier to discover. Add a few! </div>
+                
+                <MultiTagsPicker :tags="session.tags" v-model:model-value="eventTags"/>
+            </div>
+
+            <!-- Advanced Settings -->
+            <div id="advanced-settings" @click="showAdvancedSettings = true">
+                Advanced Settings
+                <picture class="centered">
+                    <source srcset="@/assets/icons/gear/gear.white.svg" media="(prefers-color-scheme: dark)">
+                    <img src="@/assets/icons/gear/gear.svg"/>
+                </picture>
+            </div>
+
             <!-- Primary Action -->
             <div id="action-wrapper">
                 <BoldTextButton v-model="state" text="create event" @click="createNewEvent"/>
             </div>
         </div>
 
-        <dialog id="settings-modal" ref="settings-modal" class="dialog">
-            <EventAdvancedSettings 
-                @close="settingsModalRef?.close()"
-                @link="handleShowExternalLinkSetting"
-                @recurrence="handleShowRecurrenceSetting"
-                @participants="handleShowParticipantsSetting"
-            />
-        </dialog>
-
-        <dialog id="participant-modal" ref="participant-modal" class="dialog">
-            <EventParticipantsLimitSettings 
-                @close="participantModalRef?.close()"
-                @done="handleLimitParticipants"
-            />
-        </dialog>
-
-        <dialog id="external-link-modal" ref="external-link-modal" class="dialog">
-            <EventExternalLinkSetting
-                @close="externalLinkModalRef?.close()"
-                @done="handleSetExternalLink"
-            />
-        </dialog>
-
-        <dialog id="recurrence-modal" ref="recurrence-modal" class="dialog">
-            <EventRecurrenceSettings
-                @close="recurrenceModalRef?.close()"
-                @done="handleSetEventRecurrence"
-            />
-        </dialog>
+        <Drawer v-model:visible="showAdvancedSettings" position="right">
+            <template #container="{ closeCallback }">
+                <div id="header" :style="{ display: 'flex', alignItems: 'center' }">
+                    <h2>Advanced Settings</h2>
+                    <button class="button" :style="{ marginRight: '1rem', marginLeft: 'auto' }" @click="closeCallback">
+                        <picture class="centered">
+                            <source srcset="@/assets/icons/xmark/xmark.white.svg" media="(prefers-color-scheme: dark)">
+                            <img src="@/assets/icons/xmark/xmark.svg"/>
+                        </picture>
+                    </button>
+                </div>
+                
+                <EventAdvancedSettings
+                    v-model:participants-config="participantsConfig"
+                    v-model:external-link="eventExternalLink"
+                    v-model:recurrence-options="eventRecurrenceOptions"
+                />
+            </template>
+        </Drawer>
     </div>
 </template>
 
@@ -209,8 +210,10 @@ import { NEW_EVENT_ERROR, NewEventManager } from '~/data/managers/NewEventManage
 import { GroupSelection, Sport, Tag, VenueDescriptor } from '~/data/models/GenericModels';
 import { EventFormatConfig, ParticipantsConfig, RecurrenceOptions } from '~/data/models/EventModels';
 
+import Drawer from 'primevue/drawer';
 import DatePicker from 'primevue/datepicker';
 import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
+import MultiTagsPicker from '~/components/MultiTagsPicker.vue/MultiTagsPicker.vue';
 import MultiSportsPicker from '~/components/MultiSportsPicker/MultiSportsPicker.vue';
 import EventTypePicker from '~/components/Events/New Event/EventTypePicker/EventTypePicker.vue';
 import EventImagePicker from '~/components/Events/New Event/EventImagePicker/EventImagePicker.vue';
@@ -219,9 +222,6 @@ import EventVenuesPicker from '~/components/Events/New Event/EventVenuesPicker/E
 import EventAdvancedSettings from '~/components/Events/New Event/EventAdvancedSettings/EventAdvancedSettings.vue';
 import EventVisibilityPicker from '~/components/Events/New Event/EventVisibilityPicker/EventVisibilityPicker.vue';
 import EventOrganizersPicker from '~/components/Events/New Event/EventOrganizersPicker/EventOrganizersPicker.vue';
-import EventRecurrenceSettings from '~/components/Modals/Events/EventRecurrenceModal/EventRecurrenceSettings.vue';
-import EventExternalLinkSetting from '~/components/Modals/Events/EventExternalLinkSetting/EventExternalLinkSetting.vue';
-import EventParticipantsLimitSettings from '~/components/Modals/Events/EventParticipantsLimitSettings/EventParticipantsLimitSettings.vue';
 
 
 const toast = useToast();
@@ -234,6 +234,8 @@ const newEventError = ref<NEW_EVENT_ERROR | null>(null);
 const eventSport = computed<Sport>(() => {
     return eventSports.value[0];
 });
+
+const showAdvancedSettings = ref<boolean>(false);
 
 const eventTitle = ref<string>('');
 const eventImage = ref<string>('');
@@ -251,15 +253,9 @@ const eventVisibility = ref<EVENT_VISIBILITY>(EVENT_VISIBILITY.PUBLIC);
 const eventStartDate = ref<Date>(new Date());
 const eventEndDate = ref<Date>(new Date(eventStartDate.value.getTime() + (60 * 60 * 1000)));
 
-const eventRecurrenceEndDate = ref<Date | undefined>(undefined);
 const eventFormatConfig = ref<EventFormatConfig | undefined>(undefined);
 const participantsConfig = ref<ParticipantsConfig | undefined>(undefined);
-const eventRecurrenceFrequency = ref<EVENT_RECURRENCE_FREQUENCY | undefined>(undefined);
-
-const settingsModalRef = useTemplateRef<HTMLDialogElement>('settings-modal');
-const recurrenceModalRef = useTemplateRef<HTMLDialogElement>('recurrence-modal');
-const participantModalRef = useTemplateRef<HTMLDialogElement>('participant-modal');
-const externalLinkModalRef = useTemplateRef<HTMLDialogElement>('external-link-modal');
+const eventRecurrenceOptions = ref<RecurrenceOptions | undefined>(undefined);
  
 function createNewEvent() {
     state.value = VIEW_STATE.LOADING;
@@ -300,12 +296,8 @@ function createNewEvent() {
 
             if (data) {
                 let opts: RecurrenceOptions | undefined;
-                if (eventRecurrenceFrequency.value != undefined && eventRecurrenceEndDate.value != undefined) {
-                    opts = new RecurrenceOptions(
-                        eventRecurrenceFrequency.value,
-                        eventRecurrenceEndDate.value,
-                        1
-                    )
+                if (eventRecurrenceOptions.value != undefined) {
+                    opts = eventRecurrenceOptions.value;
                 }
                 
                 manager.createNewEvent(data, opts)
@@ -342,38 +334,6 @@ function handleBackNavigation() {
     } else {
         router.push('/events');
     }
-}
-
-function handleShowRecurrenceSetting() {
-    settingsModalRef?.value?.close();
-    recurrenceModalRef?.value?.show();
-    
-}
-
-function handleShowParticipantsSetting() {
-    settingsModalRef?.value?.close();
-    participantModalRef?.value?.show();
-}
-
-function handleShowExternalLinkSetting() {
-    settingsModalRef?.value?.close();
-    externalLinkModalRef?.value?.show();
-}
-
-function handleSetEventRecurrence(event: { frequency: EVENT_RECURRENCE_FREQUENCY, endDate: Date }) {
-    recurrenceModalRef.value?.close();
-    eventRecurrenceEndDate.value = event.endDate;
-    eventRecurrenceFrequency.value = event.frequency;
-}
-
-function handleSetExternalLink(event: { link: string }) {
-    externalLinkModalRef.value?.close();
-    eventExternalLink.value = event.link;
-}
-
-function handleLimitParticipants(event: { min: number, max: number, hasWaitlist: boolean }) {
-    participantModalRef.value?.close();
-    participantsConfig.value = new ParticipantsConfig(event.hasWaitlist, event.min, event.max);
 }
 
 onMounted(() => {
@@ -443,6 +403,15 @@ useSeoMeta({
         max-width: 30rem;
         margin-left: 2rem;
         flex-direction: column;
+
+        #advanced-settings {
+            gap: 0.5rem;
+            margin: 1rem 0rem;
+            display: flex;
+            cursor: pointer;
+            font-weight: bold;
+            align-items: center;
+        }
 
         #action-wrapper {
             margin-top: 5rem;
@@ -565,59 +534,7 @@ useSeoMeta({
     margin: 0rem 1rem;
 }
 
-#settings-modal{
-    top: 0;
-    border: unset;
-    background: transparent;
-    backdrop-filter: blur(5px);
-
-    #event-advanced-settings {
-        border-radius: 20px;
-        max-width: 25rem !important;
-        box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
-    }
-
-}
-
-#recurrence-modal {
-    top: 0;
-    border: unset;
-    background: transparent;
-    backdrop-filter: blur(5px);
-
-    #event-recurrence-settings {
-        border-radius: 20px;
-        max-width: 25rem !important;
-        box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
-    }
-
-}
-
-#external-link-modal {
-    top: 0;
-    border: unset;
-    background: transparent;
-    backdrop-filter: blur(5px);
-
-    #event-external-link-setting {
-        border-radius: 20px;
-        max-width: 25rem !important;
-        box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
-    }
-
-}
-
-#participant-modal {
-    top: 0;
-    border: unset;
-    background: transparent;
-    backdrop-filter: blur(5px);
-
-    #event-participants-settings {
-        border-radius: 20px;
-        max-width: 25rem !important;
-        box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
-    }
-
+#event-tags-picker {
+    margin-top: 1rem;
 }
 </style>

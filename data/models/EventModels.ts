@@ -359,9 +359,9 @@ class EventDao extends Codable<EventDao> {
     externalLink?: string;
     isSensitive?: boolean;
     
-    createdAt?: number;
-    updatedAt?: number;
-    cancelledAt?: number;
+    createdAt?: Date;
+    updatedAt?: Date;
+    cancelledAt?: Date;
     
     recurrenceConfig?: EventRecurrenceConfig;
 
@@ -422,9 +422,7 @@ class EventDao extends Codable<EventDao> {
         this.externalLink = externalLink;
         this.isSensitive = isSensitive;
         
-        if (cancelledAt) {
-            this.cancelledAt = Math.floor(cancelledAt.getTime() / 1000);
-        }
+        this.cancelledAt = cancelledAt;
         
         this.recurrenceConfig = recurrenceConfig;
     }
@@ -467,10 +465,10 @@ class EventDao extends Codable<EventDao> {
         }
         
         if (this.startTime) {
-            data['start_time'] = this.startTime;
+            data['start_time'] = this.startTime.toISOString();
         }
         if (this.stopTime) {
-            data['stop_time'] = this.stopTime;
+            data['stop_time'] = this.stopTime.toISOString();
         }
         
         if (this.participantsConfig) {
@@ -491,13 +489,13 @@ class EventDao extends Codable<EventDao> {
         }
         
         if (this.createdAt) {
-            data['created_at'] = this.createdAt;
+            data['created_at'] = this.createdAt.toISOString();
         }
         if (this.updatedAt) {
-            data['updated_at'] = this.updatedAt;
+            data['updated_at'] = this.updatedAt.toISOString();
         }
         if (this.cancelledAt) {
-            data['cancelled_at'] = this.cancelledAt;
+            data['cancelled_at'] = this.cancelledAt.toISOString();
         }
         
         if (this.recurrenceConfig) {
@@ -631,7 +629,7 @@ class RecurrenceOptions extends Codable<RecurrenceOptions> {
         const data: { [key: string]: any } = {};
 
         data['pattern'] = this.pattern;
-        data['end_time'] = this.endTime.toString();
+        data['end_time'] = this.endTime.toISOString();
         data['interval'] = this.interval;
 
         return data;
@@ -662,7 +660,9 @@ class EventRecurrenceConfig extends Codable<EventRecurrenceConfig> {
 
         if (data) {
             object['recurrenceRule'] = data['recurrence_rule'];
-            object['recurrenceEnd'] = data['recurrence_end'];
+            if (data['recurrence_end']) {
+                object['recurrenceEnd'] = new Date(data['recurrence_end']);
+            }
             object['parentEventId'] = data['parent_event_id'];
             object['deletedInstances'] = data['deleted_instances'];
         }
@@ -678,7 +678,7 @@ class EventRecurrenceConfig extends Codable<EventRecurrenceConfig> {
             data['recurrence_rule'] = this.recurrenceRule;
         }
         if (this.recurrenceEnd !== undefined) {
-            data['recurrence_end'] = this.recurrenceEnd.toString();
+            data['recurrence_end'] = this.recurrenceEnd.toISOString();
         }
         if (this.parentEventId) {
             data['parent_event_id'] = this.parentEventId;
@@ -881,10 +881,10 @@ class EventFormatConfig extends Codable<EventFormatConfig> {
             data['bracket_data'] = this.bracketData;
         }
         if (this.registrationStart !== undefined) {
-            data['registration_start'] = this.registrationStart.toString();
+            data['registration_start'] = this.registrationStart.toISOString();
         }
         if (this.registrationEnd !== undefined) {
-            data['registration_end'] = this.registrationEnd.toString();
+            data['registration_end'] = this.registrationEnd.toISOString();
         }
         if (this.allowLateRegistration !== undefined) {
             data['allow_late_registration'] = this.allowLateRegistration;

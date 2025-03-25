@@ -84,7 +84,7 @@ export class NewEventManager {
                 title,
                 description,
                 sports.map((s: Sport) => s.name.split(' ')[1]),
-                tags.map((t: Tag) => t.name.split(' ')[1]),
+                tags.map((t: Tag) => t.name),
                 formatConfig,
                 startDate,
                 endDate,

@@ -1,6 +1,6 @@
 <template>
     <div id="event-media">
-        <EventTagsList :tags="tags" :limit="4"/>
+        <EventTagsList :tags="tags" :limit="3"/>
         <div id="share" @click="handleEventSharing">
             <img src="@/assets/icons/share/share.white.svg" alt="share button icon">
         </div>

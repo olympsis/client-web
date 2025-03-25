@@ -262,7 +262,7 @@ class Participant extends Codable<Participant> {
             data['status'] = eventRSVPToNumber(this.status);
         }
         if (this.createdAt) {
-            data['created_at'] = this.createdAt;
+            data['created_at'] = this.createdAt.toISOString();
         }
     
         return data;

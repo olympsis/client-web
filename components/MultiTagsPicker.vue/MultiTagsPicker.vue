@@ -1,0 +1,62 @@
+<template>
+    <ul id="multi-tags-picker">
+        <li v-for="tag in tags" :class="{ selected: model.find((s) => s.name == tag.name) !== undefined }" @click="handleSelectedTag(tag)">
+            {{ tag.name }}
+        </li>
+    </ul>
+</template>
+
+<script setup lang="ts">
+import type { Tag } from '~/data/models/GenericModels';
+
+const props = defineProps({ 
+    tags: { type: Array<Tag>, required: true },
+    multiSelect: { type: Boolean, default: true } 
+});
+const model = defineModel<Array<Tag>>({ 
+    default: [] 
+});
+
+function handleSelectedTag(tag: Tag) {
+    if (props.multiSelect) {
+        const index = model.value.findIndex((t) => t.name === tag.name)
+        if (index !== -1) {
+            model.value.splice(index, 1);
+        } else {
+            model.value.push(tag);
+        }
+    } else {
+        model.value = [tag];
+    }
+}
+</script>
+
+<style scoped>
+#multi-tags-picker {
+    gap: 0.5rem;
+    display: flex;
+    padding: unset;
+    overflow-x: scroll;
+    flex-direction: row;
+    list-style-type: none;
+    margin-bottom: 0.5rem;
+
+    li {
+        display: flex;
+        cursor: pointer;
+        align-items: center;
+        border-radius: 16px;
+        white-space: nowrap;
+        margin-bottom: 0.5rem;
+        padding: 0.25rem 0.75rem;
+        justify-content: center;
+        text-transform: capitalize;
+        border: var(--component-border) solid 1px;
+        background-color: var(--secondary-background-color);
+    }
+
+    .selected {
+        border: var(--secondary-brand-color) solid 1px;
+    }
+}
+</style>

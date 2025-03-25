@@ -39,8 +39,9 @@ const tagsFiltered = computed<string[]>(() => {
         font-weight: 500;
         font-size: 0.8rem;
         border-radius: 20px;
-        padding: 0.5rem 1rem;
         border-radius: 20px;
+        white-space: nowrap;
+        padding: 0.5rem 1rem;
         border: 1px solid gray;
         text-transform: capitalize;
         backdrop-filter: blur(20px);
@@ -67,6 +68,7 @@ const tagsFiltered = computed<string[]>(() => {
         padding: 1rem;
         width: 0.8rem;
         height: 0.8rem;
+        color: white;
         cursor: pointer;
         font-size: 0.8rem;
         font-weight: bold;

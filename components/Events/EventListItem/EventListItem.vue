@@ -3,7 +3,7 @@
         <!-- Event Image -->
         <div id="header">
             <img class="image" :src="image">
-            <EventTagsList :tags="tags"/>
+            <EventTagsList :tags="tags" :limit="2"/>
         </div>
 
         <!-- Bottom Bar (Event Details) -->

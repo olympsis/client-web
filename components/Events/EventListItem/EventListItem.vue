@@ -3,9 +3,7 @@
         <!-- Event Image -->
         <div id="header">
             <img class="image" :src="image">
-            <div id="sports">
-                <div v-for="sport in event.sports" class="sport">{{ sport }}</div>
-            </div>
+            <EventTagsList :tags="tags"/>
         </div>
 
         <!-- Bottom Bar (Event Details) -->
@@ -47,16 +45,47 @@
 </template>
 
 <script setup lang="ts">
-import { EVENT_STATE, VIEW_STATE } from '~/data/Enums';
+import { Venue } from '~/data/models/VenueModels';
 import { Event } from '~/data/models/EventModels';
-import type { Venue } from '~/data/models/VenueModels';
+import { EVENT_STATE, VIEW_STATE } from '~/data/Enums';
 import { generateImageURL } from '~/utils/image-helpers';
+
+import EventTagsList from '../EventTagsList/EventTagsList.vue';
 
 const emit = defineEmits(
     ["selected"]
 );
 const props = defineProps({
     event: { type: Event, required: true }
+});
+
+const state = ref(VIEW_STATE.LOADING);
+const image = computed(() => {
+    return props.event.mediaURL ? generateImageURL(props.event.mediaURL) : undefined;
+});
+
+const venues: Ref<Venue[]> = ref([]);
+const venueName: ComputedRef<string> = computed(() => {
+    const venuesLength = props.event.venues.length;
+    if (venuesLength == 1) {
+        return (venues.value[0]?.name ?? props.event.venues[0]?.name) ?? 'Unknown Venue';
+    } else if (venuesLength > 1) {
+        return `${venues.value[0]?.name} & ${venues.value.length-1} more`
+    } else {
+        return 'Unknown Venue';
+    }
+});
+
+const tags = computed<string[]>(() => {
+    var labels: string[] = [];
+    if (props.event.isFull()) {
+        labels.push('full');
+    } 
+    if (props.event.isCompetition()) {
+        labels.push('tournament');
+    }
+
+    return [...labels, ...props.event.sports, ...props.event.tags];
 });
 
 const status = ref<EVENT_STATE>(EVENT_STATE.PENDING);
@@ -88,23 +117,6 @@ const interval = setInterval(updateStatus, 30000);
 
 onUnmounted(() => {
     clearInterval(interval);
-});
-
-const state = ref(VIEW_STATE.LOADING);
-const image = computed(() => {
-    return props.event.mediaURL ? generateImageURL(props.event.mediaURL) : undefined;
-});
-
-const venues: Ref<Venue[]> = ref([]);
-const venueName: ComputedRef<string> = computed(() => {
-    const venuesLength = props.event.venues.length;
-    if (venuesLength == 1) {
-        return (venues.value[0]?.name ?? props.event.venues[0]?.name) ?? 'Unknown Venue';
-    } else if (venuesLength > 1) {
-        return `${venues.value[0]?.name} & ${venues.value.length-1} more`
-    } else {
-        return 'Unknown Venue';
-    }
 });
 
 async function loadLocationData() {
@@ -147,11 +159,12 @@ loadLocationData()
     background-color: var(--secondary-background-color);
 
     #header {
-        #sports {
+        #event-tags-list {
             top: 1rem;
             left: 1rem;
-            display: flex;
+            width: 90%;
             position: absolute;
+            padding-bottom: 0.5rem;
         }
 
         .sport {
@@ -159,7 +172,6 @@ loadLocationData()
             padding: 0.5rem 1rem;
             font-size: 0.8rem;
             border-radius: 20px;
-            /* background-color: black; */
             text-transform: capitalize;
             background-blend-mode: hard-light;
 

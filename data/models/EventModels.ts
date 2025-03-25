@@ -292,6 +292,15 @@ class Event extends Codable<Event> {
     }
 
     /**
+     * Checks wether or not an event is full
+     * @returns boolean indicating status
+     */
+    isFull(): boolean {
+        if (!this.participantsConfig?.maxParticipants) return false;
+        return this.participantsConfig?.maxParticipants <= this.participants.length;
+    }
+
+    /**
      * Returns the event's configuration minimum participants
      * @returns 
      */

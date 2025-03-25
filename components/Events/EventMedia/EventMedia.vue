@@ -1,8 +1,6 @@
 <template>
     <div id="event-media">
-        <div id="sports">
-            <SportLabel v-for="sport in event.sports" :sport="sport"/>
-        </div>
+        <EventTagsList :tags="tags" :limit="4"/>
         <div id="share" @click="handleEventSharing">
             <img src="@/assets/icons/share/share.white.svg" alt="share button icon">
         </div>
@@ -14,18 +12,29 @@
 import { useToast } from '#imports';
 import { generateImageURL } from '#imports';
 import { Event } from '~/data/models/EventModels';
-import SportLabel from '~/components/SportLabel/SportLabel.vue';
+import EventTagsList from '../EventTagsList/EventTagsList.vue';
 
-defineProps({
+const props = defineProps({
     event: { type: Event, required: true }
 });
 
+const toast = useToast();
+const tags = computed<string[]>(() => {
+    var labels = [];
+    if (props.event.isFull()) {
+        labels.push('full');
+    } 
+    if (props.event.isCompetition()) {
+        labels.push('tournament');
+    }
+
+    return [...labels, ...props.event.sports, ...props.event.tags];
+});
 function handleEventSharing() {
     navigator.clipboard.writeText(window.location.href);
     toast.add({ severity: 'secondary', summary: 'Link Copied', detail: 'You\'ve copied the link to this event', life: 3000 });
 }
 
-const toast = useToast();
 </script>
 
 <style scoped>
@@ -35,9 +44,11 @@ const toast = useToast();
     max-width: 30rem;
     position: relative;
 
-    #sports {
+    #event-tags-list {
         margin: 1rem;
         position: absolute;
+        padding-bottom: 0.5rem;
+        max-width: calc(100% - 80px);
     }
 
     #media {

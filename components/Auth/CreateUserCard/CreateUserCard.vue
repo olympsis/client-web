@@ -23,9 +23,10 @@
             <p>The sports you like to play or learning to play</p>
 
             <div id="list">
-                <SportIconLabel v-for="sport in SPORTS" :sport="sport" @click="handleSelectedSport(sport)" :is-selected="selectedSports.find((s) => { return s == sport }) != null"/>
+                <li v-for="sport in session.sports" :class="{ sport: true, selected: selectedSports.find((s) => s.name == sport.name) !== undefined }" @click="handleSelectedSport(sport)">
+                    {{ sport.name }}
+                </li>
             </div>
-            
         </div>
 
         <button id="action-button" @click="completeAccountCreation"> 
@@ -35,12 +36,13 @@
 </template>
 
 <script setup lang="ts">
+import { VIEW_STATE } from '@/data/Enums';
 import { ref, type Ref, watch } from 'vue';
-import { SPORTS, VIEW_STATE } from '@/data/Enums';
+import { Sport } from '~/data/models/GenericModels';
 import { useSessionStore } from '@/stores/session-store';
 import { UserService } from '~/data/services/UserService';
+import sampleSports from '~/data/dev-data/sample-sports';
 
-import SportIconLabel from '@/components/SportIconLabel/SportIconLabel.vue';
 import TextButton from '@/components/Buttons/LoadingButtons/TextButton/TextButton.vue';
 
 const session = useSessionStore();
@@ -49,7 +51,7 @@ const emits = defineEmits([ 'submit' ]);
 const model = defineModel('state', { default: VIEW_STATE.PENDING });
 
 const username: Ref<string> = ref('');
-const selectedSports: Ref<SPORTS[]> = ref([]);
+const selectedSports: Ref<Sport[]> = ref([]);
 const state: Ref<VIEW_STATE> = ref(VIEW_STATE.PENDING);
 
 let isInitialRun = true;
@@ -83,9 +85,9 @@ watch(username, (newValue, _) => {
     }
 });
 
-function handleSelectedSport(sport: any) {
+function handleSelectedSport(sport: Sport) {
     const index = selectedSports.value.findIndex((s) => {
-        return s == sport;
+        return s.name == sport.name;
     });
 
     if (index != -1) {
@@ -222,12 +224,34 @@ function completeAccountCreation() {
         }
 
         #list {
+            padding: 0;
+            width: 100%;
+            gap: 0.5rem;
             display: flex;
-            height: 10rem;
-            flex-wrap: wrap;
-            margin: 1rem 0rem;
-            overflow-y: scroll;
-            justify-content: center;
+            max-height: 10rem;
+            padding: 1rem 0rem;
+            overflow-x: scroll;
+            flex-direction: column;
+            list-style-type: none;
+            max-width: var(--desktop-max-width);
+
+            .sport {
+                display: flex;
+                cursor: pointer;
+                align-items: center;
+                border-radius: 16px;
+                white-space: nowrap;
+                margin-bottom: 0.25rem;
+                padding: 0.25rem 0.75rem;
+                justify-content: center;
+                text-transform: capitalize;
+                border: var(--component-border) solid 1px;
+                background-color: var(--secondary-background-color);
+            }
+
+            .selected {
+                border: var(--secondary-brand-color) solid 1px;
+            }
         }
     }
 

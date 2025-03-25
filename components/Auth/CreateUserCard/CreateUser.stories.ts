@@ -1,4 +1,5 @@
 import CreateUserCard from "./CreateUserCard.vue";
+import sampleSports from "~/data/dev-data/sample-sports";
 
 export default {
   component: CreateUserCard,

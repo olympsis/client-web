@@ -165,7 +165,7 @@ function fetchMapImage() {
     border-radius: 12px;
     padding: 0.5rem 1rem;
     text-transform: capitalize;
-    background-color: #E4E4E4;
+    background-color: var(--tertiary-background-color);
     border: rgb(0, 0, 0, 0.1) solid 1px;
 }
 

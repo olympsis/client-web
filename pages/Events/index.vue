@@ -262,13 +262,14 @@ definePageMeta({
 
 <style scoped>
 #events {
+    gap: 0.5rem;
     width: 100%;
     display: grid;
     height: 100dvh;
     overflow-y: scroll;
-    padding: 1rem 2rem;
+    padding: 0rem 2rem;
     justify-content: center;
-    grid-template-rows: 4rem 6rem auto auto auto;
+    grid-template-rows: 4rem 2.5rem auto auto auto;
     grid-template-areas: 
     "header"
     "sub-header"
@@ -292,6 +293,7 @@ definePageMeta({
         }
         
         #actions {
+            display: flex;
             border-radius: 15px;
             padding: 0.5rem 0.5rem 0.25rem 0.5rem;
             background-color: var(--primary-brand-color);
@@ -318,7 +320,6 @@ definePageMeta({
 
     #sub-header {
         display: flex;
-        margin: 0.5rem 0rem;
 
         #filter {
             display: flex;
@@ -355,6 +356,7 @@ definePageMeta({
             'search';
             
             #actions {
+                display: flex;
                 margin-left: auto;
 
                 #past-events-button {
@@ -526,5 +528,10 @@ definePageMeta({
             width: 98%;
         }
     }
+}
+
+h1 {
+    margin-right: 1rem;
+    white-space: nowrap;
 }
 </style>

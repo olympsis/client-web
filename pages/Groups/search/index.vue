@@ -9,15 +9,8 @@
             </div>
 
             <div id="trailing">
-                <picture id="plus" @click="router.push('/groups/new');">
-                    <source srcset="@/assets/icons/plus/plus.white.svg" media="(prefers-color-scheme: dark)">
-                    <img src="@/assets/icons/plus/plus.svg">
-                </picture>
-
-                <picture id="settings">
-                    <source srcset="@/assets/icons/gear/gear.white.svg" media="(prefers-color-scheme: dark)">
-                    <img src="@/assets/icons/gear/gear.svg">
-                </picture>
+                <img id="plus" src="@/assets/icons/plus/plus.white.svg">
+                <img id="settings" src="@/assets/icons/gear/gear.white.svg">
             </div>
         </div>
 
@@ -70,16 +63,14 @@
 </template>
 
 <script setup lang="ts">
+import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { VIEW_STATE } from '@/data/Enums';
 import type { Ref, ComputedRef } from 'vue';
-import { computed, ref, useTemplateRef } from 'vue';
-
 import { Club } from '@/data/models/ClubModels';
-import { SPORTS, stringToSport, VIEW_STATE } from '@/data/Enums';
-import { GroupSelection, Location, Sport, Tag } from '@/data/models/GenericModels';
-
 import { useModelStore } from '@/stores/model-store';
 import { useSessionStore } from '@/stores/session-store';
+import { Location, Sport, Tag } from '@/data/models/GenericModels';
 
 import Drawer from 'primevue/drawer';
 import SearchBar from '@/components/SearchBar/SearchBar.vue';
@@ -91,7 +82,7 @@ import ClubListCardTemplate from '@/components/Groups/Clubs/ClubListCardTemplate
 
 const router = useRouter();
 const modelStore = useModelStore();
-const sessionStore = useSessionStore();
+const session = useSessionStore();
 
 const state = ref(VIEW_STATE.SUCCESS);
 const searchText: Ref<string> = ref('');
@@ -106,41 +97,45 @@ const clubs: Ref<Club[]> = ref([]);
 const filteredClubs: ComputedRef<Club[]> = computed(() => {
     return clubs.value
     .filter((c) => { // Filter out user's clubs
-        return !sessionStore.groups.some((g) => {
+        return !session.groups.some((g) => {
             const groupID = g.club?.id ?? g.organization?.id;
             return groupID === c.id;
         });
     })
     .filter((c) => { // Filter by other criteria
-        var includesSport = c.sports?.find((s: string) => {
-            return selectedSports.value.find((sp) => sp.name == s);
-        });
+        const searchTextValue = searchText.value || '';
+        const containsSearch = c.name ? 
+            c.name.toLowerCase().includes(searchTextValue.toLowerCase()) : 
+            false;
 
-        var includesTag = c.tags?.find((t) => {
-            return selectedTags.value.find((tg) => tg.name == t);
-        });
+        // Check if club contains any of the selected sports
+        const includesSport = !c.sports ? false : 
+            c.sports.some((s: string) => 
+                selectedSports.value.some(sp => sp.name.split(' ')[1] === s)
+            );
 
-        var containsSearch = c.name?.toLowerCase().includes(searchText.value.toLowerCase());
+        // Check if club contains any of the selected tags
+        const includesTag = !c.tags ? false : 
+            c.tags.some(t => 
+                selectedTags.value.some(tg => tg.name === t)
+            );
 
+        // Apply filtering logic based on whether sports/tags are selected
         if (selectedSports.value.length > 0 && selectedTags.value.length > 0) {
             return includesSport && includesTag && containsSearch;
-        } else if (selectedSports.value.length > 0 && selectedTags.value.length == 0) {
+        } else if (selectedSports.value.length > 0 && selectedTags.value.length === 0) {
             return includesSport && containsSearch;
-        } else if (selectedSports.value.length == 0 && selectedTags.value.length > 0) {
+        } else if (selectedSports.value.length === 0 && selectedTags.value.length > 0) {
             return includesTag && containsSearch;
         } else {
-            return c && containsSearch;
+            return containsSearch;
         }
     });
 });
 
-// Load clubs from memory if we have any
-// If we don't and we already have the location then fetch it
-clubs.value = modelStore.getAllClubs();
-
 async function fetchClubs() {
     state.value = VIEW_STATE.LOADING;
-    let location = sessionStore.lastKnownLocation;
+    let location = session.lastKnownLocation;
     if (!location) { 
         location = new Location(
             40.76553,
@@ -154,17 +149,17 @@ async function fetchClubs() {
         );
     }
 
-    const response = await sessionStore.clubService.getClubs(location.administrativeArea ?? 'New York', location.country ?? 'United States');
+    const response = await session.clubService.getClubs(location.administrativeArea ?? 'New York', location.country ?? 'United States');
     if (response) {
         modelStore.setClubs(response.clubs);
-        clubs.value = modelStore.getAllClubs();
-        state.value = VIEW_STATE.SUCCESS;
+        clubs.value = response.clubs;
+        state.value = VIEW_STATE.SUCCESS; 
     } else {
         state.value = VIEW_STATE.FAILURE;
     }
 }
 
-sessionStore.$subscribe((mutation: any, state) => {
+session.$subscribe((mutation: any, state) => {
     const payload = mutation.payload;
     if (payload?.lastKnownLocation) {
         fetchClubs();
@@ -179,9 +174,10 @@ useSeoMeta({
 });
 
 onMounted(() => {
-    // Preselect user favorite sports
-    // TODO: Add the ability to remember selections
-    const session = useSessionStore();
+    // Load clubs from memory if we have any
+    // If we don't and we already have the location then fetch it
+    clubs.value = modelStore.getAllClubs();
+
     session.user?.sports?.forEach((s) => {
         const found = session.sports.find((sp) => sp.name.includes(s));
         if (found) {
@@ -196,7 +192,7 @@ onMounted(() => {
 
 <style scoped>
 #groups-search {
-    gap: 1rem;
+    gap: 0.5rem;
     width: 100%;
     display: grid;
     height: 100dvh;
@@ -204,7 +200,7 @@ onMounted(() => {
     padding: 0rem 2rem;
     overflow-y: scroll;
     justify-content: center;
-    grid-template-rows: 4rem auto auto auto auto;
+    grid-template-rows: 4rem 2.5rem auto auto auto;
     grid-template-areas: 
     "header"
     "sub-header"
@@ -213,7 +209,8 @@ onMounted(() => {
     "list";
 
     h1 {
-        width: 100%;
+        margin-right: 1rem;
+        white-space: nowrap;
         color: var(--primary-label-color);
     }
 
@@ -234,7 +231,6 @@ onMounted(() => {
 
     #sub-header {
         display: flex;
-        margin: 0.5rem 0rem;
 
         #filter {
             display: flex;
@@ -267,7 +263,7 @@ onMounted(() => {
         border-radius: 10px;
         padding: 0.25rem 1rem;
         justify-content: space-between;
-        background-color: var(--secondary-background-color);
+        background-color: var(--primary-brand-color);
         
         #plus {
             width: 2rem;

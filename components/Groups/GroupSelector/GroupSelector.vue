@@ -106,7 +106,7 @@ function selectGroup(group: GroupSelection){
     .selected {
         padding: 0.25rem;
         border-radius: 13px;
-        border: var(--primary-label-color) solid 1px;
+        border: var(--component-border) solid 1px;
     }
 }
 </style>

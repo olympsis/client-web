@@ -468,7 +468,7 @@ definePageMeta({
 @media (max-width: 940px) {
     #events {
         padding: 1rem;
-        grid-template-rows: 6.5rem 5rem auto auto auto;
+        grid-template-rows: 5.75rem 2.5rem auto auto auto;
 
         #header {
             display: none;

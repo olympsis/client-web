@@ -9,7 +9,7 @@
             </div>
 
             <div id="trailing">
-                <img id="plus" src="@/assets/icons/plus/plus.white.svg">
+                <img id="plus" src="@/assets/icons/plus/plus.white.svg" @click="router.push('/groups/new')">
                 <img id="settings" src="@/assets/icons/gear/gear.white.svg">
             </div>
         </div>
@@ -19,15 +19,9 @@
                 <h1>Explore Groups</h1>
 
                 <div id="trailing">
-                    <picture id="plus" @click="router.push('/groups/new');">
-                        <source srcset="@/assets/icons/plus/plus.white.svg" media="(prefers-color-scheme: dark)">
-                        <img src="@/assets/icons/plus/plus.svg">
-                    </picture>
+                    <img id="plus" src="@/assets/icons/plus/plus.white.svg" @click="router.push('/groups/new')">
 
-                    <picture id="settings">
-                        <source srcset="@/assets/icons/gear/gear.white.svg" media="(prefers-color-scheme: dark)">
-                        <img src="@/assets/icons/gear/gear.svg">
-                    </picture>
+                    <img id="settings" src="@/assets/icons/gear/gear.white.svg">
                 </div>
             </div>
 
@@ -360,8 +354,13 @@ onMounted(() => {
             width: calc(100vw - 1rem);
 
             #title {
+                width: 100%;
                 display: flex;
                 margin-bottom: 0.5rem;
+
+                #trailing {
+                    margin-left: auto;
+                }
             }
         }
 

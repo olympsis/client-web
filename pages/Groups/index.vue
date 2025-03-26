@@ -273,6 +273,7 @@ definePageMeta({
     overflow-y: scroll;
     justify-content: center;
     grid-template-columns: 35rem 23rem;
+    grid-template-rows: auto auto minmax(auto, 39rem) auto auto;
 }
 
 #new-post-modal {

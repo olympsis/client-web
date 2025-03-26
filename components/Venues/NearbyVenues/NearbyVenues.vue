@@ -4,7 +4,7 @@
             <h3> Nearby Venues </h3>
         </div>
         <ul v-if="state !== VIEW_STATE.LOADING" id="list">
-            <VenueListItem v-for="venue in venues" :venue="venue" @selected="handleSelectedVenue"/>
+            <VenueListItem v-for="venue in venues.slice(0, 5)" :venue="venue" @selected="handleSelectedVenue"/>
         </ul>
 
         <ul v-else id="list">

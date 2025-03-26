@@ -100,10 +100,9 @@ const user = computed(() => {
 
 const userClubs = computed<Array<Club>>(() => {
     let _clubs: Array<Club> = [];
-    user.value?.clubs?.forEach((id) => {
-        const club = session.clubs.find((c) => c.id == id);
-        if (club) { _clubs.push(club); }
-    })
+    session.groups.forEach((g) => {
+        if (g.club) { _clubs.push(g.club); }
+    });
 
     return _clubs;
 });
@@ -155,7 +154,7 @@ useSeoMeta({
 });
 
 onMounted(() => {
-    fetchPastEvents()
+    fetchPastEvents();
 });
 
 </script>

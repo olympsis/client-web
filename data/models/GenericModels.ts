@@ -273,13 +273,13 @@ class ParticipantDao extends Codable<ParticipantDao> {
     id: string | undefined
     userID: string | undefined
     status: number | undefined
-    createdAt: string | undefined
+    createdAt: Date | undefined
 
     constructor(
         id: string | undefined,
         userID: string | undefined,
         status: number | undefined,
-        createdAt: string | undefined,
+        createdAt: Date | undefined,
     ) {
         super();
         this.id = id
@@ -302,7 +302,7 @@ class ParticipantDao extends Codable<ParticipantDao> {
                 object['status'] = data['status'];
             }
             if (data['created_at']) {
-                object['createdAt'] = data['created_at'];
+                object['createdAt'] = new Date(data['created_at']);
             }
         }
 
@@ -323,7 +323,7 @@ class ParticipantDao extends Codable<ParticipantDao> {
             data['status'] = this.status;
         }
         if (this.createdAt) {
-            data['created_at'] = this.createdAt;
+            data['created_at'] = this.createdAt.toISOString();
         }
     
         return data;
@@ -333,12 +333,12 @@ class ParticipantDao extends Codable<ParticipantDao> {
 class Like extends Codable<Like> {
     id: string;
     uuid: string;
-    createdAt: number;
+    createdAt: Date;
 
     constructor(
         id: string,
         uuid: string,
-        createdAt: number
+        createdAt: Date
     ) {
         super();
         this.id = id;
@@ -359,7 +359,7 @@ class Like extends Codable<Like> {
             }
 
             if (data['created_at']) {
-                object['createdAt'] = data['created_at'];
+                object['createdAt'] = new Date(data['created_at']);
             }
         }
 
@@ -372,13 +372,13 @@ class Comment extends Codable<Comment> {
     id: string;
     user: UserSnippet | undefined;
     text: string;
-    createdAt: number;
+    createdAt: Date;
 
     constructor(
         id: string,
         user: UserSnippet | undefined,
         text: string,
-        createdAt: number
+        createdAt: Date
     ) {
         super();
         this.id = id;
@@ -400,7 +400,7 @@ class Comment extends Codable<Comment> {
                 object['text'] = data['text'];
             }
             if (data['created_at']) {
-                object['createdAt'] = data['created_at'];
+                object['createdAt'] = new Date(data['created_at']);
             }
         }
 
@@ -412,12 +412,12 @@ class Comment extends Codable<Comment> {
 class CommentDao extends Codable<CommentDao> {
     uuid?: string;
     text?: string;
-    createdAt?: number;
+    createdAt?: Date;
 
     constructor(
         uuid?: string,
         text?: string,
-        createdAt?: number
+        createdAt?: Date
     ) {
         super();
         this.uuid = uuid;
@@ -438,13 +438,13 @@ class Member extends Codable<Member> {
     id: string;
     role: GROUP_ROLE;
     user: UserSnippet | undefined;
-    joinedAt: number;
+    joinedAt: Date;
 
     constructor(
         id: string,
         role: GROUP_ROLE,
         user: UserSnippet | undefined,
-        joinedAt: number
+        joinedAt: Date
     ){
         super();
         this.id = id;
@@ -467,7 +467,7 @@ class Member extends Codable<Member> {
                 object['user'] = UserSnippet.decode(data['user']);
             }
             if (data['joined_at']) {
-                object['joinedAt'] = data['joined_at'];
+                object['joinedAt'] = new Date(data['joined_at']);
             }
         }
 
@@ -488,7 +488,7 @@ class Member extends Codable<Member> {
             data['user'] = this.user.encode();
         }
         if (this.joinedAt) {
-            data['joined_at'] = this.joinedAt;
+            data['joined_at'] = this.joinedAt.toISOString();
         }
     
         return data;
@@ -543,7 +543,7 @@ class Invitation {
     club: Club | undefined;
     event: Event | undefined;
     organization: Organization | undefined;
-    createdAt: number | undefined;
+    createdAt: Date | undefined;
 
     static decode<Invitation>(data: { [key: string]: any }): Invitation {
         const object = Object();
@@ -571,7 +571,7 @@ class Invitation {
                 object['organization'] = Organization.decode(data['organization']);
             }
             if (data['created_at']) {
-                object['createdAt'] = data['created_at'];
+                object['createdAt'] = new Date(data['created_at']);
             }
         }
 

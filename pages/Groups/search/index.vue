@@ -189,7 +189,7 @@ onMounted(() => {
         }
     })
 
-    fetchClubs()
+    fetchClubs();
 });
 
 </script>

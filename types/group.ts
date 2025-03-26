@@ -54,3 +54,11 @@ export function getGroupVisibility(group: Group): string {
         return 'public';
     }
 }
+
+export function getGroupTags(group: Group): string[] {
+	if (isClub(group)) {
+		return group.tags ?? [];
+	} else {
+		return [];
+	}
+}

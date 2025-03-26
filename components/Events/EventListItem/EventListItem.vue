@@ -3,7 +3,7 @@
         <!-- Event Image -->
         <div id="header">
             <img class="image" :src="image">
-            <EventTagsList :tags="tags" :limit="2"/>
+            <LabelsList :tags="tags" :limit="2"/>
         </div>
 
         <!-- Bottom Bar (Event Details) -->
@@ -50,7 +50,7 @@ import { Event } from '~/data/models/EventModels';
 import { EVENT_STATE, VIEW_STATE } from '~/data/Enums';
 import { generateImageURL } from '~/utils/image-helpers';
 
-import EventTagsList from '../EventTagsList/EventTagsList.vue';
+import LabelsList from '../../LabelsList/LabelsList.vue';
 
 const emit = defineEmits(
     ["selected"]
@@ -159,7 +159,7 @@ loadLocationData()
     background-color: var(--secondary-background-color);
 
     #header {
-        #event-tags-list {
+        #labels-list {
             top: 1rem;
             left: 1rem;
             width: 90%;

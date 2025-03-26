@@ -13,9 +13,7 @@
             <img src="@/assets/icons/picture/picture.fill.svg"/>
         </picture>
 
-        <ul id="list">
-            <SportLabel v-for="sport in sports" :sport="sport"/>
-        </ul>
+        <LabelsList :tags="tags" :limit="3" />
 
         <div id="share" @click="$emit('clicked-share')">
             <img src="@/assets/icons/share/share.white.svg" alt="share button icon">
@@ -26,26 +24,31 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { generateImageURL } from '~/utils/image-helpers';
+import LabelsList from '~/components/LabelsList/LabelsList.vue';
 
-import SportLabel from '~/components/SportLabel/SportLabel.vue';
+import { getGroupTags, type Group } from '~/types/group';
 
-const props = defineProps({
-    logoURL: { required: true },
-    bannerURL: { required: true },
-    sports: { type: Array<string>, default: [] }
+const props = defineProps<{
+    group: Group
+}>()
+
+const tags = computed<string[]>(() => {
+    const sports = props.group.sports ?? [];
+    const tags = getGroupTags(props.group);
+    return [...sports, ...tags];
 });
 
 const logoFailed = ref(false);
 const bannerFailed = ref(false);
 
 const logo = computed<string | undefined>(() => {
-    if (!props.logoURL) return undefined;
-    return generateImageURL(props.logoURL as string);
+    if (!props.group.logo) return undefined;
+    return generateImageURL(props.group.logo as string);
 });
 
 const banner = computed<string | undefined>(() => {
-    if (!props.bannerURL) return undefined;
-    return generateImageURL(props.bannerURL as string);
+    if (!props.group.banner) return undefined;
+    return generateImageURL(props.group.banner as string);
 });
 
 </script>
@@ -125,7 +128,7 @@ const banner = computed<string | undefined>(() => {
         }
     }
 
-    #list {
+    #labels-list {
         top: 0;
         padding: 0;
         gap: 0.5rem;

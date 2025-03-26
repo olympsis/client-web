@@ -15,7 +15,7 @@ class Organization extends Codable<Organization> {
     members: Member[] | undefined;
     pinnedPostId: string | undefined;
     children: ClubDao[] | undefined;
-    createdAt: number | undefined;
+    createdAt: Date | undefined;
 
     constructor(
         id?: string,
@@ -30,7 +30,7 @@ class Organization extends Codable<Organization> {
         members?: Member[],
         pinnedPostId?: string,
         children?: ClubDao[],
-        createdAt?: number
+        createdAt?: Date
     ) {
         super();
         this.id = id;
@@ -89,7 +89,7 @@ class Organization extends Codable<Organization> {
                 object['children'] = data['children'].map((child: any) => ClubDao.decode(child));
             }
             if (data['created_at']) {
-                object['createdAt'] = data['created_at'];
+                object['createdAt'] = new Date(data['created_at']);
             }
         }
 
@@ -137,7 +137,7 @@ class Organization extends Codable<Organization> {
             data['children'] = this.children.map(child => child.encode());
         }
         if (this.createdAt) {
-            data['created_at'] = this.createdAt;
+            data['created_at'] = this.createdAt.toISOString();
         }
     
         return data;

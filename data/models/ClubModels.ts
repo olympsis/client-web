@@ -19,7 +19,7 @@ class Club extends Codable<Club> {
     tags: string[] | undefined;
     rules: string[] | undefined;
     pinnedPostId: string | undefined;
-    createdAt: number | undefined;
+    createdAt: Date | undefined;
 
     constructor(
         id?: string,
@@ -37,7 +37,7 @@ class Club extends Codable<Club> {
         tags?: string[],
         rules?: string[],
         pinnedPostId?: string,
-        createdAt?: number
+        createdAt?: Date
     ) {
         super();
         this.id = id;
@@ -109,7 +109,7 @@ class Club extends Codable<Club> {
                 object['pinnedPostId'] = data['pinned_post_id'];
             }
             if (data['created_at']) {
-                object['createdAt'] = data['created_at'];
+                object['createdAt'] = new Date(data['created_at']);
             }
         }
 
@@ -167,14 +167,14 @@ class Club extends Codable<Club> {
             data['pinned_post_id'] = this.pinnedPostId;
         }
         if (this.createdAt) {
-            data['created_at'] = this.createdAt;
+            data['created_at'] = this.createdAt.toISOString();
         }
     
         return data;
     }
 }
 
-class ClubDao {
+class ClubDao extends Codable<ClubDao> {
     id: string | undefined;
     parentId: string | undefined;
     name: string | undefined;
@@ -208,6 +208,7 @@ class ClubDao {
         rules: string[] | undefined,
         pinnedPostId: string | undefined
     ) {
+        super();
         this.id = id;
         this.parentId = parentId;
         this.name = name;
@@ -225,7 +226,7 @@ class ClubDao {
         this.pinnedPostId = pinnedPostId;
     }
 
-    static decode<ClubDao>(data: { [key: string]: any }): ClubDao {
+    decode<ClubDao>(data: { [key: string]: any }): ClubDao {
         const object = Object();
 
         if (data) {
@@ -280,62 +281,58 @@ class ClubDao {
 
         return object;
     }
-}
 
-interface ClubDao {
-    encode(): { [key: string]: string }
-}
-
-ClubDao.prototype.encode = function(): { [key: string]: any } {
-    const data: { [key: string]: any } = {};
-
-    if (this.id) {
-        data['id'] = this.id;
+    override encode(): { [key: string]: any } {
+        const data: { [key: string]: any } = {};
+    
+        if (this.id) {
+            data['id'] = this.id;
+        }
+        if (this.parentId) {
+            data['parent_id'] = this.parentId;
+        }
+        if (this.name) {
+            data['name'] = this.name;
+        }
+        if (this.description) {
+            data['description'] = this.description;
+        }
+        if (this.sports) {
+            data['sports'] = this.sports;
+        }
+        if (this.city) {
+            data['city'] = this.city;
+        }
+        if (this.state) {
+            data['state'] = this.state;
+        }
+        if (this.country) {
+            data['country'] = this.country;
+        }
+        if (this.logo) {
+            data['logo'] = this.logo;
+        }
+        if (this.banner) {
+            data['banner'] = this.banner;
+        }
+        if (this.visibility) {
+            data['visibility'] = this.visibility;
+        }
+        if (this.members) {
+            data['members'] = this.members.map((member: MemberDao) => member.encode());
+        }
+        if (this.tags) {
+            data['tags'] = this.tags;
+        }
+        if (this.rules) {
+            data['rules'] = this.rules;
+        }
+        if (this.pinnedPostId) {
+            data['pinned_post_id'] = this.pinnedPostId;
+        }
+    
+        return data;
     }
-    if (this.parentId) {
-        data['parent_id'] = this.parentId;
-    }
-    if (this.name) {
-        data['name'] = this.name;
-    }
-    if (this.description) {
-        data['description'] = this.description;
-    }
-    if (this.sports) {
-        data['sports'] = this.sports;
-    }
-    if (this.city) {
-        data['city'] = this.city;
-    }
-    if (this.state) {
-        data['state'] = this.state;
-    }
-    if (this.country) {
-        data['country'] = this.country;
-    }
-    if (this.logo) {
-        data['logo'] = this.logo;
-    }
-    if (this.banner) {
-        data['banner'] = this.banner;
-    }
-    if (this.visibility) {
-        data['visibility'] = this.visibility;
-    }
-    if (this.members) {
-        data['members'] = this.members.map((member: MemberDao) => member.encode());
-    }
-    if (this.tags) {
-        data['tags'] = this.tags;
-    }
-    if (this.rules) {
-        data['rules'] = this.rules;
-    }
-    if (this.pinnedPostId) {
-        data['pinned_post_id'] = this.pinnedPostId;
-    }
-
-    return data;
 }
 
 class ClubsResponse {
@@ -365,25 +362,26 @@ class ClubsResponse {
     }
 }
 
-class ClubApplication {
+class ClubApplication extends Codable<ClubApplication> {
     id: string
     applicant: UserData | undefined
     status: string
-    createdAt: number
+    createdAt: Date
 
     constructor(
         id: string,
         applicant: UserData | undefined,
         status: string,
-        createdAt: number
+        createdAt: Date
     ){
+        super();
         this.id = id;
         this.applicant = applicant;
         this.status = status;
         this.createdAt = createdAt;
     }
 
-    static decode(data: { [key: string]: any }): ClubApplication {
+    decode(data: { [key: string]: any }): ClubApplication {
         const object = Object();
 
         if (data) {
@@ -392,7 +390,7 @@ class ClubApplication {
                 object['applicant'] = UserData.decode(data['applicant']);
             }
             object['status'] = data['status'];
-            object['createdAt'] = data['created_at'];
+            object['createdAt'] = new Date(data['created_at']);
         }
 
         Object.setPrototypeOf(object, ClubApplication.prototype);
@@ -400,9 +398,7 @@ class ClubApplication {
     }
 }
 
-
-
-class ClubApplicationDao {
+class ClubApplicationDao extends Codable<ClubApplicationDao> {
     applicant: string | undefined
     clubID: string | undefined
     status: string | undefined
@@ -412,29 +408,26 @@ class ClubApplicationDao {
         clubID: string | undefined,
         status: string | undefined,
     ){
+        super();
         this.applicant = applicant;
         this.clubID = clubID;
         this.status = status;
     }
-}
 
-interface ClubApplicationDao {
-    encode(): { [key: string]: string }
-}
-
-ClubApplicationDao.prototype.encode = function(): { [key: string]: any } {
-    const data: { [key: string]: any } = {};
-    if (this.status) {
-        data['status'] = this.status;
+    override encode(): { [key: string]: any } {
+        const data: { [key: string]: any } = {};
+        if (this.status) {
+            data['status'] = this.status;
+        }
+        if (this.clubID) {
+            data['club_id'] = this.clubID;
+        }
+        if (this.applicant) {
+            data['applicant'] = this.applicant;
+        }
+    
+        return data;
     }
-    if (this.clubID) {
-        data['club_id'] = this.clubID;
-    }
-    if (this.applicant) {
-        data['applicant'] = this.applicant;
-    }
-
-    return data;
 }
 
 class ClubApplicationsResponse {

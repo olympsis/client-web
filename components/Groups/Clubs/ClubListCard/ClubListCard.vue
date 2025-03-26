@@ -11,9 +11,7 @@
                 </picture>
             </div>
 
-            <ul id="sports">
-                <SportLabel v-for="sport in club.sports" :sport="sport"/>
-            </ul>
+            <LabelsList :tags="tags" :limit="2"/>
         </div>
 
         <!-- Tags -->
@@ -73,9 +71,11 @@ import { generateImageURL } from '~/utils/image-helpers';
 import { useSessionStore } from '~/stores/session-store';
 
 import Dialog from 'primevue/dialog';
+import LabelsList from '~/components/LabelsList/LabelsList.vue';
 import SportLabel from '~/components/SportLabel/SportLabel.vue';
 import ClubDetailsCard from '../ClubDetailsCard/ClubDetailsCard.vue';
 import TextButton from '@/components/Buttons/LoadingButtons/TextButton/TextButton.vue';
+import { getGroupTags } from '~/types/group';
 
 const props = defineProps({
     club: { type: Club, required: true },
@@ -100,12 +100,11 @@ const name = computed(() => {
     return props.club.name;
 });
 
-const location = computed(() => {
-    return `${props.club.city}, ${props.club.state}`;
-});
 
 const tags = computed(() => {
-    return props.club.sports ?? [];
+    const tags = getGroupTags(props.club);
+    const sports = props.club.sports ?? [];
+    return [...sports, ...tags];
 });
 
 const body = computed(() => {
@@ -177,7 +176,7 @@ function apply() {
             }
         }
 
-        #sports {
+        #labels-list {
             padding: 0;
             gap: 0.5rem;
             display: flex;

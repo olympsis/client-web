@@ -6,6 +6,7 @@
                 <UserIcon
                     :user="event.poster"
                     :size="2.5"
+                    :style="{ height: '2.75rem' }"
                 />
                 <div id="name">{{ event.poster?.username ?? 'olympsis-user' }}</div>
             </li>

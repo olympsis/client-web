@@ -224,10 +224,10 @@ export class Announcement extends Codable<Announcement> {
     scope: ANNOUNCEMENT_SCOPE;
     location: GeoJSON | undefined;
     status: ANNOUNCEMENT_STATUS;
-    activeDate: number;
-    expiryDate: number;
-    createdAt: number;
-    updatedAt: number;
+    activeDate: Date;
+    expiryDate: Date;
+    createdAt: Date;
+    updatedAt: Date;
 
     constructor(
         id: string,
@@ -244,10 +244,10 @@ export class Announcement extends Codable<Announcement> {
         scope: ANNOUNCEMENT_SCOPE,
         location: GeoJSON | undefined,
         status: ANNOUNCEMENT_STATUS,
-        activeDate: number,
-        expiryDate: number,
-        createdAt: number,
-        updatedAt: number
+        activeDate: Date,
+        expiryDate: Date,
+        createdAt: Date,
+        updatedAt: Date
     ) {
         super();
         this.id = id;
@@ -288,10 +288,18 @@ export class Announcement extends Codable<Announcement> {
             object['scope'] = scopeFromString(data['scope']);
             object['location'] = data['location'] ? GeoJSON.decode(data['location']) : undefined;
             object['status'] = statusFromString(data['status']);
-            object['activeDate'] = data['active_date'] || Date.now();
-            object['expiryDate'] = data['expiry_date'] || (Date.now() + 30 * 24 * 60 * 60 * 1000);
-            object['createdAt'] = data['created_at'] || Date.now();
-            object['updatedAt'] = data['updated_at'] || Date.now();
+
+            if (data['active_date']) {
+                object['activeDate'] = new Date(data['active_date']);
+            }
+            if (data['updated_at']) {
+                object['updatedAt'] = new Date(data['updated_at']);
+            }
+            if (data['expiry_date']) {
+                object['expiryDate'] = new Date(data['expiry_date']);
+            }
+            
+            object['createdAt'] = new Date(data['created_at']);
         }
 
         Object.setPrototypeOf(object, Announcement.prototype);
@@ -344,16 +352,16 @@ export class Announcement extends Codable<Announcement> {
             data['status'] = statusToString(this.status);
         }
         if (this.activeDate) {
-            data['active_date'] = this.activeDate;
+            data['active_date'] = this.activeDate.toISOString();
         }
         if (this.expiryDate) {
-            data['expiry_date'] = this.expiryDate;
+            data['expiry_date'] = this.expiryDate.toISOString();
         }
         if (this.createdAt) {
-            data['created_at'] = this.createdAt;
+            data['created_at'] = this.createdAt.toISOString();
         }
         if (this.updatedAt) {
-            data['updated_at'] = this.updatedAt;
+            data['updated_at'] = this.updatedAt.toISOString();
         }
 
         return data;

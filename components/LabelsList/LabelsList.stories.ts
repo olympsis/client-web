@@ -1,12 +1,12 @@
-import EventTagsList from "./EventTagsList.vue";
+import LabelsList from "./LabelsList.vue";
 import type { Meta, StoryObj } from "@storybook/vue3";
 
-const meta: Meta<typeof EventTagsList> = {
-    component: EventTagsList
+const meta: Meta<typeof LabelsList> = {
+    component: LabelsList
 };
   
 export default meta;
-type Story = StoryObj<typeof EventTagsList>;
+type Story = StoryObj<typeof LabelsList>;
 
 export const Basic: Story = {
     name: "Event Tags List",
@@ -19,8 +19,8 @@ export const Basic: Story = {
                 ...args,
             };
         },
-        components: { EventTagsList },
-        template: '<EventTagsList :tags="tags"/>',
+        components: { LabelsList },
+        template: '<LabelsList :tags="tags"/>',
     }),
     tags: ["autodocs"],
     decorators: [],

@@ -37,7 +37,7 @@
             <div id="group-sports-picker" :class="{ 'group-section': true, required: newGroupError === NEW_GROUP_ERROR.NO_SPORTS }">
                 <div id="label"> Group Sports <div class="asterisk">*</div> </div>
                 <div id="sub-label"> The sport(s) your group will focus on </div>
-                <MultiSportsPicker v-model:model-value="groupSports" :multi-select="true"/>
+                <MultiSportsPicker v-model:model-value="groupSports" :sports="session.sports" :multi-select="true"/>
             </div>
 
             <!-- Description -->
@@ -72,7 +72,7 @@
 import { GROUP_TYPE } from '~/data/Enums';
 import { Club } from '@/data/models/ClubModels';
 import { useSessionStore } from '@/stores/session-store';
-import { GroupSelection } from '@/data/models/GenericModels';
+import { GroupSelection, Sport } from '@/data/models/GenericModels';
 import { computed, ref, useTemplateRef, type Ref } from 'vue';
 import { Organization } from '@/data/models/OrganizationModels';
 import { GROUP_VISIBILITY, SPORTS, VIEW_STATE } from '~/data/Enums';
@@ -100,7 +100,7 @@ const groupLogo: Ref<string> = ref('');
 const groupBanner: Ref<string> = ref('');
 const groupDescription: Ref<string> = ref('');
 
-const groupSports: Ref<Array<SPORTS>> = ref([ SPORTS.RUNNING ]);
+const groupSports: Ref<Array<Sport>> = ref([ ]);
 const groupLocation: Ref<{
     subAdministrativeArea: string,
     administrativeArea: string,

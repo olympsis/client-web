@@ -12,7 +12,12 @@
             <h3>Groups Search</h3>
         </div>
 
-        <GroupLogoAndBanner :logo-u-r-l="groupLogoURL" :banner-u-r-l="groupBannerURL" :sports="club?.sports" class="media" @clicked-share="handleGroupSharing"/>
+        <GroupLogoAndBanner
+            v-if="club"
+            :group="club"
+            class="media" 
+            @clicked-share="handleGroupSharing"
+        />
 
         <GroupInfo v-if="club" :group="club" @show-auth="showAuthModal"/>
 
@@ -30,14 +35,13 @@
 <script setup lang="ts">
 
 import { computed, ref } from 'vue';
+import { VIEW_STATE } from '@/data/Enums';
 import { useToast } from 'primevue/usetoast';
 import { Club } from '@/data/models/ClubModels';
 import { useRoute, useRouter } from 'vue-router';
 import { Member } from '@/data/models/GenericModels';
-import { AUTH_STATUS, VIEW_STATE } from '@/data/Enums';
 import { useSessionStore } from '@/stores/session-store';
 import { ClubService } from '@/data/services/ClubService';
-import { formatRelativeTime } from '~/utils/time-helpers';
 import { SnapshotService } from '~/data/services/SnapshotService';
 
 import AuthModal from '~/components/Auth/AuthModal/AuthModal.vue';

@@ -24,8 +24,9 @@
             </div>
 
             <!-- Title -->
-            <input id="group-title" type="text" placeholder="New Group" v-model="groupTitle" class="text-input"/>
+            <input id="group-title" type="text" placeholder="Group Name" v-model="groupTitle" class="text-input"/>
 
+            <!-- Banner & Logo -->
             <BannerAndLogoEditor
                 v-model:logo-url="groupLogo"
                 v-model:banner-url="groupBanner"
@@ -35,16 +36,24 @@
             <div id="group-sports-picker" :class="{ 'group-section': true, required: newGroupError === NEW_GROUP_ERROR.NO_SPORTS }">
                 <div id="label"> Group Sports <div class="asterisk">*</div> </div>
                 <div id="sub-label"> The sport(s) your group will focus on </div>
-                <MultiSportsPicker v-model:model-value="groupSports" :multi-select="true"/>
+                <MultiSportsPicker v-model:model-value="groupSports" :sports="session.sports" :multi-select="true"/>
             </div>
         </div>
         <div id="right">
+
+            <!-- Event Tags -->
+            <div id="group-tags-picker" class="group-section">
+                <div id="label">Group Tags</div>
+                <div id="sub-label"> Tags make your group easier to discover. Add a few! </div>
+                
+                <MultiTagsPicker :tags="session.tags" v-model:model-value="groupTags"/>
+            </div>
 
             <!-- Description -->
             <div 
                 id="group-description" 
                 :class="{ 'group-section': true, required: newGroupError === NEW_GROUP_ERROR.NO_DESCRIPTION }"
-                :style="{ marginTop: '2.5rem' }"
+                :style="{ marginTop: '1rem' }"
             >
                 <div id="label"> Description <div class="asterisk">*</div> </div>
                 <div id="sub-label"> What is your group about? </div>
@@ -76,14 +85,15 @@
 import { GROUP_TYPE } from '~/data/Enums';
 import { Club } from '@/data/models/ClubModels';
 import { useSessionStore } from '@/stores/session-store';
-import { GroupSelection } from '@/data/models/GenericModels';
+import { GROUP_VISIBILITY, VIEW_STATE } from '~/data/Enums';
 import { computed, ref, useTemplateRef, type Ref } from 'vue';
 import { Organization } from '@/data/models/OrganizationModels';
-import { GROUP_VISIBILITY, SPORTS, VIEW_STATE } from '~/data/Enums';
+import { GroupSelection, Sport, Tag } from '@/data/models/GenericModels';
 import { NewGroupManager, NEW_GROUP_ERROR } from '@/data/managers/NewGroupManager';
 
 import LocalePicker from '@/components/LocalePicker/LocalePicker.vue';
 import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
+import MultiTagsPicker from '~/components/MultiTagsPicker.vue/MultiTagsPicker.vue';
 import MultiSportsPicker from '@/components/MultiSportsPicker/MultiSportsPicker.vue';
 import GroupTypePicker from '~/components/Groups/New Group/GroupTypePicker/GroupTypePicker.vue';
 import BannerAndLogoEditor from '@/components/Events/BannerAndLogoEditor/BannerAndLogoEditor.vue';
@@ -102,12 +112,13 @@ const newGroupError: Ref<NEW_GROUP_ERROR | null> = ref(null);
 const groupType: Ref<GROUP_TYPE> = ref(GROUP_TYPE.CLUB);
 const groupVisibility: Ref<GROUP_VISIBILITY> = ref(GROUP_VISIBILITY.PUBLIC);
 
+const groupTags = ref<Tag[]>([]);
 const groupTitle: Ref<string> = ref('');
 const groupLogo: Ref<string> = ref('');
 const groupBanner: Ref<string> = ref('');
 const groupDescription: Ref<string> = ref('');
 
-const groupSports: Ref<Array<SPORTS>> = ref([ SPORTS.RUNNING ]);
+const groupSports: Ref<Array<Sport>> = ref([]);
 const groupLocation: Ref<{
     subAdministrativeArea: string,
     administrativeArea: string,
@@ -185,6 +196,7 @@ function createNewGroup() {
                     groupLogo.value,
                     groupBanner.value,
                     groupTitle.value,
+                    groupTags.value,
                     groupSports.value,
                     groupDescription.value,
                     groupLocation.value
@@ -298,7 +310,7 @@ function createNewGroup() {
 
 #group-type-config {
     display: flex;
-    margin: 1rem;
+    margin: 0.5rem 1rem;
     
     .spacer {
         margin: 0rem 0.5rem;
@@ -311,7 +323,8 @@ function createNewGroup() {
     font-size: 2.5rem;
     font-weight: bold;
     padding: 0rem 1rem;
-    background-color: var(--primary-background-color);
+    border-radius: 10px;
+    background-color: var(--secondary-background-color);
 }
 
 .button {
@@ -367,11 +380,11 @@ function createNewGroup() {
         width: 94%;
         height: 2.5rem;
         border: unset;
-        font-size: 1.3rem;
+        font-size: 1.1rem;
         padding: 0rem 0.5rem;
         border-radius: 10px;
         color: var(--primary-label-color);
-        background-color: var(--tertiary-background-color);
+        background-color: var(--secondary-background-color);
     }
 
     .text-large {
@@ -382,7 +395,7 @@ function createNewGroup() {
         font-size: 1.3rem;
         border-radius: 10px;
         color: var(--primary-label-color);
-        background-color: var(--tertiary-background-color);
+        background-color: var(--secondary-background-color);
     }
 
     .hometown-label {

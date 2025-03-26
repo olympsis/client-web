@@ -15,9 +15,6 @@
                 <button @click="">
                     <img src="@/assets/icons/map/map.fill.svg">
                 </button>
-                <button @click="eventSettingsModalRef?.show()">
-                    <img src="@/assets/icons/gear/gear.fill.white.svg">
-                </button>
             </div>
         </div>
 
@@ -31,9 +28,6 @@
                     </button>
                     <button @click="">
                         <img src="@/assets/icons/map/map.fill.svg">
-                    </button>
-                    <button @click="eventSettingsModalRef?.show()">
-                        <img src="@/assets/icons/gear/gear.fill.white.svg">
                     </button>
                 </div>
             </div>
@@ -85,11 +79,6 @@
                 <button class="button" @click="retryFetchEvents">Try Again</button>
             </div>
         </div>
-
-        <!-- Events Settings Modal -->
-        <dialog id="event-settings-modal" ref="event-settings-modal" class="dialog">
-            <EventsSettings @close="eventSettingsModalRef?.close()" @update="handleSettingsChanged"/>
-        </dialog>
     </main>
 </template>
 
@@ -98,17 +87,16 @@ import { useRouter } from 'vue-router';
 import { VIEW_STATE } from '@/data/Enums';
 import { useSessionStore } from '@/stores/session-store';
 import { EventService } from '@/data/services/EventService';
-import { Location, Sport, Tag } from '~/data/models/GenericModels';
 import { computed, onMounted, ref, useTemplateRef } from 'vue';
 import { Event, EventSection } from '@/data/models/EventModels';
 import { compareUTCNowToDateNormal } from '~/utils/time-helpers';
+import { Location, Sport, Tag } from '~/data/models/GenericModels';
 
 import Drawer from 'primevue/drawer';
 import SearchBar from '@/components/SearchBar/SearchBar.vue';
 import TagsFilter from '~/components/TagsFilter/TagsFilter.vue';
 import SportsFilter from '~/components/SportsFilter/SportsFilter.vue';
 import EventListItem2 from '~/components/Events/EventListItem/EventListItem.vue';
-import EventsSettings from '~/components/Dialog/Events/EventsSettings/EventsSettings.vue';
 
 const router = useRouter();
 const session = useSessionStore();
@@ -120,7 +108,6 @@ const searchText = ref<string>('');
 const showFilter = ref<boolean>(false);
 const selectedTags: Ref<Array<Tag>> = ref([]);
 const selectedSports: Ref<Array<Sport>> = ref([]);
-const eventSettingsModalRef = useTemplateRef<HTMLDialogElement>('event-settings-modal');
 
 const filteredEvents = computed<Array<Event>>(() => {
     return events.value.filter((e) => { // Filter by other criteria
@@ -229,36 +216,6 @@ function retryFetchEvents() {
             if (config.public.MODE !== 'dev') return;
             console.error('Failed to get events. Error: ', error);
         });
-}
-
-async function handleSettingsChanged(event: { radius: number, sports: any}) {
-    eventSettingsModalRef.value?.close();
-    state.value = VIEW_STATE.LOADING;
-
-    let _events: Event[];
-    const radius = event.radius * 1609;
-    const sports = event.sports.value.map((s: any) => s.valueOf()).join(',');
-    const location = session.lastKnownLocation;
-
-    if (!location) throw('Failed to get location. IMPLEMENT BETTER FALLBACK');
-
-    try {
-        _events = await eventService.getEvents(
-            location.latitude, 
-            location.longitude, 
-            radius, // Radius of lookup
-            sports, // Sports involved
-            'pending, live', // Status of events
-            0,
-            100
-        );
-
-        events.value = _events;
-        state.value = VIEW_STATE.SUCCESS;
-    } catch (error) {
-        state.value = VIEW_STATE.FAILURE;
-        console.error('Failed to fetch events. Error: ' + error);
-    }
 }
 
 useSeoMeta({

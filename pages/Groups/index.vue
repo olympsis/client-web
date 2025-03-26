@@ -1,10 +1,10 @@
 <template>
     <NavigationBar/>
     <main id="group-view">
-        <GroupLogoAndBanner 
+        <GroupLogoAndBanner
+            v-if="group"
+            :group="group"
             :sports="groupSports"
-            :logo-u-r-l="groupLogoURL" 
-            :banner-u-r-l="groupBannerURL" 
             @clicked-share="handleGroupSharing"
         />
 
@@ -216,6 +216,8 @@ function hideKickModal() {
 }
 
 function handleLeaveGroup() {
+    deleteModalRef.value?.close();
+    settingsModalRef.value?.close();
     sessionStore.removeGroup(selectedGroup.value?.id ?? '');
 }
 

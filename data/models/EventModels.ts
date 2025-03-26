@@ -2,12 +2,7 @@ import { Codable } from "./Models";
 import { Venue } from "./VenueModels";
 import { UserSnippet } from "./UserModels";
 import { VenueDescriptor, Organizer, Participant, GroupSelection } from "./GenericModels";
-import { 
-    isToday,
-    isTomorrow,
-    isThisWeek,
-    isThisYear
-} from "#imports";
+
 import { 
     EVENT_VISIBILITY, 
     MEDIA_TYPE,
@@ -899,14 +894,14 @@ class Team extends Codable<Team> {
     name: string;
     members: Participant[];
     eventId: string;
-    createdAt: number;
+    createdAt: Date;
 
     constructor(
         id: string,
         name: string,
         members: Participant[],
         eventId: string,
-        createdAt: number
+        createdAt: Date
     ) {
         super();
         this.id = id;
@@ -924,7 +919,7 @@ class Team extends Codable<Team> {
             object['name'] = data['name'];
             object['members'] = data['members'] ? data['members'].map((m: any) => Participant.decode(m)) : [];
             object['eventId'] = data['event_id'];
-            object['createdAt'] = data['created_at'];
+            object['createdAt'] = new Date(data['created_at']);
         }
 
         Object.setPrototypeOf(object, Team.prototype);
@@ -947,7 +942,7 @@ class Team extends Codable<Team> {
             data['event_id'] = this.eventId;
         }
         if (this.createdAt) {
-            data['created_at'] = this.createdAt;
+            data['created_at'] = this.createdAt.toISOString();
         }
 
         return data;
@@ -959,14 +954,14 @@ class TeamDao extends Codable<TeamDao> {
     name?: string;
     members?: Participant[];
     eventId?: string;
-    createdAt?: number;
+    createdAt?: Date;
 
     constructor(
         id?: string,
         name?: string,
         members?: Participant[],
         eventId?: string,
-        createdAt?: number
+        createdAt?: Date
     ) {
         super();
         this.id = id;
@@ -992,7 +987,7 @@ class TeamDao extends Codable<TeamDao> {
             data['event_id'] = this.eventId;
         }
         if (this.createdAt) {
-            data['created_at'] = this.createdAt;
+            data['created_at'] = this.createdAt.toISOString();
         }
 
         return data;
@@ -1004,13 +999,13 @@ class EventComment extends Codable<EventComment> {
     user?: UserSnippet;
     text: string;
     eventId: string;
-    createdAt: number;
+    createdAt: Date;
 
     constructor(
         id: string,
         text: string,
         eventId: string,
-        createdAt: number,
+        createdAt: Date,
         user?: UserSnippet
     ) {
         super();
@@ -1029,7 +1024,7 @@ class EventComment extends Codable<EventComment> {
             object['user'] = data['user'] ? UserSnippet.decode(data['user']) : undefined;
             object['text'] = data['text'];
             object['eventId'] = data['event_id'];
-            object['createdAt'] = data['created_at'];
+            object['createdAt'] = new Date(data['created_at']);
         }
 
         Object.setPrototypeOf(object, EventComment.prototype);
@@ -1052,7 +1047,7 @@ class EventComment extends Codable<EventComment> {
             data['event_id'] = this.eventId;
         }
         if (this.createdAt) {
-            data['created_at'] = this.createdAt;
+            data['created_at'] = this.createdAt.toISOString();
         }
 
         return data;
@@ -1064,14 +1059,14 @@ class EventCommentDao extends Codable<EventCommentDao> {
     userId?: string;
     text?: string;
     eventId: string;
-    createdAt?: number;
+    createdAt?: Date;
 
     constructor(
         eventId: string,
         id?: string,
         userId?: string,
         text?: string,
-        createdAt?: number
+        createdAt?: Date
     ) {
         super();
         this.id = id;
@@ -1097,7 +1092,7 @@ class EventCommentDao extends Codable<EventCommentDao> {
             data['event_id'] = this.eventId;
         }
         if (this.createdAt) {
-            data['created_at'] = this.createdAt;
+            data['created_at'] = this.createdAt.toISOString();
         }
 
         return data;

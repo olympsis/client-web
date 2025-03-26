@@ -1,7 +1,8 @@
 import { UserSnippet } from "./UserModels";
 import { Comment, Like } from "./GenericModels";
+import { Codable } from "./Models";
 
-class Post {
+class Post extends Codable<Post> {
     id: string;
     type: string;
     poster?: UserSnippet;
@@ -10,7 +11,7 @@ class Post {
     images?: string[];
     likes: Like[];
     comments: Comment[];
-    createdAt: number;
+    createdAt: Date;
     externalLink?: string;
 
     constructor(
@@ -22,9 +23,10 @@ class Post {
         images: string[] | undefined,
         likes: Like[],
         comments: Comment[],
-        createdAt: number,
+        createdAt: Date,
         externalLink?: string
     ) {
+        super()
         this.id = id;
         this.type = type;
         this.poster = poster;
@@ -37,7 +39,7 @@ class Post {
         this.externalLink = externalLink;
     }
 
-    static decode(data: { [key: string]: any }): Post {
+    static override decode(data: { [key: string]: any }): Post {
         const object = Object()
     
         object['id'] = data['id']
@@ -57,7 +59,7 @@ class Post {
         if (data['comments']) {
             object['comments'] = data['comments'].map((c: any) => Comment.decode(c)) ?? [];
         }
-        object['createdAt'] = data['created_at']
+        object['createdAt'] = new Date(data['created_at']);
         object['externalLink'] = data['external_link']
     
         Object.setPrototypeOf(object, Post.prototype);
@@ -66,7 +68,7 @@ class Post {
     }
 }
 
-class PostDao {
+class PostDao extends Codable<PostDao> {
     type?: string;
     poster?: string;
     groupID?: string;
@@ -84,6 +86,7 @@ class PostDao {
         images?: string[] | undefined,
         externalLink?: string | undefined
     ) {
+        super();
         this.type = type;
         this.poster = poster;
         this.groupID = groupID;
@@ -92,9 +95,35 @@ class PostDao {
         this.images = images;
         this.externalLink = externalLink;
     }
+
+    override encode(): { [key: string]: any } {
+        let json: { [key: string]: any } = {}
+        if (this.type != null) {
+            json['type'] = this.type
+        }
+        if (this.poster != null) {
+            json['poster'] = this.poster
+        }
+        if (this.groupID != null) {
+            json['group_id'] = this.groupID
+        }
+        if (this.body != null) {
+            json['body'] = this.body
+        }
+        if (this.eventID != null) {
+            json['event_id'] = this.eventID
+        }
+        if (this.images != null) {
+            json['images'] = this.images
+        }
+        if (this.externalLink != null) {
+            json['external_link'] = this.externalLink
+        }
+        return json
+    }
 }
 
-class PostsResponse {
+class PostsResponse extends Codable<PostsResponse> {
     posts: Post[];
     totalPosts: number;
 
@@ -102,11 +131,12 @@ class PostsResponse {
         posts: Post[],
         totalPosts: number
     ){
+        super();
         this.posts = posts
         this.totalPosts = totalPosts
     }
 
-    static decode(data: { [key: string]: any }): PostsResponse {
+    static override decode(data: { [key: string]: any }): PostsResponse {
         const object = Object()
 
         object['totalPosts'] = data['posts'].length ?? 0
@@ -118,40 +148,6 @@ class PostsResponse {
 
         return object;
     }
-}
-
-interface PostDao {
-    encode(): { [key: string]: any }
-}
-
-interface PostsResponse {
-    decode(data: { [key: string]: any }): PostsResponse
-}
-
-PostDao.prototype.encode = function(): { [key: string]: any } {
-    let json: { [key: string]: any } = {}
-    if (this.type != null) {
-        json['type'] = this.type
-    }
-    if (this.poster != null) {
-        json['poster'] = this.poster
-    }
-    if (this.groupID != null) {
-        json['group_id'] = this.groupID
-    }
-    if (this.body != null) {
-        json['body'] = this.body
-    }
-    if (this.eventID != null) {
-        json['event_id'] = this.eventID
-    }
-    if (this.images != null) {
-        json['images'] = this.images
-    }
-    if (this.externalLink != null) {
-        json['external_link'] = this.externalLink
-    }
-    return json
 }
 
 export {

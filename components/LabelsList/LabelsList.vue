@@ -1,5 +1,5 @@
 <template>
-    <ul id="event-tags-list" @mouseleave="showMore = false">
+    <ul id="labels-list" @mouseleave="showMore = false">
         <li 
             v-for="tag in tagsFiltered" 
             :class="{ 
@@ -10,7 +10,7 @@
             }"
         >{{ tag }}</li>
 
-        <div id="more" v-if="tags.length > limit && !showMore" @mouseover="showMore = true">{{ `+${tags.length - 3}` }}</div>
+        <div id="more" v-if="tags.length > limit && !showMore" @mouseover="showMore = true">{{ `+${tags.length - limit}` }}</div>
     </ul>
 </template>
 
@@ -27,7 +27,7 @@ const tagsFiltered = computed<string[]>(() => {
 </script>
 
 <style scoped>
-#event-tags-list {
+#labels-list {
     gap: 0.25rem;
     display: flex;
     padding: unset;

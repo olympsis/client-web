@@ -27,62 +27,61 @@ function dateToString(date: Date): string {
 	}
 }
 
-function calculateTimeAgo(timestamp: number, verbose: boolean = true): string {
-  const currentTime = Date.now() / 1000;
-  const timeDifference = currentTime - timestamp;
-
-  const secondsInAMinute = 60;
-  const secondsInAnHour = 3600;
-  const secondsInADay = 86400;
-  const secondsInAMonth = 2629800;
-  const secondsInAYear = 31557600;
-
-  if (timeDifference < secondsInAMinute) {
-      const seconds = Math.floor(timeDifference);
-      return verbose ? 
-          (seconds === 1 ? `${seconds} second ago` : `${seconds} seconds ago`) :
-          `${seconds}s`;
-  } else if (timeDifference < secondsInAnHour) {
-      const minutes = Math.floor(timeDifference / secondsInAMinute);
-      return verbose ?
-          (minutes === 1 ? `${minutes} minute ago` : `${minutes} minutes ago`) :
-          `${minutes}m`;
-  } else if (timeDifference < secondsInADay) {
-      const hours = Math.floor(timeDifference / secondsInAnHour);
-      return verbose ?
-          (hours === 1 ? `${hours} hour ago` : `${hours} hours ago`) :
-          `${hours}h`;
-  } else if (timeDifference < secondsInAMonth) {
-      const days = Math.floor(timeDifference / secondsInADay);
-      return verbose ?
-          (days === 1 ? `${days} day ago` : `${days} days ago`) :
-          `${days}d`;
-  } else if (timeDifference < secondsInAYear) {
-      const months = Math.floor(timeDifference / secondsInAMonth);
-      return verbose ?
-          (months === 1 ? `${months} month ago` : `${months} months ago`) :
-          `${months}mo`;
-  } else {
-      const years = Math.floor(timeDifference / secondsInAYear);
-      return verbose ?
-          (years === 1 ? `${years} year ago` : `${years} years ago`) :
-          `${years}y`;
-  }
+function calculateTimeAgo(date: Date, verbose: boolean = true): string {
+	const currentTime = new Date();
+	// Get difference in milliseconds
+	const timeDifference = currentTime.getTime() - date.getTime();
+  
+	const secondsInAMinute = 60 * 1000;
+	const secondsInAnHour = 3600 * 1000;
+	const secondsInADay = 86400 * 1000;
+	const secondsInAMonth = 2629800 * 1000;
+	const secondsInAYear = 31557600 * 1000;
+  
+	if (timeDifference < secondsInAMinute) {
+		const seconds = Math.floor(timeDifference / 1000);
+		return verbose ? 
+			(seconds === 1 ? `${seconds} second ago` : `${seconds} seconds ago`) :
+			`${seconds}s`;
+	} else if (timeDifference < secondsInAnHour) {
+		const minutes = Math.floor(timeDifference / secondsInAMinute);
+		return verbose ?
+			(minutes === 1 ? `${minutes} minute ago` : `${minutes} minutes ago`) :
+			`${minutes}m`;
+	} else if (timeDifference < secondsInADay) {
+		const hours = Math.floor(timeDifference / secondsInAnHour);
+		return verbose ?
+			(hours === 1 ? `${hours} hour ago` : `${hours} hours ago`) :
+			`${hours}h`;
+	} else if (timeDifference < secondsInAMonth) {
+		const days = Math.floor(timeDifference / secondsInADay);
+		return verbose ?
+			(days === 1 ? `${days} day ago` : `${days} days ago`) :
+			`${days}d`;
+	} else if (timeDifference < secondsInAYear) {
+		const months = Math.floor(timeDifference / secondsInAMonth);
+		return verbose ?
+			(months === 1 ? `${months} month ago` : `${months} months ago`) :
+			`${months}mo`;
+	} else {
+		const years = Math.floor(timeDifference / secondsInAYear);
+		return verbose ?
+			(years === 1 ? `${years} year ago` : `${years} years ago`) :
+			`${years}y`;
+	}
 }
-
-function getMonthAndYear(timestamp: number): string {
-	const date = new Date(timestamp * 1000); // Convert seconds to milliseconds
-	
+  
+function getMonthAndYear(date: Date): string {
 	// Get month name
 	const monthNames = [
-	  "January", "February", "March", "April", "May", "June", 
-	  "July", "August", "September", "October", "November", "December"
+		"January", "February", "March", "April", "May", "June", 
+		"July", "August", "September", "October", "November", "December"
 	];
 	const month = monthNames[date.getMonth()];
-	
+
 	// Get year
 	const year = date.getFullYear();
-	
+
 	// Return formatted string
 	return `${month} ${year}`;
 }

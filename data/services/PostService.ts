@@ -46,11 +46,7 @@ export class PostService {
         try {
             const [status, _headers, body] = await this.http.request(Method.GET, endpoint, undefined, headers);
             if (status === 204) {
-                const data = {
-                    "posts": [],
-                    "total_posts": 0
-                }
-                return PostsResponse.decode(data);
+                return new PostsResponse([], 0);
             } else {
                 if (body) {
                     return PostsResponse.decode(body);

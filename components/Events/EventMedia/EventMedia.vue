@@ -1,6 +1,6 @@
 <template>
     <div id="event-media">
-        <EventTagsList :tags="tags" :limit="3"/>
+        <LabelsList :tags="tags" :limit="3"/>
         <div id="share" @click="handleEventSharing">
             <img src="@/assets/icons/share/share.white.svg" alt="share button icon">
         </div>
@@ -12,7 +12,7 @@
 import { useToast } from '#imports';
 import { generateImageURL } from '#imports';
 import { Event } from '~/data/models/EventModels';
-import EventTagsList from '../EventTagsList/EventTagsList.vue';
+import LabelsList from '../../LabelsList/LabelsList.vue';
 
 const props = defineProps({
     event: { type: Event, required: true }
@@ -44,7 +44,7 @@ function handleEventSharing() {
     max-width: 30rem;
     position: relative;
 
-    #event-tags-list {
+    #labels-list {
         margin: 1rem;
         position: absolute;
         padding-bottom: 0.5rem;

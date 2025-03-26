@@ -378,7 +378,6 @@ useSeoMeta({
             font-size: 2.5rem;
             font-weight: bold;
             padding: 0rem 1rem;
-            margin: 0.5rem 0.5rem;
             border-radius: 10px;
             background-color: var(--secondary-background-color);
         }
@@ -392,7 +391,7 @@ useSeoMeta({
 
         #note {
             font-size: 0.9rem;
-            margin: 0rem 1rem;
+            margin: 0rem 0.5rem;
             margin-bottom: 1rem;
             color: var(--tertiary-brand-color);
         }

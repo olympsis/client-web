@@ -5,10 +5,10 @@ import { useModelStore } from "@/stores/model-store";
 import { ClubService } from "../services/ClubService";
 import { useSessionStore } from "@/stores/session-store";
 import { UploadService } from "../services/UploadService";
-import { GROUP_TYPE, GROUP_VISIBILITY, SPORTS } from '../Enums';
+import { GROUP_ROLE, GROUP_TYPE, GROUP_VISIBILITY, SPORTS } from '../Enums';
 import { OrganizationService } from "../services/OrganizationService";
 import { Organization, OrganizationDao } from "../models/OrganizationModels";
-import { ImageUploadResponse, Member, type Location } from "../models/GenericModels";
+import { ImageUploadResponse, Member, Sport, Tag, type Location } from "../models/GenericModels";
 
 export class NewGroupManager {
 
@@ -27,7 +27,7 @@ export class NewGroupManager {
     public validateNewGroupData(
         title: string,
         description: string,
-        sports: Array<SPORTS>,
+        sports: Array<Sport>,
         homeTown: {
             subAdministrativeArea: string,
             administrativeArea: string,
@@ -66,7 +66,8 @@ export class NewGroupManager {
         logo: string | undefined,
         banner: string | undefined,
         title: string,
-        sports: Array<SPORTS>,
+        tags: Array<Tag>,
+        sports: Array<Sport>,
         description: string,
         hometown: {
             subAdministrativeArea: string,
@@ -82,7 +83,7 @@ export class NewGroupManager {
                     undefined,
                     title,
                     description,
-                    sports.map((s) => s.valueOf()),
+                    sports.map((s) => s.name.split(' ')[1]),
                     hometown.subAdministrativeArea,
                     hometown.administrativeArea,
                     hometown.country,
@@ -90,7 +91,7 @@ export class NewGroupManager {
                     banner,
                     visibility?.valueOf() ?? GROUP_VISIBILITY.PUBLIC,
                     undefined,
-                    undefined,
+                    tags.map((t) => t.name),
                     undefined,
                     undefined
                 );
@@ -99,7 +100,7 @@ export class NewGroupManager {
                     undefined,
                     title,
                     description,
-                    sports.map((s) => s.valueOf()),
+                    sports.map((s) => s.name.split(' ')[1]),
                     hometown.subAdministrativeArea,
                     hometown.administrativeArea,
                     hometown.country,
@@ -180,7 +181,7 @@ export class NewGroupManager {
      */
     public generateNewEventModel(id: string, dao: ClubDao | OrganizationDao) : Club | Organization {
         const user = this.sessionStore.user;
-        const timestamp = Math.floor(new Date().getTime() / 1000);
+        const timestamp = new Date();
 
         const snippet = new UserSnippet(
             user?.uuid,
@@ -190,7 +191,7 @@ export class NewGroupManager {
 
         const member = new Member(
             '000',
-            'owner',
+            GROUP_ROLE.OWNER,
             snippet,
             timestamp
         );

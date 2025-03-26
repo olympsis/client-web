@@ -45,7 +45,7 @@
                             <img src="@/assets/icons/calendar/calendar.month.svg">
                         </picture>
 
-                        <div :style="{ marginLeft: '0.5rem' }">{{ `Created ${getMonthAndYear(group?.createdAt ?? 0)}` }}</div>
+                        <div :style="{ marginLeft: '0.5rem' }">{{ `Created ${getMonthAndYear(group?.createdAt ?? new Date())}` }}</div>
                     </div>
 
                     <div v-if="isClub(group)" id="visibility" >

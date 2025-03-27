@@ -11,8 +11,8 @@
             </picture>
 
             <div class="info">
-                <div class="header">{{ venues[0].name }}</div>
-                <div class="sub-header">{{ venues[0].city + ", " + venues[0].state }}</div>
+                <div class="header">{{ venueName }}</div>
+                <div class="sub-header">{{ venueLocation }}</div>
             </div>
         </div>
 
@@ -49,9 +49,29 @@ import { Venue } from '~/data/models/VenueModels';
  * The event is static data and so are the venues because the page that this component is going into 
  * will be rendered server-side. So the data should be loaded in by the time it gets to be rendered.
  */
-defineProps({
+const props = defineProps({
     event: { type: Event, required: true },
     venues: { type: Array<Venue>, required: true }
+});
+
+const venueName = computed<string>(() => {
+    const firstVenue = props.event.venues.at(0);
+    if (firstVenue && !firstVenue.id) {
+        return firstVenue.name ?? "Custom Location";
+    } else {
+        return props.venues.at(0)?.name ?? "Custom Location";
+    }
+});
+
+const venueLocation = computed<string>(() => {
+    const firstVenue = props.event.venues.at(0);
+    if (firstVenue && !firstVenue.id) {
+        return `${firstVenue.city}, ${firstVenue.state}`;
+    } else {
+        const firstVenue = props.venues.at(0);
+        if (!firstVenue) return 'Unknown Location';
+        return `${firstVenue.city}, ${firstVenue.state}`;
+    }
 });
 </script>
 

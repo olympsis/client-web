@@ -10,8 +10,8 @@
             </picture>
 
             <div id="info">
-                <div class="title">{{ venues.at(0)?.name ?? '' }}</div>
-                <div class="sub-title">{{ (venues.at(0)?.city ?? '') + ', ' + (venues.at(0)?.state ?? '') }}</div>
+                <div class="title">{{ venueName }}</div>
+                <div class="sub-title">{{ venueLocation }}</div>
             </div>
         </div>
     </div>
@@ -31,13 +31,40 @@ const props = defineProps({
 const mapURL = ref<string | undefined> (undefined);
 const mapState = ref<VIEW_STATE>(VIEW_STATE.PENDING);
 
+const venueName = computed<string>(() => {
+    const firstVenue = props.event.venues.at(0);
+    if (firstVenue && !firstVenue.id) {
+        return firstVenue.name ?? "Custom Location";
+    } else {
+        return props.venues.at(0)?.name ?? "Custom Location";
+    }
+});
+
+const venueLocation = computed<string>(() => {
+    const firstVenue = props.event.venues.at(0);
+    if (firstVenue && !firstVenue.id) {
+        return `${firstVenue.city}, ${firstVenue.state}`;
+    } else {
+        const firstVenue = props.venues.at(0);
+        if (!firstVenue) return 'Unknown Location';
+        return `${firstVenue.city}, ${firstVenue.state}`;
+    }
+});
+
+function getCityStateCountry(): { city: string, state: string, country: string } {
+    const firstVenue = props.event.venues.at(0);
+    if (firstVenue && !firstVenue.id) {
+        return { city: firstVenue.city!, state: firstVenue.state!, country: firstVenue.country! };
+    } else {
+        const firstVenue = props.venues.at(0);
+        if (!firstVenue) throw('Fatal error');
+        return { city: firstVenue.city!, state: firstVenue.state!, country: firstVenue.country! }
+    }
+}
+
 onMounted(() => {
     if (mapURL.value) return;
-    if (props.venues.at(0) == undefined) return;
-
-    const city = props.venues.at(0)?.city ?? '';
-    const state = props.venues.at(0)?.state ?? '';
-    const country = props.venues.at(0)?.country ?? '';
+    const { city, state, country } = getCityStateCountry()
 
     mapState.value = VIEW_STATE.LOADING;
     

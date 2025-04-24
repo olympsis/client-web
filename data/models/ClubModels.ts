@@ -124,7 +124,7 @@ class Club extends Codable<Club> {
         if (this.id) {
             data['id'] = this.id;
         }
-        if (this.parent) {
+        if (this.parent && Object.keys(this.parent).length !== 0) {
             data['parent'] = this.parent.encode();
         }
         if (this.name) {

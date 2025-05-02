@@ -30,7 +30,7 @@
         </div>
 
         <!-- Add Calendar Button -->
-        <div id="add-calendar">
+        <div id="add-calendar" @click="downloadEventAsCalendar">
             <picture :style="{ width: '24px', height: '24px', margin: '0rem 0.5rem' }">
                 <source srcset="@/assets/icons/calendar/calendar.month.white.svg" media="(prefers-color-scheme: dark)">
                 <img src="@/assets/icons/calendar/calendar.month.svg">
@@ -42,6 +42,7 @@
 </template>
 
 <script setup lang="ts">
+import { generateCalendarFile } from '#imports';
 import { Event } from '~/data/models/EventModels';
 import { Venue } from '~/data/models/VenueModels';
 
@@ -73,6 +74,16 @@ const venueLocation = computed<string>(() => {
         return `${firstVenue.city}, ${firstVenue.state}`;
     }
 });
+
+/**
+ * Downloads an event as an iCalendar (.ics) file
+ * @param event The event to download as a calendar file
+ */
+ function downloadEventAsCalendar(): void {
+    const data = generateCalendarFile(props.event, props.venues);
+    const dataUrl = 'data:text/calendar;charset=utf-8,' + encodeURIComponent(data);
+    window.open(dataUrl);
+}
 </script>
 
 <style scoped>

@@ -47,6 +47,8 @@ function generateCalendarFile(event: Event, venues: Venue[]): string {
         `DTSTART:${formatDate(event.startTime)}`,
         `DTEND:${formatDate(event.stopTime)}`,
         `SUMMARY:${escapeText(event.title)}`,
+        `ATTACH;FMTTYPE=image/jpeg:${generateImageURL(event.mediaURL)}`,
+        `URL:https://www.olympsis.com/events/${event.id}`,
         `DESCRIPTION:${description}`
     ];
 

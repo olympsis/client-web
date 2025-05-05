@@ -1,5 +1,4 @@
 import * as jsrsasign from 'jsrsasign';
-import { importPKCS8, SignJWT } from 'jose';
 import { useSessionStore } from '@/stores/session-store';
 
 /**

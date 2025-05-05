@@ -14,6 +14,9 @@ class Venue extends Codable<Venue> {
     state: string | undefined;
     country: string | undefined;
 
+    bookingURL: string | undefined;
+    requiresBooking: boolean = true;
+
     static override decode<Venue>(data: { [key: string]: any }): Venue {
         const object = Object();
 
@@ -48,6 +51,11 @@ class Venue extends Codable<Venue> {
             if (data['country']) {
                 object['country'] = data['country'];
             }
+            if (data['booking_url']) {
+                object['bookingURL'] = data['booking_url'];
+            }
+
+            object['requiresBooking'] = data['requires_booking'] ?? false;
         }
 
         Object.setPrototypeOf(object, Venue.prototype);
@@ -96,6 +104,12 @@ class Venue extends Codable<Venue> {
         if (this.country) {
             data['country'] = this.country;
         }
+
+        if (this.bookingURL) {
+            data['booking_url'] = this.bookingURL;
+        }
+
+        data['requires_booking'] = this.requiresBooking;
 
         return data;
     }

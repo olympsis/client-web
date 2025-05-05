@@ -33,19 +33,39 @@
                 <p>{{ description }}</p>
             </div>
 
+            <div v-if="requiresBooking" :style="{ display: 'flex', fontSize: '0.8rem', alignItems: 'center', margin: '0rem 1rem' }">
+                <img src="@/assets/icons/warning/warning.yellow.svg">
+                <p>This location may require an external reservation before you can host an event</p>
+            </div>
+
             <!-- Venue Actions -->
             <div class="actions">
-                <div class="action directions" @click="openMaps">
+                <div class="action directions" v-if="!requiresBooking" @click="openMaps">
                     <img src="@/assets/icons/car/car.white.svg">
                     <p>Directions</p>
                 </div>
-                <div class="action type">
+
+                <div class="action type" v-else @click="openMaps">
+                    <picture>
+                        <source srcset="@/assets/icons/car/car.white.svg" media="(prefers-color-scheme: dark)">
+                        <img src="@/assets/icons/car/car.svg">
+                    </picture>
+                    <p>Directions</p>
+                </div>
+
+                <div class="action type" v-if="!requiresBooking">
                     <picture>
                         <source srcset="@/assets/icons/globe/globe.white.svg" media="(prefers-color-scheme: dark)">
                         <img src="@/assets/icons/globe/globe.svg">
                     </picture>
                     <p>{{ venueVisibility }}</p>
                 </div>
+
+                <div class="action directions" v-else @click="openBooking">
+                    <img src="@/assets/icons/calendar/calendar.add.fill.white.svg">
+                    <p>Schedule</p>
+                </div>
+
                 <div class="action new-event">
                     <picture>
                         <source srcset="@/assets/icons/plus/plus.white.svg" media="(prefers-color-scheme: dark)">
@@ -135,7 +155,11 @@ const events = computed(() => {
 
 const venueVisibility = computed(() => {
     return props.venue.owner?.type ?? 'Public';
-})
+});
+
+const requiresBooking = computed<Boolean>(() => {
+    return props.venue.requiresBooking && props.venue.bookingURL != undefined;
+});
 
 function closeModal() {
     emit("close");
@@ -151,6 +175,12 @@ function openMaps() {
         if (coordinates) {
             getDirections(coordinates);
         }
+    }
+}
+
+function openBooking() {
+    if (props.venue.bookingURL) {
+        window.open(props.venue.bookingURL);
     }
 }
 
@@ -237,7 +267,8 @@ function openMaps() {
         flex-direction: column;
 
         h3 {
-            margin: 0.5rem 1rem;
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
             color: var(--primary-label-color);
         }
 
@@ -254,7 +285,7 @@ function openMaps() {
         .action {
             display: flex;
             width: 100%;
-            height: 5.5rem;
+            height: 5rem;
             cursor: pointer;
             border-radius: 1rem;
             align-items: center;

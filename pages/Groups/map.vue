@@ -70,20 +70,19 @@
 </template>
 
 <script setup lang="ts">
-
-import Dialog from 'primevue/dialog';
+import { useRoute } from 'vue-router';
 import { Venue } from '@/data/models/VenueModels';
 import { Event } from '@/data/models/EventModels';
 import { useModelStore } from '@/stores/model-store';
 import { useSessionStore } from '@/stores/session-store';
-import { getMapkitServerToken, generateMapkitAuthToken } from '~/utils/map-helpers';
-import { createVNode, watch, onMounted, ref, render, computed, type Ref, type ComputedRef } from 'vue';
+import { generateMapkitAuthToken } from '~/utils/map-helpers';
+import { createVNode, onMounted, ref, render, computed, type Ref, type ComputedRef } from 'vue';
 
+import Dialog from 'primevue/dialog';
 import EventsListModal from '@/components/Events/EventsListModal/EventsListModal.vue';
-import VenueDetailCard from '@/components/Venues/VenueDetailCard/VenueDetailCard.vue';
 import VenueAnnotation from '@/components/Venues/VenueAnnotation/VenueAnnotation.vue';
 import NoGroupWarning from '@/components/Dialog/NoGroupWarning/NoGroupWarning.vue';
-import { useRoute } from 'vue-router';
+
 
 declare let mapkit: any;
 let map: any = null;
@@ -245,9 +244,5 @@ function loadVenues() {
         justify-content: center;
         background-color: var(--primary-brand-color);
     }
-}
-
-#events {
-    
 }
 </style>

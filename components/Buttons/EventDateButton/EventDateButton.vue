@@ -18,7 +18,7 @@ function handleInputClick() {
     if (inputRef.value) {
         inputRef.value.click()
     } else {
-        console.error('Failed to find input template reference.')
+        console.error('Failed to find input template reference.');
     }
 }
 </script>

@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
+import * as Sentry from '@sentry/nuxt';
 import { UserSnippet } from "../models/UserModels";
 import { useModelStore } from "@/stores/model-store";
 import { Post, PostDao } from "../models/PostModels";
@@ -51,6 +52,10 @@ export class NewPostManager {
             const id = await this.postService.createPost(dao);
             return this.generateNewPostModel(id, dao);
         } catch (error) {
+            Sentry.withScope((scope) => {
+                scope.setExtra('action', 'create_post');
+                Sentry.captureException(error);
+            });
             console.error(`Failed to create post. Error: ${error}`);
             return null;
         }

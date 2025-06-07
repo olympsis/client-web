@@ -81,6 +81,7 @@ import type { CroppedMedia } from '~/data/GlobalData';
 import { UserService } from '~/data/services/UserService';
 import { UploadService } from "@/data/services/UploadService";
 
+import * as Sentry from '@sentry/nuxt';
 import MediaPicker from '~/components/MediaPicker/MediaPicker.vue';
 import LocalePicker from '~/components/LocalePicker/LocalePicker.vue';
 import MultiSportsPicker from '~/components/MultiSportsPicker/MultiSportsPicker.vue';
@@ -208,6 +209,10 @@ async function updateUserProfile() {
             const config = useRuntimeConfig();
             if (config.public.MODE !== 'dev') return;
             console.error(`Failed to upload image. Error: ${error}`);
+            Sentry.withScope((scope) => {
+                scope.setExtra('action', 'upload_profile_image');
+                Sentry.captureException(error);
+            });
             return;
         }
     }
@@ -226,6 +231,10 @@ async function updateUserProfile() {
             viewState.value = VIEW_STATE.PENDING;
             console.error(`Failed to update user data. Error: ${error}`)
         }
+        Sentry.withScope((scope) => {
+            scope.setExtra('action', 'update_user');
+            Sentry.captureException(error);
+        });
     }
 }
 

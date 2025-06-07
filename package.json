@@ -6,7 +6,7 @@
     "build": "nuxt build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
-    "preview": "nuxt preview",
+    "preview": "NODE_OPTIONS='--import ./public/instrument.server.mjs' nuxt preview",
     "postinstall": "nuxt prepare",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
@@ -16,6 +16,7 @@
     "@pinia/nuxt": "^0.9.0",
     "@primevue/nuxt-module": "^4.3.2",
     "@primevue/themes": "^4.2.5",
+    "@sentry/nuxt": "^9.27.0",
     "@types/jsrsasign": "^10.5.15",
     "@vercel/analytics": "^1.4.1",
     "@vercel/speed-insights": "^1.1.0",
@@ -42,5 +43,8 @@
     "@storybook/test": "latest",
     "@storybook/vue3": "latest",
     "@types/node": "^18.17.5"
+  },
+  "overrides": {
+    "@vercel/nft": "^0.27.4"
   }
 }

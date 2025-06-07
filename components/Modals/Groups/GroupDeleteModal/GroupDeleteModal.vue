@@ -30,6 +30,7 @@ import { ClubService } from '@/data/services/ClubService';
 import { GroupSelection } from '@/data/models/GenericModels';
 import { OrganizationService } from '@/data/services/OrganizationService';
 
+import * as Sentry from "@sentry/nuxt";
 import TextButton from '@/components/Buttons/LoadingButtons/TextButton/TextButton.vue';
 
 const toast = useToast();
@@ -67,11 +68,19 @@ function handleDeleteGroup() {
                                 emit('success');
                             }, 200);
                         } else {
+                            Sentry.withScope((scope) => {
+                                scope.setExtra('action', 'delete_club');
+                                Sentry.captureMessage(`Server Error. Failed to delete club. ID: ${props.group.organization?.id}`, 'error');
+                            });
                             toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to delete club!', life: 3000 });
                             emit('close');
                         }
                     })
                     .catch((error) => {
+                        Sentry.withScope((scope) => {
+                            scope.setExtra('action', 'delete_club');
+                            Sentry.captureException(error);
+                        });
                         console.error(`Failed to delete club ${props.group.club?.id}. Error: ${error}`);
                         toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to delete Club!', life: 3000 });
                         emit('close');
@@ -90,12 +99,21 @@ function handleDeleteGroup() {
                                 emit('success');
                             }, 200);
                         } else {
+                            Sentry.withScope((scope) => {
+                                scope.setExtra('action', 'delete_organization');
+                                Sentry.captureMessage(`Server Error. Failed to delete Organization. ID: ${props.group.organization?.id}`, 'error');
+                            });
                             state.value = VIEW_STATE.FAILURE;
+                            console.error(`Failed to delete Organization. ID: ${props.group.organization?.id}`, 'error');
                             toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to delete Organization!', life: 3000 });
                             emit('close');
                         }
                     })
                     .catch((error) => {
+                        Sentry.withScope((scope) => {
+                            scope.setExtra('action', 'delete_organization');
+                            Sentry.captureException(error);
+                        });
                         console.error(`Failed to delete organization: ${props.group.organization?.id}.  Error: ${error}`);
                         toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to delete Organization!', life: 3000 });
                         state.value = VIEW_STATE.FAILURE;

@@ -1,4 +1,6 @@
 import { defineStore } from 'pinia'
+import * as Sentry from '@sentry/nuxt';
+
 import { ref, type Ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useModelStore } from './model-store';
@@ -100,6 +102,10 @@ export const useSessionStore = defineStore('session-store', () => {
             hasLoaded.value = true;
             loadingState.value = VIEW_STATE.SUCCESS;
         } catch (error) {
+            Sentry.withScope((scope) => {
+                scope.setExtra('action', 'check_in');
+                Sentry.captureException(error);
+            });
             loadingState.value = VIEW_STATE.FAILURE;
             console.error(`Failed to init session store. Checking in user failed. Error: ${error}`);
         }

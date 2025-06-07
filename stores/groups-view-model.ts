@@ -1,12 +1,13 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
 import { VIEW_STATE } from "~/data/Enums";
+import type { Group } from "~/types/group";
 import { Post } from "../data/models/PostModels";
 import { useSessionStore } from "./session-store";
 import { PostService } from "../data/services/PostService";
 import { GroupSelection } from "../data/models/GenericModels";
-import type { Club } from "~/data/models/ClubModels";
-import type { Group } from "~/types/group";
+
+import * as Sentry from '@sentry/nuxt';
 
 export const useGroupsViewModel = defineStore('groups-view-model', () => {
     var state = ref(VIEW_STATE.LOADING);
@@ -35,6 +36,11 @@ export const useGroupsViewModel = defineStore('groups-view-model', () => {
                     return;
                 })
                 .catch((error) => {
+                    Sentry.withScope((scope) => {
+                        scope.setExtra('action', 'fetch_posts');
+                        scope.setExtra('group', id);
+                        Sentry.captureException(error);
+                    });
                     console.error('Failed to load groups view model: ' + error);
                     state.value = VIEW_STATE.FAILURE;
                     return;
@@ -57,6 +63,11 @@ export const useGroupsViewModel = defineStore('groups-view-model', () => {
                 return;
             })
             .catch((error) => {
+                Sentry.withScope((scope) => {
+                    scope.setExtra('action', 'fetch_posts');
+                    scope.setExtra('group', id);
+                    Sentry.captureException(error);
+                });
                 console.error('Failed to load groups view model: ' + error);
                 state.value = VIEW_STATE.FAILURE;
                 return;
@@ -95,6 +106,11 @@ export const useGroupsViewModel = defineStore('groups-view-model', () => {
                 return
             })
             .catch((error) => {
+                Sentry.withScope((scope) => {
+                    scope.setExtra('action', 'fetch_posts');
+                    scope.setExtra('group', id);
+                    Sentry.captureException(error);
+                });
                 console.error('Failed to load posts: ' + error)
                 state.value = VIEW_STATE.FAILURE
             });

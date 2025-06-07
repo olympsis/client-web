@@ -44,6 +44,8 @@ import { useSessionStore } from '@/stores/session-store';
 import { ClubService } from '@/data/services/ClubService';
 import { SnapshotService } from '~/data/services/SnapshotService';
 
+import * as Sentry from '@sentry/nuxt';
+
 import AuthModal from '~/components/Auth/AuthModal/AuthModal.vue';
 import GroupFeed from '~/components/Groups/GroupFeed/GroupFeed.vue';
 import GroupInfo from '~/components/Groups/GroupInfo/GroupInfo.vue';
@@ -227,6 +229,10 @@ onMounted(() => {
             mapState.value = VIEW_STATE.SUCCESS;
         })
         .catch((error) => {
+            Sentry.withScope((scope) => {
+                scope.setExtra('action', 'fetch_map_snapshot');
+                Sentry.captureException(error);
+            });
             console.error(`Failed to load snapshot. Error: ${error}`);
             mapState.value = VIEW_STATE.FAILURE;
         });

@@ -1,5 +1,13 @@
 <template>
     <div id="event-body">
+        <div v-if="isExternalEvent" class="external-url" @click="openExternalURL">
+            <picture class="icon">
+                <source srcset="@/assets/icons/link/link.white.svg" media="(prefers-color-scheme: dark)">
+                <img src="@/assets/icons/link/link.svg" :style="{ marginRight: '0.25rem' }">
+            </picture>
+            <p>More event details may be available out of Olympsis. Please click on this message to learn more.</p>
+        </div>
+
         <div id="about">
             <h2>About</h2>
             <div id="body">{{ event.body }}</div>
@@ -44,6 +52,10 @@ const primaryState = ref<VIEW_STATE>(VIEW_STATE.PENDING);
 
 const isAuthenticated = computed<boolean>(() => {
     return auth.isAuthenticated.value;
+});
+
+const isExternalEvent = computed<boolean>(() => {
+    return event.value.externalLink != undefined && event.value.externalLink != "";
 });
 
 const eventState = computed<EVENT_STATE>(() => {
@@ -152,6 +164,12 @@ function openMaps() {
         }
     }
 }
+
+function openExternalURL() {
+    if (event.value.externalLink) {
+        window.open(event.value.externalLink)
+    }
+}
 </script>
 
 <style scoped>
@@ -174,5 +192,13 @@ function openMaps() {
         margin: 1rem 0rem;
         justify-content: space-around;
     }
+}
+
+.external-url {
+    display: flex;
+    cursor: pointer;
+    font-size: 0.8rem; 
+    align-items: center; 
+    margin: 0rem 0.5rem 1rem 0.5rem; 
 }
 </style>

@@ -17,12 +17,12 @@ COPY . .
 RUN npm run build
 
 # Expose the port (Cloud Run will use PORT environment variable)
-EXPOSE 3000
+EXPOSE 80
 
 # Set environment variables for production
 ENV NODE_ENV=production
 ENV NITRO_HOST=0.0.0.0
-ENV NITRO_PORT=3000
+ENV NITRO_PORT=80
 
 
 # Start the application

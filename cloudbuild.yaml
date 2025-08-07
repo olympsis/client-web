@@ -1,0 +1,83 @@
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - '--no-cache'
+      - '--build-arg'
+      - 'MODE=$_MODE'
+      - '--build-arg'
+      - 'API=$_API'
+      - '--build-arg'
+      - 'APL_KEY_ID=$_APL_KEY_ID'
+      - '--build-arg'
+      - 'APL_TEAM_ID=$_APL_TEAM_ID'
+      - '--build-arg'
+      - 'APL_APP_ID=$_APL_APP_ID'
+      - '--build-arg'
+      - 'APL_MAPKIT_SNAPSHOT_TOKEN=$_APL_MAPKIT_SNAPSHOT_TOKEN'
+      - '--build-arg'
+      - 'MAPKIT_ORIGIN=$_MAPKIT_ORIGIN'
+      - '--build-arg'
+      - 'MAPKIT_KEY=$_MAPKIT_KEY'
+      - '--build-arg'
+      - 'FB_API_KEY=$_FB_API_KEY'
+      - '--build-arg'
+      - 'FB_AUTH_DOMAIN=$_FB_AUTH_DOMAIN'
+      - '--build-arg'
+      - 'FB_PROJECT_ID=$_FB_PROJECT_ID'
+      - '--build-arg'
+      - 'FB_STORAGE_BUCKET=$_FB_STORAGE_BUCKET'
+      - '--build-arg'
+      - 'FB_MESSAGING_SENDER_ID=$_FB_MESSAGING_SENDER_ID'
+      - '--build-arg'
+      - 'FB_APP_ID=$_FB_APP_ID'
+      - '--build-arg'
+      - 'FB_MEASUREMENT_ID=$_FB_MEASUREMENT_ID'
+      - '--build-arg'
+      - 'DSN=$_DSN'
+      - '-t'
+      - >-
+        $_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
+      - .
+      - '-f'
+      - Dockerfile
+    id: Build
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - >-
+        $_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
+    id: Push
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
+    args:
+      - run
+      - services
+      - update
+      - $_SERVICE_NAME
+      - '--platform=managed'
+      - >-
+        --image=$_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
+      - >-
+        --labels=managed-by=gcp-cloud-build-deploy-cloud-run,commit-sha=$COMMIT_SHA,gcb-build-id=$BUILD_ID,gcb-trigger-id=$_TRIGGER_ID
+      - '--region=$_DEPLOY_REGION'
+      - '--quiet'
+    id: Deploy
+    entrypoint: gcloud
+images:
+  - >-
+    $_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
+options:
+  substitutionOption: ALLOW_LOOSE
+  logging: CLOUD_LOGGING_ONLY
+substitutions:
+  _AR_REPOSITORY: cloud-run-source-deploy
+  _AR_PROJECT_ID: olympsis-408521
+  _PLATFORM: managed
+  _SERVICE_NAME: client-web
+  _DEPLOY_REGION: us-central1
+  _TRIGGER_ID: fa0e0670-842b-40ad-bacb-ef92d24c5e56
+  _AR_HOSTNAME: us-central1-docker.pkg.dev
+tags:
+  - gcp-cloud-build-deploy-cloud-run
+  - gcp-cloud-build-deploy-cloud-run-managed
+  - client-web

@@ -19,8 +19,8 @@
         <div id="footer">
             <button id="menu-button" @click="toggle">
                 <picture>
-                    <source srcset="~/assets/icons/ellipsis/ellipsis.white.svg" media="(prefers-color-scheme: dark)"/>
-                    <img src="~/assets/icons/ellipsis/ellipsis.svg"/>
+                    <source srcset="@/assets/icons/ellipsis/ellipsis.white.svg" media="(prefers-color-scheme: dark)"/>
+                    <img src="@/assets/icons/ellipsis/ellipsis.svg"/>
                 </picture>
             </button>
             <Menu ref="menu" id="overlay_menu" :model="items" :popup="true"></Menu>

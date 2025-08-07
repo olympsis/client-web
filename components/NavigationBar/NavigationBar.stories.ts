@@ -1,7 +1,7 @@
 import NavigationBar from "./NavigationBar.vue";
 import type { Meta, StoryObj } from "@storybook/vue3";
 
-import "~/assets/css/main.css";
+import "@/assets/css/main.css";
 
 const meta: Meta<typeof NavigationBar> = {
   component: NavigationBar,

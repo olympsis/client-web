@@ -14,6 +14,7 @@
         "firebaseapp",
         "firestore",
         "FMTTYPE",
+        "gcloudignore",
         "hextob",
         "jsrsasign",
         "KEYUTIL",

@@ -9,8 +9,6 @@
 </template>
   
 <script setup lang="ts">
-import { Analytics } from '@vercel/analytics/nuxt';
-import { SpeedInsights } from "@vercel/speed-insights/nuxt";
 
 import Toast from 'primevue/toast';
 import LocationDialog from './components/System/LocationDialog/LocationDialog.vue';

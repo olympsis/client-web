@@ -110,7 +110,7 @@ useSeoMeta({
 	background-size: cover;
 	background-position: center;
 	background-repeat: no-repeat;
-	background-image: url('~/assets/images/sports.webp');
+	background-image: url('@/assets/images/sports.webp');
 }
 
 #create-user-card {
@@ -122,7 +122,7 @@ useSeoMeta({
 		background-size: cover;
 		background-position: center;
 		background-repeat: no-repeat;
-		background-image: url('~/assets/images/sports-small.webp');
+		background-image: url('@/assets/images/sports-small.webp');
 	}
 }
 </style>

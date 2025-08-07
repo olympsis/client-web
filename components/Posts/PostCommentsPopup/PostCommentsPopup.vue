@@ -3,8 +3,8 @@
         <div class="header">
             <button class="secondary button" @click="$emit('close')">
                 <picture>
-                    <source srcset="~/assets/icons/xmark/xmark.white.svg" media="(prefers-color-scheme: dark)">
-                    <img src="~/assets/icons/xmark/xmark.svg"/>
+                    <source srcset="@/assets/icons/xmark/xmark.white.svg" media="(prefers-color-scheme: dark)">
+                    <img src="@/assets/icons/xmark/xmark.svg"/>
                 </picture>
             </button>
         </div>
@@ -69,7 +69,7 @@ async function handleAddComment(text: string) {
             id,
             new UserSnippet(user.uuid, user.username, user.imageURL),
             text,
-            new Date().getTime() / 1000
+            new Date()
         );
         props.post.comments.push(comment);
         inputText.value = '';

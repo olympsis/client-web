@@ -1,30 +1,35 @@
 {
-  "applinks": {
-      "details": [
-           {
-             "appIDs": [ "6503405536.com.olympsis.client" ],
-             "components": [
-               {
-                  "/": "/events/*",
-                  "comment": "Matches any URL with a path that starts with /events/."
-               },
-               {
-                  "/": "/privacy-policy",
-				  "exclude": true,
-                  "comment": "Matches any URL with a path that starts with /privacy-policy."
-               },
-               {
-                  "/": "/terms-of-use",
-				  "exclude": true,
-                  "comment": "Matches any URL with a path that starts with /terms-of-use."
-               },
-               {
-                  "/": "/contact-us",
-				  "exclude": true,
-                  "comment": "Matches any URL with a path that starts with /contact."
-               }
-             ]
+	"applinks": {
+    	"details": [
+        	{
+				"appIDs": [ 
+					"6503405536.com.olympsis.client",
+					"5A6H49Q85D.com.olympsis.client"
+				],
+				"components": [
+					{
+						"/": "/events/*",
+						"comment": "Matches any URL with a path that starts with /events/."
+					},
+					{
+						"/": "/groups/*",
+						"comment": "Matches any URL with a path that starts with /events/."
+					}
+				]
            }
-       ]
-   }
+    	]
+	},
+
+	"webcredentials": {
+    	"apps": [ 
+			"6503405536.com.olympsis.client",
+			"5A6H49Q85D.com.olympsis.client" 
+		]
+   	},
+
+    "appclips": {
+        "apps": [ 
+			"5A6H49Q85D.com.olympsis.client.clip" 
+		]
+    }
 }

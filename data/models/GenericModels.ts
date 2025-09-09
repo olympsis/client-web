@@ -216,19 +216,22 @@ class Participant extends Codable<Participant> {
     id: string;
     user: UserSnippet | undefined;
     status: EVENT_RSVP_STATUS;
+    isAnonymous?: boolean;
     createdAt: Date;
 
     constructor(
         id: string = uuidv4(),
         user: UserSnippet | undefined,
         status: EVENT_RSVP_STATUS,
-        createdAt: Date
+        createdAt: Date,
+        isAnonymous?: boolean
     ) {
         super();
         this.id = id;
         this.user = user;
         this.status = status;
         this.createdAt = createdAt;
+        this.isAnonymous = isAnonymous;
     }
 
     static override decode<Participant>(data: { [key: string]: any }): Participant {
@@ -243,6 +246,10 @@ class Participant extends Codable<Participant> {
 
             object['status'] = numberToEventRSVP(data['status']);
             object['createdAt'] = new Date(data['created_at']);
+
+            if (data['is_anonymous']) {
+                object['is_anonymous'] = data['is_anonymous'];
+            }
         }
 
         Object.setPrototypeOf(object, Participant.prototype);
@@ -263,6 +270,9 @@ class Participant extends Codable<Participant> {
         }
         if (this.createdAt) {
             data['created_at'] = this.createdAt.toISOString();
+        }
+        if (this.isAnonymous != undefined) {
+            data['is_anonymous'] = this.isAnonymous
         }
     
         return data;

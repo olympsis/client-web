@@ -31,6 +31,7 @@ class Event extends Codable<Event> {
     startTime: Date;
     stopTime: Date;
 
+    config?: EventConfig;
     formatConfig?: EventFormatConfig;
 
     participants: Participant[];
@@ -76,6 +77,7 @@ class Event extends Codable<Event> {
         teams: Team[],
         teamsWaitlist: Team[],
         teamsConfig?: TeamsConfig,
+        config?: EventConfig,
         formatConfig?: EventFormatConfig,
         externalLink?: string,
         cancelledAt?: Date,
@@ -94,6 +96,7 @@ class Event extends Codable<Event> {
         this.sports = sports;
         this.tags = tags;
         
+        this.config = config;
         this.formatConfig = formatConfig;
         
         this.startTime = startTime;
@@ -136,6 +139,7 @@ class Event extends Codable<Event> {
             object['tags'] = data['tags'] || [];
             
             // Format config
+            object['config'] = data['config'] ? EventConfig.decode(data['config']) : undefined;
             object['formatConfig'] = data['format_config'] ? EventFormatConfig.decode(data['format_config']) : undefined;
             
             // Dates
@@ -210,6 +214,10 @@ class Event extends Codable<Event> {
             data['sports'] = this.sports.map((s) => s.valueOf());
         }
         
+        if (this.config) {
+            data['config'] = this.config.encode();
+        }
+
         if (this.formatConfig) {
             data['format_config'] = this.formatConfig.encode();
         }
@@ -688,16 +696,21 @@ class EventRecurrenceConfig extends Codable<EventRecurrenceConfig> {
 
 class ParticipantsConfig extends Codable<ParticipantsConfig> {
     hasWaitlist?: boolean;
+    hideParticipants?: boolean;
+
     minParticipants?: number;
     maxParticipants?: number;
 
     constructor(
         hasWaitlist?: boolean,
+        hideParticipants?: boolean,
         minParticipants?: number,
         maxParticipants?: number
     ) {
         super();
         this.hasWaitlist = hasWaitlist;
+        this.hideParticipants = hideParticipants;
+
         this.minParticipants = minParticipants;
         this.maxParticipants = maxParticipants;
     }
@@ -707,6 +720,7 @@ class ParticipantsConfig extends Codable<ParticipantsConfig> {
 
         if (data) {
             object['hasWaitlist'] = data['has_waitlist'];
+            object['hideParticipants'] = data['hide_participants'];
             object['minParticipants'] = data['min_participants'];
             object['maxParticipants'] = data['max_participants'];
         }
@@ -721,6 +735,9 @@ class ParticipantsConfig extends Codable<ParticipantsConfig> {
         if (this.hasWaitlist !== undefined) {
             data['has_waitlist'] = this.hasWaitlist;
         }
+        if (this.hideParticipants !== undefined) {
+            data['hide_participants'] = this.hideParticipants;
+        }
         if (this.minParticipants !== undefined) {
             data['min_participants'] = this.minParticipants;
         }
@@ -734,18 +751,23 @@ class ParticipantsConfig extends Codable<ParticipantsConfig> {
 
 class TeamsConfig extends Codable<TeamsConfig> {
     hasWaitlist?: boolean;
+    hideTeams?: boolean;
+
     minTeams?: number;
     maxTeams?: number;
     maxTeamSize?: number;
 
     constructor(
         hasWaitlist?: boolean,
+        hideTeams?: boolean,
         minTeams?: number,
         maxTeams?: number,
         maxTeamSize?: number
     ) {
         super();
         this.hasWaitlist = hasWaitlist;
+        this.hideTeams = hideTeams;
+
         this.minTeams = minTeams;
         this.maxTeams = maxTeams;
         this.maxTeamSize = maxTeamSize;
@@ -756,6 +778,8 @@ class TeamsConfig extends Codable<TeamsConfig> {
 
         if (data) {
             object['hasWaitlist'] = data['has_waitlist'];
+            object['hideTeams'] = data['hide_teams'];
+
             object['minTeams'] = data['min_teams'];
             object['maxTeams'] = data['max_teams'];
             object['maxTeamSize'] = data['max_team_size'];
@@ -771,6 +795,9 @@ class TeamsConfig extends Codable<TeamsConfig> {
         if (this.hasWaitlist !== undefined) {
             data['has_waitlist'] = this.hasWaitlist;
         }
+        if (this.hideTeams !== undefined) {
+            data['hide_teams'] = this.hideTeams;
+        }
         if (this.minTeams !== undefined) {
             data['min_teams'] = this.minTeams;
         }
@@ -779,6 +806,46 @@ class TeamsConfig extends Codable<TeamsConfig> {
         }
         if (this.maxTeamSize !== undefined) {
             data['max_team_size'] = this.maxTeamSize;
+        }
+
+        return data;
+    }
+}
+
+class EventConfig extends Codable<EventConfig> {
+    hidePoster?: boolean;
+    hideLocation?: boolean;
+
+    constructor(
+        hidePoster?: boolean,
+        hideLocation?: boolean
+    ) {
+        super();
+        this.hidePoster = hidePoster;
+        this.hideLocation = hideLocation;
+    }
+
+    static override decode<EventConfig>(data: { [key: string]: any; }): EventConfig {
+        const object = Object();
+
+        if (data) {
+            object['hidePoster'] = data['hidePoster'];
+            object['hideLocation'] = data['hideLocation'];
+        }
+
+        Object.setPrototypeOf(object, EventConfig.prototype);
+        return object;
+    }
+
+    override encode(): { [key: string]: any } {
+        const data: { [key: string]: any } = {};
+
+        if (this.hidePoster) {
+            data['hide_poster'] = this.hidePoster;
+        }
+
+        if (this.hideLocation) {
+            data['hide_location'] = this.hideLocation;
         }
 
         return data;

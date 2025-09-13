@@ -59,17 +59,13 @@ const isExternalEvent = computed<boolean>(() => {
 });
 
 const eventState = computed<EVENT_STATE>(() => {
-    const timestamp = Math.floor(new Date().getTime() / 1000);
+    const timestamp = Math.floor(new Date().getTime());
     const thirtyMinutesAgo = timestamp - (30 * 60);
-    const twoHoursAgo = timestamp - (2 * 60 * 60);
 
     const startTime = (event.value?.startTime.getTime()) ?? 0;
     const stopTime = (event.value?.stopTime.getTime()) ?? 0;
 
-    if (
-        (stopTime !== 0 && stopTime < timestamp) ||
-        (startTime !== 0 && startTime < twoHoursAgo)
-    ) {
+    if (stopTime !== 0 && stopTime < timestamp) {
         return EVENT_STATE.COMPLETED;
     } else if (startTime !== undefined && startTime < thirtyMinutesAgo) {
         return EVENT_STATE.LIVE;

@@ -84,7 +84,6 @@ const username = computed<string>(() => {
     return isAnonymous.value ? '@anon' : '@' + (props.participant.user?.username ?? 'olympsis-user')
 });
 
-
 </script>
 
 <style scoped>

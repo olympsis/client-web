@@ -39,7 +39,7 @@
         <!-- Completed Button -->
         <div v-if="eventState === EVENT_STATE.COMPLETED" id="completed" class="action">
             <img class="icon" src="@/assets/icons/block/block.white.svg">
-            <p> Ended </p>
+            <p :style="{ color: 'white' }"> Ended </p>
         </div>
     </button>
 </template>
@@ -70,20 +70,16 @@ const event = defineModel<Event | undefined>(
 
 const eventState = computed<EVENT_STATE>(() => {
     // Current timestamp in seconds (Unix timestamp)
-    const timestamp = Math.floor(new Date().getTime() / 1000);
+    const timestamp = Math.floor(new Date().getTime());
     
     // Convert time differences to seconds
     const thirtyMinutesAgo = timestamp - (30 * 60);
-    const twoHoursAgo = timestamp - (2 * 60 * 60);
     
     // Get start and stop times, ensuring they're treated as seconds
     const startTime = (event.value?.startTime.getTime() ?? 0);
     const stopTime = (event.value?.stopTime.getTime() ?? 0);
 
-    if (
-        (stopTime !== 0 && stopTime < timestamp) ||
-        (startTime !== 0 && startTime < twoHoursAgo)
-    ) {
+    if (stopTime !== 0 && stopTime < timestamp) {
         return EVENT_STATE.COMPLETED;
     } else if (startTime !== 0 && startTime < thirtyMinutesAgo) {
         return EVENT_STATE.LIVE;

@@ -2,14 +2,8 @@
     <div id="event-organizers">
         <h2>Hosted by</h2>
         <ul id="list">
-            <li id="poster" class="organizer">
-                <UserIcon
-                    :user="event.poster"
-                    :size="2.5"
-                    :style="{ height: '2.75rem' }"
-                />
-                <div id="name">{{ event.poster?.username ?? 'olympsis-user' }}</div>
-            </li>
+            <ParticipantListItem :participant="poster"/>
+
             <li v-for="organizer in organizers" class="organizer">
                 <GroupBadge :type="organizer.type" :imageURL="organizer.imageURL" :size="2.5" />
                 <div id="name">{{ organizer.name }}</div>
@@ -21,15 +15,34 @@
 <script setup lang="ts">
 import { Club } from '~/data/models/ClubModels';
 import { Event } from '~/data/models/EventModels';
-import { Organizer } from '~/data/models/GenericModels';
+import { UserSnippet } from '~/data/models/UserModels';
 import { Organization } from '~/data/models/OrganizationModels';
+import { Organizer, Participant } from '~/data/models/GenericModels';
+
 
 import GroupBadge from '~/components/Groups/GroupBadge/GroupBadge.vue';
+import ParticipantListItem from '../ParticipantListItem/ParticipantListItem.vue';
 
 const props = defineProps({
     event: { type: Event, required: true },
     clubs: { type: Array<Club>, required: true },
     organizations: { type: Array<Organization>, required: true }
+});
+
+const poster = computed<Participant>(() => {
+    let snippet = new UserSnippet(
+        props.event.poster?.uuid,
+        props.event.poster?.firstName,
+        props.event.poster?.lastName,
+        props.event.poster?.username,
+        props.event.poster?.imageURL
+    );
+    return Participant.decode({
+        'id': `${111}`,
+        'status': 1,
+        'user': snippet.encode(),
+        'created_at': Date.now() 
+    });
 });
 
 const organizers = computed<Array<{ type: number, name: String, imageURL: string }>>(() => {

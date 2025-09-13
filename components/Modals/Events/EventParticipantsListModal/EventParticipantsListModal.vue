@@ -22,6 +22,7 @@
                 :participant="participant" 
                 :is-user="uuid === participant.user?.uuid"
                 :is-admin="isAdmin"
+                :has-menu="true"
                 @kicked="handleKickParticipant"
             />
         </ul>
@@ -34,6 +35,7 @@
                 :participant="participant" 
                 :is-user="uuid === participant.user?.uuid"
                 :is-admin="isAdmin"
+                :has-menu="true"
                 @kicked="handleKickParticipant"
             />
         </ul>

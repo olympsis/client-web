@@ -166,10 +166,12 @@ function handleRSVPResponse(_event: any) {
 async function handleResponse(response: number, hide: boolean | undefined = undefined) {
     const user = session.user;
     let snippet = new UserSnippet(
-        user?.uuid ?? '',
-        user?.username ?? '',
-        user?.imageURL ?? ''
-    )
+        user?.uuid,
+        user?.firstName,
+        user?.lastName,
+        user?.username ,
+        user?.imageURL
+    );
     let ptp: Participant = Participant.decode({
         'id': `${111}`,
         'status': response,

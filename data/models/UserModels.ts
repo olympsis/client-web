@@ -153,16 +153,22 @@ class UserDTO {
 
 class UserSnippet extends Codable<UserSnippet> {
     uuid: string | undefined;
+    firstName: string | undefined;
+    lastName: string | undefined;
     username: string | undefined;
     imageURL: string | undefined;
 
     constructor(
         uuid: string | undefined,
+        firstName: string | undefined,
+        lastName: string | undefined,
         username: string | undefined,
         imageURL: string | undefined
     ){
         super();
         this.uuid = uuid;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.username = username;
         this.imageURL = imageURL;
     }
@@ -173,6 +179,12 @@ class UserSnippet extends Codable<UserSnippet> {
         if (data) {
             if (data['uuid']) {
                 object['uuid'] = data['uuid']
+            }
+            if (data['first_name']) {
+                object['firstName'] = data['first_name']
+            }
+            if (data['last_name']) {
+                object['lastName'] = data['last_name']
             }
             if (data['username']) {
                 object['username'] = data['username']
@@ -193,6 +205,14 @@ class UserSnippet extends Codable<UserSnippet> {
 
         data['uuid'] = this.uuid;
         
+        if (this.firstName) {
+            data['first_name'] = this.firstName
+        }
+
+        if (this.lastName) {
+            data['last_name'] = this.lastName
+        }
+ 
         if (this.username) {
             data['username'] = this.username;
         }

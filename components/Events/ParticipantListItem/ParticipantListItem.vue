@@ -1,7 +1,7 @@
 <template>
     <li id="participant-list-item">
         <UserIcon 
-            :user="participant.user" 
+            :user="isAnonymous ? undefined : participant.user" 
             :size="2" 
             :style="{ 'height': '2.5rem' }"
             :class="{ 'yes': participant.status === EVENT_RSVP_STATUS.YES, 'maybe': participant.status === EVENT_RSVP_STATUS.MAYBE }"
@@ -39,7 +39,6 @@ const props = defineProps({
     participant: { type: Participant, required: true },
     isAdmin: { type: Boolean, default: false },
     isUser: { type: Boolean, default: false },
-    isAnonymous: { type: Boolean, default: false },
     hasMenu: { type: Boolean, default: false }
 });
 
@@ -71,13 +70,20 @@ const status = computed<string>(() => {
     }
 });
 
+const isAnonymous = computed<boolean>(() => {
+    if (props.isAdmin) return false;
+
+    return props.participant.isAnonymous ?? false;
+});
+
 const fullName = computed<string>(() => {
-    return props.isAnonymous ? 'Anonymous User' : ((props.participant.user?.firstName ?? 'Olympsis') + ' ' + (props.participant.user?.lastName ?? 'User'));
+    return isAnonymous.value ? 'Anonymous User' : ((props.participant.user?.firstName ?? 'Olympsis') + ' ' + (props.participant.user?.lastName ?? 'User'));
 });
 
 const username = computed<string>(() => {
-    return props.isAnonymous ? '@anon' : '@' + (props.participant.user?.username ?? 'olympsis-user')
+    return isAnonymous.value ? '@anon' : '@' + (props.participant.user?.username ?? 'olympsis-user')
 });
+
 
 </script>
 

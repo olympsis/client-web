@@ -829,8 +829,8 @@ class EventConfig extends Codable<EventConfig> {
         const object = Object();
 
         if (data) {
-            object['hidePoster'] = data['hidePoster'];
-            object['hideLocation'] = data['hideLocation'];
+            object['hidePoster'] = data['hide_poster'];
+            object['hideLocation'] = data['hide_location'];
         }
 
         Object.setPrototypeOf(object, EventConfig.prototype);

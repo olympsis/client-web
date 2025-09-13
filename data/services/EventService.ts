@@ -140,7 +140,7 @@ export class EventService {
         let headers = new Map<string, string>()
         headers.set('Authorization', token)
 
-        const data = JSON.stringify(dao);
+        const data = JSON.stringify(dao.encode());
 
         const endpoint = new Endpoint(`/v1/events/${id}/participants`);
         const [status, _headers, _] = await this.http.request(Method.POST, endpoint, data, headers);

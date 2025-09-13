@@ -248,7 +248,7 @@ class Participant extends Codable<Participant> {
             object['createdAt'] = new Date(data['created_at']);
 
             if (data['is_anonymous']) {
-                object['is_anonymous'] = data['is_anonymous'];
+                object['isAnonymous'] = data['is_anonymous'];
             }
         }
 
@@ -283,18 +283,21 @@ class ParticipantDao extends Codable<ParticipantDao> {
     id: string | undefined
     userID: string | undefined
     status: number | undefined
+    isAnonymous: boolean | undefined
     createdAt: Date | undefined
 
     constructor(
         id: string | undefined,
         userID: string | undefined,
         status: number | undefined,
+        isAnonymous: boolean | undefined,
         createdAt: Date | undefined,
     ) {
         super();
         this.id = id
         this.userID = userID
         this.status = status
+        this.isAnonymous = isAnonymous;
         this.createdAt = createdAt
     }
 
@@ -310,6 +313,9 @@ class ParticipantDao extends Codable<ParticipantDao> {
             }
             if (data['status']) {
                 object['status'] = data['status'];
+            }
+            if (data['is_anonymous']) {
+                object['isAnonymous'] = data['is_anonymous'];
             }
             if (data['created_at']) {
                 object['createdAt'] = new Date(data['created_at']);
@@ -331,6 +337,9 @@ class ParticipantDao extends Codable<ParticipantDao> {
         }
         if (this.status) {
             data['status'] = this.status;
+        }
+        if (this.isAnonymous != undefined) {
+            data['is_anonymous'] = this.isAnonymous;
         }
         if (this.createdAt) {
             data['created_at'] = this.createdAt.toISOString();

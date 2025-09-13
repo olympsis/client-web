@@ -94,7 +94,7 @@ const settingsModal = useTemplateRef<HTMLDialogElement>('settings-modal');
 const participantsModal = useTemplateRef<HTMLDialogElement>('participants-modal');  
 
 const eventID = computed<string>(() => {
-    return Array.isArray(route.params.id) ? route.params.id.join(',') : route.params.id;
+    return Array.isArray(route.params.id) ? route.params.id.join(',') : route.params.id ?? '';
 });
 
 /**
@@ -159,24 +159,11 @@ function hideRSVPModal() {
 }
 
 function handleRSVPResponse(_event: any) {
-    if (_event.response === 'yes') {
-        handleYesResponse();
-        hideRSVPModal();
-    } else {
-        handleMaybeResponse();
-        hideRSVPModal();
-    }
+    handleResponse(_event.response === 'yes' ? 1 : 0, _event.hide);
+    hideRSVPModal();
 }
 
-async function handleYesResponse() {
-    return await handleResponse(1);
-}
-
-async function handleMaybeResponse() {
-    return await handleResponse(0);
-}
-
-async function handleResponse(response: number) {
+async function handleResponse(response: number, hide: boolean | undefined = undefined) {
     const user = session.user;
     let snippet = new UserSnippet(
         user?.uuid ?? '',
@@ -187,6 +174,7 @@ async function handleResponse(response: number) {
         'id': `${111}`,
         'status': response,
         'user': snippet,
+        'is_anonymous': hide,
         'created_at': Date.now()
     });
     
@@ -195,6 +183,7 @@ async function handleResponse(response: number) {
             undefined,
             session.user?.uuid,
             response,
+            hide,
             undefined
         );
 

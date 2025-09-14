@@ -10,9 +10,13 @@
                 <img src="@/assets/icons/pin-drop/pin.drop.svg">
             </picture>
 
-            <div class="info">
+            <div v-if="!hideLocation" class="info">
                 <div class="header">{{ venueName }}</div>
                 <div class="sub-header">{{ venueLocation }}</div>
+            </div>
+            <div v-if="hideLocation" class="info-hidden">
+                <div class="header"></div>
+                <div class="sub-header"></div>
             </div>
         </div>
 
@@ -42,9 +46,12 @@
 </template>
 
 <script setup lang="ts">
+import { GROUP_ROLE } from '~/data/Enums';
 import { generateCalendarFile } from '#imports';
 import { Event } from '~/data/models/EventModels';
 import { Venue } from '~/data/models/VenueModels';
+
+const session = useSessionStore();
 
 /**
  * The event is static data and so are the venues because the page that this component is going into 
@@ -53,6 +60,19 @@ import { Venue } from '~/data/models/VenueModels';
 const props = defineProps({
     event: { type: Event, required: true },
     venues: { type: Array<Venue>, required: true }
+});
+
+const isAdmin = computed<boolean>(() => {
+    const adminGroups = session.groups.filter((g) => {
+        const group = g.club ?? g.organization;
+        if (!group) return false;
+        return group.members?.find((m) => m.user?.uuid === session.user?.uuid && m.role !== GROUP_ROLE.MEMBER);
+    });
+    return adminGroups.find((g) => {
+        const group = g.club ?? g.organization;
+        if (!group) return false;
+        return props.event.organizers.find((o) => o.id === group.id);
+    }) != undefined;
 });
 
 const venueName = computed<string>(() => {
@@ -73,6 +93,12 @@ const venueLocation = computed<string>(() => {
         if (!firstVenue) return 'Unknown Location';
         return `${firstVenue.city}, ${firstVenue.state}`;
     }
+});
+
+const hideLocation = computed<boolean>(() => {
+    // If user is an admin or an event participant show location
+    if (isAdmin.value || props.event.participants.find((p) => p.user?.uuid === session.user?.uuid)) return false;
+    return props.event.config?.hideLocation ?? false;
 });
 
 /**
@@ -116,6 +142,23 @@ const venueLocation = computed<string>(() => {
 
             .sub-header {
                 font-size: 0.9rem;
+            }
+        }
+
+        .info-hidden {
+            margin-left: 1rem;
+
+            .header {
+                height: 15px;
+                width: 10rem;
+                margin-bottom: 0.25rem;
+                background-color: var(--olympsis-gray);
+            }
+
+            .sub-header {
+                height: 15px;
+                width: 5rem;
+                background-color: var(--olympsis-gray);
             }
         }
     }

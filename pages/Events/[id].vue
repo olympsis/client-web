@@ -15,7 +15,7 @@
                 @open-settings="handleOpenSettingsModal"
             />
             <EventParticipantsPeek :event="event" @open-participants="handleOpenParticipantsModal"/>
-            <EventLocations :event="event" :venues="venues"/>
+            <EventLocations v-if="!hideLocation" :event="event" :venues="venues"/>
 
             <!-- RSVP -->
             <dialog id="rsvp-modal" ref="rsvp-modal" class="dialog">
@@ -48,11 +48,11 @@
 
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
-import { VIEW_STATE } from '@/data/Enums';
 import { Club } from '@/data/models/ClubModels';
 import { Venue } from '@/data/models/VenueModels';
 import { Event } from '@/data/models/EventModels';
 import { useModelStore } from '@/stores/model-store';
+import { VIEW_STATE, GROUP_ROLE } from '@/data/Enums';
 import { UserSnippet } from '@/data/models/UserModels';
 import { useSessionStore } from '@/stores/session-store';
 import { generateImageURL } from '~/utils/image-helpers';
@@ -115,6 +115,25 @@ const eventBody = computed<string>(() => {
 
 const eventImageURL = computed<string | undefined>(() => {
     return event.value?.mediaURL ? generateImageURL(event.value?.mediaURL) : undefined;
+});
+
+const isAdmin = computed<boolean>(() => {
+    const adminGroups = session.groups.filter((g) => {
+        const group = g.club ?? g.organization;
+        if (!group) return false;
+        return group.members?.find((m) => m.user?.uuid === session.user?.uuid && m.role !== GROUP_ROLE.MEMBER);
+    });
+    return adminGroups.find((g) => {
+        const group = g.club ?? g.organization;
+        if (!group) return false;
+        return event.value?.organizers.find((o) => o.id === group.id);
+    }) != undefined;
+});
+
+const hideLocation = computed<boolean>(() => {
+    // If user is an admin or an event participant show location
+    if (isAdmin.value || event.value?.participants.find((p) => p.user?.uuid === session.user?.uuid)) return false;
+    return event.value?.config?.hideLocation ?? false;
 });
 
 /**
@@ -296,7 +315,6 @@ async function loadEventData(id: string) {
             })
         });
 
-        
     return { 
         event: _event.encode(), 
         clubs: clubsArr.map((c) => c.encode()), 

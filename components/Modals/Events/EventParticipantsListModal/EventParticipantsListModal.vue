@@ -48,13 +48,13 @@
 </template>
 
 <script setup lang="ts">
+import { GROUP_ROLE } from '~/data/Enums';
 import { Event } from '@/data/models/EventModels';
 import { Participant } from '~/data/models/GenericModels';
+import { EventService } from '~/data/services/EventService';
 
 import SearchBar from '~/components/SearchBar/SearchBar.vue';
 import ParticipantListItem from '~/components/Events/ParticipantListItem/ParticipantListItem.vue';
-import { GROUP_ROLE } from '~/data/Enums';
-import { EventService } from '~/data/services/EventService';
 
 const props = defineProps({
     event: { type: Event, required: true }

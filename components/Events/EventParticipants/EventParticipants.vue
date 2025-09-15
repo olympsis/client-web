@@ -1,7 +1,7 @@
 <template>
     <div id="participants-peek">
         <h2>{{ event.participants.length + " " + displayString }}</h2>
-        <ul id="participants">
+        <ul v-if="!hideParticipants" id="participants">
             <ParticipantListItem 
                 v-for="participant in event.participants.slice(0, 3)"
                 :participant="participant" 
@@ -9,6 +9,9 @@
                 :is-admin="isAdmin"
             />
         </ul>
+        <div v-if="hideParticipants" id="hidden">
+            <div>RSVP to see participants</div>
+        </div>
 
         <div id="more" v-if="event.participants.length > 3" @click="$emit('open-participants')">{{ "+" + (event.participants.length - 3) + " More" }}</div>
     </div>
@@ -63,6 +66,11 @@ const isAdmin = computed<boolean>(() => {
     }) != undefined;
 });
 
+const hideParticipants = computed<boolean>(() => {
+    if (isAdmin.value || props.event.participants.find((p) => p.user?.uuid == session.user?.uuid)) return false;
+    return props.event.participantsConfig?.hideParticipants ?? false;
+});
+
 </script>
 
 <style scoped>
@@ -84,6 +92,27 @@ const isAdmin = computed<boolean>(() => {
                 font-weight: bold;
                 margin-left: 2rem;
             }
+        }
+    }
+
+    #hidden {
+        width: 100%;
+        height: 15rem;
+        display: flex;
+        align-items: center;
+        background-color: var(--secondary-background-color);
+
+        div {
+            width: 100%;
+            height: 2rem;
+            display: flex;
+            color: black;
+            font-weight: 500;
+            align-items: center;
+            justify-content: center;
+            background-color: white;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
         }
     }
 

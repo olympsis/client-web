@@ -1,5 +1,13 @@
 <template>
     <div id="event-advanced-settings">
+        <div id="hide-poster" class="section" :style="{ display: 'flex', flexDirection: 'row'}">
+            <div id="left">
+                <h4>Hide Poster</h4>
+                <div class="sub-header">Only show the event's organizers</div>
+            </div>
+            <Toggle v-model:checked="hidePoster"/>
+        </div>
+
         <div id="participants" class="section">
             <h3 class="header">
                 Participants
@@ -152,10 +160,11 @@
 <script setup lang="ts">
 import DatePicker from 'primevue/datepicker';
 import ToggleSwitch from 'primevue/toggleswitch';
-
+import Toggle from '~/components/Toggle/Toggle.vue';
 import { EVENT_RECURRENCE_FREQUENCY } from '~/data/Enums';
-import { RecurrenceOptions, ParticipantsConfig } from '~/data/models/EventModels';
+import { RecurrenceOptions, ParticipantsConfig, EventConfig } from '~/data/models/EventModels';
 
+const eventConfig = defineModel<EventConfig | undefined>('eventConfig', { required: true });
 const participantsConfig = defineModel<ParticipantsConfig | undefined>('participantsConfig', { required: true });
 const eventExternalLink = defineModel<string>('externalLink', { required: true });
 const recurrenceOptions = defineModel<RecurrenceOptions | undefined>('recurrenceOptions', { required: true });
@@ -166,14 +175,23 @@ const showExternalLinkOption = ref<boolean>(false);
 
 const min = ref<number>(0);
 const max = ref<number>(0);
+const hidePoster = ref<boolean>(false);
 const endDate = ref<Date>(new Date());
 const hasWaitlist = ref<boolean>(false);
 const recurrenceInterval = ref<number>(1);
 const frequency = ref<EVENT_RECURRENCE_FREQUENCY>(EVENT_RECURRENCE_FREQUENCY.WEEKLY);
 
+watch(hidePoster, () => {
+    if (eventConfig.value == undefined) {
+        eventConfig.value = new EventConfig(hidePoster.value)
+    } else {
+        eventConfig.value.hidePoster = hidePoster.value
+    }
+}, { immediate: false })
+
 watch(min, () => {
     if (participantsConfig.value == undefined) {
-        participantsConfig.value = new ParticipantsConfig(hasWaitlist.value, min.value, max.value);
+        participantsConfig.value = new ParticipantsConfig(hasWaitlist.value, undefined, min.value, max.value);
     } else {
         participantsConfig.value.minParticipants = min.value;
     }
@@ -181,7 +199,7 @@ watch(min, () => {
 
 watch(max, () => {
     if (participantsConfig.value == undefined) {
-        participantsConfig.value = new ParticipantsConfig(hasWaitlist.value, min.value, max.value);
+        participantsConfig.value = new ParticipantsConfig(hasWaitlist.value, undefined, min.value, max.value);
     } else {
         participantsConfig.value.maxParticipants = max.value;
     }
@@ -189,7 +207,7 @@ watch(max, () => {
 
 watch(hasWaitlist, () => {
     if (participantsConfig.value == undefined) {
-        participantsConfig.value = new ParticipantsConfig(hasWaitlist.value, min.value, max.value);
+        participantsConfig.value = new ParticipantsConfig(hasWaitlist.value, undefined, min.value, max.value);
     } else {
         participantsConfig.value.hasWaitlist = hasWaitlist.value;
     }
@@ -220,6 +238,10 @@ watch(endDate, () => {
 }, { immediate: false });
 
 onMounted(() => {
+    if (eventConfig.value != undefined) {
+        hidePoster.value = eventConfig.value.hidePoster ?? false;
+    }
+
     if (participantsConfig.value != undefined) {
         min.value = participantsConfig.value.minParticipants ?? 0;
         max.value = participantsConfig.value.maxParticipants ?? 0;

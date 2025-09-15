@@ -192,8 +192,9 @@
                 </div>
                 
                 <EventAdvancedSettings
-                    v-model:participants-config="participantsConfig"
+                    v-model:event-config="eventConfig"
                     v-model:external-link="eventExternalLink"
+                    v-model:participants-config="participantsConfig"
                     v-model:recurrence-options="eventRecurrenceOptions"
                 />
             </template>
@@ -204,11 +205,11 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { useToast } from 'primevue/usetoast';
+import { VIEW_STATE, MEDIA_TYPE } from '~/data/Enums';
 import { EVENT_TYPE, EVENT_VISIBILITY } from '~/data/Enums';
-import { VIEW_STATE, EVENT_RECURRENCE_FREQUENCY, MEDIA_TYPE } from '~/data/Enums';
 import { NEW_EVENT_ERROR, NewEventManager } from '~/data/managers/NewEventManager';
 import { GroupSelection, Sport, Tag, VenueDescriptor } from '~/data/models/GenericModels';
-import { EventFormatConfig, ParticipantsConfig, RecurrenceOptions } from '~/data/models/EventModels';
+import { EventConfig, EventFormatConfig, ParticipantsConfig, RecurrenceOptions } from '~/data/models/EventModels';
 
 import Drawer from 'primevue/drawer';
 import DatePicker from 'primevue/datepicker';
@@ -232,7 +233,7 @@ const manager: NewEventManager = new NewEventManager();
 const newEventError = ref<NEW_EVENT_ERROR | null>(null);
 
 const eventSport = computed<Sport>(() => {
-    return eventSports.value[0];
+    return eventSports.value[0] as Sport;
 });
 
 const showAdvancedSettings = ref<boolean>(false);
@@ -253,6 +254,7 @@ const eventVisibility = ref<EVENT_VISIBILITY>(EVENT_VISIBILITY.PUBLIC);
 const eventStartDate = ref<Date>(new Date());
 const eventEndDate = ref<Date>(new Date(eventStartDate.value.getTime() + (60 * 60 * 1000)));
 
+const eventConfig = ref<EventConfig | undefined>(undefined);
 const eventFormatConfig = ref<EventFormatConfig | undefined>(undefined);
 const participantsConfig = ref<ParticipantsConfig | undefined>(undefined);
 const eventRecurrenceOptions = ref<RecurrenceOptions | undefined>(undefined);
@@ -288,6 +290,7 @@ function createNewEvent() {
                 eventEndDate.value,
                 MEDIA_TYPE.IMAGE,
                 eventImage.value,
+                eventConfig.value,
                 eventFormatConfig.value,
                 participantsConfig.value,
                 undefined,
@@ -338,7 +341,7 @@ function handleBackNavigation() {
 
 onMounted(() => {
     if (session.sports.length > 0) {
-        eventSports.value.push(session.sports[0])
+        eventSports.value.push(session.sports[0] as Sport)
     }
 });
 

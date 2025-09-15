@@ -350,6 +350,7 @@ class EventDao extends Codable<EventDao> {
     sports?: string[];
     tags?: string[];
     
+    config?: EventConfig;
     formatConfig?: EventFormatConfig;
     
     startTime?: Date;
@@ -378,6 +379,7 @@ class EventDao extends Codable<EventDao> {
         body?: string,
         sports?: string[],
         tags?: string[],
+        config?: EventConfig,
         formatConfig?: EventFormatConfig,
         startTime?: Date,
         stopTime?: Date,
@@ -409,6 +411,7 @@ class EventDao extends Codable<EventDao> {
         this.body = body;
         this.sports = sports;
         this.tags = tags;
+        this.config = config;
         this.formatConfig = formatConfig;
         
         if (startTime) {
@@ -463,6 +466,10 @@ class EventDao extends Codable<EventDao> {
             data['tags'] = this.tags.map((t) => t.valueOf());
         }
         
+        if (this.config) {
+            data['config'] = this.config.encode();
+        }
+
         if (this.formatConfig) {
             data['format_config'] = this.formatConfig.encode();
         }
@@ -1169,6 +1176,7 @@ class EventCommentDao extends Codable<EventCommentDao> {
 export {
     Event,
     EventDao,
+    EventConfig,
     EventsResponse,
     EventSection,
     LocationResponse,

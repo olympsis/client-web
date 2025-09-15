@@ -5,7 +5,7 @@ import { MEDIA_TYPE, EVENT_VISIBILITY } from '../Enums';
 import { useSessionStore } from "@/stores/session-store";
 import { UploadService } from "../services/UploadService";
 import { Sport, Tag, type GroupSelection, type VenueDescriptor } from "../models/GenericModels";
-import { EventDao, EventFormatConfig, NewEventDao, ParticipantsConfig, RecurrenceOptions, TeamsConfig } from "../models/EventModels";
+import { EventConfig, EventDao, EventFormatConfig, NewEventDao, ParticipantsConfig, RecurrenceOptions, TeamsConfig } from "../models/EventModels";
 
 export class NewEventManager {
 
@@ -67,6 +67,7 @@ export class NewEventManager {
         endDate: Date,
         mediaType: MEDIA_TYPE,
         mediaURL: string,
+        config?: EventConfig,
         formatConfig?: EventFormatConfig,
         participantsConfig?: ParticipantsConfig,
         teamsConfig?: TeamsConfig,
@@ -84,8 +85,9 @@ export class NewEventManager {
                 mediaType,
                 title,
                 description,
-                sports.map((s: Sport) => s.name.split(' ')[1]),
+                sports.map((s: Sport) => s.name.split(' ')[1]!),
                 tags.map((t: Tag) => t.name),
+                config,
                 formatConfig,
                 startDate,
                 endDate,

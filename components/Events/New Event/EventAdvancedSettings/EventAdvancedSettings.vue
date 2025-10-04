@@ -55,6 +55,39 @@
             </div>
         </div>
 
+        <div id="event-format" class="section">
+            <h3 class="header">
+                Event Format
+                <div :style="{ marginRight: '1rem', cursor: 'pointer' }" @click="showEventFormatOptions = !showEventFormatOptions">
+                    <picture class="centered">
+                        <source srcset="@/assets/icons/chevron/chevron.left.white.svg" media="(prefers-color-scheme: dark)">
+                        <img src="@/assets/icons/chevron/chevron.left.svg" class="chevron" :class="{ open: showEventFormatOptions == true }"/>
+                    </picture>
+                </div>
+            </h3>
+
+            <div class="sub-header" v-if="!showEventFormatOptions">
+                Set event competition types
+            </div>
+
+            <div class="sub-section" v-if="showEventFormatOptions">
+                <div class="competition">
+                    <div class="text">
+                        <div class="sub-section-header">Is a Tournament?</div>
+                        <div class="sub-section-sub-header">Toggle competition mode-casual or tournament?</div>
+                    </div>
+                    <Toggle v-model:checked="isCompetition"/>
+                </div>
+
+                <div class="formats">
+                    <CompetitionFormats 
+                        v-model:selectedSport="manager.selectedSport"
+                        v-model:selectedFormats="selectedFormats"
+                    />
+                </div>
+            </div>
+        </div>
+
         <div id="recurrence" class="section">
             <h3 class="header">
                 Recurring event
@@ -161,9 +194,12 @@
 import DatePicker from 'primevue/datepicker';
 import ToggleSwitch from 'primevue/toggleswitch';
 import Toggle from '~/components/Toggle/Toggle.vue';
-import { EVENT_RECURRENCE_FREQUENCY } from '~/data/Enums';
+import CompetitionFormats from '../../CompetitionFormats/CompetitionFormats.vue';
+import { COMPETITION_FORMAT, EVENT_RECURRENCE_FREQUENCY } from '~/data/Enums';
 import { RecurrenceOptions, ParticipantsConfig, EventConfig } from '~/data/models/EventModels';
+import type { Sport } from '~/data/models/GenericModels';
 
+const manager = useNewEventManager();
 const eventConfig = defineModel<EventConfig | undefined>('eventConfig', { required: true });
 const participantsConfig = defineModel<ParticipantsConfig | undefined>('participantsConfig', { required: true });
 const eventExternalLink = defineModel<string>('externalLink', { required: true });
@@ -172,6 +208,7 @@ const recurrenceOptions = defineModel<RecurrenceOptions | undefined>('recurrence
 const showRecurrenceOptions = ref<boolean>(false);
 const showParticipantOptions = ref<boolean>(false);
 const showExternalLinkOption = ref<boolean>(false);
+const showEventFormatOptions = ref<boolean>(false);
 
 const min = ref<number>(0);
 const max = ref<number>(0);
@@ -180,6 +217,10 @@ const endDate = ref<Date>(new Date());
 const hasWaitlist = ref<boolean>(false);
 const recurrenceInterval = ref<number>(1);
 const frequency = ref<EVENT_RECURRENCE_FREQUENCY>(EVENT_RECURRENCE_FREQUENCY.WEEKLY);
+
+const isCompetition = ref<Boolean>(false);
+const selectedSport = ref<Sport| undefined>(undefined);
+const selectedFormats = ref<COMPETITION_FORMAT[]>([]);
 
 watch(hidePoster, () => {
     if (eventConfig.value == undefined) {
@@ -368,5 +409,9 @@ onMounted(() => {
             border: 3px solid var(--primary-brand-color) !important;
         }
     }
+}
+
+.competition {
+    display: flex;
 }
 </style>

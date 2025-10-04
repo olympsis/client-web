@@ -41,7 +41,9 @@ enum COMPETITION_FORMAT {
     WINNER_STAYS_ON = 'winner_stays_on',
     
     // Team Formats
+    VERSUS_1 = '1v1',
     VERSUS_2 = '2v2',
+    VERSUS_4 = '4v4',
     VERSUS_3 = '3v3',
     VERSUS_5 = '5v5',
     VERSUS_6 = '6v6',
@@ -384,6 +386,16 @@ function stringToMediaType(value: string): MEDIA_TYPE {
     }
 }
 
+enum NEW_EVENT_ERROR {
+    NO_TITLE=0,
+    NO_DESCRIPTION=1,
+    NO_ORGANIZERS=2,
+    NO_VENUES=3,
+    NO_IMAGE=4,
+    INVALID_START_DATE=5,
+    INVALID_END_DATE=6
+}
+
 enum RSVP_STATUS {
     YES=1,
     MAYBE=0
@@ -670,6 +682,8 @@ export {
 
     MEDIA_TYPE,
     stringToMediaType,
+
+    NEW_EVENT_ERROR,
 
     SPORTS,
     sportToString,

@@ -1,7 +1,5 @@
 <template>
 	<div id="app">
-		<Analytics/>
-		<SpeedInsights/>
 		<Toast/>
 		<NuxtPage/>
 		<LocationDialog/>

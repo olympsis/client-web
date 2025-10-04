@@ -44,7 +44,7 @@ export class NewPostManager {
             );
 
             // For now only handle the one image upload
-            if (images) {
+            if (images && images[0]) {
                 const resp = await this.handleImageUpload(images[0]);
                 dao.images = [resp.url ?? '']
             }
@@ -65,6 +65,8 @@ export class NewPostManager {
         const user = this.sessionStore.user;
         const poster = new UserSnippet(
             user?.uuid,
+            user?.firstName,
+            user?.lastName,
             user?.username,
             user?.imageURL
         );
@@ -78,7 +80,7 @@ export class NewPostManager {
             dao.images,
             [],
             [],
-            Math.floor(Date.now() / 1000)
+            new Date()
         )
     }
 }

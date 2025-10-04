@@ -1,13 +1,13 @@
 import { v4 as uuidv4 } from 'uuid';
 import * as Sentry from '@sentry/nuxt';
 import { EventService } from "../services/EventService";
-import { MEDIA_TYPE, EVENT_VISIBILITY } from '../Enums';
+import { MEDIA_TYPE, EVENT_VISIBILITY, NEW_EVENT_ERROR } from '../Enums';
 import { useSessionStore } from "@/stores/session-store";
 import { UploadService } from "../services/UploadService";
 import { Sport, Tag, type GroupSelection, type VenueDescriptor } from "../models/GenericModels";
 import { EventConfig, EventDao, EventFormatConfig, NewEventDao, ParticipantsConfig, RecurrenceOptions, TeamsConfig } from "../models/EventModels";
 
-export class NewEventManager {
+class NewEventManager {
 
     private sessionStore = useSessionStore();
     private eventService = new EventService();
@@ -166,12 +166,6 @@ export class NewEventManager {
     }
 }
 
-export enum NEW_EVENT_ERROR {
-    NO_TITLE=0,
-    NO_DESCRIPTION=1,
-    NO_ORGANIZERS=2,
-    NO_VENUES=3,
-    NO_IMAGE=4,
-    INVALID_START_DATE=5,
-    INVALID_END_DATE=6
+export {
+    NewEventManager
 }

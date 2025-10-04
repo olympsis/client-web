@@ -22,13 +22,13 @@
                 class="text-input"
                 type="text" 
                 placeholder="Event Title" 
-                v-model="eventTitle" 
+                v-model="manager.title" 
             />
 
             <!-- Config -->
             <div id="event-type-config">
-                <EventTypePicker v-model:model-value="eventType" :style="{marginRight: '0.5rem'}"/>
-                <EventVisibilityPicker v-model:model-value="eventVisibility"/>
+                <EventTypePicker v-model:model-value="manager.eventType"/>
+                <EventVisibilityPicker v-model:model-value="manager.visibility"/>
             </div>
 
             <div id="note">
@@ -49,7 +49,7 @@
                     error: newEventError === NEW_EVENT_ERROR.NO_ORGANIZERS 
                 }"> Organizer(s) <div class="asterisk">*</div> </div>
                 <div class="sub-label"> The clubs/organizations affiliated with this event. </div>
-                <EventOrganizersPicker v-model:model-value="eventGroups"/>
+                <EventOrganizersPicker v-model:model-value="manager.groups"/>
             </div>
 
             <!-- Description -->
@@ -59,7 +59,7 @@
                     error: newEventError === NEW_EVENT_ERROR.NO_DESCRIPTION 
                 }"> Description <div class="asterisk">*</div> </div>
                 <div class="sub-label"> Give details about the event </div>
-                <textarea type="text" v-model="eventDescription" class="text-large"/>
+                <textarea type="text" v-model="manager.description" class="text-large"/>
             </div>
 
            <!-- Start Date -->
@@ -73,7 +73,7 @@
                 <div class="sub-label"> When does this event start? </div>
                 <DatePicker 
                     class="date-picker"
-                    v-model="eventStartDate" 
+                    v-model="manager.startDate" 
                     showTime hourFormat="12" 
                     :pt="{
                          root: (options) => ({
@@ -111,7 +111,7 @@
                 <div class="sub-label"> When does this event end? </div>
                 <DatePicker 
                     class="date-picker"
-                    v-model="eventEndDate" 
+                    v-model="manager.endDate" 
                     showTime hourFormat="12" 
                     :pt="{
                         root: (options) => ({
@@ -148,12 +148,12 @@
                     error: newEventError === NEW_EVENT_ERROR.NO_VENUES 
                 }"> Location(s) <div class="asterisk">*</div> </div>
                 <div class="sub-label"> Select your event's location(s) </div>
-                <EventVenuesPicker v-model:model-value="eventVenues"/>
+                <EventVenuesPicker v-model:model-value="manager.venues"/>
             </div>
 
             <!-- Image Picker -->
             <div id="event-image-picker" v-if="eventSports.length > 0">
-                <EventImagePicker v-model:selected-sport="eventSport" v-model:selected-image="eventImage" />
+                <EventImagePicker v-model:selected-sport="eventSport" v-model:selected-image="manager.image" />
             </div>
 
             <!-- Event Tags -->
@@ -161,7 +161,7 @@
                 <div class="label">Event Tags</div>
                 <div class="sub-label"> Tags make your event easier to discover. Add a few! </div>
                 
-                <MultiTagsPicker :tags="session.tags" v-model:model-value="eventTags"/>
+                <MultiTagsPicker :tags="session.tags" v-model:model-value="manager.tags"/>
             </div>
 
             <!-- Advanced Settings -->
@@ -192,10 +192,11 @@
                 </div>
                 
                 <EventAdvancedSettings
-                    v-model:event-config="eventConfig"
-                    v-model:external-link="eventExternalLink"
-                    v-model:participants-config="participantsConfig"
-                    v-model:recurrence-options="eventRecurrenceOptions"
+                    v-model:event-config="manager.config"
+                    v-model:teams-config="manager.teamsConfig"
+                    v-model:external-link="manager.externalLink"
+                    v-model:participants-config="manager.participantsConfig"
+                    v-model:recurrence-options="manager.recurrenceOptions"
                 />
             </template>
         </Drawer>
@@ -205,11 +206,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { useToast } from 'primevue/usetoast';
-import { VIEW_STATE, MEDIA_TYPE } from '~/data/Enums';
-import { EVENT_TYPE, EVENT_VISIBILITY } from '~/data/Enums';
-import { NEW_EVENT_ERROR, NewEventManager } from '~/data/managers/NewEventManager';
-import { GroupSelection, Sport, Tag, VenueDescriptor } from '~/data/models/GenericModels';
-import { EventConfig, EventFormatConfig, ParticipantsConfig, RecurrenceOptions } from '~/data/models/EventModels';
+import {  Sport } from '~/data/models/GenericModels';
+import { VIEW_STATE, NEW_EVENT_ERROR } from '~/data/Enums';
 
 import Drawer from 'primevue/drawer';
 import DatePicker from 'primevue/datepicker';
@@ -228,8 +226,8 @@ import EventOrganizersPicker from '~/components/Events/New Event/EventOrganizers
 const toast = useToast();
 const router = useRouter();
 const session = useSessionStore();
+const manager = useNewEventManager();
 const state = ref<VIEW_STATE>(VIEW_STATE.PENDING);
-const manager: NewEventManager = new NewEventManager();
 const newEventError = ref<NEW_EVENT_ERROR | null>(null);
 
 const eventSport = computed<Sport>(() => {
@@ -238,88 +236,41 @@ const eventSport = computed<Sport>(() => {
 
 const showAdvancedSettings = ref<boolean>(false);
 
-const eventTitle = ref<string>('');
-const eventImage = ref<string>('');
-const eventDescription = ref<string>('');
-
-const eventTags = ref<Tag[]>([]);
 const eventSports = ref<Sport[]>([]);
-const eventExternalLink = ref<string>('');
 
-const eventGroups = ref<GroupSelection[]>([]);
-const eventVenues = ref<VenueDescriptor[]>([]);
-const eventType = ref<EVENT_TYPE>(EVENT_TYPE.REGULAR);
-const eventVisibility = ref<EVENT_VISIBILITY>(EVENT_VISIBILITY.PUBLIC);
-
-const eventStartDate = ref<Date>(new Date());
-const eventEndDate = ref<Date>(new Date(eventStartDate.value.getTime() + (60 * 60 * 1000)));
-
-const eventConfig = ref<EventConfig | undefined>(undefined);
-const eventFormatConfig = ref<EventFormatConfig | undefined>(undefined);
-const participantsConfig = ref<ParticipantsConfig | undefined>(undefined);
-const eventRecurrenceOptions = ref<RecurrenceOptions | undefined>(undefined);
+// Sports selection watcher
+watch(eventSports, () => {
+    if (eventSports.value.length == 0) return;
+    manager.selectedSport = eventSports.value[0];
+}, { immediate: true });
  
 function createNewEvent() {
     state.value = VIEW_STATE.LOADING;
 
     try {
-        const isInvalid = manager.validateNewEventData(
-            eventTitle.value,
-            eventDescription.value,
-            eventGroups.value,
-            eventVenues.value,
-            eventImage.value,
-            eventStartDate.value,
-            eventEndDate.value
-        );
+        const isInvalid = manager.validateNewEventData();
         
         if (isInvalid != null) {
             newEventError.value = isInvalid;
             state.value = VIEW_STATE.PENDING;
         } else {
             newEventError.value = null;
-            const data = manager.generateNewEventData(
-                eventVisibility.value,
-                eventGroups.value,
-                eventTags.value,
-                [eventSport.value],
-                eventTitle.value,
-                eventDescription.value,
-                eventVenues.value,
-                eventStartDate.value,
-                eventEndDate.value,
-                MEDIA_TYPE.IMAGE,
-                eventImage.value,
-                eventConfig.value,
-                eventFormatConfig.value,
-                participantsConfig.value,
-                undefined,
-                eventExternalLink.value
-            );
-
-            if (data) {
-                let opts: RecurrenceOptions | undefined;
-                if (eventRecurrenceOptions.value != undefined) {
-                    opts = eventRecurrenceOptions.value;
-                }
-                
-                manager.createNewEvent(data, opts)
-                    .then((id: string | null) => {
-                        if (!id) throw('No ID returned by the server.')
-                        state.value = VIEW_STATE.SUCCESS;
-                        setTimeout(() => {
-                            router.push(`/events/${id}`);
-                        }, 500);
-                    })
-                    .catch((error: any) => {
-                        state.value = VIEW_STATE.FAILURE;
-                        console.error('Failed to create event. Error: ', error);
-                        toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to create event!', life: 3000 });
-                        setTimeout(() => {
-                            state.value = VIEW_STATE.PENDING;
-                        }, 250);
-                    });
-            }
+            manager.createNewEvent()
+                .then((id: string | null) => {
+                    if (!id) throw('No ID returned by the server.')
+                    state.value = VIEW_STATE.SUCCESS;
+                    setTimeout(() => {
+                        router.push(`/events/${id}`);
+                    }, 500);
+                })
+                .catch((error: any) => {
+                    state.value = VIEW_STATE.FAILURE;
+                    console.error('Failed to create event. Error: ', error);
+                    toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to create event!', life: 3000 });
+                    setTimeout(() => {
+                        state.value = VIEW_STATE.PENDING;
+                    }, 250);
+                });
         }
     } catch(error) {
         state.value = VIEW_STATE.FAILURE;
@@ -342,6 +293,7 @@ function handleBackNavigation() {
 onMounted(() => {
     if (session.sports.length > 0) {
         eventSports.value.push(session.sports[0] as Sport)
+        manager.selectedSport = session.sports[0] as Sport;
     }
 });
 
@@ -353,7 +305,7 @@ useSeoMeta({
     ogLocale: 'en_US',
     ogSiteName: 'Olympsis',
     ogUrl: () => `https://olympsis.com/events`,
-    ogTitle: () => eventTitle.value,
+    ogTitle: () => 'New Event | Olympsis',
     ogDescription: () => 'Creating a new event on Olympsis',
 
     twitterSite: '@olympsis',

@@ -4,7 +4,7 @@ import { Event } from "./EventModels";
 import { UserSnippet } from "./UserModels";
 import { Organization } from "./OrganizationModels";
 import { Codable } from "./Models";
-import { eventRSVPToNumber, GROUP_ROLE, numberToEventRSVP, stringToGroupRole, type EVENT_RSVP_STATUS, type GROUP_TYPE } from "../Enums";
+import { COMPETITION_FORMAT, eventRSVPToNumber, GROUP_ROLE, numberToEventRSVP, stringToGroupRole, type EVENT_RSVP_STATUS, type GROUP_TYPE } from "../Enums";
 
 class Model {
     id: string | undefined
@@ -922,6 +922,304 @@ class Sport extends Codable<Sport> {
 
         Object.setPrototypeOf(object, Sport.prototype);
         return object;
+    }
+
+    // Computed property that returns applicable competition formats
+    get applicableFormats(): COMPETITION_FORMAT[] {
+        const sportName = this.name
+            .toLowerCase()
+            .replace(/️/g, '')
+            .replace(/‍/g, '')
+            .replace(/♀/g, '')
+            .replace(/♂/g, '');
+
+        // Team Ball Sports
+        if (sportName.includes('soccer')) {
+            return [
+                COMPETITION_FORMAT.BRACKET,
+                COMPETITION_FORMAT.LEAGUE,
+                COMPETITION_FORMAT.ROUND_ROBIN,
+                COMPETITION_FORMAT.SINGLE_ELIMINATION,
+                COMPETITION_FORMAT.DOUBLE_ELIMINATION,
+                COMPETITION_FORMAT.WINNER_STAYS_ON,
+                COMPETITION_FORMAT.VERSUS_1,
+                COMPETITION_FORMAT.VERSUS_2,
+                COMPETITION_FORMAT.VERSUS_3,
+                COMPETITION_FORMAT.VERSUS_4,
+                COMPETITION_FORMAT.VERSUS_5,
+                COMPETITION_FORMAT.VERSUS_7,
+                COMPETITION_FORMAT.VERSUS_8,
+                COMPETITION_FORMAT.VERSUS_9,
+                COMPETITION_FORMAT.VERSUS_10,
+                COMPETITION_FORMAT.VERSUS_11
+            ];
+        }
+
+        if (sportName.includes('basketball')) {
+            return [
+                COMPETITION_FORMAT.BRACKET,
+                COMPETITION_FORMAT.LEAGUE,
+                COMPETITION_FORMAT.ROUND_ROBIN,
+                COMPETITION_FORMAT.SINGLE_ELIMINATION,
+                COMPETITION_FORMAT.DOUBLE_ELIMINATION,
+                COMPETITION_FORMAT.WINNER_STAYS_ON,
+                COMPETITION_FORMAT.BEST_OF_3,
+                COMPETITION_FORMAT.BEST_OF_5,
+                COMPETITION_FORMAT.VERSUS_3,
+                COMPETITION_FORMAT.VERSUS_4,
+                COMPETITION_FORMAT.VERSUS_5
+            ];
+        }
+
+        if (sportName.includes('volleyball')) {
+            return [
+                COMPETITION_FORMAT.BRACKET,
+                COMPETITION_FORMAT.LEAGUE,
+                COMPETITION_FORMAT.ROUND_ROBIN,
+                COMPETITION_FORMAT.SINGLE_ELIMINATION,
+                COMPETITION_FORMAT.DOUBLE_ELIMINATION,
+                COMPETITION_FORMAT.WINNER_STAYS_ON,
+                COMPETITION_FORMAT.VERSUS_3,
+                COMPETITION_FORMAT.VERSUS_4,
+                COMPETITION_FORMAT.BEST_OF_3,
+                COMPETITION_FORMAT.BEST_OF_5,
+                COMPETITION_FORMAT.VERSUS_5,
+                COMPETITION_FORMAT.VERSUS_6
+            ];
+        }
+
+        if (sportName.includes('football') && !sportName.includes('flag')) {
+            return [
+                COMPETITION_FORMAT.BRACKET,
+                COMPETITION_FORMAT.LEAGUE,
+                COMPETITION_FORMAT.ROUND_ROBIN,
+                COMPETITION_FORMAT.SINGLE_ELIMINATION,
+                COMPETITION_FORMAT.VERSUS_11
+            ];
+        }
+
+        if (sportName.includes('flag-football')) {
+            return [
+                COMPETITION_FORMAT.BRACKET,
+                COMPETITION_FORMAT.LEAGUE,
+                COMPETITION_FORMAT.ROUND_ROBIN,
+                COMPETITION_FORMAT.SINGLE_ELIMINATION,
+                COMPETITION_FORMAT.VERSUS_5,
+                COMPETITION_FORMAT.VERSUS_7,
+                COMPETITION_FORMAT.VERSUS_8
+            ];
+        }
+
+        if (sportName.includes('handball')) {
+            return [
+                COMPETITION_FORMAT.BRACKET,
+                COMPETITION_FORMAT.LEAGUE,
+                COMPETITION_FORMAT.ROUND_ROBIN,
+                COMPETITION_FORMAT.SINGLE_ELIMINATION,
+                COMPETITION_FORMAT.DOUBLE_ELIMINATION,
+                COMPETITION_FORMAT.WINNER_STAYS_ON,
+                COMPETITION_FORMAT.VERSUS_7
+            ];
+        }
+
+        // Racket/Paddle Sports
+        if (sportName.includes('tennis')) {
+            return [
+                COMPETITION_FORMAT.BRACKET,
+                COMPETITION_FORMAT.ROUND_ROBIN,
+                COMPETITION_FORMAT.SINGLE_ELIMINATION,
+                COMPETITION_FORMAT.DOUBLE_ELIMINATION,
+                COMPETITION_FORMAT.BEST_OF_3,
+                COMPETITION_FORMAT.BEST_OF_5,
+                COMPETITION_FORMAT.WINNER_STAYS_ON,
+                COMPETITION_FORMAT.VERSUS_2
+            ];
+        }
+
+        if (sportName.includes('badminton')) {
+            return [
+                COMPETITION_FORMAT.BRACKET,
+                COMPETITION_FORMAT.ROUND_ROBIN,
+                COMPETITION_FORMAT.SINGLE_ELIMINATION,
+                COMPETITION_FORMAT.DOUBLE_ELIMINATION,
+                COMPETITION_FORMAT.BEST_OF_3,
+                COMPETITION_FORMAT.BEST_OF_5,
+                COMPETITION_FORMAT.WINNER_STAYS_ON,
+                COMPETITION_FORMAT.VERSUS_2
+            ];
+        }
+
+        if (sportName.includes('ping-pong')) {
+            return [
+                COMPETITION_FORMAT.BRACKET,
+                COMPETITION_FORMAT.ROUND_ROBIN,
+                COMPETITION_FORMAT.SINGLE_ELIMINATION,
+                COMPETITION_FORMAT.DOUBLE_ELIMINATION,
+                COMPETITION_FORMAT.BEST_OF_3,
+                COMPETITION_FORMAT.BEST_OF_5,
+                COMPETITION_FORMAT.WINNER_STAYS_ON,
+                COMPETITION_FORMAT.VERSUS_2
+            ];
+        }
+
+        if (sportName.includes('racquetball')) {
+            return [
+                COMPETITION_FORMAT.BRACKET,
+                COMPETITION_FORMAT.ROUND_ROBIN,
+                COMPETITION_FORMAT.SINGLE_ELIMINATION,
+                COMPETITION_FORMAT.DOUBLE_ELIMINATION,
+                COMPETITION_FORMAT.BEST_OF_3,
+                COMPETITION_FORMAT.BEST_OF_5,
+                COMPETITION_FORMAT.WINNER_STAYS_ON,
+                COMPETITION_FORMAT.VERSUS_2
+            ];
+        }
+
+        if (sportName.includes('padel')) {
+            return [
+                COMPETITION_FORMAT.BRACKET,
+                COMPETITION_FORMAT.ROUND_ROBIN,
+                COMPETITION_FORMAT.SINGLE_ELIMINATION,
+                COMPETITION_FORMAT.DOUBLE_ELIMINATION,
+                COMPETITION_FORMAT.BEST_OF_3,
+                COMPETITION_FORMAT.BEST_OF_5,
+                COMPETITION_FORMAT.VERSUS_2
+            ];
+        }
+
+        if (sportName.includes('pickleball')) {
+            return [
+                COMPETITION_FORMAT.BRACKET,
+                COMPETITION_FORMAT.ROUND_ROBIN,
+                COMPETITION_FORMAT.SINGLE_ELIMINATION,
+                COMPETITION_FORMAT.DOUBLE_ELIMINATION,
+                COMPETITION_FORMAT.BEST_OF_3,
+                COMPETITION_FORMAT.BEST_OF_5,
+                COMPETITION_FORMAT.VERSUS_2
+            ];
+        }
+
+        // Golf
+        if (sportName.includes('golf')) {
+            return [
+                COMPETITION_FORMAT.STROKE_PLAY,
+                COMPETITION_FORMAT.MATCH_PLAY,
+                COMPETITION_FORMAT.SCRAMBLE,
+                COMPETITION_FORMAT.BEST_BALL,
+                COMPETITION_FORMAT.STABLEFORD,
+                COMPETITION_FORMAT.SKINS_GAME,
+                COMPETITION_FORMAT.ALTERNATE_SHOT,
+                COMPETITION_FORMAT.SHAMBLE,
+                COMPETITION_FORMAT.MODIFIED_STABLEFORD,
+                COMPETITION_FORMAT.SCRATCH
+            ];
+        }
+
+        // Individual Cardio Sports
+        if (sportName.includes('running')) {
+            return [
+                COMPETITION_FORMAT.TIME_TRIAL,
+                COMPETITION_FORMAT.SPRINT,
+                COMPETITION_FORMAT.LONG_DISTANCE,
+                COMPETITION_FORMAT.RELAY
+            ];
+        }
+
+        if (sportName.includes('biking')) {
+            return [
+                COMPETITION_FORMAT.TIME_TRIAL,
+                COMPETITION_FORMAT.ROAD_RACE,
+                COMPETITION_FORMAT.CRITERIUM,
+                COMPETITION_FORMAT.STAGE_RACE
+            ];
+        }
+
+        if (sportName.includes('swimming')) {
+            return [
+                COMPETITION_FORMAT.TIME_TRIAL,
+                COMPETITION_FORMAT.SPRINT,
+                COMPETITION_FORMAT.LONG_DISTANCE,
+                COMPETITION_FORMAT.RELAY
+            ];
+        }
+
+        if (sportName.includes('walking')) {
+            return [];
+        }
+
+        // Climbing
+        if (sportName.includes('climbing')) {
+            return [
+                COMPETITION_FORMAT.BOULDERING,
+                COMPETITION_FORMAT.LEAD_CLIMBING,
+                COMPETITION_FORMAT.SPEED_CLIMBING,
+                COMPETITION_FORMAT.BRACKET,
+                COMPETITION_FORMAT.ROUND_ROBIN
+            ];
+        }
+
+        // Fitness/Wellness (limited competitive formats)
+        if (sportName.includes('yoga')) {
+            return []; // For yoga challenges/competitions
+        }
+
+        if (sportName.includes('pilates')) {
+            return []; // For pilates challenges
+        }
+
+        if (sportName.includes('weights')) {
+            return [
+                COMPETITION_FORMAT.BRACKET,
+                COMPETITION_FORMAT.ROUND_ROBIN,
+                COMPETITION_FORMAT.TIME_TRIAL
+            ]; // For weightlifting competitions
+        }
+
+        // Other/Specialty Sports
+        if (sportName.includes('spike')) {
+            return [
+                COMPETITION_FORMAT.BRACKET,
+                COMPETITION_FORMAT.ROUND_ROBIN,
+                COMPETITION_FORMAT.SINGLE_ELIMINATION,
+                COMPETITION_FORMAT.DOUBLE_ELIMINATION,
+                COMPETITION_FORMAT.BEST_OF_3,
+                COMPETITION_FORMAT.VERSUS_2
+            ];
+        }
+
+        if (sportName.includes('hiking')) {
+            return [
+                COMPETITION_FORMAT.TIME_TRIAL,
+                COMPETITION_FORMAT.LONG_DISTANCE
+            ];
+        }
+
+        if (sportName.includes('skiing')) {
+            return [
+                COMPETITION_FORMAT.TIME_TRIAL,
+                COMPETITION_FORMAT.BRACKET,
+                COMPETITION_FORMAT.ROUND_ROBIN
+            ]; // For ski races
+        }
+
+        if (sportName.includes('snowboarding')) {
+            return [
+                COMPETITION_FORMAT.TIME_TRIAL,
+                COMPETITION_FORMAT.BRACKET,
+                COMPETITION_FORMAT.ROUND_ROBIN
+            ]; // For snowboard races
+        }
+
+        if (sportName.includes('kayaking')) {
+            return [
+                COMPETITION_FORMAT.TIME_TRIAL,
+                COMPETITION_FORMAT.ROAD_RACE,
+                COMPETITION_FORMAT.LONG_DISTANCE
+            ]; // Water racing formats
+        }
+
+        // Default
+        return []; // No applicable formats
     }
 }
 

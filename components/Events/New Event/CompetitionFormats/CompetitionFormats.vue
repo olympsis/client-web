@@ -41,6 +41,7 @@ function handleTap(format: COMPETITION_FORMAT) {
     margin-top: 0.5rem;
 
     .format {
+        color: black;
         cursor: pointer;
         width: fit-content;
         font-size: 0.75rem;

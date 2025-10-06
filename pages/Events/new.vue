@@ -234,9 +234,9 @@ const eventSport = computed<Sport>(() => {
     return eventSports.value[0] as Sport;
 });
 
+const eventSports = ref<Sport[]>([]);
 const showAdvancedSettings = ref<boolean>(false);
 
-const eventSports = ref<Sport[]>([]);
 
 // Sports selection watcher
 watch(eventSports, () => {

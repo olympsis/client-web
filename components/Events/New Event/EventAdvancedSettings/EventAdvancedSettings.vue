@@ -1,13 +1,15 @@
 <template>
     <div id="event-advanced-settings">
+        <!-- Poster option -->
         <div id="hide-poster" class="section" :style="{ display: 'flex', flexDirection: 'row'}">
             <div id="left">
                 <h4>Hide Poster</h4>
                 <div class="sub-header">Only show the event's organizers</div>
             </div>
-            <Toggle v-model:checked="hidePoster"/>
+            <ToggleSwitch v-model="hidePoster" :style="{ 'margin-left': '1rem', 'margin-top': '0.5rem' }"/>
         </div>
 
+        <!-- Participant options -->
         <div id="participants" class="section">
             <h3 class="header">
                 Participants
@@ -55,6 +57,7 @@
             </div>
         </div>
 
+        <!-- Formatting options-->
         <div id="event-format" class="section">
             <h3 class="header">
                 Event Format
@@ -76,7 +79,7 @@
                         <div class="sub-section-header">Is a Tournament?</div>
                         <div class="sub-section-sub-header">Toggle competition mode-casual or tournament?</div>
                     </div>
-                    <Toggle v-model:checked="isCompetition"/>
+                    <ToggleSwitch v-model="isCompetition"/>
                 </div>
 
                 <div class="formats">
@@ -88,6 +91,7 @@
             </div>
         </div>
 
+        <!-- Recurrence options -->
         <div id="recurrence" class="section">
             <h3 class="header">
                 Recurring event
@@ -173,6 +177,7 @@
             </div>
         </div>
 
+        <!-- External link -->
         <div id="externalLink" class="section">
             <h3 class="header">
                 External Link
@@ -185,7 +190,7 @@
             </h3>
             <div class="sub-header">Redirect participants to URL after RSVP'ing</div>
 
-            <input class="input" v-model="eventExternalLink" v-if="showExternalLinkOption"/>
+            <input class="input" v-model="manager.externalLink" v-if="showExternalLinkOption"/>
         </div>
     </div>
 </template>
@@ -193,17 +198,11 @@
 <script setup lang="ts">
 import DatePicker from 'primevue/datepicker';
 import ToggleSwitch from 'primevue/toggleswitch';
-import Toggle from '~/components/Toggle/Toggle.vue';
-import CompetitionFormats from '../../CompetitionFormats/CompetitionFormats.vue';
+import CompetitionFormats from '../CompetitionFormats/CompetitionFormats.vue';
 import { COMPETITION_FORMAT, EVENT_RECURRENCE_FREQUENCY } from '~/data/Enums';
-import { RecurrenceOptions, ParticipantsConfig, EventConfig } from '~/data/models/EventModels';
-import type { Sport } from '~/data/models/GenericModels';
+import { RecurrenceOptions, ParticipantsConfig, EventConfig, EventFormatConfig } from '~/data/models/EventModels';
 
 const manager = useNewEventManager();
-const eventConfig = defineModel<EventConfig | undefined>('eventConfig', { required: true });
-const participantsConfig = defineModel<ParticipantsConfig | undefined>('participantsConfig', { required: true });
-const eventExternalLink = defineModel<string>('externalLink', { required: true });
-const recurrenceOptions = defineModel<RecurrenceOptions | undefined>('recurrenceOptions', { required: true });
 
 const showRecurrenceOptions = ref<boolean>(false);
 const showParticipantOptions = ref<boolean>(false);
@@ -218,87 +217,113 @@ const hasWaitlist = ref<boolean>(false);
 const recurrenceInterval = ref<number>(1);
 const frequency = ref<EVENT_RECURRENCE_FREQUENCY>(EVENT_RECURRENCE_FREQUENCY.WEEKLY);
 
-const isCompetition = ref<Boolean>(false);
-const selectedSport = ref<Sport| undefined>(undefined);
+const isCompetition = ref<boolean>(false);
 const selectedFormats = ref<COMPETITION_FORMAT[]>([]);
 
 watch(hidePoster, () => {
-    if (eventConfig.value == undefined) {
-        eventConfig.value = new EventConfig(hidePoster.value)
+    if (manager.config == undefined) {
+        manager.config = new EventConfig(hidePoster.value)
     } else {
-        eventConfig.value.hidePoster = hidePoster.value
+        manager.config.hidePoster = hidePoster.value
     }
-}, { immediate: false })
+}, { immediate: false });
+
+watch(isCompetition, () => {
+    if (manager.formatConfig == undefined) {
+        manager.formatConfig = new EventFormatConfig(isCompetition.value)
+    } else {
+        manager.formatConfig.isCompetition = isCompetition.value;
+    }
+}, { immediate: false });
 
 watch(min, () => {
-    if (participantsConfig.value == undefined) {
-        participantsConfig.value = new ParticipantsConfig(hasWaitlist.value, undefined, min.value, max.value);
+    if (manager.participantsConfig == undefined) {
+        manager.participantsConfig = new ParticipantsConfig(hasWaitlist.value, undefined, min.value, max.value);
     } else {
-        participantsConfig.value.minParticipants = min.value;
+        manager.participantsConfig.minParticipants = min.value;
     }
 }, { immediate: false });
 
 watch(max, () => {
-    if (participantsConfig.value == undefined) {
-        participantsConfig.value = new ParticipantsConfig(hasWaitlist.value, undefined, min.value, max.value);
+    if (manager.participantsConfig == undefined) {
+        manager.participantsConfig = new ParticipantsConfig(hasWaitlist.value, undefined, min.value, max.value);
     } else {
-        participantsConfig.value.maxParticipants = max.value;
+        manager.participantsConfig.maxParticipants = max.value;
     }
 }, { immediate: false });
 
 watch(hasWaitlist, () => {
-    if (participantsConfig.value == undefined) {
-        participantsConfig.value = new ParticipantsConfig(hasWaitlist.value, undefined, min.value, max.value);
+    if (manager.participantsConfig == undefined) {
+        manager.participantsConfig = new ParticipantsConfig(hasWaitlist.value, undefined, min.value, max.value);
     } else {
-        participantsConfig.value.hasWaitlist = hasWaitlist.value;
+        manager.participantsConfig.hasWaitlist = hasWaitlist.value;
     }
 }, { immediate: false });
 
 watch(frequency, () => {
-    if (recurrenceOptions.value == undefined) {
-        recurrenceOptions.value = new RecurrenceOptions(frequency.value.valueOf(), endDate.value, recurrenceInterval.value);
+    if (manager.recurrenceOptions == undefined) {
+        manager.recurrenceOptions = new RecurrenceOptions(frequency.value.valueOf(), endDate.value, recurrenceInterval.value);
     } else { 
-        recurrenceOptions.value.pattern = frequency.value.valueOf();
+        manager.recurrenceOptions.pattern = frequency.value.valueOf();
     }
 }, { immediate: false });
 
 watch(recurrenceInterval, () => {
-    if (recurrenceOptions.value == undefined) {
-        recurrenceOptions.value = new RecurrenceOptions(frequency.value.valueOf(), endDate.value, recurrenceInterval.value);
+    if (manager.recurrenceOptions == undefined) {
+        manager.recurrenceOptions = new RecurrenceOptions(frequency.value.valueOf(), endDate.value, recurrenceInterval.value);
     } else { 
-        recurrenceOptions.value.interval = recurrenceInterval.value;
+        manager.recurrenceOptions.interval = recurrenceInterval.value;
     }
 }, { immediate: false });
 
 watch(endDate, () => {
-    if (recurrenceOptions.value == undefined) {
-        recurrenceOptions.value = new RecurrenceOptions(frequency.value.valueOf(), endDate.value, recurrenceInterval.value);
+    if (manager.recurrenceOptions == undefined) {
+        manager.recurrenceOptions = new RecurrenceOptions(frequency.value.valueOf(), endDate.value, recurrenceInterval.value);
     } else { 
-        recurrenceOptions.value.endTime = endDate.value;
+        manager.recurrenceOptions.endTime = endDate.value;
     }
 }, { immediate: false });
 
 onMounted(() => {
-    if (eventConfig.value != undefined) {
-        hidePoster.value = eventConfig.value.hidePoster ?? false;
+    // Restore hide poster
+    if (manager.config != undefined) {
+        hidePoster.value = manager.config.hidePoster ?? false;
     }
 
-    if (participantsConfig.value != undefined) {
-        min.value = participantsConfig.value.minParticipants ?? 0;
-        max.value = participantsConfig.value.maxParticipants ?? 0;
-        hasWaitlist.value = participantsConfig.value.hasWaitlist ?? false;
+    // Restore participants config
+    if (manager.participantsConfig != undefined) {
+        min.value = manager.participantsConfig.minParticipants ?? 0;
+        max.value = manager.participantsConfig.maxParticipants ?? 0;
+        hasWaitlist.value = manager.participantsConfig.hasWaitlist ?? false;
         showParticipantOptions.value = true;
     }
 
-    if (recurrenceOptions.value != undefined) {
-        endDate.value = recurrenceOptions.value.endTime;
-        frequency.value = recurrenceOptions.value.pattern == 'WEEKLY' ? EVENT_RECURRENCE_FREQUENCY.WEEKLY : EVENT_RECURRENCE_FREQUENCY.MONTHLY;
-        recurrenceInterval.value = recurrenceOptions.value.interval;
+    // Restore recurrence options
+    if (manager.recurrenceOptions != undefined) {
+        endDate.value = manager.recurrenceOptions.endTime;
+        frequency.value = manager.recurrenceOptions.pattern == 'WEEKLY' ? EVENT_RECURRENCE_FREQUENCY.WEEKLY : EVENT_RECURRENCE_FREQUENCY.MONTHLY;
+        recurrenceInterval.value = manager.recurrenceOptions.interval;
         showRecurrenceOptions.value = true
     }
 
-    if (eventExternalLink.value != '') {
+    // Restore external link
+    if (manager.externalLink != '') {
         showExternalLinkOption.value = true;
+    }
+
+    // Restore format options
+    if (manager.formatConfig != undefined) {
+        isCompetition.value = manager.formatConfig.isCompetition ?? false;
+        selectedFormats.value = manager.formatConfig.formats ?? [];
+        showEventFormatOptions.value = true;
+    }
+});
+
+onUnmounted(() => {
+    if (manager.formatConfig == undefined) {
+        manager.formatConfig = new EventFormatConfig(undefined, undefined, undefined, undefined, selectedFormats.value)
+    } else {
+        manager.formatConfig.formats = selectedFormats.value;
     }
 });
 </script>
@@ -328,7 +353,7 @@ onMounted(() => {
     display: flex;
     margin-bottom: 1.5rem;
     flex-direction: column;
-
+    
     .header {
         display: flex;
 

@@ -865,7 +865,7 @@ class EventFormatConfig extends Codable<EventFormatConfig> {
     parentCompetitionId?: string;
     competitionState?: string;
     
-    format?: COMPETITION_FORMAT;
+    formats?: COMPETITION_FORMAT[];
     rounds?: number;
     currentRound?: number;
     bracketData?: any;
@@ -879,7 +879,7 @@ class EventFormatConfig extends Codable<EventFormatConfig> {
         isCompetitionGame?: boolean,
         parentCompetitionId?: string,
         competitionState?: string,
-        format?: COMPETITION_FORMAT,
+        formats?: COMPETITION_FORMAT[],
         rounds?: number,
         currentRound?: number,
         bracketData?: any,
@@ -892,7 +892,7 @@ class EventFormatConfig extends Codable<EventFormatConfig> {
         this.isCompetitionGame = isCompetitionGame;
         this.parentCompetitionId = parentCompetitionId;
         this.competitionState = competitionState;
-        this.format = format;
+        this.formats = formats;
         this.rounds = rounds;
         this.currentRound = currentRound;
         this.bracketData = bracketData;
@@ -909,7 +909,7 @@ class EventFormatConfig extends Codable<EventFormatConfig> {
             object['isCompetitionGame'] = data['is_competition_game'];
             object['parentCompetitionId'] = data['parent_competition_id'];
             object['competitionState'] = data['competition_state'];
-            object['format'] = data['format'] !== undefined ? stringToCompetitionFormat(data['format']) : undefined;
+            object['formats'] = data['formats'] !== undefined ? data['formats'].map((f: COMPETITION_FORMAT) => stringToCompetitionFormat(f)) : undefined;
             object['rounds'] = data['rounds'];
             object['currentRound'] = data['current_round'];
             object['bracketData'] = data['bracket_data'];
@@ -937,8 +937,8 @@ class EventFormatConfig extends Codable<EventFormatConfig> {
         if (this.competitionState) {
             data['competition_state'] = this.competitionState;
         }
-        if (this.format !== undefined) {
-            data['format'] = this.format.valueOf();
+        if (this.formats !== undefined) {
+            data['formats'] = this.formats.map((f) => f.valueOf());
         }
         if (this.rounds !== undefined) {
             data['rounds'] = this.rounds;

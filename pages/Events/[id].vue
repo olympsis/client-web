@@ -17,6 +17,8 @@
             <EventParticipantsPeek :event="event" @open-participants="handleOpenParticipantsModal"/>
             <EventLocations v-if="!hideLocation" :event="event" :venues="venues"/>
 
+            <EventFormats v-if="eventFormats.length > 0" :formats="eventFormats"/>
+
             <!-- RSVP -->
             <dialog id="rsvp-modal" ref="rsvp-modal" class="dialog">
                 <EventRSVPModal v-if="event" :event="event" @close="hideRSVPModal" @rsvp="handleRSVPResponse"/>
@@ -52,7 +54,7 @@ import { Club } from '@/data/models/ClubModels';
 import { Venue } from '@/data/models/VenueModels';
 import { Event } from '@/data/models/EventModels';
 import { useModelStore } from '@/stores/model-store';
-import { VIEW_STATE, GROUP_ROLE } from '@/data/Enums';
+import { VIEW_STATE, GROUP_ROLE, COMPETITION_FORMAT } from '@/data/Enums';
 import { UserSnippet } from '@/data/models/UserModels';
 import { useSessionStore } from '@/stores/session-store';
 import { generateImageURL } from '~/utils/image-helpers';
@@ -69,6 +71,7 @@ import EventOrganizers from '~/components/Events/EventOrganizers/EventOrganizers
 
 import AuthModal from '@/components/Auth/AuthModal/AuthModal.vue';
 import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
+import EventFormats from '~/components/Events/EventFormats/EventFormats.vue';
 import EventRSVPModal from '@/components/Modals/Events/EventRSVPModal/EventRSVPModal.vue';
 import EventParticipantsPeek from '@/components/Events/EventParticipants/EventParticipants.vue';
 import EventDetailSettingsModal from '@/components/Modals/Events/EventDetailSettingsModal/EventDetailSettingsModal.vue';
@@ -134,6 +137,14 @@ const hideLocation = computed<boolean>(() => {
     // If user is an admin or an event participant show location
     if (isAdmin.value || event.value?.participants.find((p) => p.user?.uuid === session.user?.uuid)) return false;
     return event.value?.config?.hideLocation ?? false;
+});
+
+const eventFormats = computed<COMPETITION_FORMAT[]>(() => {
+    if (event.value?.formatConfig?.formats) {
+        return event.value?.formatConfig?.formats;
+    } else {
+        return [];
+    }
 });
 
 /**
@@ -411,6 +422,7 @@ watch(data, (newData) => {
             'media locations'
             'host locations'
             'participants locations'
+            'formats locations'
             ;
         grid-template-columns: 30rem 30rem;
 
@@ -427,6 +439,7 @@ watch(data, (newData) => {
             'media header'
             'media body'
             'host location'
+            'formats location'
             ;
             grid-template-columns: 30rem 30rem;
 
@@ -612,6 +625,7 @@ watch(data, (newData) => {
             'body'
             'host'
             'participants'
+            'formats'
             'locations'
             ;
             grid-template-columns: auto;

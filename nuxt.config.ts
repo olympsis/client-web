@@ -16,8 +16,8 @@ export default defineNuxtConfig({
 		"@pinia/nuxt",
 		"@nuxtjs/robots",
 		"@nuxtjs/storybook",
-		"@primevue/nuxt-module",
 		"@sentry/nuxt/module",
+		"@primevue/nuxt-module",
 	],
 
 	build: {
@@ -33,8 +33,7 @@ export default defineNuxtConfig({
 			APP_ID: process.env.APL_APP_ID ?? "",
 			APL_KEY_ID: process.env.APL_KEY_ID ?? "",
 			APL_TEAM_ID: process.env.APL_TEAM_ID ?? "",
-			APL_MAPKIT_SNAPSHOT_TOKEN:
-				process.env.APL_MAPKIT_SNAPSHOT_TOKEN ?? "",
+			APL_MAPKIT_SNAPSHOT_TOKEN: process.env.APL_MAPKIT_SNAPSHOT_TOKEN ?? "",
 
 			MAPKIT_ORIGIN: process.env.MAPKIT_ORIGIN ?? "",
 			MAPKIT_KEY: process.env.MAPKIT_KEY ?? "",
@@ -52,7 +51,7 @@ export default defineNuxtConfig({
 	routeRules: {
 		// Sites routes
 		"/": {
-			redirect: "/signin",
+						redirect: "/signin",
 		},
 		"/signin": { ssr: false },
 		"/about-us": { prerender: true },
@@ -72,7 +71,10 @@ export default defineNuxtConfig({
 
 	app: {
 		head: {
-			link: [{ rel: "icon", type: "image/x-icon", href: "/favicon.ico" }],
+			link: [
+				{ rel: "icon", type: "image/x-icon", href: "/favicon.ico" },
+				{ rel: "apple-touch-icon", type: "image/x-icon", href: "/favicon.ico" }
+			],
 			meta: [
 				{
 					name: "theme-color",

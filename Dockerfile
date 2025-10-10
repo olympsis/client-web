@@ -1,6 +1,9 @@
 # Use the official Node.js 22 image for Cloud Run compatibility
 FROM node:22-alpine
 
+# Install pnpm globally
+RUN npm install -g pnpm
+
 # Set working directory
 WORKDIR /app
 

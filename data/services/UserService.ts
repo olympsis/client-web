@@ -1,4 +1,5 @@
 import { getAuth } from 'firebase/auth'
+import * as Sentry from '@sentry/nuxt';
 import { Courrier, Method, Endpoint, Scheme } from 'malakbel';
 import { CheckIn, UserData, UserDTO } from "../models/UserModels";
 
@@ -11,25 +12,25 @@ export class UserService {
         this.http = new Courrier(Scheme.HTTPS, config.public.API)
     }
 
-    public async checkIn() : Promise<CheckIn | undefined> {
+    async checkIn() : Promise<CheckIn | undefined> {
         let token = await getAuth().currentUser?.getIdToken() ?? ""
 
         let headers = new Map<string, string>()
         headers.set('Authorization', token)
 
         let endpoint = new Endpoint('/v1/users/check-in')
-        const [status, _headers, body] = await this.http.request(Method.GET, endpoint, undefined, headers);
-
-        if (body) {
+        try {
+            const [_, _headers, body] = await this.http.request(Method.GET, endpoint, undefined, headers);
+            if (!body) return undefined;
             return CheckIn.decode(body);
-        } else {
-            return undefined
+        } catch(error) {
+            Sentry.withScope((scope) => {
+                scope.setExtra('action', 'check-in request');
+                Sentry.captureException(error);
+            });
+            return undefined;
         }
     }
-
-    async createUserData() {}
-
-    async getUserData() {}
 
     async updateUserData(user: UserDTO): Promise<UserData | null> {
         let token = await getAuth().currentUser?.getIdToken() ?? ""
@@ -41,13 +42,9 @@ export class UserService {
         let endpoint = new Endpoint('/v1/users/user')
         const [status, _headers, body] = await this.http.request(Method.PUT, endpoint, data, headers);
 
-        if (status === 200) {
-            if (body) {
-                return UserData.decode(body);
-            }
-        }
-
-        return null
+        if (status !== 200) return null;
+        if (!body) return null;
+        return UserData.decode(body);
     }
 
     async usernameAvailability(username: string): Promise<Boolean> {
@@ -59,13 +56,9 @@ export class UserService {
 
         let endpoint = new Endpoint('/v1/users/username', query)
 
-        const [status, _headers, body] = await this.http.request(Method.GET, endpoint, undefined, headers);
-
-        if (body) {
-            const data = body as { [key: string]: any };
-            return data['is_available'] as Boolean;
-        } else {
-            return false;
-        }
+        const [_, _headers, body] = await this.http.request(Method.GET, endpoint, undefined, headers);
+        if (!body) return false;
+        const data = body as { [key: string]: any };
+        return data['is_available'] as Boolean;
     }
 }

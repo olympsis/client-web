@@ -56,13 +56,13 @@ ENV SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN}
 COPY package*.json ./
 
 # Install dependencies
-RUN npm ci --omit=dev
+RUN pnpm i
 
 # Copy source code
 COPY . .
 
 # Build the application
-RUN npm run build
+RUN pnpm run build
 
 # Expose the port (Cloud Run will use PORT environment variable)
 EXPOSE 80

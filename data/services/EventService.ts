@@ -3,6 +3,7 @@ import type { Venue } from '../models/VenueModels';
 import { Courrier, Endpoint, Method, Scheme } from "malakbel";
 import type { ParticipantDao } from '../models/GenericModels';
 import { Event, EventDao, EventsResponse, LocationResponse, NewEventDao } from "../models/EventModels";
+import { getAuthToken } from '~/utils/generic-helpers';
 
 export class EventService {
 
@@ -72,6 +73,25 @@ export class EventService {
         } catch (error) {
             console.error(error)
             return [];
+        }
+    }
+
+    async getUserPastEvents(uuid: string): Promise<Event[]> {
+        try {
+            const token = await getAuthToken();
+            let headers = new Map<string, string>();
+            headers.set('Authorization', token);
+
+            const endpoint = new Endpoint(`/v1/events/past/user/${uuid}`);
+            const [status, _headers, body] = await this.http.request(Method.GET, endpoint, undefined, headers);
+
+            if (status !== 200) return [];
+            if (!body) return [];
+
+            const data = body as { [key: string]: any };
+            return data.map((e: { [key: string]: any }) => Event.decode(e));
+        } catch(error) {
+            throw Error('Failed to get past events. Error: ' + error)
         }
     }
 

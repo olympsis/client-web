@@ -70,6 +70,8 @@
 
 <script setup lang="ts">
 
+import * as Sentry from '@sentry/nuxt';
+
 import { computed } from 'vue';
 import { Club } from '~/data/models/ClubModels';
 import { Event } from '~/data/models/EventModels';
@@ -127,23 +129,17 @@ function hideEditModal() {
 }
 
 async function fetchPastEvents() {
-    let _events: Event[];
-    const sports = session.user?.sports.join(',') ?? 'all'
-    const location = session.lastKnownLocation;
-
-    if (!location) throw('Failed to get location. IMPLEMENT BETTER FALLBACK');
-
-    _events = await eventService.getEvents(
-        location.latitude, 
-        location.longitude, 
-        64373, // Radius of lookup
-        sports, // Sports involved
-        'completed',
-        0,
-        100
-    );
-
-    session.pastEvents = _events.filter((e) => e.participants.find((u) => u.user?.uuid == user.value?.uuid));
+    const uuid = session.user?.uuid;
+    if (!uuid) return;
+    
+    try {
+        session.pastEvents = await eventService.getUserPastEvents(uuid);
+    } catch(error) {
+        Sentry.withScope((scope) => {
+            scope.setExtra('action', 'fetch-user-past-events');
+            Sentry.captureException(error);
+        });
+    }
 }
 
 useSeoMeta({

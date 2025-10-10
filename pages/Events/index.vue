@@ -224,40 +224,6 @@ function retryFetchEvents() {
         });
 }
 
-async function handleSettingsChanged(event: { radius: number, sports: any}) {
-    eventSettingsModalRef.value?.close();
-    state.value = VIEW_STATE.LOADING;
-
-    let _events: Event[];
-    const radius = event.radius * 1609;
-    const sports = event.sports.value.map((s: any) => s.valueOf()).join(',');
-    const location = session.lastKnownLocation;
-
-    if (!location) throw('Failed to get location. IMPLEMENT BETTER FALLBACK');
-
-    try {
-        _events = await eventService.getEvents(
-            location.latitude, 
-            location.longitude, 
-            radius, // Radius of lookup
-            sports, // Sports involved
-            'pending, live', // Status of events
-            0,
-            100
-        );
-
-        events.value = _events;
-        state.value = VIEW_STATE.SUCCESS;
-    } catch (error) {
-        state.value = VIEW_STATE.FAILURE;
-        console.error('Failed to fetch events. Error: ' + error);
-        Sentry.withScope((scope) => {
-            scope.setExtra('action', 'fetch_events');
-            Sentry.captureException(error);
-        });
-    }
-}
-
 useSeoMeta({
     title: 'Events | Olympsis',
     ogTitle: 'Events | Olympsis',

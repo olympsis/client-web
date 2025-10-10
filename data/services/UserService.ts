@@ -1,5 +1,6 @@
-import { getAuth } from 'firebase/auth'
 import * as Sentry from '@sentry/nuxt';
+import { getAuth } from 'firebase/auth';
+import { getAuthToken } from '~/utils/generic-helpers';
 import { Courrier, Method, Endpoint, Scheme } from 'malakbel';
 import { CheckIn, UserData, UserDTO } from "../models/UserModels";
 
@@ -13,13 +14,12 @@ export class UserService {
     }
 
     async checkIn() : Promise<CheckIn | undefined> {
-        let token = await getAuth().currentUser?.getIdToken() ?? ""
-
-        let headers = new Map<string, string>()
-        headers.set('Authorization', token)
-
-        let endpoint = new Endpoint('/v1/users/check-in')
         try {
+            const token = await getAuthToken();
+            let headers = new Map<string, string>()
+            headers.set('Authorization', token)
+
+            let endpoint = new Endpoint('/v1/users/check-in')
             const [_, _headers, body] = await this.http.request(Method.GET, endpoint, undefined, headers);
             if (!body) return undefined;
             return CheckIn.decode(body);

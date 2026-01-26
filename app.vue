@@ -25,14 +25,6 @@ onMounted(async () => {
 		console.error("Something Unexpected Happened!")
 	}
 
-	/**
-	 * We fetch venues and events nearby on first app load if user is authenticated.
-	 * We have other views that will be available to the public such as /events
-	 * That page will fetch events data by itself if someone isn't authenticated and is visiting the site.
-	 */
-		if (auth.isAuthenticated) {
-		await session.loadVenuesAndEvents();
-	}
 })
 
 useHead({

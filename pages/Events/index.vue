@@ -238,7 +238,7 @@ session.$subscribe((mutation: any, state) => {
     }
 });
 
-onMounted(() => {
+onMounted(async () => {
     // Preselect user favorite sports
     // TODO: Add the ability to remember selections
     const session = useSessionStore();
@@ -248,6 +248,9 @@ onMounted(() => {
             selectedSports.value.push(found);
         }
     })
+
+    // Request location if needed - the subscription will re-fetch events when location is obtained
+    session.loadVenuesAndEvents();
 
     fetchEvents()
         .then((resp) => {

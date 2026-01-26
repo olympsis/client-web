@@ -31,7 +31,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { VIEW_STATE } from '@/data/Enums';
 import { Event } from '~/data/models/EventModels';
@@ -71,6 +71,11 @@ const name = computed<string>(() => {
         return ` ${user.firstName}`
     }
     return '';
+});
+
+// Request location and load nearby venues/events when user visits the home page
+onMounted(async () => {
+    await sessionStore.loadVenuesAndEvents();
 });
 
 useSeoMeta({

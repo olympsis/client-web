@@ -13,7 +13,6 @@ import LocationDialog from './components/System/LocationDialog/LocationDialog.vu
 import { SystemService } from './data/services/SystemService';
 
 onMounted(async () => {
-	const auth = useAuth();
 	const session = useSessionStore();
 
 	try {

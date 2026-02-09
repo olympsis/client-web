@@ -15,9 +15,9 @@ export default defineNuxtPlugin(nuxtApp => {
         messagingSenderId: config.public.FB_MESSAGING_SENDER_ID
     };
     
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const analytics = getAnalytics(app);
+    // const app = initializeApp(firebaseConfig);
+    // const auth = getAuth(app);
+    // const analytics = getAnalytics(app);
 
     // const isPrivateBrowsing = !detectPrivateBrowsing();
     // setPersistence(auth, isPrivateBrowsing ? inMemoryPersistence : browserSessionPersistence)
@@ -28,8 +28,8 @@ export default defineNuxtPlugin(nuxtApp => {
     //         console.error("Error setting persistence:", error);
     //     });
 
-    nuxtApp.provide('auth', auth);
-    nuxtApp.vueApp.provide('auth', auth);
-    nuxtApp.provide('analytics', analytics);
-    nuxtApp.vueApp.provide('analytics', analytics);
+    // nuxtApp.provide('auth', auth);
+    // nuxtApp.vueApp.provide('auth', auth);
+    // nuxtApp.provide('analytics', analytics);
+    // nuxtApp.vueApp.provide('analytics', analytics);
 });

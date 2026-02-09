@@ -1,6 +1,5 @@
 import * as Sentry from '@sentry/nuxt';
 import { getAuth } from 'firebase/auth';
-import { getAuthToken } from '~/utils/generic-helpers';
 import { Courrier, Method, Endpoint, Scheme } from 'malakbel';
 import { CheckIn, UserData, UserDTO } from "../models/UserModels";
 
@@ -10,14 +9,38 @@ export class UserService {
 
     constructor() {
         const config = useRuntimeConfig();
-        this.http = new Courrier(Scheme.HTTPS, config.public.API)
+        switch (config.public.MODE) {
+            case 'dev':
+                this.http = new Courrier(Scheme.HTTP, config.public.API);
+                break;
+            default:
+                this.http = new Courrier(Scheme.HTTPS, config.public.API);
+                break;
+        }
+    }
+
+    /**
+     * Builds auth headers based on the current environment.
+     * Dev mode uses a static userID header; prod uses Firebase auth token.
+     */
+    private async getAuthHeaders(): Promise<Map<string, string>> {
+        const config = useRuntimeConfig();
+        let headers = new Map<string, string>();
+        switch (config.public.MODE) {
+            case 'dev':
+                headers.set('userID', config.public.USER_ID);
+                break;
+            default:
+                const token = await getAuth().currentUser?.getIdToken() ?? ""
+                headers.set('Authorization', token);
+                break;
+        }
+        return headers;
     }
 
     async checkIn() : Promise<CheckIn | undefined> {
         try {
-            const token = await getAuthToken();
-            let headers = new Map<string, string>()
-            headers.set('Authorization', token)
+            const headers = await this.getAuthHeaders();
 
             let endpoint = new Endpoint('/v1/users/check-in')
             const [_, _headers, body] = await this.http.request(Method.GET, endpoint, undefined, headers);
@@ -33,10 +56,7 @@ export class UserService {
     }
 
     async updateUserData(user: UserDTO): Promise<UserData | null> {
-        let token = await getAuth().currentUser?.getIdToken() ?? ""
-
-        let headers = new Map<string, string>()
-        headers.set('Authorization', token)
+        const headers = await this.getAuthHeaders();
 
         let data = JSON.stringify(user.encode());
         let endpoint = new Endpoint('/v1/users/user')

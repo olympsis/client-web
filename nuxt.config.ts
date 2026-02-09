@@ -29,6 +29,7 @@ export default defineNuxtConfig({
 			MODE: process.env.mode ?? "dev",
 
 			API: process.env.API ?? "",
+			USER_ID: process.env.USER_ID ?? "",
 
 			APP_ID: process.env.APL_APP_ID ?? "",
 			APL_KEY_ID: process.env.APL_KEY_ID ?? "",

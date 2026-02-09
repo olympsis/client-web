@@ -3,8 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "nuxt build",
-    "dev": "nuxt dev",
+    "build": "nuxt build --dotenv .env.prod",
+    "dev": "nuxt dev --dotenv .env.dev",
     "generate": "nuxt generate",
     "preview": "NODE_OPTIONS='--import ./public/instrument.server.mjs' nuxt preview",
     "postinstall": "nuxt prepare",

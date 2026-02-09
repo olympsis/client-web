@@ -9,7 +9,33 @@ export class ClubService {
 
     constructor() {
         const config = useRuntimeConfig();
-        this.http = new Courrier(Scheme.HTTPS, config.public.API);
+        switch (config.public.MODE) {
+            case 'dev':
+                this.http = new Courrier(Scheme.HTTP, config.public.API);
+                break;
+            default:
+                this.http = new Courrier(Scheme.HTTPS, config.public.API);
+                break;
+        }
+    }
+
+    /**
+     * Builds auth headers based on the current environment.
+     * Dev mode uses a static userID header; prod uses Firebase auth token.
+     */
+    private async getAuthHeaders(): Promise<Map<string, string>> {
+        const config = useRuntimeConfig();
+        let headers = new Map<string, string>();
+        switch (config.public.MODE) {
+            case 'dev':
+                headers.set('userID', config.public.USER_ID);
+                break;
+            default:
+                const token = await getAuth().currentUser?.getIdToken() ?? ""
+                headers.set('Authorization', token);
+                break;
+        }
+        return headers;
     }
 
     async getClub(id: string) : Promise<Club | undefined> {
@@ -39,12 +65,7 @@ export class ClubService {
     }
 
     async getClubs(state: string, country: string) : Promise<ClubsResponse | undefined> {
-        
-        const auth = getAuth();
-        let token = await auth.currentUser?.getIdToken() ?? ""
-
-        let headers = new Map<string, string>();
-        headers.set('Authorization', token);
+        const headers = await this.getAuthHeaders();
 
         const endpoint = new Endpoint(`/v1/clubs?country=${country}`);
 
@@ -73,10 +94,7 @@ export class ClubService {
     }
 
     async createClub(dao: ClubDao) : Promise<string | null> {
-        let token = await getAuth().currentUser?.getIdToken() ?? ""
-        
-        let headers = new Map<string, string>();
-        headers.set('Authorization', token);
+        const headers = await this.getAuthHeaders();
 
         const endpoint = new Endpoint("/v1/clubs");
         const data = JSON.stringify(dao.encode());
@@ -101,10 +119,7 @@ export class ClubService {
     }
 
     async modifyClub(dao: ClubDao) : Promise<boolean> {
-        let token = await getAuth().currentUser?.getIdToken() ?? ""
-        
-        let headers = new Map<string, string>();
-        headers.set('Authorization', token);
+        const headers = await this.getAuthHeaders();
 
         const endpoint = new Endpoint(`/v1/clubs/${dao.id}`);
         const data = JSON.stringify(dao);
@@ -124,10 +139,7 @@ export class ClubService {
     }
 
     async deleteClub(id: string): Promise<boolean> {
-        let token = await getAuth().currentUser?.getIdToken() ?? ""
-        
-        let headers = new Map<string, string>();
-        headers.set('Authorization', token);
+        const headers = await this.getAuthHeaders();
 
         const endpoint = new Endpoint(`/v1/clubs/${id}`);
 
@@ -146,10 +158,7 @@ export class ClubService {
     }
 
     async leaveClub(id: String) : Promise<boolean> {
-        let token = await getAuth().currentUser?.getIdToken() ?? ""
-        
-        let headers = new Map<string, string>();
-        headers.set('Authorization', token);
+        const headers = await this.getAuthHeaders();
 
         const endpoint = new Endpoint(`/v1/clubs/${id}/leave`);
 
@@ -168,11 +177,7 @@ export class ClubService {
     }
 
     async applyToClub(id: string): Promise<boolean> {
-        const auth = getAuth();
-        const token = await auth.currentUser?.getIdToken() ?? '';
-
-        const headers = new Map<string, string>();
-        headers.set('Authorization', token);
+        const headers = await this.getAuthHeaders();
 
         const endpoint = new Endpoint(`/v1/clubs/${id}/applications`);
         const [status, _headers, body] = await this.http.request(Method.POST, endpoint, undefined, headers);
@@ -185,11 +190,7 @@ export class ClubService {
     }
 
     async getApplicationRequests(id: string): Promise<ClubApplicationsResponse | null> {
-        const auth = getAuth();
-        let token = await auth.currentUser?.getIdToken() ?? ""
-
-        let headers = new Map<string, string>();
-        headers.set('Authorization', token);
+        const headers = await this.getAuthHeaders();
 
         const endpoint = new Endpoint(`/v1/clubs/${id}/applications`);
 
@@ -218,11 +219,7 @@ export class ClubService {
     }
 
     async modifyApplication(id: string, clubID: string, dao: ClubApplicationDao): Promise<boolean> {
-        const auth = getAuth();
-        let token = await auth.currentUser?.getIdToken() ?? ""
-
-        let headers = new Map<string, string>();
-        headers.set('Authorization', token);
+        const headers = await this.getAuthHeaders();
         const data = JSON.stringify(dao.encode());
 
         const endpoint = new Endpoint(`/v1/clubs/${clubID}/applications/${id}`);
@@ -241,11 +238,7 @@ export class ClubService {
      */
 
     async changeMemberRank(clubID: string, memberID: string, request: ChangeRoleRequest): Promise<boolean> {
-        const auth = getAuth();
-        let token = await auth.currentUser?.getIdToken() ?? ""
-
-        let headers = new Map<string, string>();
-        headers.set('Authorization', token);
+        const headers = await this.getAuthHeaders();
         const data = JSON.stringify(request.encode());
 
         const endpoint = new Endpoint(`/v1/clubs/${clubID}/members/${memberID}/rank`);
@@ -259,11 +252,7 @@ export class ClubService {
     }
 
     async kickMember(clubID: string, memberID: string): Promise<boolean> {
-        const auth = getAuth();
-        let token = await auth.currentUser?.getIdToken() ?? ""
-
-        let headers = new Map<string, string>();
-        headers.set('Authorization', token);
+        const headers = await this.getAuthHeaders();
 
         const endpoint = new Endpoint(`/v1/clubs/${clubID}/members/${memberID}/kick`);
         const [status, _headers, body] = await this.http.request(Method.PUT, endpoint, undefined, headers);

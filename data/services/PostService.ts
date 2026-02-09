@@ -9,14 +9,37 @@ export class PostService {
 
     constructor() {
         const config = useRuntimeConfig();
-        this.http = new Courrier(Scheme.HTTPS, config.public.API);
+        switch (config.public.MODE) {
+            case 'dev':
+                this.http = new Courrier(Scheme.HTTP, config.public.API);
+                break;
+            default:
+                this.http = new Courrier(Scheme.HTTPS, config.public.API);
+                break;
+        }
+    }
+
+    /**
+     * Builds auth headers based on the current environment.
+     * Dev mode uses a static userID header; prod uses Firebase auth token.
+     */
+    private async getAuthHeaders(): Promise<Map<string, string>> {
+        const config = useRuntimeConfig();
+        let headers = new Map<string, string>();
+        switch (config.public.MODE) {
+            case 'dev':
+                headers.set('userID', config.public.USER_ID);
+                break;
+            default:
+                const token = await getAuth().currentUser?.getIdToken() ?? ""
+                headers.set('Authorization', token);
+                break;
+        }
+        return headers;
     }
 
     async createPost(dao: PostDao): Promise<string> {
-        let token = await getAuth().currentUser?.getIdToken() ?? ""
-        
-        let headers = new Map<string, string>();
-        headers.set('Authorization', token);
+        const headers = await this.getAuthHeaders();
 
         const endpoint = new Endpoint("/v1/posts");
         const data = JSON.stringify(dao.encode());
@@ -33,13 +56,10 @@ export class PostService {
     }
 
     async getPosts(id: string): Promise<PostsResponse | undefined> {
-        let token = await getAuth().currentUser?.getIdToken() ?? ""
+        const headers = await this.getAuthHeaders();
 
         let query = new Map<string, string>()
         query.set('groupID', id);
-        
-        let headers = new Map<string, string>()
-        headers.set('Authorization', token)
 
         const endpoint = new Endpoint('/v1/posts', query)
 
@@ -61,10 +81,7 @@ export class PostService {
     }
 
     async deletePost(id: string) : Promise<boolean> {
-        let token = await getAuth().currentUser?.getIdToken() ?? ""
-
-        let headers = new Map<string, string>()
-        headers.set('Authorization', token)
+        const headers = await this.getAuthHeaders();
 
         const endpoint = new Endpoint(`/v1/posts/${id}`);
         const [status, _headers, body] = await this.http.request(Method.DELETE, endpoint, undefined, headers);
@@ -76,10 +93,7 @@ export class PostService {
     }
 
     async likePost(id: string): Promise<string> {
-        let token = await getAuth().currentUser?.getIdToken() ?? ""
-
-        let headers = new Map<string, string>()
-        headers.set('Authorization', token)
+        const headers = await this.getAuthHeaders();
 
         const endpoint = new Endpoint(`/v1/posts/${id}/likes`);
         const [status, _headers, body] = await this.http.request(Method.POST, endpoint, undefined, headers);
@@ -94,10 +108,7 @@ export class PostService {
     }
 
     async unLikePost(id: string, lID: string): Promise<boolean> {
-        let token = await getAuth().currentUser?.getIdToken() ?? ""
-
-        let headers = new Map<string, string>()
-        headers.set('Authorization', token)
+        const headers = await this.getAuthHeaders();
 
         const endpoint = new Endpoint(`/v1/posts/${id}/likes/${lID}`);
         const [status, _headers, body] = await this.http.request(Method.DELETE, endpoint, undefined, headers);
@@ -109,10 +120,7 @@ export class PostService {
     }
 
     async addComment(id: string, dao: CommentDao): Promise<string> {
-        let token = await getAuth().currentUser?.getIdToken() ?? ""
-
-        let headers = new Map<string, string>()
-        headers.set('Authorization', token)
+        const headers = await this.getAuthHeaders();
 
         const data = JSON.stringify(dao.encode());
         const endpoint = new Endpoint(`/v1/posts/${id}/comments`);
@@ -128,10 +136,7 @@ export class PostService {
     }
 
     async removeComment(id: string, cID: string): Promise<boolean> {
-        let token = await getAuth().currentUser?.getIdToken() ?? ""
-
-        let headers = new Map<string, string>()
-        headers.set('Authorization', token)
+        const headers = await this.getAuthHeaders();
 
         const endpoint = new Endpoint(`/v1/posts/${id}/comments/${cID}`);
         const [status, _headers, body] = await this.http.request(Method.DELETE, endpoint, undefined, headers);

@@ -3,7 +3,6 @@ import type { Venue } from '../models/VenueModels';
 import { Courrier, Endpoint, Method, Scheme } from "malakbel";
 import type { ParticipantDao } from '../models/GenericModels';
 import { Event, EventDao, EventsResponse, LocationResponse, NewEventDao } from "../models/EventModels";
-import { getAuthToken } from '~/utils/generic-helpers';
 
 export class EventService {
 
@@ -11,14 +10,37 @@ export class EventService {
 
     constructor() {
         const config = useRuntimeConfig();
-        this.http = new Courrier(Scheme.HTTPS, config.public.API);
+        switch (config.public.MODE) {
+            case 'dev':
+                this.http = new Courrier(Scheme.HTTP, config.public.API);
+                break;
+            default:
+                this.http = new Courrier(Scheme.HTTPS, config.public.API);
+                break;
+        }
+    }
+
+    /**
+     * Builds auth headers based on the current environment.
+     * Dev mode uses a static userID header; prod uses Firebase auth token.
+     */
+    private async getAuthHeaders(): Promise<Map<string, string>> {
+        const config = useRuntimeConfig();
+        let headers = new Map<string, string>();
+        switch (config.public.MODE) {
+            case 'dev':
+                headers.set('userID', config.public.USER_ID);
+                break;
+            default:
+                const token = await getAuth().currentUser?.getIdToken() ?? ""
+                headers.set('Authorization', token);
+                break;
+        }
+        return headers;
     }
 
     async createEvent(dao: NewEventDao) : Promise<string | null> {
-        let token = await getAuth().currentUser?.getIdToken() ?? ""
-        
-        let headers = new Map<string, string>();
-        headers.set('Authorization', token);
+        const headers = await this.getAuthHeaders();
 
         const endpoint = new Endpoint("/v1/events");
         const data = JSON.stringify(dao.encode());
@@ -43,10 +65,7 @@ export class EventService {
     }
 
     async getEvents(latitude: number, longitude: number, radius: number, sports: string, status: string, skip: number, limit: number): Promise<Event[]> {
-        let token = await getAuth().currentUser?.getIdToken() ?? "";
-
-        let headers = new Map<string, string>();
-        headers.set('Authorization', token);
+        const headers = await this.getAuthHeaders();
 
         let query = new Map<string, string>();
         query.set("location", `${String(longitude)},${String(latitude)}`);
@@ -78,9 +97,7 @@ export class EventService {
 
     async getUserPastEvents(uuid: string): Promise<Event[]> {
         try {
-            const token = await getAuthToken();
-            let headers = new Map<string, string>();
-            headers.set('Authorization', token);
+            const headers = await this.getAuthHeaders();
 
             const endpoint = new Endpoint(`/v1/events/past/user/${uuid}`);
             const [status, _headers, body] = await this.http.request(Method.GET, endpoint, undefined, headers);
@@ -121,10 +138,7 @@ export class EventService {
     }
 
     async getNearbyData(latitude: number, longitude: number, radius: number, sports: string): Promise<({ venues: Venue[], events: Event[] })> {
-        let token = await getAuth().currentUser?.getIdToken() ?? ""
-        
-        let headers = new Map<string, string>();
-        headers.set('Authorization', token);
+        const headers = await this.getAuthHeaders();
 
         let query = new Map<string, string>();
         query.set("latitude", String(latitude));
@@ -155,10 +169,7 @@ export class EventService {
     }
 
     async addParticipant(id: string, dao: ParticipantDao) : Promise<boolean> {
-        let token = await getAuth().currentUser?.getIdToken() ?? ""
-
-        let headers = new Map<string, string>()
-        headers.set('Authorization', token)
+        const headers = await this.getAuthHeaders();
 
         const data = JSON.stringify(dao.encode());
 
@@ -171,10 +182,7 @@ export class EventService {
     }
 
     async removeParticipant(id: string, participantID?:string) : Promise<boolean> {
-        let token = await getAuth().currentUser?.getIdToken() ?? "";
-
-        let headers = new Map<string, string>();
-        headers.set('Authorization', token);
+        const headers = await this.getAuthHeaders();
 
         var url = `/v1/events/${id}/participants`;
         let query = new Map<string, string>();
@@ -192,10 +200,7 @@ export class EventService {
     }
 
     async deleteEvent(id: string, deleteAll?: boolean): Promise<boolean> {
-        let token = await getAuth().currentUser?.getIdToken() ?? "";
-
-        let headers = new Map<string, string>();
-        headers.set('Authorization', token);
+        const headers = await this.getAuthHeaders();
 
         let query = new Map<string, string>();
         if (deleteAll) {

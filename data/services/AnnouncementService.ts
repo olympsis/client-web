@@ -11,7 +11,14 @@ export class AnnouncementService {
 
     constructor() {
         const config = useRuntimeConfig();
-        this.http = new Courrier(Scheme.HTTPS, config.public.API);
+        switch (config.public.MODE) {
+            case 'dev':
+                this.http = new Courrier(Scheme.HTTP, config.public.API);
+                break;
+            default:
+                this.http = new Courrier(Scheme.HTTPS, config.public.API);
+                break;
+        }
     }
 
     /**

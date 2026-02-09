@@ -7,15 +7,37 @@ export class ChatService {
 
     constructor() {
         const config = useRuntimeConfig();
-        this.http = new Courrier(Scheme.HTTPS, config.public.API);
+        switch (config.public.MODE) {
+            case 'dev':
+                this.http = new Courrier(Scheme.HTTP, config.public.API);
+                break;
+            default:
+                this.http = new Courrier(Scheme.HTTPS, config.public.API);
+                break;
+        }
+    }
+
+    /**
+     * Builds auth headers based on the current environment.
+     * Dev mode uses a static userID header; prod uses Firebase auth token.
+     */
+    private async getAuthHeaders(): Promise<Map<string, string>> {
+        const config = useRuntimeConfig();
+        let headers = new Map<string, string>();
+        switch (config.public.MODE) {
+            case 'dev':
+                headers.set('userID', config.public.USER_ID);
+                break;
+            default:
+                const token = await getAuth().currentUser?.getIdToken() ?? ""
+                headers.set('Authorization', token);
+                break;
+        }
+        return headers;
     }
 
     async createChatRoom(dto: ChatRoomDTO): Promise<string | null> {
-        const token = await getAuth().currentUser?.getIdToken() ?? '';
-        
-        const headers  = new Map<string, string>();
-        headers.set('Authorization', token);
-
+        const headers = await this.getAuthHeaders();
 
         const endpoint =  new Endpoint('/v1/chats');
         const data = JSON.stringify(dto.encode());
@@ -41,11 +63,7 @@ export class ChatService {
     }
 
     async getChatRooms(groupID: string): Promise<ChatRoom[]> {
-        const token = await getAuth().currentUser?.getIdToken() ?? '';
-        
-        const headers  = new Map<string, string>();
-        headers.set('Authorization', token);
-
+        const headers = await this.getAuthHeaders();
 
         const endpoint =  new Endpoint(`/v1/chats/group/${groupID}`);
 
@@ -75,10 +93,7 @@ export class ChatService {
     }
 
     async getChatRoom(id: string): Promise<ChatRoom | null> {
-        const token = await getAuth().currentUser?.getIdToken() ?? '';
-        
-        const headers  = new Map<string, string>();
-        headers.set('Authorization', token);
+        const headers = await this.getAuthHeaders();
 
         const endpoint =  new Endpoint(`/v1/chats/${id}`);
 
@@ -104,11 +119,7 @@ export class ChatService {
     }
 
     async modifyChatRoom(id: string, dto: ChatRoomDTO): Promise<boolean> {
-        const token = await getAuth().currentUser?.getIdToken() ?? '';
-        
-        const headers  = new Map<string, string>();
-        headers.set('Authorization', token);
-
+        const headers = await this.getAuthHeaders();
 
         const endpoint =  new Endpoint(`/v1/chats/${id}`);
         const data = JSON.stringify(dto.encode());
@@ -128,10 +139,7 @@ export class ChatService {
     }
 
     async deleteChatRoom(id: string): Promise<boolean> {
-        const token = await getAuth().currentUser?.getIdToken() ?? '';
-        
-        const headers  = new Map<string, string>();
-        headers.set('Authorization', token);
+        const headers = await this.getAuthHeaders();
 
         const endpoint =  new Endpoint(`/v1/chats/${id}`);
 
@@ -150,10 +158,7 @@ export class ChatService {
     }
 
     async joinChatRoom(id: string): Promise<boolean> {
-        const token = await getAuth().currentUser?.getIdToken() ?? '';
-        
-        const headers  = new Map<string, string>();
-        headers.set('Authorization', token);
+        const headers = await this.getAuthHeaders();
 
         const endpoint =  new Endpoint(`/v1/chats/${id}/join`);
 
@@ -172,10 +177,7 @@ export class ChatService {
     }
 
     async leaveChatRoom(id: string): Promise<boolean> {
-        const token = await getAuth().currentUser?.getIdToken() ?? '';
-        
-        const headers  = new Map<string, string>();
-        headers.set('Authorization', token);
+        const headers = await this.getAuthHeaders();
 
         const endpoint =  new Endpoint(`/v1/chats/${id}/leave`);
 

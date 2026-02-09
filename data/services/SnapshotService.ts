@@ -7,34 +7,38 @@ export class SnapshotService {
 
     constructor() {
         const config = useRuntimeConfig();
-        this.http = new Courrier(Scheme.HTTPS, config.public.API);
+        switch (config.public.MODE) {
+            case 'dev':
+                this.http = new Courrier(Scheme.HTTP, config.public.API);
+                break;
+            default:
+                this.http = new Courrier(Scheme.HTTPS, config.public.API);
+                break;
+        }
     }
-    
+
+    /**
+     * Builds auth headers based on the current environment.
+     * Dev mode uses a static userID header; prod uses Firebase auth token.
+     */
+    private async getAuthHeaders(): Promise<Map<string, string>> {
+        const config = useRuntimeConfig();
+        let headers = new Map<string, string>();
+        switch (config.public.MODE) {
+            case 'dev':
+                headers.set('userID', config.public.USER_ID);
+                break;
+            default:
+                const token = await getAuth().currentUser?.getIdToken() ?? ""
+                headers.set('Authorization', token);
+                break;
+        }
+        return headers;
+    }
+
     public async getMapSnapshot(name: string): Promise<Blob> {
-        // Add retry mechanism for token retrieval
-        const getToken = async (maxRetries: number = 5, delayMs: number = 500): Promise<string> => {
-            let retries = 0;
-            while (retries < maxRetries) {
-                const token = await getAuth().currentUser?.getIdToken();
-                
-                if (token) {
-                    return token;
-                }
-                
-                console.log(`Token is undefined, retrying (${retries + 1}/${maxRetries})...`);
-                await new Promise(resolve => setTimeout(resolve, delayMs * Math.pow(2, retries))); // Exponential backoff
-                retries++;
-            }
-            
-            throw new Error('Failed to retrieve token after multiple attempts');
-        };
-        
-        // Get token with retry mechanism
-        const token = await getToken();
-        
-        const headers = new Map<string, string>();
-        headers.set('Authorization', token);
-    
+        const headers = await this.getAuthHeaders();
+
         let query = new Map<string, string>();
         query.set("center", name);
     
@@ -52,7 +56,9 @@ export class SnapshotService {
             headers: undefined
         };
     
-        const url = `https://${this.http.host}${endpoint.path}${endpoint.mapToQueryString()}`
+        const config = useRuntimeConfig();
+        const scheme = config.public.MODE === 'dev' ? 'http' : 'https';
+        const url = `${scheme}://${this.http.host}${endpoint.path}${endpoint.mapToQueryString()}`
     
         headers.set('Content-Type', 'image/png');
     

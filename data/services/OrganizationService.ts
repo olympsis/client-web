@@ -9,7 +9,33 @@ export class OrganizationService {
 
     constructor() {
         const config = useRuntimeConfig();
-        this.http = new Courrier(Scheme.HTTPS, config.public.API);
+        switch (config.public.MODE) {
+            case 'dev':
+                this.http = new Courrier(Scheme.HTTP, config.public.API);
+                break;
+            default:
+                this.http = new Courrier(Scheme.HTTPS, config.public.API);
+                break;
+        }
+    }
+
+    /**
+     * Builds auth headers based on the current environment.
+     * Dev mode uses a static userID header; prod uses Firebase auth token.
+     */
+    private async getAuthHeaders(): Promise<Map<string, string>> {
+        const config = useRuntimeConfig();
+        let headers = new Map<string, string>();
+        switch (config.public.MODE) {
+            case 'dev':
+                headers.set('userID', config.public.USER_ID);
+                break;
+            default:
+                const token = await getAuth().currentUser?.getIdToken() ?? ""
+                headers.set('Authorization', token);
+                break;
+        }
+        return headers;
     }
 
     async getOrganization(id: string) : Promise<Organization | undefined> {
@@ -45,10 +71,7 @@ export class OrganizationService {
     }
 
     async createOrganization(dao: OrganizationDao) : Promise<string | null> {
-        let token = await getAuth().currentUser?.getIdToken() ?? ""
-        
-        let headers = new Map<string, string>();
-        headers.set('Authorization', token);
+        const headers = await this.getAuthHeaders();
 
         const endpoint = new Endpoint("/v1/organizations");
         const data = JSON.stringify(dao);
@@ -81,10 +104,7 @@ export class OrganizationService {
     }
 
     async leaveOrganization(id: string) : Promise<boolean> {
-        let token = await getAuth().currentUser?.getIdToken() ?? ""
-                
-        let headers = new Map<string, string>();
-        headers.set('Authorization', token);
+        const headers = await this.getAuthHeaders();
 
         const endpoint = new Endpoint(`/v1/organizations/${id}/leave`);
 
@@ -107,11 +127,7 @@ export class OrganizationService {
      */
 
     async changeMemberRank(clubID: string, memberID: string, request: ChangeRoleRequest): Promise<boolean> {
-        const auth = getAuth();
-        let token = await auth.currentUser?.getIdToken() ?? ""
-
-        let headers = new Map<string, string>();
-        headers.set('Authorization', token);
+        const headers = await this.getAuthHeaders();
         const data = JSON.stringify(request.encode());
 
         const endpoint = new Endpoint(`/v1/organizations/${clubID}/members/${memberID}/rank`);
@@ -125,11 +141,7 @@ export class OrganizationService {
     }
 
     async kickMember(clubID: string, memberID: string): Promise<boolean> {
-        const auth = getAuth();
-        let token = await auth.currentUser?.getIdToken() ?? ""
-
-        let headers = new Map<string, string>();
-        headers.set('Authorization', token);
+        const headers = await this.getAuthHeaders();
 
         const endpoint = new Endpoint(`/v1/organizations/${clubID}/members/${memberID}/kick`);
         const [status, _headers, body] = await this.http.request(Method.PUT, endpoint, undefined, headers);

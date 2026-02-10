@@ -1,0 +1,63 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "submit": "Submit",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "close": "Close",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "view": "View",
+    "share": "Share",
+    "more": "More"
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signOut": "Sign Out",
+    "signUp": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot Password?"
+  },
+  "nav": {
+    "home": "Home",
+    "events": "Events",
+    "groups": "Groups",
+    "profile": "Profile"
+  },
+  "events": {
+    "title": "Events",
+    "create": "Create Event",
+    "upcoming": "Upcoming Events",
+    "past": "Past Events",
+    "join": "Join Event",
+    "leave": "Leave Event",
+    "details": "Event Details",
+    "location": "Location",
+    "date": "Date",
+    "time": "Time",
+    "participants": "Participants"
+  },
+  "groups": {
+    "title": "Groups",
+    "create": "Create Group",
+    "join": "Join Group",
+    "leave": "Leave Group",
+    "members": "Members",
+    "settings": "Group Settings",
+    "search": "Search Groups"
+  },
+  "profile": {
+    "title": "Profile",
+    "edit": "Edit Profile",
+    "settings": "Settings",
+    "myEvents": "My Events",
+    "myGroups": "My Groups"
+  }
+}

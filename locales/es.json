@@ -1,0 +1,63 @@
+{
+  "common": {
+    "loading": "Cargando...",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "submit": "Enviar",
+    "confirm": "Confirmar",
+    "back": "Volver",
+    "next": "Siguiente",
+    "close": "Cerrar",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "sort": "Ordenar",
+    "view": "Ver",
+    "share": "Compartir",
+    "more": "Más"
+  },
+  "auth": {
+    "signIn": "Iniciar Sesión",
+    "signOut": "Cerrar Sesión",
+    "signUp": "Registrarse",
+    "email": "Correo Electrónico",
+    "password": "Contraseña",
+    "forgotPassword": "¿Olvidaste tu Contraseña?"
+  },
+  "nav": {
+    "home": "Inicio",
+    "events": "Eventos",
+    "groups": "Grupos",
+    "profile": "Perfil"
+  },
+  "events": {
+    "title": "Eventos",
+    "create": "Crear Evento",
+    "upcoming": "Próximos Eventos",
+    "past": "Eventos Pasados",
+    "join": "Unirse al Evento",
+    "leave": "Salir del Evento",
+    "details": "Detalles del Evento",
+    "location": "Ubicación",
+    "date": "Fecha",
+    "time": "Hora",
+    "participants": "Participantes"
+  },
+  "groups": {
+    "title": "Grupos",
+    "create": "Crear Grupo",
+    "join": "Unirse al Grupo",
+    "leave": "Salir del Grupo",
+    "members": "Miembros",
+    "settings": "Configuración del Grupo",
+    "search": "Buscar Grupos"
+  },
+  "profile": {
+    "title": "Perfil",
+    "edit": "Editar Perfil",
+    "settings": "Configuración",
+    "myEvents": "Mis Eventos",
+    "myGroups": "Mis Grupos"
+  }
+}

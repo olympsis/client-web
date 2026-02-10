@@ -1,0 +1,63 @@
+{
+  "common": {
+    "loading": "Chargement...",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "submit": "Soumettre",
+    "confirm": "Confirmer",
+    "back": "Retour",
+    "next": "Suivant",
+    "close": "Fermer",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "sort": "Trier",
+    "view": "Voir",
+    "share": "Partager",
+    "more": "Plus"
+  },
+  "auth": {
+    "signIn": "Se Connecter",
+    "signOut": "Se Déconnecter",
+    "signUp": "S'inscrire",
+    "email": "E-mail",
+    "password": "Mot de Passe",
+    "forgotPassword": "Mot de Passe Oublié?"
+  },
+  "nav": {
+    "home": "Accueil",
+    "events": "Événements",
+    "groups": "Groupes",
+    "profile": "Profil"
+  },
+  "events": {
+    "title": "Événements",
+    "create": "Créer un Événement",
+    "upcoming": "Événements à Venir",
+    "past": "Événements Passés",
+    "join": "Rejoindre l'Événement",
+    "leave": "Quitter l'Événement",
+    "details": "Détails de l'Événement",
+    "location": "Lieu",
+    "date": "Date",
+    "time": "Heure",
+    "participants": "Participants"
+  },
+  "groups": {
+    "title": "Groupes",
+    "create": "Créer un Groupe",
+    "join": "Rejoindre le Groupe",
+    "leave": "Quitter le Groupe",
+    "members": "Membres",
+    "settings": "Paramètres du Groupe",
+    "search": "Rechercher des Groupes"
+  },
+  "profile": {
+    "title": "Profil",
+    "edit": "Modifier le Profil",
+    "settings": "Paramètres",
+    "myEvents": "Mes Événements",
+    "myGroups": "Mes Groupes"
+  }
+}

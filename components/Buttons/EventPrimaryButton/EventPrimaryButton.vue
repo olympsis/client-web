@@ -33,7 +33,7 @@
         <!-- Live Button -->
         <div v-if="eventState === EVENT_STATE.LIVE" id="live" class="action">
             <img class="icon" src="@/assets/icons/circle/circle.fill.white.svg" :style="{ 'width': '2rem' }">
-            <p> Live </p>
+            <p :style="{color:'white'}"> Live </p>
         </div>
 
         <!-- Completed Button -->
@@ -130,6 +130,7 @@ const pendingState = computed<EVENT_PENDING_STATE>(() => {
     flex-direction: column;
     justify-content: center;
     color: var(--primary-label-color);
+    border: var(--icon-border-color) solid 1px;
     background-color: var(--secondary-background-color);
 
     div {

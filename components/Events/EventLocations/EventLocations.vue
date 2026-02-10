@@ -44,10 +44,11 @@ const venueName = computed<string>(() => {
 const venueLocation = computed<string>(() => {
     const firstVenue = props.event.venues.at(0);
     if (firstVenue && !firstVenue.id) {
+        if (!firstVenue.city && !firstVenue.state) return 'Custom Coordinates';
         return `${firstVenue.city}, ${firstVenue.state}`;
     } else {
         const firstVenue = props.venues.at(0);
-        if (!firstVenue) return 'Unknown Location';
+        if (!firstVenue || (!firstVenue.city && !firstVenue.state)) return 'Custom Coordinates';
         return `${firstVenue.city}, ${firstVenue.state}`;
     }
 });

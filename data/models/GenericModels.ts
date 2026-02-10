@@ -80,11 +80,11 @@ class Ownership extends Codable<Ownership> {
 }
 
 class Organizer extends Codable<Organizer> {
-    type: number; // 0 - club | 1 - org
+    type: string; // 0 - club | 1 - org
     id: string | undefined;
 
     constructor(
-        type: number,
+        type: string,
         id: string | undefined
     ) {
         super();
@@ -96,7 +96,7 @@ class Organizer extends Codable<Organizer> {
         const object = Object();
 
         if (data) {
-            object['type'] = data['type'] ?? 0;
+            object['type'] = data['type'] ?? "GROUP";
             
             if (data['id']) {
                 object['id'] = data['id'];

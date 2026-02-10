@@ -174,7 +174,7 @@ function openExternalURL() {
         width: 100%;
         padding: 1rem;
         border-radius: 16px;
-        border: var(--component-border) solid 1px;
+        border: var(--icon-border-color) solid 1px;
         background-color: var(--secondary-background-color);
 
         #body {

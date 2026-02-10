@@ -40,6 +40,7 @@ defineProps({
         justify-content: center;
         color: var(--primary-label-color);
         border-radius: var(--button-border-radius);
+        border: var(--icon-border-color) solid 1px;
         background-color: var(--secondary-background-color);
 
         img {

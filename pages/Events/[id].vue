@@ -292,7 +292,7 @@ async function loadEventData(id: string) {
                         promises.push(session.clubService.getClub(o.id));
                     }
                     break;
-                case 1:
+                case "ORGANIZATION":
                     if (o.id) {
                         promises.push(session.orgService.getOrganization(o.id));
                     }
@@ -628,8 +628,10 @@ watch(data, (newData) => {
             'formats'
             'locations'
             ;
-            grid-template-columns: auto;
-            margin: 2rem 1rem;
+            grid-template-columns: 1fr;
+            max-width: 30rem;
+            margin: 2rem auto;
+            padding: 0 1rem;
             .body {
                 margin-top: unset;
             }

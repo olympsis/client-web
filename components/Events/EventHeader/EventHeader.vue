@@ -87,6 +87,7 @@ const venueName = computed<string>(() => {
 const venueLocation = computed<string>(() => {
     const firstVenue = props.event.venues.at(0);
     if (firstVenue && !firstVenue.id) {
+        if (!firstVenue.city && !firstVenue.state) return 'Custom Coordinates';
         return `${firstVenue.city}, ${firstVenue.state}`;
     } else {
         const firstVenue = props.venues.at(0);
@@ -170,6 +171,7 @@ const hideLocation = computed<boolean>(() => {
         align-items: center;
         border-radius: 10px;
         padding: 0.5rem 1rem;
+        border: var(--icon-border-color) solid 1px;
         background-color: var(--secondary-background-color);
     }
 }

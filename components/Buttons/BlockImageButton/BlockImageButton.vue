@@ -47,6 +47,7 @@ const imageSrcDark = computed<string>(() => {
         flex-direction: column;
         justify-content: center;
         color: var(--primary-label-color);
+        border: var(--icon-border-color) solid 1px;
         border-radius: var(--button-border-radius);
         background-color: var(--secondary-background-color);
 

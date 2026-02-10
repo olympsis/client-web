@@ -64,7 +64,9 @@
     "section": {
       "new": "New Events",
       "trending": "Trending Events",
-      "your-next": "Up Next"
+      "your-next": "Up Next",
+      "tomorrow": "Tomorrow",
+      "this-weekend": "This Weekend"
     }
   },
   "groups": {

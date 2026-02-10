@@ -4,7 +4,7 @@
             <h4> {{ title }} </h4>
         </div>
         <ul v-if="state != VIEW_STATE.LOADING" id="list">
-            <EventListItem2 v-for="event in events" :event="event" @selected="router.push(`/events/${event.id}`)"/>
+            <EventListItem2 v-for="event in events" :event="event" :show-full-time="showFullTime" @selected="router.push(`/events/${event.id}`)"/>
         </ul>
 
         <ul v-else id="list">
@@ -25,7 +25,8 @@ import EventListItem2 from '../EventListItem/EventListItem.vue';
 
 defineProps({
     title: { type: String, default: "" },
-    events: { type: Array<Event>, required: true }
+    events: { type: Array<Event>, required: true },
+    showFullTime: { type: Boolean, default: false }
 });
 
 const state = defineModel<VIEW_STATE>('state', {
@@ -39,8 +40,9 @@ const router = useRouter();
 <style scoped>
 #events-section {
     width: 100%;
+    min-width: 0;
     grid-area: next;
-    margin: 1rem 0rem;
+    margin-bottom: 1rem;
 
     #header {
         h4 {
@@ -85,7 +87,7 @@ const router = useRouter();
     }
 
     @media (max-width: 970px) {
-        width: 100vw;
+        width: 100%;
     }
 
     .skeleton {

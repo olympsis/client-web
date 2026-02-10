@@ -64,7 +64,9 @@
     "section": {
       "new": "Nouveaux Événements",
       "trending": "Événements Tendance",
-      "your-next": "À Suivre"
+      "your-next": "À Suivre",
+      "tomorrow": "Demain",
+      "this-weekend": "Ce Week-end"
     }
   },
   "groups": {

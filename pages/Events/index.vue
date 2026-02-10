@@ -63,14 +63,8 @@
             </div>
 
             <ul v-else-if="state === VIEW_STATE.SUCCESS && eventSections.length > 0" id="events-list">
-                <li id="event-section" v-for="section in eventSections">
-                    <h2>{{ section.dayString }}</h2>
-                    <ul id="section-events">
-                        <li v-for="event in section.events" @click="router.push(`/events/${event.id}`)">
-                            <EventListItem2 :event="event"/>
-                        </li>
-                    </ul>
-                </li>
+                <EventsSection v-if="recentlyCreatedEvents.length > 0" :title="$t('events.section.new')" :events="recentlyCreatedEvents" :show-full-time="true" v-model:state="state" />
+                <EventsSection v-for="section in eventSections" :title="section.dayString" :events="section.events" v-model:state="state"/>
             </ul>
 
             <div v-else-if="state === VIEW_STATE.FAILURE" id="not-found" class="no-events">
@@ -134,6 +128,17 @@ const filteredEvents = computed<Array<Event>>(() => {
             return e && containsSearch;
         }
     });
+});
+
+/** Events created within the last 7 days, sorted newest first */
+const recentlyCreatedEvents = computed<Event[]>(() => {
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+    return filteredEvents.value
+        .filter((e) => e.createdAt && e.createdAt >= oneWeekAgo)
+        .sort((a, b) => a.startTime.getTime() - b.startTime.getTime())
+        .slice(0, 20);
 });
 
 const eventSections = computed<EventSection[]>(() => {
@@ -281,6 +286,7 @@ definePageMeta({
     width: 100%;
     display: grid;
     height: 100dvh;
+    overflow-x: hidden;
     overflow-y: scroll;
     padding: 0rem 2rem;
     justify-items: center;
@@ -397,15 +403,13 @@ definePageMeta({
             padding: 0;
             list-style-type: none;
 
-            h2 {
-                font-weight: 500;
-                font-size: 1.2rem;
-                margin: 1rem 0rem;
+            h4 {
+                margin: 1rem;
                 color: var(--primary-label-color);
             }
 
             li {
-                width: fit-content;
+                width: 100%;
                 margin: 0.5rem auto;
 
                 #section-events {
@@ -415,18 +419,18 @@ definePageMeta({
                     margin: 0rem 1rem;
                     list-style-type: none;
 
-                    grid-template-columns: 1fr 1fr 1fr;
+                    grid-template-columns: repeat(3, minmax(0, 1fr));
 
                     li {
                         margin: 0rem;
                     }
 
-                    @media (max-width: 1030px) { 
-                        grid-template-columns: 1fr 1fr;
+                    @media (max-width: 1030px) {
+                        grid-template-columns: repeat(2, minmax(0, 1fr));
                     }
 
                     @media (max-width: 850px) {
-                        grid-template-columns: 1fr;
+                        grid-template-columns: minmax(0, 1fr);
                     }
 
                     @media (max-width: 500px) {
@@ -494,6 +498,7 @@ definePageMeta({
         }
         
         #mobile-header {
+            width: 100%;
             display: flex;
             flex-direction: column;
 

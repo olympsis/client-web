@@ -64,7 +64,9 @@
     "section": {
       "new": "Nuevos Eventos",
       "trending": "Eventos Populares",
-      "your-next": "A Continuación"
+      "your-next": "A Continuación",
+      "tomorrow": "Mañana",
+      "this-weekend": "Este Fin de Semana"
     }
   },
   "groups": {

@@ -24,7 +24,7 @@
                         <img class="calendar" src="@/assets/icons/calendar/calendar.svg"> 
                     </picture>
                     <div id="date">
-                        {{ timeToString(event.startTime) }}
+                        {{ showFullTime ? dateToString(event.startTime) : timeToString(event.startTime) }}
                     </div>
                 </div>
             </div>
@@ -57,7 +57,8 @@ const emit = defineEmits(
     ["selected"]
 );
 const props = defineProps({
-    event: { type: Event, required: true }
+    event: { type: Event, required: true },
+    showFullTime: { type: Boolean, default: false }
 });
 
 const state = ref(VIEW_STATE.LOADING);

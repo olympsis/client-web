@@ -5,12 +5,12 @@
         </NuxtLink>
        
         <div class="routes">
-            <NavigationButton to="/events" text="Events" icon="--events-icon" variant="light"/>
+            <NavigationButton to="/events" :text="$t('nav.events')" icon="--events-icon" variant="light"/>
 
             <NuxtLink v-if="isAuthenticated" id="web-profile" to="/profile" class="profile">
                 <ProfileButton :imageURL="userImageURL"/>
             </NuxtLink>
-            <NavigationButton v-else class="signin" to="/signin" text="Sign In" variant="dark"/>
+            <NavigationButton v-else class="signin" to="/signin" :text="$t('auth.signIn')" variant="dark"/>
         </div>
     </header>
 </template>

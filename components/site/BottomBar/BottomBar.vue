@@ -1,10 +1,10 @@
 <template>
     <div id="bottom-bar-container">
         <div>
-            <router-link id="link" to="/terms-of-use" class="link" > Terms of Use </router-link>
-            <router-link id="link" to="/privacy-policy" class="link" > Privacy Policy </router-link>
-            <router-link id="link" to="/contact-us" class="link" > Contact Us </router-link>
-            <a id="link" href="https://donate.stripe.com/bIY03V2LCduXfn27ss"> Donate </a>
+            <router-link id="link" to="/terms-of-use" class="link" > {{ $t('footer.termsOfUse') }} </router-link>
+            <router-link id="link" to="/privacy-policy" class="link" > {{ $t('footer.privacyPolicy') }} </router-link>
+            <router-link id="link" to="/contact-us" class="link" > {{ $t('footer.contactUs') }} </router-link>
+            <a id="link" href="https://donate.stripe.com/bIY03V2LCduXfn27ss"> {{ $t('footer.donate') }} </a>
         </div>
         <a id="text"> Olympsis © 2026 </a>
     </div>

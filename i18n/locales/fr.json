@@ -59,5 +59,11 @@
     "settings": "Paramètres",
     "myEvents": "Mes Événements",
     "myGroups": "Mes Groupes"
+  },
+  "footer": {
+    "termsOfUse": "Conditions d'Utilisation",
+    "privacyPolicy": "Politique de Confidentialité",
+    "contactUs": "Nous Contacter",
+    "donate": "Faire un Don"
   }
 }

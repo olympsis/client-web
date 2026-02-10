@@ -1,7 +1,7 @@
 <template>
     <div id="events-section">
         <div id="header">
-            <h3> {{ title }} </h3>
+            <h4> {{ title }} </h4>
         </div>
         <ul v-if="state != VIEW_STATE.LOADING" id="list">
             <EventListItem2 v-for="event in events" :event="event" @selected="router.push(`/events/${event.id}`)"/>
@@ -24,7 +24,7 @@ import Skeleton from 'primevue/skeleton';
 import EventListItem2 from '../EventListItem/EventListItem.vue';
 
 defineProps({
-    title: { type: String, default: "Your Next Events" },
+    title: { type: String, default: "" },
     events: { type: Array<Event>, required: true }
 });
 
@@ -43,7 +43,7 @@ const router = useRouter();
     margin: 1rem 0rem;
 
     #header {
-        h3 {
+        h4 {
             font-weight: 600;
             margin-left: 1rem;
             margin-bottom: 0.5rem;

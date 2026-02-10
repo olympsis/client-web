@@ -11,11 +11,16 @@
     "next": "Siguiente",
     "close": "Cerrar",
     "search": "Buscar",
+    "searchPlaceholder": "Buscar...",
     "filter": "Filtrar",
+    "filters": "Filtros",
     "sort": "Ordenar",
     "view": "Ver",
     "share": "Compartir",
-    "more": "Más"
+    "more": "Más",
+    "sports": "Deportes",
+    "tags": "Etiquetas",
+    "tryAgain": "Intentar de Nuevo"
   },
   "auth": {
     "signIn": "Iniciar Sesión",
@@ -33,7 +38,9 @@
   },
   "events": {
     "title": "Eventos",
+    "listTitle": "Lista de Eventos",
     "create": "Crear Evento",
+    "createOne": "Crear Uno",
     "upcoming": "Próximos Eventos",
     "past": "Eventos Pasados",
     "join": "Unirse al Evento",
@@ -42,7 +49,23 @@
     "location": "Ubicación",
     "date": "Fecha",
     "time": "Hora",
-    "participants": "Participantes"
+    "participants": "Participantes",
+    "noEventsFound": "No se Encontraron Eventos",
+    "failedToFind": "Error al buscar Eventos",
+    "unknownVenue": "Lugar Desconocido",
+    "andMore": "y {count} más",
+    "full": "lleno",
+    "tournament": "torneo",
+    "pending": "Pendiente",
+    "live": "En Vivo",
+    "ended": "Finalizado",
+    "seoTitle": "Eventos | Olympsis",
+    "seoDescription": "¡Encuentra eventos deportivos cerca de ti!",
+    "section": {
+      "new": "Nuevos Eventos",
+      "trending": "Eventos Populares",
+      "your-next": "A Continuación"
+    }
   },
   "groups": {
     "title": "Grupos",

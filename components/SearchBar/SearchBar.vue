@@ -4,7 +4,7 @@
             <source srcset="@/assets/icons/search/search.white.svg" media="(prefers-color-scheme: dark)">
             <img src="@/assets/icons/search/search.svg">
         </picture>
-        <input type="text" v-model="model" placeholder="Search...">
+        <input type="text" v-model="model" :placeholder="$t('common.searchPlaceholder')">
     </div>
 </template>
 

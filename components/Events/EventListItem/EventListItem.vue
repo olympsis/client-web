@@ -52,6 +52,7 @@ import { generateImageURL } from '~/utils/image-helpers';
 
 import LabelsList from '../../LabelsList/LabelsList.vue';
 
+const { t } = useI18n();
 const emit = defineEmits(
     ["selected"]
 );
@@ -68,21 +69,21 @@ const venues: Ref<Venue[]> = ref([]);
 const venueName: ComputedRef<string> = computed(() => {
     const venuesLength = props.event.venues.length;
     if (venuesLength == 1) {
-        return (venues.value[0]?.name ?? props.event.venues[0]?.name) ?? 'Unknown Venue';
+        return (venues.value[0]?.name ?? props.event.venues[0]?.name) ?? t('events.unknownVenue');
     } else if (venuesLength > 1) {
-        return `${venues.value[0]?.name} & ${venues.value.length-1} more`
+        return `${venues.value[0]?.name} ${t('events.andMore', { count: venues.value.length-1 })}`
     } else {
-        return 'Unknown Venue';
+        return t('events.unknownVenue');
     }
 });
 
 const tags = computed<string[]>(() => {
     var labels: string[] = [];
     if (props.event.isFull()) {
-        labels.push('full');
-    } 
+        labels.push(t('events.full'));
+    }
     if (props.event.isCompetition()) {
-        labels.push('tournament');
+        labels.push(t('events.tournament'));
     }
 
     return [...labels, ...props.event.sports, ...props.event.tags];
@@ -92,11 +93,11 @@ const status = ref<EVENT_STATE>(EVENT_STATE.PENDING);
 const statusString = computed<string>(() => {
     switch(status.value) {
         case EVENT_STATE.PENDING:
-            return 'Pending';
+            return t('events.pending');
         case EVENT_STATE.LIVE:
-            return 'Live';
+            return t('events.live');
         default:
-            return 'Ended';
+            return t('events.ended');
     }
 });
 const updateStatus = () => {

@@ -167,6 +167,10 @@ h1 {
 	font-family: 'Archivo', 'Helvetica Nue', 'Arial';
 }
 
+h4 {
+	font-family: 'Archivo', 'Helvetica Nue', 'Arial';
+}
+
 * {
   	box-sizing: border-box;
 }

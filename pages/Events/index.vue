@@ -2,7 +2,7 @@
     <NavigationBar/>
     <main id="events">
         <div id="header">
-            <h1>Events List</h1>
+            <h1>{{ $t('events.listTitle') }}</h1>
 
             <div id="body">
                 <SearchBar v-model:value="searchText"/>
@@ -20,7 +20,7 @@
 
         <div id="mobile-header">
             <div id="title">
-                <h1>Events List</h1>
+                <h1>{{ $t('events.listTitle') }}</h1>
 
                 <div id="actions">
                     <button @click="navigateToNewEvent">
@@ -37,7 +37,7 @@
 
         <div id="sub-header">
             <button id="filter" @click="showFilter = true">
-                <div id="text">Filters</div>
+                <div id="text">{{ $t('common.filters') }}</div>
                 <picture :style="{height: '24px'}">
                     <source srcset="@/assets/icons/filter/filter.white.svg" media="(prefers-color-scheme: dark)">
                     <img src="@/assets/icons/filter/filter.svg">
@@ -45,10 +45,10 @@
             </button>
 
             <Drawer v-model:visible="showFilter" position="right">
-                <div class="section-header" :style="{fontWeight: 'bold'}">Sports</div>
+                <div class="section-header" :style="{fontWeight: 'bold'}">{{ $t('common.sports') }}</div>
                 <SportsFilter v-model:model-value="selectedSports"/>
 
-                <div class="section-header" :style="{fontWeight: 'bold'}">Tags</div>
+                <div class="section-header" :style="{fontWeight: 'bold'}">{{ $t('common.tags') }}</div>
                 <TagsFilter v-model:model-value="selectedTags"/>
             </Drawer>
         </div>
@@ -58,8 +58,8 @@
 
             <div v-else-if="state === VIEW_STATE.SUCCESS && eventSections.length == 0" id="no-events" class="no-events">
                 <img src="@/assets/images/event-404.svg">
-                <div>No Events Found</div>
-                <button class="button" @click="navigateToNewEvent">Create One</button>
+                <div>{{ $t('events.noEventsFound') }}</div>
+                <button class="button" @click="navigateToNewEvent">{{ $t('events.createOne') }}</button>
             </div>
 
             <ul v-else-if="state === VIEW_STATE.SUCCESS && eventSections.length > 0" id="events-list">
@@ -75,8 +75,8 @@
 
             <div v-else-if="state === VIEW_STATE.FAILURE" id="not-found" class="no-events">
                 <img src="@/assets/images/event-404.svg">
-                <div>Failed to find Events</div>
-                <button class="button" @click="retryFetchEvents">Try Again</button>
+                <div>{{ $t('events.failedToFind') }}</div>
+                <button class="button" @click="retryFetchEvents">{{ $t('common.tryAgain') }}</button>
             </div>
         </div>
     </main>
@@ -88,7 +88,7 @@ import * as Sentry from '@sentry/nuxt';
 import { VIEW_STATE } from '@/data/Enums';
 import { useSessionStore } from '@/stores/session-store';
 import { EventService } from '@/data/services/EventService';
-import { computed, onMounted, ref, useTemplateRef } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { Event, EventSection } from '@/data/models/EventModels';
 import { compareUTCNowToDateNormal } from '~/utils/time-helpers';
 import { Location, Sport, Tag } from '~/data/models/GenericModels';
@@ -98,7 +98,9 @@ import SearchBar from '@/components/SearchBar/SearchBar.vue';
 import TagsFilter from '~/components/TagsFilter/TagsFilter.vue';
 import SportsFilter from '~/components/SportsFilter/SportsFilter.vue';
 import EventListItem2 from '~/components/Events/EventListItem/EventListItem.vue';
+import EventsSection from '~/components/Events/EventsSection/EventsSection.vue';
 
+const { t } = useI18n();
 const router = useRouter();
 const session = useSessionStore();
 const state = ref(VIEW_STATE.LOADING);
@@ -225,13 +227,13 @@ function retryFetchEvents() {
 }
 
 useSeoMeta({
-    title: 'Events | Olympsis',
-    ogTitle: 'Events | Olympsis',
-    description: 'Find sports events near you!',
-    ogDescription: 'Find sports events near you!'
+    title: t('events.seoTitle'),
+    ogTitle: t('events.seoTitle'),
+    description: t('events.seoDescription'),
+    ogDescription: t('events.seoDescription')
 });
 
-session.$subscribe((mutation: any, state) => {
+session.$subscribe((mutation: any, _) => {
     const payload = mutation.payload;
     if (payload?.lastKnownLocation) {
         retryFetchEvents();
@@ -281,9 +283,10 @@ definePageMeta({
     height: 100dvh;
     overflow-y: scroll;
     padding: 0rem 2rem;
-    justify-content: center;
+    justify-items: center;
+    grid-template-columns: 1fr;
     grid-template-rows: 4rem 2.5rem auto auto auto;
-    grid-template-areas: 
+    grid-template-areas:
     "header"
     "sub-header"
     "list"
@@ -296,8 +299,8 @@ definePageMeta({
         margin-top: 1rem;
         grid-area: header;
         align-items: center;
-        max-width: var(--desktop-max-width);
         justify-content: space-between;
+        max-width: var(--desktop-max-width);
 
         #body {
             width: 100%;
@@ -332,8 +335,10 @@ definePageMeta({
     }
 
     #sub-header {
+        width: 100%;
         display: flex;
-
+        max-width: var(--desktop-max-width);
+        
         #filter {
             display: flex;
             height: 2.5rem;
@@ -381,6 +386,7 @@ definePageMeta({
     }
 
     #events-body {
+        width: 100%;
         max-width: var(--desktop-max-width);
         #loader {
             margin: auto;

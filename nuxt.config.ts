@@ -118,24 +118,10 @@ export default defineNuxtConfig({
 											{ code: "fr", language: "fr-FR", file: "fr.json", name: "Français" },
 							],
 							defaultLocale: "en",
-							lazy: true,
 							langDir: "locales",
 							strategy: "no_prefix",  // URLs stay clean without locale prefix
-							detectBrowserLanguage: {
-											useCookie: true,
-											cookieKey: "i18n_redirected",
-											redirectOn: "root",  // Only redirect on root path
-							},
 			},
 
-				sentry: {
-								sourceMapsUploadOptions: {
-												org: "olympsis",
-												project: "client-web",
-								},
-
-								autoInjectServerSentry: "top-level-import",
-				},
 
 				sourcemap: {
 								client: "hidden",

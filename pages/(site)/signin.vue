@@ -1,5 +1,5 @@
 <template>
-  <TopBar/>
+  <NavigationBar/>
   <main id="signin">
     <AuthenticationCard 
         v-if="!isSignedUp" 
@@ -24,6 +24,7 @@ import { AuthenticationFacade } from '~/data/facades/AuthenticationFacade';
 
 import TopBar from '~/components/site/TopBar/TopBar.vue';
 import BottomBar from '~/components/site/BottomBar/BottomBar.vue';
+import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
 import CreateUserCard from '~/components/Auth/CreateUserCard/CreateUserCard.vue';
 import AuthenticationCard from '~/components/Auth/AuthenticationCard/AuthenticationCard.vue';
 

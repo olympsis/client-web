@@ -49,8 +49,8 @@ function handleImageFailure() {
     border-radius: 50%;    
     align-items: center;
     justify-content: center;
-    background-color: var(--tertiary-brand-color);
-    border: 3px solid var(--secondary-brand-color);
+    background-color: var(--olympsis-light-gray);
+    border: 1.5px solid var(--olympsis-gray);
 
     img {
         width: 1.3rem;

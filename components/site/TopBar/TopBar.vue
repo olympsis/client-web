@@ -35,7 +35,7 @@ const isAuthenticated = computed<boolean>(() => {
 
 const primaryText = computed<string>(() => {
     if (isAuthenticated.value) return 'App';
-    return 'Signin';
+    return 'Sign in';
 });
 
 function toggleMenu() {
@@ -70,14 +70,20 @@ function handlePrimaryButton() {
     background-color: var(--primary-brand-color);
 }
 
+#signin {
+    text-wrap: nowrap;
+    width: fit-content;
+}
+
 .name {
     color: white;
-    margin-left: 1rem;
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-right: 1rem;
-    font-style: oblique;
-    font-family: 'Roboto';
+    font-weight: 900;
+    font-size: 1.7rem;
+    margin-left: 2rem;
+    font-style: normal;
+    text-align: center;
+    font-style: italic;
+    font-family: 'Archivo', 'Helvetica Nue';
 }
 
 .menu {

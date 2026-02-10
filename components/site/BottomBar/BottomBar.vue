@@ -6,7 +6,7 @@
             <router-link id="link" to="/contact-us" class="link" > Contact Us </router-link>
             <a id="link" href="https://donate.stripe.com/bIY03V2LCduXfn27ss"> Donate </a>
         </div>
-        <a id="text"> Olympsis © 2024 </a>
+        <a id="text"> Olympsis © 2026 </a>
     </div>
 </template>
 

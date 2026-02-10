@@ -15,7 +15,7 @@ export default defineNuxtConfig({
 				modules: [
 				 "@pinia/nuxt",
 				 "@nuxtjs/robots",
-				 "@nuxtjs/storybook",
+				 // "@nuxtjs/storybook",    // causes EAGAIN proxy errors in dev
 				 "@sentry/nuxt/module",
 				 "@primevue/nuxt-module",
 				 "@nuxtjs/i18n",

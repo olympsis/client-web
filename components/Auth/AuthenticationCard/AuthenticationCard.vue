@@ -59,8 +59,8 @@ function signInWithGoogle() {
     h1 {
         color: white;
         font-size: 1.8em;
-        text-align: center;
         margin: 1rem 0rem;
+        text-align: center;
     }
 
     h2 {

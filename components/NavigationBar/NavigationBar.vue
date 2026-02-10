@@ -1,46 +1,17 @@
 <template>
     <header id="navigation-bar">
         <NuxtLink to="/home" id="logo">
-            OLYMPSIS
+            Olympsis
         </NuxtLink>
        
-        <div id="web-routes" class="routes">
-            <NuxtLink to="/home" activeClass="route-selected" class="route"> Dashboard </NuxtLink>
+        <div class="routes">
+            <NavigationButton to="/events" text="Events" icon="--events-icon" variant="light"/>
 
-            <NuxtLink to="/groups" activeClass="route-selected" class="route"> Groups </NuxtLink>
-
-            <NuxtLink to="/events" activeClass="route-selected" class="route"> Events </NuxtLink>
-
-            <!-- <NuxtLink to="/rooms" activeClass="route-selected" class="route">
-                <div class="chats" />
-            </NuxtLink> -->
-        </div>
-
-        <div id="mobile-routes" class="routes">
-            <NuxtLink to="/home" activeClass="route-selected" class="route">
-                <div class="home"/>
-            </NuxtLink>
-
-            <NuxtLink to="/groups" activeClass="route-selected" class="route">
-                <div class="group" />
-            </NuxtLink>
-
-            <NuxtLink to="/events" activeClass="route-selected" class="route">
-                <div class="events" />
-            </NuxtLink>
-
-            <!-- <NuxtLink to="/rooms" activeClass="route-selected" class="route">
-                <div class="chats" />
-            </NuxtLink> -->
-
-            <NuxtLink to="/profile" class="profile">
+            <NuxtLink v-if="isAuthenticated" id="web-profile" to="/profile" class="profile">
                 <ProfileButton :imageURL="userImageURL"/>
             </NuxtLink>
+            <NavigationButton v-else class="signin" to="/signin" text="Sign In" variant="dark"/>
         </div>
-
-        <NuxtLink id="web-profile" to="/profile" class="profile">
-            <ProfileButton :imageURL="userImageURL"/>
-        </NuxtLink>
     </header>
 </template>
 
@@ -52,11 +23,12 @@ import { generateImageURL } from '~/utils/image-helpers';
 import { useSessionStore } from '~/stores/session-store';
 
 import ProfileButton from '~/components/ProfileButton/ProfileButton.vue';
+import NavigationButton from '../Buttons/NavigationButton/NavigationButton.vue';
 
 const isOpen = ref(false);
 const session = useSessionStore();
 
-// const { user, isAuthenticated, logout } = useAuth()
+const { isAuthenticated } = useAuth()
 
 const userImageURL = computed(() => {
     return session.user?.imageURL ? generateImageURL(session.user.imageURL) : undefined;
@@ -88,226 +60,43 @@ function hideMenu() {
     position: -webkit-sticky;
     justify-content: space-between;
     border-bottom: solid 1px var(--navigation-border);
-    background-color: var(--primary-background-color);
+    background-color: var(--primary-brand-color);
 
     #logo {
-        flex: 1;
+        color: white;
         font-weight: 900;
-        font-size: 1.5rem;
+        font-size: 1.7rem;
+        margin-left: 2rem;
         font-style: normal;
         text-align: center;
-        color: var(--navigation-label);
-        font-family: 'Archivo', 'Helvetica Nue';
-    }
-
-    #mobile-routes {
-        display: none;
+        font-style: italic;
+        font-family: 'Archivo', 'Helvetica Nue', 'Arial';
     }
 
     .routes {
-        flex: 2;
-        width: 100%;
         display: flex;
-        min-width: 12rem;
-        max-width: 25rem;
+        margin-right: 2rem;
         align-items: center;
-        justify-content: space-between;
     }
 
     .profile {
-        flex: 1;
+        margin-left: 1rem;
         align-items: center;
         justify-content: center;
     }
-}
 
-@media (max-width: 970px) {
-    #navigation-bar {
-        display: flex;
-        justify-content: space-between;
+    .signin {
+        margin-left: 1rem;
+    }
 
-        #web-routes {
-            display: none;
-        }
-        
-        #mobile-routes {
-            display: flex;
-        }
-        
-        #web-profile {
-            display: none;
+    @media (max-width: 820px) {
+        #logo {
+            margin-left: 1rem;
         }
 
         .routes {
-            min-width: none;
-            max-width: none;
-        }
-        a {
-            flex: 1;
-            margin: 0rem auto !important;
+            margin-right: 1rem;
         }
     }
-    #logo {
-        display: none;
-    }
-}
-
-#trailing {
-    display: flex;
-    align-items: center;
-}
-
-.route {
-    display: flex;
-    font-weight: 500;
-    margin: 0rem 2rem;
-    align-items: center;
-    flex-direction: column;
-    color: var(--navigation-label);
-
-    .label {
-        color: white;
-        font-size: 0.65rem;
-        text-transform: uppercase;
-    }
-
-    .home {
-        width: 35px;
-        height: 40px;
-        background-size: 35px 40px;
-        background-position: center;
-        background-repeat: no-repeat;
-        background-image: var(--home-icon);
-    }
-
-    .group {
-        width: 40px;
-        height: 40px;
-        background-size: 40px;
-        background-position: center;
-        background-repeat: no-repeat;
-        background-image: var(--group-icon);
-    }
-
-    .events {
-        width: 40px;
-        height: 40px;
-        background-size: 33px;
-        background-position: center;
-        background-repeat: no-repeat;
-        background-image: var(--events-icon);
-    }
-
-    .chats {
-        width: 40px;
-        height: 40px;
-        background-size: 40px;
-        background-position: center;
-        background-repeat: no-repeat;
-        background-image: url('@/assets/icons/bubble2/bubble.2.white.svg');
-    }
-}
-
-.route-selected {
-    display: flex;
-    font-weight: 600;
-    margin: 0rem 2rem;
-    align-items: center;
-    flex-direction: column;
-    text-decoration: underline;
-    text-underline-offset: 3px;
-    text-decoration-thickness: 1.5px;
-    
-    .label {
-        color: white;
-        font-size: 0.65rem;
-        font-weight: normal;
-        text-transform: uppercase;
-    }
-
-    .home {
-        width: 35px;
-        height: 40px;
-        background-size: 35px 40px;
-        background-image: var(--home-icon-selected);
-    }
-
-    .group {
-        width: 40px;
-        height: 40px;
-        background-size: 40px;
-        background-position: center;
-        background-repeat: no-repeat;
-        background-image: var(--group-icon-selected);
-    }
-
-    .events {
-        width: 40px;
-        height: 40px;
-        background-size: 33px;
-        background-position: center;
-        background-repeat: no-repeat;
-        background-image: var(--events-icon-selected);
-    }
-
-
-    .chats {
-        width: 40px;
-        height: 40px;
-        background-size: 40px;
-        background-position: center;
-        background-repeat: no-repeat;
-        background-image: url('@/assets/icons/bubble2/bubble.2.fill.white.svg');
-    }
-}
-
-.chats {
-    width: 30px;
-    height: 30px;
-    cursor: pointer;
-    margin-top: 0.4rem;
-    margin-right: 0.5rem;
-    background-size: 30px;
-    background-position: center;
-    background-image: url('@/assets/icons/bubble2/bubble.2.svg');
-}
-
-.chats-selected {
-    width: 30px;
-    height: 30px;
-    cursor: pointer;
-    margin-top: 0.4rem;
-    margin-right: 0.5rem;
-    background-size: 30px;
-    background-position: center;
-    background-image: url('@/assets/icons/bubble2/bubble.2.fill.svg');
-}
-
-.notifications {
-    width: 35px;
-    height: 35px;
-    cursor: pointer;
-    margin-right: 0.5rem;
-    background-size: 30px;
-    background-position: center;
-    background-image: url('@/assets/icons/bell/bell.svg');
-}
-
-.notifications-selected {
-    width: 35px;
-    height: 35px;
-    cursor: pointer;
-    background-size: 30px;
-    background-position: center;
-    background-image: url('@/assets/icons/bell/bell.fill.svg');
-}
-
-.chats-selected {
-    width: 35px;
-    height: 35px;
-    cursor: pointer;
-    background-size: 30px;
-    background-position: center;
-    background-image: url('@/assets/icons/bubble2/bubble.2.fill.svg');
 }
 </style>

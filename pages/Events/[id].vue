@@ -1,8 +1,11 @@
 <template>
     <NavigationBar/>
     <main id="event-detail-view">
-        <!-- Event Detail -->
-        <div v-if="failed !== undefined && failed !== true && event != undefined" id="event-detail">
+        <div 
+            v-if="failed !== undefined && failed !== true && event != undefined" 
+            id="event-detail"
+            :style="{ '--grid-areas': gridTemplateAreas, '--grid-areas-mobile': gridTemplateAreasMobile }"
+        >
             <EventMedia :event="event"/>
             <EventOrganizers :event="event" :clubs="clubs" :organizations="orgs"/>
             <EventHeader :event="event" :venues="venues" class="header"/>
@@ -14,9 +17,18 @@
                 @open-rsvp="showRSVPModal" 
                 @open-settings="handleOpenSettingsModal"
             />
-            <EventParticipantsPeek :event="event" @open-participants="handleOpenParticipantsModal"/>
+
+            <!-- Participants Peek -->
+            <EventParticipantsPeek 
+                v-if="event.participants.length > 0" 
+                :event="event" 
+                @open-participants="handleOpenParticipantsModal"
+            />
+
+            <!-- Locations -->
             <EventLocations v-if="!hideLocation" :event="event" :venues="venues"/>
 
+            <!-- Formats -->
             <EventFormats v-if="eventFormats.length > 0" :formats="eventFormats"/>
 
             <!-- RSVP -->
@@ -145,6 +157,53 @@ const eventFormats = computed<COMPETITION_FORMAT[]>(() => {
     } else {
         return [];
     }
+});
+
+const hasParticipants = computed<boolean>(() => {
+    return (event.value?.participants.length ?? 0) > 0;
+});
+
+const hasFormats = computed<boolean>(() => {
+    return eventFormats.value.length > 0;
+});
+
+/**
+ * Dynamically builds the grid-template-areas string based on which
+ * optional sections (participants, formats) are visible. This prevents
+ * empty grid rows from reserving space + gap when their content is hidden.
+ */
+const gridTemplateAreas = computed<string>(() => {
+    let areas = `
+        'media header'
+        'media body'
+        'media locations'
+        'host locations'`;
+    if (hasParticipants.value) {
+        areas += `\n        'participants locations'`;
+    }
+    if (hasFormats.value) {
+        areas += `\n        'formats locations'`;
+    }
+    return areas;
+});
+
+/**
+ * Same dynamic grid areas but for the mobile (single-column) layout.
+ */
+const gridTemplateAreasMobile = computed<string>(() => {
+    let areas = `
+        'header'
+        'media'
+        'body'
+        'host'`;
+    if (hasParticipants.value) {
+        areas += `\n        'participants'`;
+    }
+    if (hasFormats.value) {
+        areas += `\n        'formats'`;
+    }
+    areas += `\n        'locations'`;
+    return areas;
 });
 
 /**
@@ -416,14 +475,7 @@ watch(data, (newData) => {
         margin-top: 3rem;
         position: relative;
         margin-bottom: 2rem;
-        grid-template-areas:
-            'media header'
-            'media body'
-            'media locations'
-            'host locations'
-            'participants locations'
-            'formats locations'
-            ;
+        grid-template-areas: var(--grid-areas);
         grid-template-columns: 30rem 30rem;
 
         .body {
@@ -619,15 +671,7 @@ watch(data, (newData) => {
         }
 
         @media(max-width: 1100px) {
-            grid-template-areas:
-            'header'
-            'media'
-            'body'
-            'host'
-            'participants'
-            'formats'
-            'locations'
-            ;
+            grid-template-areas: var(--grid-areas-mobile);
             grid-template-columns: 1fr;
             max-width: 30rem;
             margin: 2rem auto;

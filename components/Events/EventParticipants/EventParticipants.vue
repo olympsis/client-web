@@ -1,6 +1,6 @@
 <template>
     <div id="participants-peek">
-        <h2>{{ event.participants.length + " " + displayString }}</h2>
+        <h2>{{displayString}}</h2>
         <ul v-if="!hideParticipants" id="participants">
             <ParticipantListItem 
                 v-for="participant in event.participants.slice(0, 3)"
@@ -50,7 +50,8 @@ const eventState = computed<EVENT_STATE>(() => {
 });
 
 const displayString = computed<string>(() => {
-    return eventState.value != EVENT_STATE.COMPLETED ? "Going" : "Went" ;
+    if (hideParticipants.value) return  'Participants';
+    return `${props.event.participants.length} ` + (eventState.value != EVENT_STATE.COMPLETED ? "Going" : "Went");
 });
 
 const isAdmin = computed<boolean>(() => {

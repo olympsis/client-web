@@ -17,6 +17,43 @@ enum AUTH_STATUS {
 /**
  * CHAT ENUMS
  */
+/**
+ * COMMENT REACTION ENUMS
+ */
+enum COMMENT_REACTION_TYPE {
+    THUMBS_UP = 'thumbs_up',
+    HEART = 'heart',
+    LAUGH = 'laugh',
+    FIRE = 'fire',
+    SAD = 'sad',
+    THUMBS_DOWN = 'thumbs_down'
+}
+
+/** Maps a reaction type enum to its corresponding emoji character. */
+function reactionTypeToEmoji(type: COMMENT_REACTION_TYPE): string {
+    switch (type) {
+        case COMMENT_REACTION_TYPE.THUMBS_UP: return '👍';
+        case COMMENT_REACTION_TYPE.HEART: return '❤️';
+        case COMMENT_REACTION_TYPE.LAUGH: return '😂';
+        case COMMENT_REACTION_TYPE.FIRE: return '🔥';
+        case COMMENT_REACTION_TYPE.SAD: return '😢';
+        case COMMENT_REACTION_TYPE.THUMBS_DOWN: return '👎';
+    }
+}
+
+/** Converts a raw string value from the API into a COMMENT_REACTION_TYPE enum. */
+function stringToCommentReactionType(value: string): COMMENT_REACTION_TYPE {
+    switch (value) {
+        case 'thumbs_up': return COMMENT_REACTION_TYPE.THUMBS_UP;
+        case 'heart': return COMMENT_REACTION_TYPE.HEART;
+        case 'laugh': return COMMENT_REACTION_TYPE.LAUGH;
+        case 'fire': return COMMENT_REACTION_TYPE.FIRE;
+        case 'sad': return COMMENT_REACTION_TYPE.SAD;
+        case 'thumbs_down': return COMMENT_REACTION_TYPE.THUMBS_DOWN;
+        default: return COMMENT_REACTION_TYPE.THUMBS_UP;
+    }
+}
+
 enum CHAT_ROOM_TYPE {
     GROUP = 'group',
     DIRECT = 'direct'
@@ -641,6 +678,10 @@ export {
     ANNOUNCEMENT_STATUS,
     statusFromString,
     statusToString,
+
+    COMMENT_REACTION_TYPE,
+    reactionTypeToEmoji,
+    stringToCommentReactionType,
 
     CHAT_ROOM_TYPE,
     CHAT_MESSAGE_TYPE,

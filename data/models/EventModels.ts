@@ -3,55 +3,85 @@ import { Venue } from "./VenueModels";
 import { UserSnippet } from "./UserModels";
 import { VenueDescriptor, Organizer, Participant, GroupSelection } from "./GenericModels";
 
-import { 
-    EVENT_VISIBILITY, 
+import {
+    EVENT_VISIBILITY,
     MEDIA_TYPE,
     COMPETITION_FORMAT,
-    eventVisibilityToNumber,  
+    COMMENT_REACTION_TYPE,
+    eventVisibilityToNumber,
     numberToEventVisibility,
     GROUP_TYPE,
     stringToMediaType,
-    stringToCompetitionFormat, 
+    stringToCompetitionFormat,
+    stringToCommentReactionType,
 } from "../Enums";
 
+/**
+ * Core event model representing a sports event on the Olympsis platform.
+ * Maps to the backend `Event` struct in the Go models package.
+ *
+ * Events are organized by clubs/organizations, held at venues, and support
+ * individual participants, teams, competitions, and recurring schedules.
+ */
 class Event extends Codable<Event> {
     id: string;
+    /** The user who originally created this event */
     poster?: UserSnippet;
+    /** Clubs or organizations hosting this event (type 0 = Club, type 1 = Organization) */
     organizers: Organizer[];
+    /** Venue references — resolved to full Venue objects separately via VenueService */
     venues: VenueDescriptor[];
 
+    /** S3/storage key for the event's cover image or video */
     mediaURL: string;
     mediaType: MEDIA_TYPE;
 
     title: string;
     body: string;
     tags: string[];
+    /** Sport types associated with this event (e.g. "soccer", "basketball") */
     sports: string[];
-    
+
     startTime: Date;
     stopTime: Date;
 
+    /** General event display settings (hide poster, hide location) */
     config?: EventConfig;
+    /** Competition-specific configuration — formats, rounds, bracket data, registration windows */
     formatConfig?: EventFormatConfig;
 
+    /** Users who have RSVP'd to this event (status: 0=Maybe, 1=Yes) */
     participants: Participant[];
+    /** Overflow participants when the event reaches max capacity */
     participantsWaitlist: Participant[];
+    /** Participant limits and waitlist/visibility settings */
     participantsConfig?: ParticipantsConfig;
     participantsCount?: number;
 
+    /** Teams registered for team-based events */
     teams: Team[];
+    /** Overflow teams when event reaches max team capacity */
     teamsWaitlist: Team[];
+    /** Team limits and waitlist/visibility settings */
     teamsConfig?: TeamsConfig;
     teamsCount?: number;
-    
+
+    /** User comments on this event — embedded directly on the event document */
+    comments: EventComment[];
+
+    /** PUBLIC, PRIVATE, or GROUP — controls who can discover this event */
     visibility: EVENT_VISIBILITY;
+    /** Optional link to an external registration page or event site */
     externalLink?: string;
+    /** Whether this event contains sensitive/mature content */
     isSensitive: boolean;
 
     createdAt: Date;
     updatedAt?: Date;
+    /** Set when the event is cancelled — presence indicates a cancelled event */
     cancelledAt?: Date;
 
+    /** iCalendar-compatible recurrence rule for recurring events */
     recurrenceConfig?: EventRecurrenceConfig;
 
     constructor(
@@ -77,6 +107,7 @@ class Event extends Codable<Event> {
         teams: Team[],
         teamsWaitlist: Team[],
         teamsConfig?: TeamsConfig,
+        comments?: EventComment[],
         config?: EventConfig,
         formatConfig?: EventFormatConfig,
         externalLink?: string,
@@ -109,6 +140,8 @@ class Event extends Codable<Event> {
         this.teams = teams;
         this.teamsWaitlist = teamsWaitlist;
         this.teamsConfig = teamsConfig;
+
+        this.comments = comments ?? [];
 
         this.visibility = visibility;
         this.externalLink = externalLink;
@@ -156,6 +189,9 @@ class Event extends Codable<Event> {
             object['teamsWaitlist'] = data['teams_waitlist'] ? data['teams_waitlist'].map((t: any) => Team.decode(t)) : [];
             object['teamsConfig'] = data['teams_config'] ? TeamsConfig.decode(data['teams_config']) : undefined;
             
+            // Comments
+            object['comments'] = data['comments'] ? data['comments'].map((c: any) => EventComment.decode(c)) : [];
+
             object['visibility'] = numberToEventVisibility(data['visibility']);
             object['externalLink'] = data['external_link'];
             object['isSensitive'] = data['is_sensitive'] || false;
@@ -252,6 +288,11 @@ class Event extends Codable<Event> {
             data['teams_config'] = this.teamsConfig.encode();
         }
         
+        // Comments
+        if (this.comments) {
+            data['comments'] = this.comments.map((c) => c.encode());
+        }
+
         if (this.visibility) {
             data['visibility'] = eventVisibilityToNumber(this.visibility);
         }
@@ -279,94 +320,87 @@ class Event extends Codable<Event> {
     }
 
     /**
-     * Checks wether or not an event is a recurring event by looking at the event's format configuration is competition value.
-     * @returns boolean indicating status
+     * Checks whether this event is a structured competition (tournament, league, etc.)
+     * by looking at the format configuration's isCompetition flag.
      */
     isCompetition(): boolean {
         return !!this.formatConfig?.isCompetition;
     }
 
     /**
-     * Checks wether or not an event is a recurring event by looking to see if a recurrence config exists
-     * @returns boolean indicating status
+     * Checks whether this event repeats on a schedule by looking
+     * for an attached recurrence config (iCalendar RRULE-based).
      */
     isRecurringEvent(): boolean {
         return !!this.recurrenceConfig;
     }
 
     /**
-     * Checks wether or not an event is full
-     * @returns boolean indicating status
+     * Checks whether the event has reached its maximum participant capacity.
+     * Returns false if no max is configured (unlimited participants).
      */
     isFull(): boolean {
         if (!this.participantsConfig?.maxParticipants) return false;
         return this.participantsConfig?.maxParticipants <= this.participants.length;
     }
 
-    /**
-     * Returns the event's configuration minimum participants
-     * @returns 
-     */
+    /** Returns the configured minimum participants, or 0 if not set. */
     getMinParticipants(): number {
         return this.participantsConfig?.minParticipants ?? 0;
     }
 
-    /**
-     * Returns the event's configuration maximum participants
-     * @returns
-     */
+    /** Returns the configured maximum participants, or 0 (unlimited) if not set. */
     getMaxParticipants(): number {
         return this.participantsConfig?.maxParticipants ?? 0;
     }
 
-    /**
-     * Returns the event's configuration minimum teams
-     * @returns 
-     */
+    /** Returns the configured minimum teams, or 0 if not set. */
     getMinTeams(): number {
         return this.teamsConfig?.maxTeams ?? 0;
     }
 
-    /**
-     * Returns the event's configuration maximum teams
-     * @returns
-     */
+    /** Returns the configured maximum teams, or 0 (unlimited) if not set. */
     getMaxTeams(): number {
         return this.teamsConfig?.minTeams  ?? 0;
     }
 }
 
-// Updated EventDao class
+/**
+ * Data Access Object for creating or updating an event.
+ * All fields are optional — only populated fields are sent to the API.
+ * The constructor accepts GroupSelection objects and converts them to
+ * Organizer instances (mapping club/organization type to numeric type codes).
+ */
 class EventDao extends Codable<EventDao> {
     posterId?: string;
     organizers?: Organizer[];
     venues?: VenueDescriptor[];
-    
+
     mediaURL?: string;
     mediaType?: MEDIA_TYPE;
-    
+
     title?: string;
     body?: string;
     sports?: string[];
     tags?: string[];
-    
+
     config?: EventConfig;
     formatConfig?: EventFormatConfig;
-    
+
     startTime?: Date;
     stopTime?: Date;
-    
+
     participantsConfig?: ParticipantsConfig;
     teamsConfig?: TeamsConfig;
-    
+
     visibility?: EVENT_VISIBILITY;
     externalLink?: string;
     isSensitive?: boolean;
-    
+
     createdAt?: Date;
     updatedAt?: Date;
     cancelledAt?: Date;
-    
+
     recurrenceConfig?: EventRecurrenceConfig;
 
     constructor(
@@ -516,8 +550,13 @@ class EventDao extends Codable<EventDao> {
     }
 }
 
+/**
+ * Paginated response wrapper returned by the events list API.
+ * Contains the page of events plus the total count for pagination controls.
+ */
 class EventsResponse {
   events: Event[];
+  /** Total number of events matching the query (not just this page) */
   totalEvents: number;
 
   constructor(
@@ -542,6 +581,10 @@ class EventsResponse {
   }
 }
 
+/**
+ * Response from location-based event queries.
+ * Returns both the events found near a location and their associated venues.
+ */
 class LocationResponse {
   events: Event[];
   venues: Venue[];
@@ -570,8 +613,13 @@ class LocationResponse {
   }
 }
 
+/**
+ * Client-side grouping of events by date for display in sectioned lists.
+ * Used to render events under day headers (e.g. "Today", "Tomorrow", "Feb 15").
+ */
 class EventSection {
     date: Date;
+    /** Formatted display string for the section header (e.g. "Today", "Monday") */
     dayString: string;
     events: Event[];
 
@@ -586,9 +634,16 @@ class EventSection {
     }
 }
 
+/**
+ * Top-level DAO for the event creation endpoint.
+ * Wraps an EventDao with additional creation-time options like
+ * whether to auto-add the creator as a participant and recurrence settings.
+ */
 class NewEventDao extends Codable<NewEventDao> {
     event: EventDao
+    /** If true, the event creator is automatically added as a participant */
     includeHost?: boolean
+    /** Optional recurrence schedule — omit for one-time events */
     recurrence?: RecurrenceOptions
 
     constructor(
@@ -619,9 +674,17 @@ class NewEventDao extends Codable<NewEventDao> {
     }
 }
 
+/**
+ * Recurrence settings sent when creating a new recurring event.
+ * The backend uses these to generate individual event instances
+ * according to the pattern and interval until the end time.
+ */
 class RecurrenceOptions extends Codable<RecurrenceOptions> {
+    /** Recurrence frequency: "DAILY", "WEEKLY", or "MONTHLY" */
     pattern: string
+    /** Date after which no more recurring instances are created */
     endTime: Date
+    /** How many pattern units between occurrences (e.g. interval=2 with WEEKLY = every 2 weeks) */
     interval: number
 
     constructor(
@@ -646,10 +709,18 @@ class RecurrenceOptions extends Codable<RecurrenceOptions> {
     }
 }
 
+/**
+ * Stored recurrence metadata on an event that was created as part of a recurring series.
+ * The backend attaches this after generating instances from RecurrenceOptions.
+ */
 class EventRecurrenceConfig extends Codable<EventRecurrenceConfig> {
+    /** iCalendar RRULE string (e.g. "FREQ=WEEKLY;INTERVAL=1") */
     recurrenceRule?: string;
+    /** When the recurrence series stops generating new instances */
     recurrenceEnd?: Date;
+    /** ID of the original event that spawned this recurring series */
     parentEventId?: string;
+    /** IDs of individual instances that were deleted from the series */
     deletedInstances?: string[];
 
     constructor(
@@ -701,11 +772,19 @@ class EventRecurrenceConfig extends Codable<EventRecurrenceConfig> {
     }
 }
 
+/**
+ * Configuration for individual participant registration on an event.
+ * Controls capacity limits, waitlist behavior, and participant visibility.
+ */
 class ParticipantsConfig extends Codable<ParticipantsConfig> {
+    /** Whether overflow participants are placed on a waitlist instead of being rejected */
     hasWaitlist?: boolean;
+    /** Whether the participant list is hidden from non-admin viewers */
     hideParticipants?: boolean;
 
+    /** Minimum participants needed for the event to proceed */
     minParticipants?: number;
+    /** Maximum participants allowed — additional RSVPs go to the waitlist (if enabled) */
     maxParticipants?: number;
 
     constructor(
@@ -756,12 +835,21 @@ class ParticipantsConfig extends Codable<ParticipantsConfig> {
     }
 }
 
+/**
+ * Configuration for team-based events.
+ * Controls team capacity, waitlist behavior, and team visibility.
+ */
 class TeamsConfig extends Codable<TeamsConfig> {
+    /** Whether overflow teams are placed on a waitlist instead of being rejected */
     hasWaitlist?: boolean;
+    /** Whether the team list is hidden from non-admin viewers */
     hideTeams?: boolean;
 
+    /** Minimum number of teams needed for the event to proceed */
     minTeams?: number;
+    /** Maximum number of teams allowed */
     maxTeams?: number;
+    /** Maximum number of members allowed per team */
     maxTeamSize?: number;
 
     constructor(
@@ -819,8 +907,14 @@ class TeamsConfig extends Codable<TeamsConfig> {
     }
 }
 
+/**
+ * General display/privacy settings for an event.
+ * These flags control what information is visible to non-admin users.
+ */
 class EventConfig extends Codable<EventConfig> {
+    /** Hide the identity of who created the event */
     hidePoster?: boolean;
+    /** Hide the event's location from non-participants and non-admins */
     hideLocation?: boolean;
 
     constructor(
@@ -859,19 +953,37 @@ class EventConfig extends Codable<EventConfig> {
     }
 }
 
+/**
+ * Configuration for competition/tournament events.
+ * Supports multiple format types (bracket, league, round robin, etc.),
+ * round tracking, bracket data, and registration windows.
+ *
+ * Competition events can spawn child "game" events — linked via parentCompetitionId.
+ */
 class EventFormatConfig extends Codable<EventFormatConfig> {
+    /** Whether this event is a structured competition (tournament, league, etc.) */
     isCompetition?: boolean;
+    /** Whether this event is a single game/match within a larger competition */
     isCompetitionGame?: boolean;
+    /** Links a game event back to its parent competition event */
     parentCompetitionId?: string;
+    /** Current state of the competition: "PENDING", "LIVE", or "COMPLETED" */
     competitionState?: string;
-    
+
+    /** Competition format types (e.g. bracket, round_robin, single_elimination, best_of_3) */
     formats?: COMPETITION_FORMAT[];
+    /** Total number of rounds in the competition */
     rounds?: number;
+    /** Which round is currently active */
     currentRound?: number;
+    /** Opaque bracket/tournament structure data — format depends on the competition type */
     bracketData?: any;
-    
+
+    /** When registration opens for this competition */
     registrationStart?: Date;
+    /** Registration deadline — after this, only allowed if allowLateRegistration is true */
     registrationEnd?: Date;
+    /** Whether participants can register after the registration deadline */
     allowLateRegistration?: boolean;
 
     constructor(
@@ -963,10 +1075,16 @@ class EventFormatConfig extends Codable<EventFormatConfig> {
     }
 }
 
+/**
+ * A team registered for a team-based event.
+ * Members are stored as Participant objects (same model as individual participants).
+ */
 class Team extends Codable<Team> {
     id: string;
     name: string;
+    /** Team members — each represented as a Participant with their own RSVP status */
     members: Participant[];
+    /** The event this team is registered for */
     eventId: string;
     createdAt: Date;
 
@@ -1023,6 +1141,7 @@ class Team extends Codable<Team> {
     }
 }
 
+/** Data Access Object for creating or updating a team within an event. */
 class TeamDao extends Codable<TeamDao> {
     id?: string;
     name?: string;
@@ -1068,11 +1187,86 @@ class TeamDao extends Codable<TeamDao> {
     }
 }
 
+/** A single emoji reaction on an event comment. */
+class CommentReaction extends Codable<CommentReaction> {
+    id: string;
+    /** The user who reacted — may be undefined if the user account was deleted */
+    user?: UserSnippet;
+    type: COMMENT_REACTION_TYPE;
+    createdAt: Date;
+
+    constructor(
+        id: string,
+        type: COMMENT_REACTION_TYPE,
+        createdAt: Date,
+        user?: UserSnippet
+    ) {
+        super();
+        this.id = id;
+        this.user = user;
+        this.type = type;
+        this.createdAt = createdAt;
+    }
+
+    static override decode<CommentReaction>(data: { [key: string]: any }): CommentReaction {
+        const object = Object();
+
+        if (data) {
+            object['id'] = data['id'];
+            object['user'] = data['user'] ? UserSnippet.decode(data['user']) : undefined;
+            object['type'] = stringToCommentReactionType(data['type']);
+            object['createdAt'] = new Date(data['created_at']);
+        }
+
+        Object.setPrototypeOf(object, CommentReaction.prototype);
+        return object;
+    }
+
+    override encode(): { [key: string]: any } {
+        const data: { [key: string]: any } = {};
+
+        if (this.id) {
+            data['id'] = this.id;
+        }
+        if (this.user) {
+            data['user'] = this.user.encode();
+        }
+        if (this.type) {
+            data['type'] = this.type.valueOf();
+        }
+        if (this.createdAt) {
+            data['created_at'] = this.createdAt.toISOString();
+        }
+
+        return data;
+    }
+}
+
+/** Data Access Object for creating a reaction on a comment. */
+class CommentReactionDao extends Codable<CommentReactionDao> {
+    type: COMMENT_REACTION_TYPE;
+
+    constructor(type: COMMENT_REACTION_TYPE) {
+        super();
+        this.type = type;
+    }
+
+    override encode(): { [key: string]: any } {
+        return {
+            'type': this.type.valueOf()
+        };
+    }
+}
+
+/** A user comment on an event. */
 class EventComment extends Codable<EventComment> {
     id: string;
+    /** The comment author — may be undefined if the user account was deleted */
     user?: UserSnippet;
     text: string;
     eventId: string;
+    /** Emoji reactions on this comment */
+    reactions: CommentReaction[];
     createdAt: Date;
 
     constructor(
@@ -1080,13 +1274,15 @@ class EventComment extends Codable<EventComment> {
         text: string,
         eventId: string,
         createdAt: Date,
-        user?: UserSnippet
+        user?: UserSnippet,
+        reactions?: CommentReaction[]
     ) {
         super();
         this.id = id;
         this.user = user;
         this.text = text;
         this.eventId = eventId;
+        this.reactions = reactions ?? [];
         this.createdAt = createdAt;
     }
 
@@ -1098,6 +1294,7 @@ class EventComment extends Codable<EventComment> {
             object['user'] = data['user'] ? UserSnippet.decode(data['user']) : undefined;
             object['text'] = data['text'];
             object['eventId'] = data['event_id'];
+            object['reactions'] = data['reactions'] ? data['reactions'].map((r: any) => CommentReaction.decode(r)) : [];
             object['createdAt'] = new Date(data['created_at']);
         }
 
@@ -1120,6 +1317,9 @@ class EventComment extends Codable<EventComment> {
         if (this.eventId) {
             data['event_id'] = this.eventId;
         }
+        if (this.reactions && this.reactions.length > 0) {
+            data['reactions'] = this.reactions.map((r) => r.encode());
+        }
         if (this.createdAt) {
             data['created_at'] = this.createdAt.toISOString();
         }
@@ -1128,10 +1328,12 @@ class EventComment extends Codable<EventComment> {
     }
 }
 
+/** Data Access Object for creating or updating a comment on an event. */
 class EventCommentDao extends Codable<EventCommentDao> {
     id?: string;
     userId?: string;
     text?: string;
+    /** Required — the event this comment belongs to */
     eventId: string;
     createdAt?: Date;
 
@@ -1192,6 +1394,9 @@ export {
     
     Team,
     TeamDao,
+
+    CommentReaction,
+    CommentReactionDao,
 
     EventComment,
     EventCommentDao

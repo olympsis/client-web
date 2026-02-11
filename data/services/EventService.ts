@@ -2,7 +2,8 @@ import { getAuth } from 'firebase/auth'
 import type { Venue } from '../models/VenueModels';
 import { Courrier, Endpoint, Method, Scheme } from "malakbel";
 import type { ParticipantDao } from '../models/GenericModels';
-import { Event, EventDao, EventsResponse, LocationResponse, NewEventDao } from "../models/EventModels";
+import { Event, EventDao, EventsResponse, LocationResponse, NewEventDao, CommentReactionDao } from "../models/EventModels";
+import { COMMENT_REACTION_TYPE } from "../Enums";
 
 export class EventService {
 
@@ -211,6 +212,54 @@ export class EventService {
         const [status, _headers, body] = await this.http.request(Method.DELETE, endpoint, undefined, headers);
         if (status == 200) {
             return true;
+        }
+        return false;
+    }
+
+    /**
+     * Adds an emoji reaction to a comment on an event.
+     * Returns the new reaction's ID on success, or null on failure.
+     */
+    async addCommentReaction(eventId: string, commentId: string, type: COMMENT_REACTION_TYPE): Promise<string | null> {
+        const headers = await this.getAuthHeaders();
+
+        const dao = new CommentReactionDao(type);
+        const data = JSON.stringify(dao.encode());
+
+        const endpoint = new Endpoint(`/v1/events/${eventId}/comments/${commentId}/reactions`);
+        try {
+            const [status, _headers, body] = await this.http.request(Method.POST, endpoint, data, headers);
+            if (status === 201) {
+                if (body) {
+                    const resp = body as { [key: string]: any };
+                    return resp['id'] ?? null;
+                }
+            } else {
+                console.error(`Failed to add comment reaction. Status Code (${status})`);
+            }
+        } catch (error) {
+            console.error(`Failed to add comment reaction: ${error}`);
+        }
+        return null;
+    }
+
+    /**
+     * Removes an emoji reaction from a comment on an event.
+     * Returns true on success, false on failure.
+     */
+    async removeCommentReaction(eventId: string, commentId: string, reactionId: string): Promise<boolean> {
+        const headers = await this.getAuthHeaders();
+
+        const endpoint = new Endpoint(`/v1/events/${eventId}/comments/${commentId}/reactions/${reactionId}`);
+        try {
+            const [status, _headers, body] = await this.http.request(Method.DELETE, endpoint, undefined, headers);
+            if (status === 200) {
+                return true;
+            } else {
+                console.error(`Failed to remove comment reaction. Status Code (${status})`);
+            }
+        } catch (error) {
+            console.error(`Failed to remove comment reaction: ${error}`);
         }
         return false;
     }

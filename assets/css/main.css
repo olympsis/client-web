@@ -163,12 +163,16 @@ body {
 	font-family: 'Inter', 'Helvetica Nue', sans-serif;
 }
 
+textarea {
+	font-family: 'Inter', 'Helvetica Nue', sans-serif;
+}
+
 h1 {
-	font-family: 'Archivo', 'Helvetica Nue', 'Arial';
+	font-family: 'Archivo', 'Helvetica Nue', 'Roboto';
 }
 
 h4 {
-	font-family: 'Archivo', 'Helvetica Nue', 'Arial';
+	font-family: 'Archivo', 'Helvetica Nue', 'Roboto';
 }
 
 * {

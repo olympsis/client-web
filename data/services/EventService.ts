@@ -2,7 +2,7 @@ import { getAuth } from 'firebase/auth'
 import type { Venue } from '../models/VenueModels';
 import { Courrier, Endpoint, Method, Scheme } from "malakbel";
 import type { ParticipantDao } from '../models/GenericModels';
-import { Event, EventDao, EventsResponse, LocationResponse, NewEventDao, CommentReactionDao } from "../models/EventModels";
+import { Event, EventDao, EventsResponse, LocationResponse, NewEventDao, CommentReactionDao, EventCommentDao } from "../models/EventModels";
 import { COMMENT_REACTION_TYPE } from "../Enums";
 
 export class EventService {
@@ -214,6 +214,33 @@ export class EventService {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Adds a comment to an event.
+     * Returns the new comment's ID on success, or null on failure.
+     */
+    async addComment(eventId: string, text: string): Promise<string | null> {
+        const headers = await this.getAuthHeaders();
+
+        const dao = new EventCommentDao(eventId, undefined, undefined, text);
+        const data = JSON.stringify(dao.encode());
+
+        const endpoint = new Endpoint(`/v1/events/${eventId}/comments`);
+        try {
+            const [status, _headers, body] = await this.http.request(Method.POST, endpoint, data, headers);
+            if (status === 201) {
+                if (body) {
+                    const resp = body as { [key: string]: any };
+                    return resp['id'] ?? null;
+                }
+            } else {
+                console.error(`Failed to add comment. Status Code (${status})`);
+            }
+        } catch (error) {
+            console.error(`Failed to add comment: ${error}`);
+        }
+        return null;
     }
 
     /**

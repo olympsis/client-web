@@ -432,7 +432,7 @@ class EventDao extends Codable<EventDao> {
         if (organizers) {
             this.organizers = organizers?.map((o) => {
                 return new Organizer(
-                    o.type === GROUP_TYPE.CLUB ? 0 : 1,
+                    o.type === GROUP_TYPE.CLUB ? 'CLUB' : 'ORGANIZATION',
                     o.club?.id ?? o.organization?.id
                 );
             });

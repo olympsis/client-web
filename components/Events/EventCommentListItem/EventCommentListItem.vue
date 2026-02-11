@@ -163,6 +163,7 @@ onMounted(() => {
 #event-comment-list-item {
     width: 100%;
     display: flex;
+    list-style-type: none;
     align-items: flex-start;
 
     #body {

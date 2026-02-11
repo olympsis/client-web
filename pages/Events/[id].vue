@@ -31,6 +31,9 @@
             <!-- Formats -->
             <EventFormats v-if="eventFormats.length > 0" :formats="eventFormats"/>
 
+            <!-- Comments -->
+            <EventComments :event="event"/>
+
             <!-- RSVP -->
             <dialog id="rsvp-modal" ref="rsvp-modal" class="dialog">
                 <EventRSVPModal v-if="event" :event="event" @close="hideRSVPModal" @rsvp="handleRSVPResponse"/>
@@ -66,24 +69,24 @@ import { Club } from '@/data/models/ClubModels';
 import { Venue } from '@/data/models/VenueModels';
 import { Event } from '@/data/models/EventModels';
 import { useModelStore } from '@/stores/model-store';
-import { VIEW_STATE, GROUP_ROLE, COMPETITION_FORMAT } from '@/data/Enums';
 import { UserSnippet } from '@/data/models/UserModels';
 import { useSessionStore } from '@/stores/session-store';
 import { generateImageURL } from '~/utils/image-helpers';
 import { computed, ref, type Ref, useTemplateRef, } from 'vue';
 import { Organization } from '@/data/models/OrganizationModels';
+import { VIEW_STATE, GROUP_ROLE, COMPETITION_FORMAT } from '@/data/Enums';
 import { Participant, ParticipantDao } from '@/data/models/GenericModels';
 
 import * as Sentry from '@sentry/nuxt';
+import AuthModal from '@/components/Auth/AuthModal/AuthModal.vue';
 import EventBody from '~/components/Events/EventBody/EventBody.vue';
 import EventMedia from '~/components/Events/EventMedia/EventMedia.vue';
+import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
 import EventHeader from '~/components/Events/EventHeader/EventHeader.vue';
+import EventFormats from '~/components/Events/EventFormats/EventFormats.vue';
+import EventComments from '~/components/Events/EventComments/EventComments.vue';
 import EventLocations from '~/components/Events/EventLocations/EventLocations.vue';
 import EventOrganizers from '~/components/Events/EventOrganizers/EventOrganizers.vue';
-
-import AuthModal from '@/components/Auth/AuthModal/AuthModal.vue';
-import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
-import EventFormats from '~/components/Events/EventFormats/EventFormats.vue';
 import EventRSVPModal from '@/components/Modals/Events/EventRSVPModal/EventRSVPModal.vue';
 import EventParticipantsPeek from '@/components/Events/EventParticipants/EventParticipants.vue';
 import EventDetailSettingsModal from '@/components/Modals/Events/EventDetailSettingsModal/EventDetailSettingsModal.vue';

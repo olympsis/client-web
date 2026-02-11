@@ -2,8 +2,14 @@
     <div id="event-comments">
         <h2>Comments</h2>
         <div id="text-field">
-            <textarea placeholder="Add a Comment"/>
-            <button>Comment</button>
+            <textarea
+                v-model="commentText"
+                placeholder="Add a Comment"
+                maxlength="1000"
+                rows="1"
+                @input="autoResize"
+            />
+            <button @click="addComment" :style="{ cursor: 'pointer' }">Comment</button>
         </div>
         <ul id="comments">
             <li v-for="comment in comments" class="comment">
@@ -18,10 +24,12 @@
 </template>
 
 <script setup lang="ts">
-import { Event, EventComment, CommentReaction } from '~/data/models/EventModels';
+import { ref } from 'vue';
 import { COMMENT_REACTION_TYPE } from '~/data/Enums';
-import { EventService } from '~/data/services/EventService';
 import { UserSnippet } from '~/data/models/UserModels';
+import { EventService } from '~/data/services/EventService';
+import { Event, EventComment, CommentReaction } from '~/data/models/EventModels';
+
 import EventCommentListItem from '../EventCommentListItem/EventCommentListItem.vue';
 
 const event = defineModel('event', {
@@ -29,11 +37,71 @@ const event = defineModel('event', {
     required: true
 });
 
+const commentText = ref('');
+
 const session = useSessionStore();
 const eventService = new EventService();
 
+/**
+ * Auto-resizes the textarea to fit its content.
+ * Resets height to auto first so it can shrink when text is deleted,
+ * then sets it to scrollHeight to match the actual content height.
+ */
+function autoResize(e: InputEvent) {
+    const textarea = e.target as HTMLTextAreaElement;
+    textarea.style.height = 'auto';
+    textarea.style.height = textarea.scrollHeight + 'px';
+}
+
+/**
+ * Adds a new comment to the event with optimistic UI:
+ * 1. Immediately adds the comment locally (with a temp ID)
+ * 2. Clears the textarea and resets its height
+ * 3. Sends the API request
+ * 4. On success: updates the temp ID with the real server ID
+ * 5. On failure: rolls back the optimistic comment
+ */
+async function addComment() {
+    const text = commentText.value.trim();
+    if (!text) return;
+
+    const user = session.user;
+    if (!user?.uuid) return;
+
+    const eventId = event.value.id;
+
+    // Build an optimistic comment with a temporary ID
+    const tempId = `temp-${Date.now()}`;
+    const optimisticComment = new EventComment(
+        tempId,
+        text,
+        eventId,
+        new Date(),
+        undefined,// new UserSnippet(user.uuid, user.firstName, user.lastName, user.username, user.imageURL),
+        []
+    );
+
+    // Optimistic update: add comment immediately and clear the input
+    event.value.comments.push(optimisticComment);
+    commentText.value = '';
+
+    // Send API request
+    const commentId = await eventService.addComment(eventId, text);
+
+    if (commentId) {
+        // Replace the temp ID with the real server ID
+        optimisticComment.id = commentId;
+    } else {
+        // Rollback: remove the optimistic comment on failure
+        const index = event.value.comments.findIndex((c) => c.id === tempId);
+        if (index !== -1) {
+            event.value.comments.splice(index, 1);
+        }
+    }
+}
+
 const comments = computed<EventComment[]>(() => {
-    return event.value.comments;
+    return [...event.value.comments].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 });
 
 /**
@@ -132,10 +200,11 @@ async function handleRemoveReaction(payload: { commentId: string; reactionId: st
 
         textarea {
             width: 100%;
-            height: 2rem;
+            resize: none;
             border: unset;
-            font-size: 1rem;
-            min-height: 2rem;
+            overflow: hidden;
+            font-size: 0.8rem;
+            line-height: 1.2rem;
             margin-right: 1rem;
             border-radius: 20px;
             padding: 0.4rem 0.75rem;
@@ -150,6 +219,15 @@ async function handleRemoveReaction(payload: { commentId: string; reactionId: st
             padding: 0rem 1rem;
             border-radius: 20px;
             background-color: var(--primary-brand-color);
+        }
+    }
+
+    #comments {
+        padding: 0.5rem 0rem;
+        list-style-type: none;
+
+        li {
+            margin: 1rem 0.5rem;
         }
     }
 }

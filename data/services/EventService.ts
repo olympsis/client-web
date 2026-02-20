@@ -1,44 +1,11 @@
-import { getAuth } from 'firebase/auth'
 import type { Venue } from '../models/VenueModels';
-import { Courrier, Endpoint, Method, Scheme } from "malakbel";
+import { Endpoint, Method } from "malakbel";
 import type { ParticipantDao } from '../models/GenericModels';
 import { Event, EventDao, EventsResponse, LocationResponse, NewEventDao, CommentReactionDao, EventCommentDao } from "../models/EventModels";
 import { COMMENT_REACTION_TYPE } from "../Enums";
+import { BaseService } from './BaseService';
 
-export class EventService {
-
-    private http: Courrier;
-
-    constructor() {
-        const config = useRuntimeConfig();
-        switch (config.public.MODE) {
-            case 'dev':
-                this.http = new Courrier(Scheme.HTTP, config.public.API);
-                break;
-            default:
-                this.http = new Courrier(Scheme.HTTPS, config.public.API);
-                break;
-        }
-    }
-
-    /**
-     * Builds auth headers based on the current environment.
-     * Dev mode uses a static userID header; prod uses Firebase auth token.
-     */
-    private async getAuthHeaders(): Promise<Map<string, string>> {
-        const config = useRuntimeConfig();
-        let headers = new Map<string, string>();
-        switch (config.public.MODE) {
-            case 'dev':
-                headers.set('userID', config.public.USER_ID);
-                break;
-            default:
-                const token = await getAuth().currentUser?.getIdToken() ?? ""
-                headers.set('Authorization', token);
-                break;
-        }
-        return headers;
-    }
+export class EventService extends BaseService {
 
     async createEvent(dao: NewEventDao) : Promise<string | null> {
         const headers = await this.getAuthHeaders();
@@ -47,7 +14,7 @@ export class EventService {
         const data = JSON.stringify(dao.encode());
 
         try {
-            const [status, _headers, body] = await this.http.request(Method.POST, endpoint, data, headers); 
+            const [status, _headers, body] = await this.http.request(Method.POST, endpoint, data, headers);
             if (status === 201) {
                 if (body) {
                     const resp = body as { [key: string]: any }

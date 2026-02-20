@@ -1,40 +1,8 @@
-import { getAuth } from "firebase/auth";
-import { Courrier, Endpoint, Method, Scheme } from "malakbel";
+import { Endpoint, Method } from "malakbel";
 import { ChatRoom, ChatRoomsResponse, type ChatRoomDTO } from "../models/ChatModels";
+import { BaseService } from './BaseService';
 
-export class ChatService {
-    private http: Courrier;
-
-    constructor() {
-        const config = useRuntimeConfig();
-        switch (config.public.MODE) {
-            case 'dev':
-                this.http = new Courrier(Scheme.HTTP, config.public.API);
-                break;
-            default:
-                this.http = new Courrier(Scheme.HTTPS, config.public.API);
-                break;
-        }
-    }
-
-    /**
-     * Builds auth headers based on the current environment.
-     * Dev mode uses a static userID header; prod uses Firebase auth token.
-     */
-    private async getAuthHeaders(): Promise<Map<string, string>> {
-        const config = useRuntimeConfig();
-        let headers = new Map<string, string>();
-        switch (config.public.MODE) {
-            case 'dev':
-                headers.set('userID', config.public.USER_ID);
-                break;
-            default:
-                const token = await getAuth().currentUser?.getIdToken() ?? ""
-                headers.set('Authorization', token);
-                break;
-        }
-        return headers;
-    }
+export class ChatService extends BaseService {
 
     async createChatRoom(dto: ChatRoomDTO): Promise<string | null> {
         const headers = await this.getAuthHeaders();
@@ -68,7 +36,7 @@ export class ChatService {
         const endpoint =  new Endpoint(`/v1/chats/group/${groupID}`);
 
         try {
-            const [status, _headers, body] = await this.http.request(Method.GET, endpoint, undefined, headers); 
+            const [status, _headers, body] = await this.http.request(Method.GET, endpoint, undefined, headers);
             if (status === 200) {
                 if (body) {
                     const data = body as { [key: string]: any }
@@ -98,7 +66,7 @@ export class ChatService {
         const endpoint =  new Endpoint(`/v1/chats/${id}`);
 
         try {
-            const [status, _headers, body] = await this.http.request(Method.GET, endpoint, undefined, headers); 
+            const [status, _headers, body] = await this.http.request(Method.GET, endpoint, undefined, headers);
             if (status === 200) {
                 if (body) {
                     const data = body as { [key: string]: any }
@@ -144,7 +112,7 @@ export class ChatService {
         const endpoint =  new Endpoint(`/v1/chats/${id}`);
 
         try {
-            const [status, _headers, body] = await this.http.request(Method.GET, endpoint, undefined, headers); 
+            const [status, _headers, body] = await this.http.request(Method.GET, endpoint, undefined, headers);
             if (status === 200) {
                 return true;
             } else {
@@ -163,7 +131,7 @@ export class ChatService {
         const endpoint =  new Endpoint(`/v1/chats/${id}/join`);
 
         try {
-            const [status, _headers, body] = await this.http.request(Method.POST, endpoint, undefined, headers); 
+            const [status, _headers, body] = await this.http.request(Method.POST, endpoint, undefined, headers);
             if (status === 201) {
                 return true;
             } else {
@@ -182,7 +150,7 @@ export class ChatService {
         const endpoint =  new Endpoint(`/v1/chats/${id}/leave`);
 
         try {
-            const [status, _headers, body] = await this.http.request(Method.DELETE, endpoint, undefined, headers); 
+            const [status, _headers, body] = await this.http.request(Method.DELETE, endpoint, undefined, headers);
             if (status === 201) {
                 return true;
             } else {

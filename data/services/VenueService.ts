@@ -1,41 +1,8 @@
-import { getAuth } from 'firebase/auth';
 import { Venue, VenuesResponse } from '../models/VenueModels';
-import { Courrier, Method, Endpoint, Scheme } from 'malakbel';
+import { Method, Endpoint } from 'malakbel';
+import { BaseService } from './BaseService';
 
-export class VenueService {
-
-    private http: Courrier;
-
-    constructor() {
-        const config = useRuntimeConfig();
-        switch (config.public.MODE) {
-            case 'dev':
-                this.http = new Courrier(Scheme.HTTP, config.public.API);
-                break;
-            default:
-                this.http = new Courrier(Scheme.HTTPS, config.public.API);
-                break;
-        }
-    }
-
-    /**
-     * Builds auth headers based on the current environment.
-     * Dev mode uses a static userID header; prod uses Firebase auth token.
-     */
-    private async getAuthHeaders(): Promise<Map<string, string>> {
-        const config = useRuntimeConfig();
-        let headers = new Map<string, string>();
-        switch (config.public.MODE) {
-            case 'dev':
-                headers.set('userID', config.public.USER_ID);
-                break;
-            default:
-                const token = await getAuth().currentUser?.getIdToken() ?? ""
-                headers.set('Authorization', token);
-                break;
-        }
-        return headers;
-    }
+export class VenueService extends BaseService {
 
     async getVenues(lat: number, long: number, radius: number, sports: string): Promise<VenuesResponse | undefined> {
         let query = new Map<string, string>()
@@ -85,4 +52,3 @@ export class VenueService {
         throw (`ERROR NOT IMPLEMENTED YET - STATUS(${status})`);
     }
 }
-

@@ -1,42 +1,9 @@
-import { getAuth } from "firebase/auth";
-import { Courrier, Endpoint, Method, Scheme } from "malakbel";
+import { Endpoint, Method } from "malakbel";
 import { Club, ClubApplicationDao, ClubApplicationsResponse, ClubDao, ClubsResponse } from "../models/ClubModels";
 import type { ChangeRoleRequest } from "../models/GenericModels";
+import { BaseService } from './BaseService';
 
-export class ClubService {
-
-    private http: Courrier;
-
-    constructor() {
-        const config = useRuntimeConfig();
-        switch (config.public.MODE) {
-            case 'dev':
-                this.http = new Courrier(Scheme.HTTP, config.public.API);
-                break;
-            default:
-                this.http = new Courrier(Scheme.HTTPS, config.public.API);
-                break;
-        }
-    }
-
-    /**
-     * Builds auth headers based on the current environment.
-     * Dev mode uses a static userID header; prod uses Firebase auth token.
-     */
-    private async getAuthHeaders(): Promise<Map<string, string>> {
-        const config = useRuntimeConfig();
-        let headers = new Map<string, string>();
-        switch (config.public.MODE) {
-            case 'dev':
-                headers.set('userID', config.public.USER_ID);
-                break;
-            default:
-                const token = await getAuth().currentUser?.getIdToken() ?? ""
-                headers.set('Authorization', token);
-                break;
-        }
-        return headers;
-    }
+export class ClubService extends BaseService {
 
     async getClub(id: string) : Promise<Club | undefined> {
         const endpoint = new Endpoint(`/v1/clubs/${id}`);
@@ -100,7 +67,7 @@ export class ClubService {
         const data = JSON.stringify(dao.encode());
 
         try {
-            const [status, _headers, body] = await this.http.request(Method.POST, endpoint, data, headers); 
+            const [status, _headers, body] = await this.http.request(Method.POST, endpoint, data, headers);
             if (status === 201) {
                 if (body) {
                     const resp = body as { [key: string]: any }
@@ -125,7 +92,7 @@ export class ClubService {
         const data = JSON.stringify(dao);
 
         try {
-            const [status, _headers, body] = await this.http.request(Method.PUT, endpoint, data, headers); 
+            const [status, _headers, body] = await this.http.request(Method.PUT, endpoint, data, headers);
             if (status === 200) {
                 return true;
             } else {
@@ -144,7 +111,7 @@ export class ClubService {
         const endpoint = new Endpoint(`/v1/clubs/${id}`);
 
         try {
-            const [status, _headers, body] = await this.http.request(Method.DELETE, endpoint, undefined, headers); 
+            const [status, _headers, body] = await this.http.request(Method.DELETE, endpoint, undefined, headers);
             if (status === 200) {
                 return true;
             } else {
@@ -163,7 +130,7 @@ export class ClubService {
         const endpoint = new Endpoint(`/v1/clubs/${id}/leave`);
 
         try {
-            const [status, _headers, body] = await this.http.request(Method.PUT, endpoint, undefined, headers); 
+            const [status, _headers, body] = await this.http.request(Method.PUT, endpoint, undefined, headers);
             if (status === 200) {
                 return true;
             } else {
@@ -184,7 +151,7 @@ export class ClubService {
 
         if (status === 201) {
             return true;
-        } 
+        }
 
         return false;
     }

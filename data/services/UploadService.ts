@@ -1,40 +1,8 @@
-import { getAuth } from "firebase/auth";
 import { ImageUploadResponse } from "../models/GenericModels";
-import { Courrier, Endpoint, FileType, Method, Scheme } from "malakbel";
+import { Endpoint, Method } from "malakbel";
+import { BaseService } from './BaseService';
 
-export class UploadService {
-    private http: Courrier;
-
-    constructor() {
-        const config = useRuntimeConfig();
-        switch (config.public.MODE) {
-            case 'dev':
-                this.http = new Courrier(Scheme.HTTP, config.public.API);
-                break;
-            default:
-                this.http = new Courrier(Scheme.HTTPS, config.public.API);
-                break;
-        }
-    }
-
-    /**
-     * Builds auth headers based on the current environment.
-     * Dev mode uses a static userID header; prod uses Firebase auth token.
-     */
-    private async getAuthHeaders(): Promise<Map<string, string>> {
-        const config = useRuntimeConfig();
-        let headers = new Map<string, string>();
-        switch (config.public.MODE) {
-            case 'dev':
-                headers.set('userID', config.public.USER_ID);
-                break;
-            default:
-                const token = await getAuth().currentUser?.getIdToken() ?? ""
-                headers.set('Authorization', token);
-                break;
-        }
-        return headers;
-    }
+export class UploadService extends BaseService {
 
     public async uploadImage(file: ArrayBuffer, name: string, bucket: string): Promise<ImageUploadResponse> {
         const headers = await this.getAuthHeaders();
@@ -44,7 +12,7 @@ export class UploadService {
 
         // TODO: This code belongs in the Malakbel package. For some reason the function is ignoring the headers.
         // I am probably overlooking something simple. I do not have the time to deal with this at the moment.
-        var options: { 
+        var options: {
             method: string,
             body: any | undefined,
             headers: any | undefined

@@ -1,21 +1,8 @@
-import { Courrier, Method, Endpoint, Scheme } from 'malakbel';
+import { Method, Endpoint } from 'malakbel';
 import { ApplicationConfig } from '../models/GenericModels';
+import { BaseService } from './BaseService';
 
-export class SystemService {
-
-    private http: Courrier;
-
-    constructor() {
-        const config = useRuntimeConfig();
-        switch (config.public.MODE) {
-            case 'dev':
-                this.http = new Courrier(Scheme.HTTP, config.public.API);
-                break;
-            default:
-                this.http = new Courrier(Scheme.HTTPS, config.public.API);
-                break;
-        }
-    }
+export class SystemService extends BaseService {
 
     async getConfig(): Promise<ApplicationConfig> {
         let query = new Map<string, string>()
@@ -31,4 +18,3 @@ export class SystemService {
         }
     }
 }
-

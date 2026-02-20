@@ -26,6 +26,11 @@ export default defineNuxtConfig({
 				},
 
 				runtimeConfig: {
+								// Server-only secrets (never sent to the client)
+								MAPKIT_KEY: process.env.MAPKIT_KEY ?? "",
+								APL_KEY_ID: process.env.APL_KEY_ID ?? "",
+								APL_TEAM_ID: process.env.APL_TEAM_ID ?? "",
+
 								public: {
 												MODE: process.env.mode ?? "dev",
 
@@ -33,12 +38,10 @@ export default defineNuxtConfig({
 												USER_ID: process.env.USER_ID ?? "",
 
 												APP_ID: process.env.APL_APP_ID ?? "",
-												APL_KEY_ID: process.env.APL_KEY_ID ?? "",
-												APL_TEAM_ID: process.env.APL_TEAM_ID ?? "",
-												APL_MAPKIT_SNAPSHOT_TOKEN: process.env.APL_MAPKIT_SNAPSHOT_TOKEN ?? "",
 
 												MAPKIT_ORIGIN: process.env.MAPKIT_ORIGIN ?? "",
-												MAPKIT_KEY: process.env.MAPKIT_KEY ?? "",
+
+												SENTRY_DSN: process.env.SENTRY_DSN ?? "",
 
 												FB_APP_ID: process.env.FB_APP_ID ?? "",
 												FB_API_KEY: process.env.FB_API_KEY ?? "",

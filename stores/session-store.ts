@@ -69,8 +69,10 @@ export const useSessionStore = defineStore('session-store', () => {
             // Set app-wide loading state
             loadingState.value = VIEW_STATE.LOADING;
 
+            const config = useRuntimeConfig();
+
             // Initialize auth if needed
-            if (!authStore.isAuthInitialized) {
+            if (!authStore.isAuthInitialized && config.public.MODE != 'dev') {
                 await authStore.initAuth();
             }
 
@@ -78,7 +80,7 @@ export const useSessionStore = defineStore('session-store', () => {
              * If we fail to authenticate for any reason we should re-route to the login page.
              * What could possibly go wrong...
              */
-            if (!authStore.isAuthenticated) {
+            if (!authStore.isAuthenticated && config.public.MODE != 'dev') {
                 navigateTo({ path: '/signin' });
             };
 

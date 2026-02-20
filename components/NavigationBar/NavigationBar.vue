@@ -7,10 +7,18 @@
         <div class="routes">
             <NavigationButton to="/events" :text="$t('nav.events')" icon="--events-icon" variant="light"/>
 
-            <NuxtLink v-if="isAuthenticated" id="web-profile" to="/profile" class="profile">
-                <ProfileButton :imageURL="userImageURL"/>
-            </NuxtLink>
-            <NavigationButton v-else class="signin" to="/signin" :text="$t('auth.signIn')" variant="dark"/>
+            <!-- Auth-dependent buttons rendered client-side only to avoid SSR hydration mismatch -->
+            <ClientOnly>
+                <NuxtLink v-if="isAuthenticated" id="web-profile" to="/profile" class="profile">
+                    <ProfileButton :imageURL="userImageURL"/>
+                </NuxtLink>
+                <NavigationButton v-else class="signin" to="/signin" :text="$t('auth.signIn')" variant="dark"/>
+
+                <!-- Placeholder matching button size so the navbar doesn't shift during hydration -->
+                <template #fallback>
+                    <div class="nav-placeholder" />
+                </template>
+            </ClientOnly>
         </div>
     </header>
 </template>
@@ -86,6 +94,13 @@ function hideMenu() {
     }
 
     .signin {
+        margin-left: 1rem;
+    }
+
+    /* Keeps navbar from shifting while client resolves auth state */
+    .nav-placeholder {
+        width: 80px;
+        height: 36px;
         margin-left: 1rem;
     }
 

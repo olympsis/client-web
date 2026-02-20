@@ -22,7 +22,16 @@ export const useAuthStore = defineStore('auth', () => {
         const nuxtApp = useNuxtApp();
         const auth = nuxtApp.$auth as Auth;
 
+        const config = useRuntimeConfig();
+
         return new Promise<void>((resolve) => {
+            if (config.public.MODE == 'dev') {
+                firebaseUser.value = { uid: 'dev-user' } as User;
+                authStatus.value = AUTH_STATUS.authenticated;
+                isAuthInitialized.value = true;
+                resolve();
+                return;
+            }
             const unsubscribe = onAuthStateChanged(auth, (user) => {
                 firebaseUser.value = user;
                 

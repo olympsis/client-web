@@ -5,21 +5,21 @@ import { useAuthStore } from "../stores/auth-store";
 export default defineNuxtRouteMiddleware(async (to, from) => {
     if (import.meta.server) return;
     
-    // const authStore = useAuthStore();
+    const authStore = useAuthStore();
     const sessionStore = useSessionStore();
     
     // Check if this is navigation between routes
     const isNavigating = !!from.name;
     
     // Initialize auth if needed
-    // if (!authStore.isAuthInitialized) {
-    //     await authStore.initAuth();
-    // }
+    if (!authStore.isAuthInitialized) {
+        await authStore.initAuth();
+    }
 
     // Load session data only if not already loaded
-    // if (authStore.isAuthInitialized && !sessionStore.hasLoaded) {
-    //     await sessionStore.init();
-    // }
+    if (authStore.isAuthInitialized && !sessionStore.hasLoaded) {
+        await sessionStore.init();
+    }
 
     // If this is navigation (not initial load) and we're already loaded, 
     // force success state and don't reload
@@ -28,9 +28,9 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     }
     
     // If authenticated user tries to access signin, redirect to home
-    // if (authStore.isAuthenticated && to.path === '/signin') {
-    //     return navigateTo('/home');
-    // }
+    if (authStore.isAuthenticated && to.path === '/signin') {
+        return navigateTo('/home');
+    }
     
     // Handle /groups path redirection rule
     if (to.path.startsWith('/groups')) {
@@ -49,10 +49,10 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
                             to.path.match(/^\/groups\/search\/([a-zA-Z0-9]+)$/) !== null;
     
     // Redirect unauthenticated users from non-public routes
-    // if (!authStore.isAuthenticated && !isPublicRoute) {
-    //     return navigateTo({
-    //         path: '/signin',
-    //         query: { redirect: to.fullPath }
-    //     });
-    // }
+    if (!authStore.isAuthenticated && !isPublicRoute) {
+        return navigateTo({
+            path: '/signin',
+            query: { redirect: to.fullPath }
+        });
+    }
 });

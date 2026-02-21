@@ -12,9 +12,9 @@
                 <button @click="navigateToNewEvent">
                     <img src="@/assets/icons/plus/plus.white.svg">
                 </button>
-                <button @click="">
+                <!-- <button @click="">
                     <img src="@/assets/icons/map/map.fill.svg">
-                </button>
+                </button> -->
             </div>
         </div>
 
@@ -26,9 +26,9 @@
                     <button @click="navigateToNewEvent">
                         <img src="@/assets/icons/plus/plus.white.svg">
                     </button>
-                    <button @click="">
+                    <!-- <button @click="">
                         <img src="@/assets/icons/map/map.fill.svg">
-                    </button>
+                    </button> -->
                 </div>
             </div>
 
@@ -318,7 +318,7 @@ definePageMeta({
         #actions {
             display: flex;
             border-radius: 15px;
-            padding: 0.5rem 0.5rem 0.25rem 0.5rem;
+            padding: 0.25rem 0.5rem 0.25rem 0.5rem;
             background-color: var(--primary-brand-color);
 
             button {
@@ -515,7 +515,7 @@ definePageMeta({
                 display: flex;
                 flex-direction: row;
                 border-radius: 15px;
-                padding: 0.5rem 0.5rem 0.25rem 0.5rem;
+                padding: 0.25rem 0.5rem 0.25rem 0.5rem;
                 background-color: var(--primary-brand-color);
 
                 button {

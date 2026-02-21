@@ -58,7 +58,7 @@
         <!-- Event 404 -->
         <div v-if="failed === true" id="event-not-found">
             <img src="@/assets/images/event-404.svg">
-            <h1>Sorry, we failed to find the event</h1>
+            <h1>{{ t('events.detail.notFound') }}</h1>
         </div>
     </main>
 </template>
@@ -92,6 +92,7 @@ import EventParticipantsPeek from '@/components/Events/EventParticipants/EventPa
 import EventDetailSettingsModal from '@/components/Modals/Events/EventDetailSettingsModal/EventDetailSettingsModal.vue';
 import EventParticipantsListModal from '@/components/Modals/Events/EventParticipantsListModal/EventParticipantsListModal.vue';
 
+const { t } = useI18n();
 const auth = useAuth();
 const route = useRoute();
 const session = useSessionStore();
@@ -124,11 +125,11 @@ const isAuthenticated = computed<boolean>(() => {
 });
 
 const eventTitle = computed<string>(() => {
-    return event.value?.title ?? 'Olympsis Events';
+    return event.value?.title ?? t('events.detail.defaultTitle');
 });
 
 const eventBody = computed<string>(() => {
-    return event.value?.body ?? 'Join olympsis to find sports events near you!';
+    return event.value?.body ?? t('events.detail.defaultBody');
 });
 
 const eventImageURL = computed<string | undefined>(() => {

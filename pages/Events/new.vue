@@ -21,7 +21,7 @@
                 }"
                 class="text-input"
                 type="text" 
-                placeholder="Event Title" 
+                :placeholder="t('events.new.title')"
                 v-model="manager.title" 
             />
 
@@ -32,13 +32,13 @@
             </div>
 
             <div id="note">
-                *fields required.
+                {{ t('events.new.fieldsRequired') }}
             </div>
 
             <!-- Sports Picker -->
             <div id="event-sports-picker">
-                <div class="label">Event Sport</div>
-                <div class="sub-label"> Choose the event's sport activity </div>
+                <div class="label">{{ t('events.new.sport') }}</div>
+                <div class="sub-label"> {{ t('events.new.sportSub') }} </div>
                 <MultiSportsPicker v-model:model-value="eventSports" :sports="session.sports"/>
             </div>
 
@@ -47,8 +47,8 @@
                 <div :class="{ 
                     label: newEventError !== NEW_EVENT_ERROR.NO_ORGANIZERS, 
                     error: newEventError === NEW_EVENT_ERROR.NO_ORGANIZERS 
-                }"> Organizer(s) <div class="asterisk">*</div> </div>
-                <div class="sub-label"> The clubs/organizations affiliated with this event. </div>
+                }"> {{ t('events.new.organizers') }} <div class="asterisk">*</div> </div>
+                <div class="sub-label"> {{ t('events.new.organizersSub') }} </div>
                 <EventOrganizersPicker v-model:model-value="manager.groups"/>
             </div>
 
@@ -57,8 +57,8 @@
                 <div :class="{ 
                     label: newEventError !== NEW_EVENT_ERROR.NO_DESCRIPTION, 
                     error: newEventError === NEW_EVENT_ERROR.NO_DESCRIPTION 
-                }"> Description <div class="asterisk">*</div> </div>
-                <div class="sub-label"> Give details about the event </div>
+                }"> {{ t('events.new.description') }} <div class="asterisk">*</div> </div>
+                <div class="sub-label"> {{ t('events.new.descriptionSub') }} </div>
                 <textarea type="text" v-model="manager.description" class="text-large"/>
             </div>
 
@@ -69,8 +69,8 @@
                         label: newEventError !== NEW_EVENT_ERROR.INVALID_START_DATE,
                         error: newEventError === NEW_EVENT_ERROR.INVALID_START_DATE 
                     }"
-                > Start Date/Time <div class="asterisk">*</div> </div>
-                <div class="sub-label"> When does this event start? </div>
+                > {{ t('events.new.startDate') }} <div class="asterisk">*</div> </div>
+                <div class="sub-label"> {{ t('events.new.startDateSub') }} </div>
                 <DatePicker 
                     class="date-picker"
                     v-model="manager.startDate" 
@@ -107,8 +107,8 @@
                         label: newEventError !== NEW_EVENT_ERROR.INVALID_END_DATE,
                         error: newEventError === NEW_EVENT_ERROR.INVALID_END_DATE 
                     }
-                "> End Date/Time<div class="asterisk">*</div>  </div>
-                <div class="sub-label"> When does this event end? </div>
+                "> {{ t('events.new.endDate') }}<div class="asterisk">*</div>  </div>
+                <div class="sub-label"> {{ t('events.new.endDateSub') }} </div>
                 <DatePicker 
                     class="date-picker"
                     v-model="manager.endDate" 
@@ -146,8 +146,8 @@
                 <div :class="{ 
                     label: newEventError !== NEW_EVENT_ERROR.NO_VENUES, 
                     error: newEventError === NEW_EVENT_ERROR.NO_VENUES 
-                }"> Location(s) <div class="asterisk">*</div> </div>
-                <div class="sub-label"> Select your event's location(s) </div>
+                }"> {{ t('events.new.locations') }} <div class="asterisk">*</div> </div>
+                <div class="sub-label"> {{ t('events.new.locationsSub') }} </div>
                 <EventVenuesPicker v-model:model-value="manager.venues"/>
             </div>
 
@@ -158,15 +158,15 @@
 
             <!-- Event Tags -->
             <div id="event-tags-picker">
-                <div class="label">Event Tags</div>
-                <div class="sub-label"> Tags make your event easier to discover. Add a few! </div>
+                <div class="label">{{ t('events.new.tags') }}</div>
+                <div class="sub-label"> {{ t('events.new.tagsSub') }} </div>
                 
                 <MultiTagsPicker :tags="session.tags" v-model:model-value="manager.tags"/>
             </div>
 
             <!-- Advanced Settings -->
             <div id="advanced-settings" @click="showAdvancedSettings = true">
-                Advanced Settings
+                {{ t('events.new.advancedSettings') }}
                 <picture class="centered">
                     <source srcset="@/assets/icons/gear/gear.white.svg" media="(prefers-color-scheme: dark)">
                     <img src="@/assets/icons/gear/gear.svg"/>
@@ -175,14 +175,14 @@
 
             <!-- Primary Action -->
             <div id="action-wrapper">
-                <BoldTextButton v-model="state" text="create event" @click="createNewEvent"/>
+                <BoldTextButton v-model="state" :text="t('events.new.createEvent')" @click="createNewEvent"/>
             </div>
         </div>
 
         <Drawer v-model:visible="showAdvancedSettings" position="right">
             <template #container="{ closeCallback }">
                 <div id="header" :style="{ display: 'flex', alignItems: 'center' }">
-                    <h2>Advanced Settings</h2>
+                    <h2>{{ t('events.new.advancedSettings') }}</h2>
                     <button class="button" :style="{ marginRight: '1rem', marginLeft: 'auto' }" @click="closeCallback">
                         <picture class="centered">
                             <source srcset="@/assets/icons/xmark/xmark.white.svg" media="(prefers-color-scheme: dark)">
@@ -223,6 +223,7 @@ import EventVisibilityPicker from '~/components/Events/New Event/EventVisibility
 import EventOrganizersPicker from '~/components/Events/New Event/EventOrganizersPicker/EventOrganizersPicker.vue';
 
 
+const { t } = useI18n();
 const toast = useToast();
 const router = useRouter();
 const session = useSessionStore();
@@ -266,7 +267,7 @@ function createNewEvent() {
                 .catch((error: any) => {
                     state.value = VIEW_STATE.FAILURE;
                     console.error('Failed to create event. Error: ', error);
-                    toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to create event!', life: 3000 });
+                    toast.add({ severity: 'error', summary: 'Error', detail: t('events.new.errorCreate'), life: 3000 });
                     setTimeout(() => {
                         state.value = VIEW_STATE.PENDING;
                     }, 250);
@@ -276,7 +277,7 @@ function createNewEvent() {
         state.value = VIEW_STATE.FAILURE;
         // URGENT: DEV ENV ONLY
         console.error(`Failed to create event. Error: ${error}`);
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Could not create event!', life: 3000 });
+        toast.add({ severity: 'error', summary: 'Error', detail: t('events.new.errorCouldNot'), life: 3000 });
     }
 }
 
@@ -298,20 +299,20 @@ onMounted(() => {
 });
 
 useSeoMeta({
-    title: () => 'New Event | Olympsis',
-    description: () => 'Creating a new event on Olympsis',
-    
+    title: () => t('events.new.seoTitle'),
+    description: () => t('events.new.seoDescription'),
+
     ogType: 'website',
     ogLocale: 'en_US',
     ogSiteName: 'Olympsis',
     ogUrl: () => `https://olympsis.com/events`,
-    ogTitle: () => 'New Event | Olympsis',
-    ogDescription: () => 'Creating a new event on Olympsis',
+    ogTitle: () => t('events.new.seoTitle'),
+    ogDescription: () => t('events.new.seoDescription'),
 
     twitterSite: '@olympsis',
-    twitterTitle: () => 'New Event | Olympsis',
+    twitterTitle: () => t('events.new.seoTitle'),
     twitterCard: 'summary_large_image',
-    twitterDescription: () => 'Creating a new event on Olympsis'
+    twitterDescription: () => t('events.new.seoDescription')
 });
 </script>
 

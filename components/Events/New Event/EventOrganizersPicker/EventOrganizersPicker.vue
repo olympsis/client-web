@@ -11,9 +11,9 @@
         :pt="{ content: { style: { backgroundColor: 'var(--primary-background-color)', borderRadius: '5px' } } }"
     >
         <div id="organizers-header">
-            <h1> Organizers </h1>
+            <h1> {{ t('events.organizers.title') }} </h1>
             <button @click="op.hide()">
-                Done
+                {{ t('events.organizers.done') }}
             </button>
         </div>
 
@@ -60,15 +60,16 @@ import ScrollPanel from 'primevue/scrollpanel';
 
 
 
+const { t } = useI18n();
 const op = ref();
 const toggle = (event: any) => {
     op.value.toggle(event);
     model.value = [];
-    displayText.value = 'Select at least one Group'
+    displayText.value = t('events.organizers.selectGroup')
 }
 
 const componentKey = ref(0);
-const displayText = ref('Select at least one Group');
+const displayText = ref(t('events.organizers.selectGroup'));
 const model = defineModel<GroupSelection[]>({ default: [] });
 
 const sessionStore = useSessionStore();
@@ -128,9 +129,9 @@ function generateDisplayString() {
         return `${group1?.name ?? 'olympsis-group'} & ${group2?.name ?? 'olympsis-group'}`
     } else if (model.value.length > 2) {
         const group = model.value[0].club ?? model.value[0].organization
-        return `${group?.name ?? 'olympsis-group'} & ${model.value.length - 1} others`
+        return `${group?.name ?? 'olympsis-group'} ${t('events.organizers.andOthers', { count: model.value.length - 1 })}`
     } else {
-        return 'Select at least one Group';
+        return t('events.organizers.selectGroup');
     }
 }
 </script>

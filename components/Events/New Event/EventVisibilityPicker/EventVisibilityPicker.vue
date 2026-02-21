@@ -13,7 +13,7 @@
         :dismissable="true" 
         :pt="{ content: { style: { backgroundColor: 'var(--primary-background-color)', borderRadius: '5px' } } }"
     >
-        <div id="popup-header"> Visibility </div>
+        <div id="popup-header"> {{ t('events.visibility.title') }} </div>
         <div id="popup-body">
             <div class="option">
                 <div class="header">
@@ -22,7 +22,7 @@
                         @click="pickOption(EVENT_VISIBILITY.PUBLIC)"/>
                     <h1>{{ EVENT_VISIBILITY.PUBLIC }}</h1>
                 </div>
-                <p class="body">Any users on Olympsis will be able to see this event and interact with it.</p>
+                <p class="body">{{ t('events.visibility.publicDesc') }}</p>
             </div>
 
             <div class="option">
@@ -33,7 +33,7 @@
                     />
                     <h1>{{ EVENT_VISIBILITY.GROUPS }}</h1>
                 </div>
-                <p class="body">Only members of the associated groups will be able to see and interact with this event. A user may be explicitly invited to RSVP to this event.</p>
+                <p class="body">{{ t('events.visibility.groupsDesc') }}</p>
             </div>
 
             <div class="option">
@@ -44,7 +44,7 @@
                     />
                     <h1>{{ EVENT_VISIBILITY.PRIVATE }}</h1>
                 </div>
-                <p class="body">An Event that is only visible to those who have been invited  to RSVP and to those who have already RSVP’ed. </p>
+                <p class="body">{{ t('events.visibility.privateDesc') }}</p>
             </div>
         </div>
     </Popover>
@@ -56,6 +56,7 @@ import { EVENT_VISIBILITY } from '~/data/Enums';
 
 import Popover from 'primevue/popover';
 
+const { t } = useI18n();
 const op = ref();
 const model = defineModel({ default: EVENT_VISIBILITY.PUBLIC })
 

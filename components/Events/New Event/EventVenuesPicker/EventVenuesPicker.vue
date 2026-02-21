@@ -14,18 +14,18 @@
             <div id="event-venues-popup-container" :key="randomKey">
                 <!-- Popup Header -->
                 <div id="popup-header">
-                    <button id="cancel" @click="dismissModal(closeCallback)"> Cancel </button>
-                    
-                    Venues
+                    <button id="cancel" @click="dismissModal(closeCallback)"> {{ $t('common.cancel') }} </button>
 
-                    <button id="done" @click="dismissModal(closeCallback)"> Done </button>
+                    {{ t('events.venues.title') }}
+
+                    <button id="done" @click="dismissModal(closeCallback)"> {{ t('events.organizers.done') }} </button>
                 </div>
 
                 <!-- Sub Header/Navigation -->
 
                 <div id="sub-header">
                     <div v-if="!isCustomLocation" @click="isCustomLocation = true" :style="{ display: 'flex', alignItems: 'center', fontSize: '0.8rem' }">
-                        Set Custom Location
+                        {{ t('events.venues.customLocation') }}
                         <picture class="centered" :style="{ height: '24px', width: '24px' }">
                             <source srcset="@/assets/icons/chevron/chevron.right.white.svg" media="(prefers-color-scheme: dark)">
                             <img src="@/assets/icons/chevron/chevron.right.svg" class="chevron"/>
@@ -39,22 +39,22 @@
                                 <img src="@/assets/icons/chevron/chevron.left.svg" class="chevron"/>
                             </picture>
 
-                            Back to Venues
+                            {{ t('events.venues.backToVenues') }}
                         </div>
-                        <div v-if="selectedLocation" @click="clearSelectedLocation" :style="{ fontSize: '0.8rem', color: 'var(--tertiary-brand-color)' }"> Clear Selection </div>
+                        <div v-if="selectedLocation" @click="clearSelectedLocation" :style="{ fontSize: '0.8rem', color: 'var(--tertiary-brand-color)' }"> {{ t('events.venues.clearSelection') }} </div>
                     </div>
                 </div>
 
                 <!-- Selected Location -->
                 <div id="selected-location" v-if="selectedLocation && isCustomLocation">
                     <div class="selected-location-details">
-                        <div class="location-title">Selected Location</div>
+                        <div class="location-title">{{ t('events.venues.selectedLocation') }}</div>
                         <div class="location-name-input">
-                            <label for="location-name">Name:</label>
+                            <label for="location-name">{{ t('events.venues.locationName') }}</label>
                             <input 
                                 id="location-name" 
                                 v-model="selectedLocation.name" 
-                                placeholder="Custom Location"
+                                :placeholder="t('events.detail.customLocation')"
                             />
                         </div>
                         <div class="location-coordinates">
@@ -65,7 +65,7 @@
                             {{ selectedLocation.address }}
                         </div>
                         <button class="use-location-btn" @click="useSelectedLocation">
-                            Use This Location
+                            {{ t('events.venues.useThisLocation') }}
                         </button>
                     </div>
                 </div>
@@ -92,7 +92,7 @@
                                     <source srcset="@/assets/icons/add/add.white.svg" media="(prefers-color-scheme: dark)"/>
                                     <img src="@/assets/icons/add/add.svg"/>
                                 </picture>
-                                Add a Venue
+                                {{ t('events.venues.addVenue') }}
                             </div>
                         </div>
 
@@ -119,7 +119,7 @@
                         <!-- Map View -->
                         <div class="map-instructions" v-if="!selectedLocation">
                             <img class="icon" :style="{ marginRight: '0.25rem' }" src="@/assets/icons/pin-drop/pin-drop.gray.svg">
-                            Tap on the map to select a location
+                            {{ t('events.venues.tapToSelect') }}
                         </div>
                         <div ref="mapContainer" id="map" :key="'map-' + isCustomLocation"></div>
                     </div>
@@ -152,6 +152,7 @@ declare global {
 let map: any = null;
 let locationMarker: any = null;
 
+const { t } = useI18n();
 const sessionStore = useSessionStore();
 const modelStore = useModelStore();
 const model = defineModel<VenueDescriptor[]>({ default: [] });
@@ -172,7 +173,7 @@ const selectedLocation = ref<{
 } | undefined>(undefined);
 
 const pickerText: ComputedRef<string> = computed(() => {
-    return model.value.length > 0 ? `Change Venue(s)(${model.value.length})` : 'Pick Venue(s)'
+    return model.value.length > 0 ? t('events.venues.changeVenues', { count: model.value.length }) : t('events.venues.pickVenues')
 });
 
 const venues: ComputedRef<VenueDescriptor[]> = computed(() => {
@@ -195,7 +196,7 @@ const venues: ComputedRef<VenueDescriptor[]> = computed(() => {
 });
 const venuesResult: Ref<VenueDescriptor[]> = ref([]);
 const venuesCount: ComputedRef<string> = computed(() => {
-    return `${venues.value.length} venue(s) near you`;
+    return t('events.venues.nearYou', { count: venues.value.length });
 });
 
 let debounceTimeout: number | null = null;
@@ -356,7 +357,7 @@ function handleMapClick(event: any) {
     selectedLocation.value = {
         latitude: coordinate.latitude,
         longitude: coordinate.longitude,
-        name: "Custom Location" 
+        name: t('events.detail.customLocation')
     };
     
     // Add or update marker

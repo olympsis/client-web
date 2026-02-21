@@ -12,7 +12,7 @@
         :dismissable="true" 
         :pt="{ content: { style: { backgroundColor: 'var(--primary-background-color)', borderRadius: '5px' } } }"
     >
-        <div id="popup-header"> Type </div>
+        <div id="popup-header"> {{ t('events.type.title') }} </div>
         <div id="popup-body">
             <div class="option">
                 <div class="header">
@@ -21,7 +21,7 @@
                         @click="pickOption(EVENT_TYPE.REGULAR)"/>
                     <h1>{{ EVENT_TYPE.REGULAR }}</h1>
                 </div>
-                <p class="body">An informal event, where people can attend without prior registration. Pick ups, meets etc... </p>
+                <p class="body">{{ t('events.type.regularDesc') }}</p>
             </div>
             <div class="option">
                 <div class="header">
@@ -31,7 +31,7 @@
                     />
                     <h1>{{ EVENT_TYPE.COMPETITIVE }}</h1>
                 </div>
-                <p class="body">A structured event where individuals or teams compete to determine a winner or to gain a prize. Tournaments, brackets etc...</p>
+                <p class="body">{{ t('events.type.competitiveDesc') }}</p>
             </div>
         </div>
     </Popover>
@@ -43,6 +43,7 @@ import { ref } from 'vue';
 import Popover from 'primevue/popover';
 import { EVENT_TYPE } from '~/data/Enums';
 
+const { t } = useI18n();
 const op = ref();
 const model = defineModel({ default: EVENT_TYPE.REGULAR })
 

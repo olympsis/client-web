@@ -40,7 +40,7 @@
                 <img src="@/assets/icons/calendar/calendar.month.svg">
             </picture>
 
-            <div>Add to Calendar</div>
+            <div>{{ t('events.detail.addToCalendar') }}</div>
         </div>
     </div>
 </template>
@@ -51,6 +51,7 @@ import { generateCalendarFile } from '#imports';
 import { Event } from '~/data/models/EventModels';
 import { Venue } from '~/data/models/VenueModels';
 
+const { t } = useI18n();
 const session = useSessionStore();
 
 /**
@@ -78,20 +79,20 @@ const isAdmin = computed<boolean>(() => {
 const venueName = computed<string>(() => {
     const firstVenue = props.event.venues.at(0);
     if (firstVenue && !firstVenue.id) {
-        return firstVenue.name ?? "Custom Location";
+        return firstVenue.name ?? t('events.detail.customLocation');
     } else {
-        return props.venues.at(0)?.name ?? "Custom Location";
+        return props.venues.at(0)?.name ?? t('events.detail.customLocation');
     }
 });
 
 const venueLocation = computed<string>(() => {
     const firstVenue = props.event.venues.at(0);
     if (firstVenue && !firstVenue.id) {
-        if (!firstVenue.city && !firstVenue.state) return 'Custom Coordinates';
+        if (!firstVenue.city && !firstVenue.state) return t('events.detail.customCoordinates');
         return `${firstVenue.city}, ${firstVenue.state}`;
     } else {
         const firstVenue = props.venues.at(0);
-        if (!firstVenue) return 'Unknown Location';
+        if (!firstVenue) return t('events.detail.unknownLocation');
         return `${firstVenue.city}, ${firstVenue.state}`;
     }
 });

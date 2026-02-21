@@ -3,8 +3,8 @@
         <!-- Poster option -->
         <div id="hide-poster" class="section" :style="{ display: 'flex', flexDirection: 'row'}">
             <div id="left">
-                <h4>Hide Poster</h4>
-                <div class="sub-header">Only show the event's organizers</div>
+                <h4>{{ t('events.advanced.hidePoster') }}</h4>
+                <div class="sub-header">{{ t('events.advanced.hidePosterSub') }}</div>
             </div>
             <ToggleSwitch v-model="hidePoster" :style="{ 'margin-left': '1rem', 'margin-top': '0.5rem' }"/>
         </div>
@@ -12,7 +12,7 @@
         <!-- Participant options -->
         <div id="participants" class="section">
             <h3 class="header">
-                Participants
+                {{ t('events.advanced.participants') }}
                 <div :style="{ marginRight: '1rem', cursor: 'pointer' }" @click="showParticipantOptions = !showParticipantOptions">
                     <picture class="centered">
                         <source srcset="@/assets/icons/chevron/chevron.left.white.svg" media="(prefers-color-scheme: dark)">
@@ -22,12 +22,12 @@
             </h3>
 
             <div class="sub-header" v-if="!showParticipantOptions">
-                Set event capacity & more
+                {{ t('events.advanced.participantsSub') }}
             </div>
 
             <div class="sub-section" v-if="showParticipantOptions">
-                <div class="sub-section-header">Min Participants</div>
-                <div class="sub-section-sub-header">Least amount of participants needed for event.</div>
+                <div class="sub-section-header">{{ t('events.advanced.minParticipants') }}</div>
+                <div class="sub-section-sub-header">{{ t('events.advanced.minParticipantsSub') }}</div>
 
                 <div id="input" class="participants-slider">
                     <input type="number" v-model="min"/>
@@ -35,8 +35,8 @@
             </div>
 
             <div class="sub-section" v-if="showParticipantOptions">
-                <div class="sub-section-header">Max Participants</div>
-                <div class="sub-section-sub-header">Set the event's capacity.</div>
+                <div class="sub-section-header">{{ t('events.advanced.maxParticipants') }}</div>
+                <div class="sub-section-sub-header">{{ t('events.advanced.maxParticipantsSub') }}</div>
 
                 <div id="input" class="participants-slider">
                     <input type="number" v-model="max"/>
@@ -45,10 +45,10 @@
 
             <div class="sub-section" v-if="showParticipantOptions">
                 <div class="sub-section-header">
-                    Add a Waitlist
+                    {{ t('events.advanced.waitlist') }}
                 </div>
                 <div class="sub-section-sub-header">
-                    Allow extra participants to join if spots open up.
+                    {{ t('events.advanced.waitlistSub') }}
                 </div>
 
                 <div id="input" :style="{ marginTop: '0.5rem', marginLeft: 'auto' }">
@@ -60,7 +60,7 @@
         <!-- Formatting options-->
         <div id="event-format" class="section">
             <h3 class="header">
-                Event Format
+                {{ t('events.advanced.eventFormat') }}
                 <div :style="{ marginRight: '1rem', cursor: 'pointer' }" @click="showEventFormatOptions = !showEventFormatOptions">
                     <picture class="centered">
                         <source srcset="@/assets/icons/chevron/chevron.left.white.svg" media="(prefers-color-scheme: dark)">
@@ -70,14 +70,14 @@
             </h3>
 
             <div class="sub-header" v-if="!showEventFormatOptions">
-                Set event competition types
+                {{ t('events.advanced.eventFormatSub') }}
             </div>
 
             <div class="sub-section" v-if="showEventFormatOptions">
                 <div class="competition">
                     <div class="text">
-                        <div class="sub-section-header">Is a Tournament?</div>
-                        <div class="sub-section-sub-header">Toggle competition mode-casual or tournament?</div>
+                        <div class="sub-section-header">{{ t('events.advanced.isTournament') }}</div>
+                        <div class="sub-section-sub-header">{{ t('events.advanced.isTournamentSub') }}</div>
                     </div>
                     <ToggleSwitch v-model="isCompetition"/>
                 </div>
@@ -94,7 +94,7 @@
         <!-- Recurrence options -->
         <div id="recurrence" class="section">
             <h3 class="header">
-                Recurring event
+                {{ t('events.advanced.recurring') }}
                 <div :style="{ marginRight: '1rem', cursor: 'pointer' }" @click="showRecurrenceOptions = !showRecurrenceOptions">
                     <picture class="centered">
                         <source srcset="@/assets/icons/chevron/chevron.left.white.svg" media="(prefers-color-scheme: dark)">
@@ -104,19 +104,19 @@
             </h3>
 
             <div class="sub-header" v-if="!showRecurrenceOptions">
-                Set this event to repeat
+                {{ t('events.advanced.recurringSub') }}
             </div>
 
             <div class="sub-section" v-if="showRecurrenceOptions">
                 <div class="sub-section-header">
-                    Recurrence Frequency
+                    {{ t('events.advanced.frequency') }}
                 </div>
                 <div class="sub-section-sub-header">
-                    How often do you want this event to happen?
+                    {{ t('events.advanced.frequencySub') }}
                 </div>
 
                 <div :style="{ display: 'flex', fontSize: '0.8rem', alignItems: 'center', marginLeft: '1rem', fontWeight: 'bold', lineHeight: '0.5rem', marginTop: '1rem' }">
-                    Every
+                    {{ t('events.advanced.every') }}
                     <input type="number" :style="{ width: '4rem', marginLeft: '0.5rem', marginTop: 'unset' }" class="input" v-model="recurrenceInterval"/>
                 </div>
 
@@ -138,10 +138,10 @@
 
             <div class="sub-section" v-if="showRecurrenceOptions">
                 <div class="sub-section-header">
-                    End Date
+                    {{ t('events.advanced.endDate') }}
                 </div>
                 <div class="sub-section-sub-header">
-                    When do you want this recurrence to stop?
+                    {{ t('events.advanced.endDateSub') }}
                 </div>
 
                 <DatePicker 
@@ -180,7 +180,7 @@
         <!-- External link -->
         <div id="externalLink" class="section">
             <h3 class="header">
-                External Link
+                {{ t('events.advanced.externalLink') }}
                 <div :style="{ marginRight: '1rem', cursor: 'pointer' }" @click="showExternalLinkOption = !showExternalLinkOption">
                     <picture class="centered">
                         <source srcset="@/assets/icons/chevron/chevron.left.white.svg" media="(prefers-color-scheme: dark)">
@@ -188,7 +188,7 @@
                     </picture>
                 </div>
             </h3>
-            <div class="sub-header">Redirect participants to URL after RSVP'ing</div>
+            <div class="sub-header">{{ t('events.advanced.externalLinkSub') }}</div>
 
             <input class="input" v-model="manager.externalLink" v-if="showExternalLinkOption"/>
         </div>
@@ -202,6 +202,7 @@ import CompetitionFormats from '../CompetitionFormats/CompetitionFormats.vue';
 import { COMPETITION_FORMAT, EVENT_RECURRENCE_FREQUENCY } from '~/data/Enums';
 import { RecurrenceOptions, ParticipantsConfig, EventConfig, EventFormatConfig } from '~/data/models/EventModels';
 
+const { t } = useI18n();
 const manager = useNewEventManager();
 
 const showRecurrenceOptions = ref<boolean>(false);

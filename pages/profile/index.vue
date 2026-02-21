@@ -33,17 +33,17 @@
                         } 
                     } 
                     }">
-                    <Tab value="0" class="font">Achievements</Tab>
-                    <Tab value="1" class="font">Groups Enrolled</Tab>
+                    <!-- <Tab value="0" class="font">Achievements</Tab>
+                    <Tab value="1" class="font">Groups Enrolled</Tab> -->
                     <Tab value="2" class="font">Events Attended</Tab>
                 </TabList>
                 <TabPanels>
-                    <TabPanel value="0">
+                    <!-- <TabPanel value="0">
                         <AwardsTab />
                     </TabPanel>
                     <TabPanel value="1">
                         <GroupsTab :clubs="userClubs" :organizations="[]"/>
-                    </TabPanel>
+                    </TabPanel> -->
                     <TabPanel value="2">
                         <EventsTab :events="session.pastEvents"/>
                     </TabPanel>

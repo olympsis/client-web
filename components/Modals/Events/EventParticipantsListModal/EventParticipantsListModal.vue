@@ -112,7 +112,7 @@ async function handleKickParticipant(event: { participant: Participant }) {
     min-width: 20rem;
     border-radius: 20px;
     max-width: var(--dialog-max-width);
-    background-color: var(--primary-background-color);
+    background-color: var(--secondary-background-color);
 
     #header {
         width: 100%;

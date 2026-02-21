@@ -121,7 +121,7 @@ async function deleteEvent(deleteAll?: boolean) {
 #event-detail-settings-modal {
     min-width: 20rem;
     max-width: var(--dialog-max-width);
-    background-color: var(--primary-background-color);
+    background-color: var(--secondary-background-color);
     
     #header {
         display: flex;

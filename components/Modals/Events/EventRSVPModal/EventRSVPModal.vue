@@ -67,9 +67,9 @@ const hideRSVP = ref(false);
         .button {
             width: 1.5rem;
             height: 1.5rem;
-            border: unset;
             cursor: pointer;
             border-radius: 10px;
+            border: var(--component-border) solid 1px;
             background-color: var(--tertiary-background-color);
 
             &:hover {

@@ -16,6 +16,7 @@ const model = defineModel('value',{ required: true });
 #search-bar {
     width: 100%;
     display: flex;
+    min-width: 0; /* Allow shrinking inside flex containers */
     border-radius: 10px;
     align-items: center;
     padding: 0.25rem 0rem;
@@ -33,6 +34,7 @@ const model = defineModel('value',{ required: true });
     picture {
         width: 2rem;
         height: 2rem;
+        flex-shrink: 0; /* Keep icon from collapsing */
         margin: 0rem 1rem;
 
         img {
@@ -42,6 +44,7 @@ const model = defineModel('value',{ required: true });
 
     input {
         width: 100%;
+        min-width: 0; /* Override intrinsic input size so it can shrink */
         height: 1.5rem;
         border: unset;
         font-size: 1.1rem;

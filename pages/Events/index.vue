@@ -290,7 +290,7 @@ definePageMeta({
     overflow-y: scroll;
     padding: 0rem 2rem;
     justify-items: center;
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     grid-template-rows: 4rem 2.5rem auto auto auto;
     grid-template-areas:
     "header"
@@ -309,7 +309,8 @@ definePageMeta({
         max-width: var(--desktop-max-width);
 
         #body {
-            width: 100%;
+            flex: 1;
+            min-width: 0; /* Allow shrinking below content width */
             max-width: 35rem;
             margin-right: 1rem;
         }

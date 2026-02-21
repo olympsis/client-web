@@ -31,7 +31,7 @@ defineProps({
     border-radius: 0.65rem;
     padding: 0.35rem 1.15rem;
     transition: opacity 0.2s ease;
-    border: 1.25px solid var(--olympsis-gray);
+    border: 1.75px solid var(--olympsis-gray);
 
     &:hover {
         opacity: 0.8;
@@ -53,7 +53,14 @@ defineProps({
     .label {
         font-size: 1rem;
         font-weight: 400;
-        color: var(--primary-brand-color);
+        color: var(--primary-label-color);
+    }
+}
+
+/* In dark mode, light variant switches to the brand background */
+@media (prefers-color-scheme: dark) {
+    .light {
+        background-color: var(--primary-brand-color);
     }
 }
 
@@ -64,7 +71,7 @@ defineProps({
     .label {
         font-size: 1rem;
         font-weight: 400;
-        color: white;
+        color: var(--primary-label-color);
     }
 }
 </style>

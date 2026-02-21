@@ -217,7 +217,8 @@ onMounted(() => {
         justify-content: space-between;
 
         #body {
-            width: 100%;
+            flex: 1;
+            min-width: 0; /* Allow shrinking below content width */
             max-width: 35rem;
             margin-right: 1rem;
         }

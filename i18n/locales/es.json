@@ -134,8 +134,11 @@
       "every": "Cada",
       "endDate": "Fecha de Fin",
       "endDateSub": "¿Cuándo quieres que se detenga esta recurrencia?",
-      "externalLink": "Enlace Externo",
-      "externalLinkSub": "Redirigir participantes a URL después de confirmar asistencia"
+      "externalLinks": "Enlaces Externos",
+      "externalLinksSub": "Agregar enlaces para páginas de registro, sitios web de eventos, etc.",
+      "linkTitle": "Título",
+      "linkURL": "URL",
+      "addLink": "Agregar Enlace"
     },
     "organizers": {
       "title": "Organizadores",

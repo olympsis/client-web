@@ -177,20 +177,43 @@
             </div>
         </div>
 
-        <!-- External link -->
-        <div id="externalLink" class="section">
+        <!-- External links -->
+        <div id="externalLinks" class="section">
             <h3 class="header">
-                {{ t('events.advanced.externalLink') }}
-                <div :style="{ marginRight: '1rem', cursor: 'pointer' }" @click="showExternalLinkOption = !showExternalLinkOption">
+                {{ t('events.advanced.externalLinks') }}
+                <div :style="{ marginRight: '1rem', cursor: 'pointer' }" @click="showExternalLinksOption = !showExternalLinksOption">
                     <picture class="centered">
                         <source srcset="@/assets/icons/chevron/chevron.left.white.svg" media="(prefers-color-scheme: dark)">
-                        <img src="@/assets/icons/chevron/chevron.left.svg" class="chevron" :class="{ open: showExternalLinkOption == true }"/>
+                        <img src="@/assets/icons/chevron/chevron.left.svg" class="chevron" :class="{ open: showExternalLinksOption == true }"/>
                     </picture>
                 </div>
             </h3>
-            <div class="sub-header">{{ t('events.advanced.externalLinkSub') }}</div>
 
-            <input class="input" v-model="externalLinkURL" v-if="showExternalLinkOption"/>
+            <div class="sub-header" v-if="!showExternalLinksOption">
+                {{ t('events.advanced.externalLinksSub') }}
+            </div>
+
+            <div v-if="showExternalLinksOption" class="external-links-list">
+                <!-- Link cards -->
+                <div v-for="(draft, index) in linkDrafts" :key="index" class="link-card">
+                    <div class="link-card-header">
+                        <span class="link-card-label">{{ index + 1 }}</span>
+                        <button class="button" @click="removeLink(index)">
+                            <picture class="centered">
+                                <source srcset="@/assets/icons/xmark/xmark.white.svg" media="(prefers-color-scheme: dark)">
+                                <img src="@/assets/icons/xmark/xmark.svg">
+                            </picture>
+                        </button>
+                    </div>
+                    <input class="input title-input" v-model="draft.title" :placeholder="t('events.advanced.linkTitle')"/>
+                    <input class="input" v-model="draft.url" :placeholder="t('events.advanced.linkURL')"/>
+                </div>
+
+                <!-- Add link button -->
+                <button v-if="linkDrafts.length < MAX_EXTERNAL_LINKS" class="add-link-btn" @click="addLink">
+                    + {{ t('events.advanced.addLink') }}
+                </button>
+            </div>
         </div>
     </div>
 </template>
@@ -207,7 +230,7 @@ const manager = useNewEventManager();
 
 const showRecurrenceOptions = ref<boolean>(false);
 const showParticipantOptions = ref<boolean>(false);
-const showExternalLinkOption = ref<boolean>(false);
+const showExternalLinksOption = ref<boolean>(false);
 const showEventFormatOptions = ref<boolean>(false);
 
 const min = ref<number>(0);
@@ -221,16 +244,27 @@ const frequency = ref<EVENT_RECURRENCE_FREQUENCY>(EVENT_RECURRENCE_FREQUENCY.WEE
 const isCompetition = ref<boolean>(false);
 const selectedFormats = ref<COMPETITION_FORMAT[]>([]);
 
-/** Local ref for the external link URL input — synced to manager.externalLinks array */
-const externalLinkURL = ref<string>(manager.externalLinks.at(0)?.url ?? '');
+/** Maximum number of external links allowed per event */
+const MAX_EXTERNAL_LINKS = 3;
 
-watch(externalLinkURL, (val) => {
-    if (val && val !== '') {
-        manager.externalLinks = [new EventLink('External Link', val)];
-    } else {
-        manager.externalLinks = [];
-    }
-}, { immediate: false });
+/** Local drafts for external links — each entry has a title and url */
+const linkDrafts = reactive<{ title: string, url: string }[]>([]);
+
+function addLink() {
+    if (linkDrafts.length >= MAX_EXTERNAL_LINKS) return;
+    linkDrafts.push({ title: '', url: '' });
+}
+
+function removeLink(index: number) {
+    linkDrafts.splice(index, 1);
+}
+
+/** Sync linkDrafts to the manager store, filtering out entries with no URL */
+watch(linkDrafts, (drafts) => {
+    manager.externalLinks = drafts
+        .filter((d) => d.url.trim() !== '')
+        .map((d) => new EventLink(d.title.trim() || 'External Link', d.url.trim()));
+}, { deep: true });
 
 watch(hidePoster, () => {
     if (manager.config == undefined) {
@@ -320,8 +354,10 @@ onMounted(() => {
 
     // Restore external links
     if (manager.externalLinks.length > 0) {
-        externalLinkURL.value = manager.externalLinks.at(0)?.url ?? '';
-        showExternalLinkOption.value = true;
+        manager.externalLinks.forEach((link) => {
+            linkDrafts.push({ title: link.title ?? '', url: link.url ?? '' });
+        });
+        showExternalLinksOption.value = true;
     }
 
     // Restore format options
@@ -451,5 +487,68 @@ onUnmounted(() => {
 
 .competition {
     display: flex;
+}
+
+.external-links-list {
+    margin-top: 0.5rem;
+}
+
+.link-card {
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    border-radius: 10px;
+    border: 1px solid var(--component-border);
+    background-color: var(--secondary-background-color);
+
+    .link-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 0.25rem;
+
+        .link-card-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--primary-label-color);
+        }
+
+        .button {
+            width: 1.25rem;
+            height: 1.25rem;
+            cursor: pointer;
+            border-radius: 50%;
+            border: 1px solid var(--component-border);
+            background-color: var(--tertiary-background-color);
+
+            &:hover {
+                transform: scale(1.1);
+            }
+        }
+    }
+
+    .input {
+        margin-top: 0.25rem;
+        font-size: 0.85rem;
+    }
+
+    .title-input {
+        font-weight: 600;
+    }
+}
+
+.add-link-btn {
+    width: 100%;
+    border: unset;
+    cursor: pointer;
+    padding: 0.5rem;
+    margin-top: 0.25rem;
+    font-size: 0.85rem;
+    border-radius: 10px;
+    color: var(--primary-label-color);
+    background-color: var(--secondary-background-color);
+
+    &:hover {
+        opacity: 0.8;
+    }
 }
 </style>

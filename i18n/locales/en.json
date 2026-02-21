@@ -134,8 +134,11 @@
       "every": "Every",
       "endDate": "End Date",
       "endDateSub": "When do you want this recurrence to stop?",
-      "externalLink": "External Link",
-      "externalLinkSub": "Redirect participants to URL after RSVP'ing"
+      "externalLinks": "External Links",
+      "externalLinksSub": "Add links for registration pages, event websites, etc.",
+      "linkTitle": "Title",
+      "linkURL": "URL",
+      "addLink": "Add Link"
     },
     "organizers": {
       "title": "Organizers",

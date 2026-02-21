@@ -234,7 +234,7 @@ const gridTemplateAreasMobile = computed<string>(() => {
 
 function showAuthModal() {
     if (authModal.value) {
-        authModal.value.show()
+        authModal.value.showModal()
     } else {
         console.error('Failed to find reference to Auth Modal');
     }
@@ -254,7 +254,7 @@ function showRSVPModal() {
         return;
     }
     if (rsvpModal.value) {
-        rsvpModal.value.show();
+        rsvpModal.value.showModal();
     } else {
         console.error('Failed to find reference to RSVP Modal');
     }
@@ -325,7 +325,7 @@ function handleOpenParticipantsModal() {
         return;
     }
     if (participantsModal.value) {
-        participantsModal.value.show();
+        participantsModal.value.showModal();
     }
 }
 
@@ -341,7 +341,7 @@ function handleOpenSettingsModal() {
         return;
     }
     if (settingsModal.value) {
-        settingsModal.value.show();
+        settingsModal.value.showModal();
     }
 }
 
@@ -746,10 +746,12 @@ watch(data, (newData) => {
 }
 
 #settings-modal {
-    top: 0;
     border: unset;
     background: transparent;
-    backdrop-filter: blur(5px);
+
+    &::backdrop {
+        backdrop-filter: blur(5px);
+    }
 
     #event-detail-settings-modal {
         border-radius: 20px;
@@ -759,10 +761,12 @@ watch(data, (newData) => {
 }
 
 #participants-modal {
-    top: 0;
     border: unset;
     background: transparent;
-    backdrop-filter: blur(5px);
+
+    &::backdrop {
+        backdrop-filter: blur(5px);
+    }
 
     #participants-modal {
         border-radius: 20px;
@@ -772,10 +776,12 @@ watch(data, (newData) => {
 }
 
 #rsvp-modal {
-    top: 0;
     border: unset;
     background: transparent;
-    backdrop-filter: blur(5px);
+
+    &::backdrop {
+        backdrop-filter: blur(5px);
+    }
 
     #event-rsvp-modal {
         border-radius: 20px;
@@ -786,10 +792,12 @@ watch(data, (newData) => {
 }
 
 #auth-modal {
-    top: 0;
     border: unset;
     background: transparent;
-    backdrop-filter: blur(5px);
+
+    &::backdrop {
+        backdrop-filter: blur(5px);
+    }
 
     .auth-card {
         border-radius: 20px;

@@ -194,7 +194,6 @@
                 <EventAdvancedSettings
                     v-model:event-config="manager.config"
                     v-model:teams-config="manager.teamsConfig"
-                    v-model:external-link="manager.externalLink"
                     v-model:participants-config="manager.participantsConfig"
                     v-model:recurrence-options="manager.recurrenceOptions"
                 />

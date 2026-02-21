@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { defineStore } from "pinia";
 import * as Sentry from '@sentry/nuxt';
 import { EVENT_TYPE, EVENT_VISIBILITY, MEDIA_TYPE, NEW_EVENT_ERROR } from "~/data/Enums";
-import { EventDao, NewEventDao, TeamsConfig, type EventConfig, type EventFormatConfig, type ParticipantsConfig, type RecurrenceOptions } from "~/data/models/EventModels";
+import { EventDao, EventLink, NewEventDao, TeamsConfig, type EventConfig, type EventFormatConfig, type ParticipantsConfig, type RecurrenceOptions } from "~/data/models/EventModels";
 import { GroupSelection, Sport, Tag, VenueDescriptor } from "~/data/models/GenericModels";
 import { UploadService } from '~/data/services/UploadService';
 import { EventService } from '~/data/services/EventService';
@@ -18,7 +18,7 @@ export const useNewEventManager = defineStore('new-event-manager', () => {
     const description = ref<string>('');
 
     const tags = ref<Tag[]>([]);
-    const externalLink = ref<string>('');
+    const externalLinks = ref<EventLink[]>([]);
 
     const groups = ref<GroupSelection[]>([]);
     const venues = ref<VenueDescriptor[]>([]);
@@ -90,7 +90,7 @@ export const useNewEventManager = defineStore('new-event-manager', () => {
                 participantsConfig.value,
                 teamsConfig.value,
                 visibility.value,
-                externalLink.value
+                externalLinks.value
             );
         }
 
@@ -177,7 +177,7 @@ export const useNewEventManager = defineStore('new-event-manager', () => {
         description,
 
         tags,
-        externalLink,
+        externalLinks,
         
         groups,
         venues,

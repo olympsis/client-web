@@ -29,9 +29,10 @@ function generateCalendarFile(event: Event, venues: Venue[]): string {
     // Create description including event details
     let description = escapeText(event.body || '');
 
-    // Add external link if available
-    if (event.externalLink) {
-        description += `\\n\\nMore info: ${event.externalLink}`;
+    // Add external links if available
+    if (event.externalLinks && event.externalLinks.length > 0) {
+        const linksList = event.externalLinks.map(l => `${l.title}: ${l.url}`).join('\\n');
+        description += `\\n\\nMore info:\\n${linksList}`;
     }
 
     // Build the iCalendar content
@@ -57,9 +58,9 @@ function generateCalendarFile(event: Event, venues: Venue[]): string {
         icsContent.push(`LOCATION:${escapeText(location)}`);
     }
 
-    // Add URL if available
-    if (event.externalLink) {
-        icsContent.push(`URL:${event.externalLink}`);
+    // Add first external link URL if available
+    if (event.externalLinks && event.externalLinks.length > 0) {
+        icsContent.push(`URL:${event.externalLinks[0].url}`);
     }
 
     // Add first venue location

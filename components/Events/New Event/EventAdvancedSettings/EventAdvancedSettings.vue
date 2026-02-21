@@ -190,7 +190,7 @@
             </h3>
             <div class="sub-header">{{ t('events.advanced.externalLinkSub') }}</div>
 
-            <input class="input" v-model="manager.externalLink" v-if="showExternalLinkOption"/>
+            <input class="input" v-model="externalLinkURL" v-if="showExternalLinkOption"/>
         </div>
     </div>
 </template>
@@ -200,7 +200,7 @@ import DatePicker from 'primevue/datepicker';
 import ToggleSwitch from 'primevue/toggleswitch';
 import CompetitionFormats from '../CompetitionFormats/CompetitionFormats.vue';
 import { COMPETITION_FORMAT, EVENT_RECURRENCE_FREQUENCY } from '~/data/Enums';
-import { RecurrenceOptions, ParticipantsConfig, EventConfig, EventFormatConfig } from '~/data/models/EventModels';
+import { RecurrenceOptions, ParticipantsConfig, EventConfig, EventFormatConfig, EventLink } from '~/data/models/EventModels';
 
 const { t } = useI18n();
 const manager = useNewEventManager();
@@ -220,6 +220,17 @@ const frequency = ref<EVENT_RECURRENCE_FREQUENCY>(EVENT_RECURRENCE_FREQUENCY.WEE
 
 const isCompetition = ref<boolean>(false);
 const selectedFormats = ref<COMPETITION_FORMAT[]>([]);
+
+/** Local ref for the external link URL input — synced to manager.externalLinks array */
+const externalLinkURL = ref<string>(manager.externalLinks.at(0)?.url ?? '');
+
+watch(externalLinkURL, (val) => {
+    if (val && val !== '') {
+        manager.externalLinks = [new EventLink('External Link', val)];
+    } else {
+        manager.externalLinks = [];
+    }
+}, { immediate: false });
 
 watch(hidePoster, () => {
     if (manager.config == undefined) {
@@ -307,8 +318,9 @@ onMounted(() => {
         showRecurrenceOptions.value = true
     }
 
-    // Restore external link
-    if (manager.externalLink != '') {
+    // Restore external links
+    if (manager.externalLinks.length > 0) {
+        externalLinkURL.value = manager.externalLinks.at(0)?.url ?? '';
         showExternalLinkOption.value = true;
     }
 

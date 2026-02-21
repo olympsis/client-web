@@ -191,6 +191,7 @@ async function handleRemoveReaction(payload: { commentId: string; reactionId: st
 
 <style scoped>
 #event-comments {
+    grid-area: comments;
     #text-field {
         width: 100%;
         display: flex;

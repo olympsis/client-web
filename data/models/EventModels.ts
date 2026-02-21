@@ -71,8 +71,8 @@ class Event extends Codable<Event> {
 
     /** PUBLIC, PRIVATE, or GROUP — controls who can discover this event */
     visibility: EVENT_VISIBILITY;
-    /** Optional link to an external registration page or event site */
-    externalLink?: string;
+    /** External links attached to this event (e.g. registration pages, event sites) */
+    externalLinks: EventLink[];
     /** Whether this event contains sensitive/mature content */
     isSensitive: boolean;
 
@@ -110,7 +110,7 @@ class Event extends Codable<Event> {
         comments?: EventComment[],
         config?: EventConfig,
         formatConfig?: EventFormatConfig,
-        externalLink?: string,
+        externalLinks?: EventLink[],
         cancelledAt?: Date,
         recurrenceConfig?: EventRecurrenceConfig
     ){
@@ -121,18 +121,18 @@ class Event extends Codable<Event> {
         this.venues = venues;
         this.mediaURL = mediaURL;
         this.mediaType = mediaType;
-        
+
         this.title = title;
         this.body = body;
         this.sports = sports;
         this.tags = tags;
-        
+
         this.config = config;
         this.formatConfig = formatConfig;
-        
+
         this.startTime = startTime;
         this.stopTime = stopTime;
-        
+
         this.participants = participants;
         this.participantsWaitlist = participantsWaitlist;
         this.participantsConfig = participantsConfig;
@@ -144,7 +144,7 @@ class Event extends Codable<Event> {
         this.comments = comments ?? [];
 
         this.visibility = visibility;
-        this.externalLink = externalLink;
+        this.externalLinks = externalLinks ?? [];
         this.isSensitive = isSensitive;
 
         this.createdAt = createdAt;
@@ -193,7 +193,7 @@ class Event extends Codable<Event> {
             object['comments'] = data['comments'] ? data['comments'].map((c: any) => EventComment.decode(c)) : [];
 
             object['visibility'] = numberToEventVisibility(data['visibility']);
-            object['externalLink'] = data['external_link'];
+            object['externalLinks'] = data['external_links'] ? data['external_links'].map((l: any) => EventLink.decode(l)) : [];
             object['isSensitive'] = data['is_sensitive'] || false;
             
             // Time variables
@@ -296,12 +296,12 @@ class Event extends Codable<Event> {
         if (this.visibility) {
             data['visibility'] = eventVisibilityToNumber(this.visibility);
         }
-        if (this.externalLink) {
-            data['external_link'] = this.externalLink;
+        if (this.externalLinks && this.externalLinks.length > 0) {
+            data['external_links'] = this.externalLinks.map((l) => l.encode());
         }
-        
+
         data['is_sensitive'] = this.isSensitive;
-        
+
         if (this.createdAt) {
             data['created_at'] = this.createdAt;
         }
@@ -311,7 +311,7 @@ class Event extends Codable<Event> {
         if (this.cancelledAt) {
             data['cancelled_at'] = this.cancelledAt;
         }
-        
+
         if (this.recurrenceConfig) {
             data['recurrence_config'] = this.recurrenceConfig.encode();
         }
@@ -394,7 +394,7 @@ class EventDao extends Codable<EventDao> {
     teamsConfig?: TeamsConfig;
 
     visibility?: EVENT_VISIBILITY;
-    externalLink?: string;
+    externalLinks?: EventLink[];
     isSensitive?: boolean;
 
     createdAt?: Date;
@@ -420,15 +420,15 @@ class EventDao extends Codable<EventDao> {
         participantsConfig?: ParticipantsConfig,
         teamsConfig?: TeamsConfig,
         visibility?: EVENT_VISIBILITY,
-        externalLink?: string,
+        externalLinks?: EventLink[],
         isSensitive?: boolean,
         cancelledAt?: Date,
         recurrenceConfig?: EventRecurrenceConfig
     ) {
         super();
-        
+
         this.posterId = posterId;
-        
+
         if (organizers) {
             this.organizers = organizers?.map((o) => {
                 return new Organizer(
@@ -437,7 +437,7 @@ class EventDao extends Codable<EventDao> {
                 );
             });
         }
-        
+
         this.venues = venues;
         this.mediaURL = mediaURL;
         this.mediaType = mediaType;
@@ -447,23 +447,23 @@ class EventDao extends Codable<EventDao> {
         this.tags = tags;
         this.config = config;
         this.formatConfig = formatConfig;
-        
+
         if (startTime) {
             this.startTime = startTime
         }
-        
+
         if (stopTime) {
             this.stopTime = stopTime
         }
-        
+
         this.participantsConfig = participantsConfig;
         this.teamsConfig = teamsConfig;
         this.visibility = visibility;
-        this.externalLink = externalLink;
+        this.externalLinks = externalLinks;
         this.isSensitive = isSensitive;
-        
+
         this.cancelledAt = cancelledAt;
-        
+
         this.recurrenceConfig = recurrenceConfig;
     }
 
@@ -525,8 +525,8 @@ class EventDao extends Codable<EventDao> {
         if (this.visibility !== undefined) {
             data['visibility'] = eventVisibilityToNumber(this.visibility);
         }
-        if (this.externalLink) {
-            data['external_link'] = this.externalLink;
+        if (this.externalLinks && this.externalLinks.length > 0) {
+            data['external_links'] = this.externalLinks.map((l) => l.encode());
         }
         if (this.isSensitive !== undefined) {
             data['is_sensitive'] = this.isSensitive;
@@ -1375,23 +1375,58 @@ class EventCommentDao extends Codable<EventCommentDao> {
     }
 }
 
+/**
+ * An external link attached to an event.
+ * Maps to the backend `EventLink` struct in the Go models package.
+ */
+class EventLink extends Codable<EventLink> {
+    title: string;
+    url: string;
+
+    constructor(title: string, url: string) {
+        super();
+        this.title = title;
+        this.url = url;
+    }
+
+    static override decode<EventLink>(data: { [key: string]: any }): EventLink {
+        const object = Object();
+
+        if (data) {
+            object['title'] = data['title'];
+            object['url'] = data['url'];
+        }
+
+        Object.setPrototypeOf(object, EventLink.prototype);
+        return object;
+    }
+
+    override encode(): { [key: string]: any } {
+        return {
+            'title': this.title,
+            'url': this.url
+        };
+    }
+}
+
 export {
     Event,
     EventDao,
     EventConfig,
+    EventLink,
     EventsResponse,
     EventSection,
     LocationResponse,
-    
+
     NewEventDao,
     RecurrenceOptions,
 
     ParticipantsConfig,
     TeamsConfig,
-    
+
     EventFormatConfig,
     EventRecurrenceConfig,
-    
+
     Team,
     TeamDao,
 

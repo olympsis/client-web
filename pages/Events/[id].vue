@@ -25,6 +25,9 @@
                 @open-participants="handleOpenParticipantsModal"
             />
 
+            <!-- External Links -->
+            <EventExternalLinks v-if="event.externalLinks.length > 0" :links="event.externalLinks" />
+
             <!-- Locations -->
             <EventLocations v-if="!hideLocation" :event="event" :venues="venues"/>
 
@@ -91,6 +94,7 @@ import EventRSVPModal from '@/components/Modals/Events/EventRSVPModal/EventRSVPM
 import EventParticipantsPeek from '@/components/Events/EventParticipants/EventParticipants.vue';
 import EventDetailSettingsModal from '@/components/Modals/Events/EventDetailSettingsModal/EventDetailSettingsModal.vue';
 import EventParticipantsListModal from '@/components/Modals/Events/EventParticipantsListModal/EventParticipantsListModal.vue';
+import EventExternalLinks from '~/components/Events/EventExternalLinks/EventExternalLinks.vue';
 
 const { t } = useI18n();
 const auth = useAuth();
@@ -155,6 +159,10 @@ const hideLocation = computed<boolean>(() => {
     return event.value?.config?.hideLocation ?? false;
 });
 
+const hasExternalLinks = computed<boolean>(() => {
+    return !!event.value?.externalLinks.length;
+});
+
 const eventFormats = computed<COMPETITION_FORMAT[]>(() => {
     if (event.value?.formatConfig?.formats) {
         return event.value?.formatConfig?.formats;
@@ -182,12 +190,17 @@ const gridTemplateAreas = computed<string>(() => {
         'media body'
         'media locations'
         'host locations'`;
+    if (hasExternalLinks.value) {
+        areas += `\n        'links locations'`;
+    }
     if (hasParticipants.value) {
         areas += `\n        'participants locations'`;
     }
     if (hasFormats.value) {
         areas += `\n        'formats locations'`;
     }
+    // Comments placed in the left column, under the shorter side of the grid
+    areas += `\n        'comments locations'`;
     return areas;
 });
 
@@ -200,6 +213,9 @@ const gridTemplateAreasMobile = computed<string>(() => {
         'media'
         'body'
         'host'`;
+    if (hasExternalLinks.value) {
+        areas += `\n        'links'`
+    }
     if (hasParticipants.value) {
         areas += `\n        'participants'`;
     }
@@ -207,6 +223,7 @@ const gridTemplateAreasMobile = computed<string>(() => {
         areas += `\n        'formats'`;
     }
     areas += `\n        'locations'`;
+    areas += `\n        'comments'`
     return areas;
 });
 
@@ -474,7 +491,7 @@ watch(data, (newData) => {
     margin-bottom: auto;
     
     #event-detail {
-        gap: 2rem;
+        gap: 1rem;
         display: grid;
         margin-top: 3rem;
         position: relative;

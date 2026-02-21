@@ -48,7 +48,7 @@ const poster = computed<Participant>(() => {
 const organizers = computed<Array<{ type: number, name: String, imageURL: string }>>(() => {
     let _organizers: Array<{ type: number, name: string, imageURL: string }> = []
     props.event.organizers.forEach((o: Organizer) => {
-        if (o.type == 0) {
+        if (o.type == 'CLUB') {
             const club = props.clubs.find((c) => c.id == o.id);
             if (club) {
                 _organizers.push({ type: 0, name: club.name ?? 'Olympsis Club', imageURL: club.logo ?? '' })
@@ -71,6 +71,7 @@ const organizers = computed<Array<{ type: number, name: String, imageURL: string
     #list {
         padding: 0;
         margin-top: 0.5rem;
+        margin-left: 0.5rem;
         list-style-type: none;
 
         li {

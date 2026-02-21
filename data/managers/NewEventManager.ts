@@ -5,7 +5,7 @@ import { MEDIA_TYPE, EVENT_VISIBILITY, NEW_EVENT_ERROR } from '../Enums';
 import { useSessionStore } from "@/stores/session-store";
 import { UploadService } from "../services/UploadService";
 import { Sport, Tag, type GroupSelection, type VenueDescriptor } from "../models/GenericModels";
-import { EventConfig, EventDao, EventFormatConfig, NewEventDao, ParticipantsConfig, RecurrenceOptions, TeamsConfig } from "../models/EventModels";
+import { EventConfig, EventDao, EventFormatConfig, EventLink, NewEventDao, ParticipantsConfig, RecurrenceOptions, TeamsConfig } from "../models/EventModels";
 
 class NewEventManager {
 
@@ -71,7 +71,7 @@ class NewEventManager {
         formatConfig?: EventFormatConfig,
         participantsConfig?: ParticipantsConfig,
         teamsConfig?: TeamsConfig,
-        externalLink?: string
+        externalLinks?: EventLink[]
     ) : EventDao {
         const user = this.sessionStore.user;
         const uuid = user?.uuid;
@@ -94,7 +94,7 @@ class NewEventManager {
                 participantsConfig,
                 teamsConfig,
                 visibility,
-                externalLink
+                externalLinks
             );
         }
 

@@ -35,7 +35,7 @@
                     }">
                     <!-- <Tab value="0" class="font">Achievements</Tab>
                     <Tab value="1" class="font">Groups Enrolled</Tab> -->
-                    <Tab value="2" class="font">Events Attended</Tab>
+                    <Tab value="0" class="font">Events Attended</Tab>
                 </TabList>
                 <TabPanels>
                     <!-- <TabPanel value="0">
@@ -44,7 +44,7 @@
                     <TabPanel value="1">
                         <GroupsTab :clubs="userClubs" :organizations="[]"/>
                     </TabPanel> -->
-                    <TabPanel value="2">
+                    <TabPanel value="0">
                         <EventsTab :events="session.pastEvents"/>
                     </TabPanel>
                 </TabPanels>
@@ -74,7 +74,7 @@ import * as Sentry from '@sentry/nuxt';
 
 import { computed } from 'vue';
 import { Club } from '~/data/models/ClubModels';
-import { Event } from '~/data/models/EventModels';
+// import { Event } from '~/data/models/EventModels';
 import { useSessionStore } from '@/stores/session-store';
 import { EventService } from '~/data/services/EventService';
 
@@ -84,8 +84,8 @@ import TabList from 'primevue/tablist';
 import TabPanel from 'primevue/tabpanel';
 import TabPanels from 'primevue/tabpanels';
 import UserIcon from '@/components/UserIcon/UserIcon.vue';
-import AwardsTab from '~/components/Profile/AwardsTab/AwardsTab.vue';
-import GroupsTab from '~/components/Profile/GroupsTab/GroupsTab.vue';
+// import AwardsTab from '~/components/Profile/AwardsTab/AwardsTab.vue';
+// import GroupsTab from '~/components/Profile/GroupsTab/GroupsTab.vue';
 import EventsTab from '~/components/Profile/EventsTab/EventsTab.vue';
 import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
 import ProfileSettings from '~/components/Profile/ProfileSettings/ProfileSettings.vue';
@@ -186,14 +186,21 @@ onMounted(() => {
         display: flex;
 
         button {
-            border: unset;
             cursor: pointer;
             margin-left: auto;
-            background-color: unset;
+            padding: 0.4rem;
+            border-radius: 10px;
+            border: var(--component-border) solid 1px;
+            background-color: var(--tertiary-background-color);
+
+            &:hover {
+                transform: scale(1.1);
+            }
 
             img {
-                width: 2rem;
-                height: 2rem;
+                width: 1.5rem;
+                height: 1.5rem;
+                display: block;
             }
         }
     }
@@ -209,13 +216,16 @@ onMounted(() => {
         }
 
         .action {
-            height: 2rem;
-            border: unset;
             cursor: pointer;
             margin: 2rem auto;
-            padding: 0rem 1rem;
+            padding: 0.4rem 1rem;
             border-radius: 10px;
-            background-color: var(--secondary-background-color);
+            border: var(--component-border) solid 1px;
+            background-color: var(--tertiary-background-color);
+
+            &:hover {
+                transform: scale(1.1);
+            }
         }
    }
 

@@ -72,7 +72,6 @@ import { useSessionStore } from '~/stores/session-store';
 
 import Dialog from 'primevue/dialog';
 import LabelsList from '~/components/LabelsList/LabelsList.vue';
-import SportLabel from '~/components/SportLabel/SportLabel.vue';
 import ClubDetailsCard from '../ClubDetailsCard/ClubDetailsCard.vue';
 import TextButton from '@/components/Buttons/LoadingButtons/TextButton/TextButton.vue';
 import { getGroupTags } from '~/types/group';

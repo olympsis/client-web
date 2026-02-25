@@ -64,7 +64,7 @@
 
             <ul v-else-if="state === VIEW_STATE.SUCCESS && eventSections.length > 0" id="events-list">
                 <EventsSection v-if="recentlyCreatedEvents.length > 0" :title="$t('events.section.new')" :events="recentlyCreatedEvents" :show-full-time="true" v-model:state="state" />
-                <EventsSection v-for="section in eventSections" :title="section.dayString" :events="section.events" v-model:state="state"/>
+                <EventsSection v-for="section in eventSections" :title="section.dayString" :events="section.events" v-model:state="state" :show-full-time="true"/>
             </ul>
 
             <div v-else-if="state === VIEW_STATE.FAILURE" id="not-found" class="no-events">
@@ -91,7 +91,6 @@ import Drawer from 'primevue/drawer';
 import SearchBar from '@/components/SearchBar/SearchBar.vue';
 import TagsFilter from '~/components/TagsFilter/TagsFilter.vue';
 import SportsFilter from '~/components/SportsFilter/SportsFilter.vue';
-import EventListItem2 from '~/components/Events/EventListItem/EventListItem.vue';
 import EventsSection from '~/components/Events/EventsSection/EventsSection.vue';
 
 const { t } = useI18n();

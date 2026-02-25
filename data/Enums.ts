@@ -314,6 +314,7 @@ function numberToEventSkillLevel(level: number): EVENT_SKILL_LEVEL {
 
 enum EVENT_STATE {
     PENDING,
+    WAITLIST,
     LIVE,
     COMPLETED,
 }

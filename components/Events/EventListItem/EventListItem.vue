@@ -7,37 +7,42 @@
         </div>
 
         <!-- Bottom Bar (Event Details) -->
-        <div id="details">
-            <!-- Right Side -->
-            <div id="detail-left">
-                <div id="title"> {{ event.title }} </div>
-                <div id="location">
-                    <picture :style="{ height: '1rem', width: '1rem', marginRight: '0.25rem' }">
-                        <source srcset="@/assets/icons/pin-drop/pin.drop.white.svg" media="(prefers-color-scheme: dark)"> 
-                        <img class="location-pin" src="@/assets/icons/pin-drop/pin.drop.svg"> 
-                    </picture>
-                    <div id="location-name">{{ venueName }}</div>
-                </div>
-                <div id="start-date">
-                    <picture :style="{ height: '1rem', width: '1rem', marginRight: '0.25rem' }">
-                        <source srcset="@/assets/icons/calendar/calendar.white.svg" media="(prefers-color-scheme: dark)"> 
-                        <img class="calendar" src="@/assets/icons/calendar/calendar.svg"> 
-                    </picture>
-                    <div id="date">
-                        {{ showFullTime ? dateToString(event.startTime) : timeToString(event.startTime) }}
+        <div id="details" class="glass">
+            <div id="title"> {{ event.title }} </div>
+
+            <!-- Bottom row: info left, meta right -->
+            <div id="detail-row">
+                <div id="detail-left">
+                    <div id="location">
+                        <picture :style="{ height: '1rem', width: '1rem', marginRight: '0.25rem' }">
+                            <source srcset="@/assets/icons/pin-drop/pin.drop.white.svg" media="(prefers-color-scheme: dark)">
+                            <img class="location-pin" src="@/assets/icons/pin-drop/pin.drop.svg">
+                        </picture>
+                        <div id="location-name">{{ venueName }}</div>
+                    </div>
+                    <div id="start-date">
+                        <picture :style="{ height: '1rem', width: '1rem', marginRight: '0.25rem' }">
+                            <source srcset="@/assets/icons/calendar/calendar.white.svg" media="(prefers-color-scheme: dark)">
+                            <img class="calendar" src="@/assets/icons/calendar/calendar.svg">
+                        </picture>
+                        <div id="date">
+                            {{ showFullTime ? eventDateDisplay : timeToString(event.startTime) }}
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Left Side -->
-            <div id="detail-right">
-                <div id="status">{{ statusString }}</div>
-                <div id="participants">
-                    <picture>
-                        <source srcset="@/assets/icons/group/group.white.svg" media="(prefers-color-scheme: dark)"> 
-                        <img class="location-pin" src="@/assets/icons/group/group.svg"> 
-                    </picture>
-                    <div id="count">{{ event.participants.length }}</div>
+                <div id="detail-right">
+                    <div id="status" :class="statusClass">
+                        <span class="status-dot"></span>
+                        {{ statusString }}
+                    </div>
+                    <div id="participants" :style="{ visibility: event.participants.length > 0 ? 'visible' : 'hidden' }">
+                        <picture>
+                            <source srcset="@/assets/icons/group/group.white.svg" media="(prefers-color-scheme: dark)">
+                            <img class="location-pin" src="@/assets/icons/group/group.svg">
+                        </picture>
+                        <div id="count">{{ event.participants.length }}</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -66,6 +71,19 @@ const image = computed(() => {
     return props.event.mediaURL ? generateImageURL(props.event.mediaURL) : undefined;
 });
 
+/**
+ * When showFullTime is used:
+ * - Within the current week: show the time (e.g. "3:30 PM")
+ * - Outside the current week: show the full date (e.g. "Mar 15, 2026")
+ */
+const eventDateDisplay = computed(() => {
+    const startTime = props.event.startTime;
+    if (isThisWeek(startTime, new Date())) {
+        return timeToString(startTime);
+    }
+    return dateToString(startTime);
+});
+
 const venues: Ref<Venue[]> = ref([]);
 const venueName: ComputedRef<string> = computed(() => {
     const venuesLength = props.event.venues.length;
@@ -91,34 +109,119 @@ const tags = computed<string[]>(() => {
 });
 
 const status = ref<EVENT_STATE>(EVENT_STATE.PENDING);
+
+// Reactive elapsed time string for live events (e.g. "12:05" or "1:32")
+const elapsedString = ref('');
+
+/**
+ * Formats elapsed milliseconds into a readable duration:
+ * - Under 1 hour: MM:SS (e.g. "3:42")
+ * - 1 hour or more: H:MM (e.g. "2:15")
+ */
+const formatElapsed = (elapsedMs: number): string => {
+    const totalSeconds = Math.floor(elapsedMs / 1000);
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+
+    if (hours > 0) {
+        return `${hours}:${String(minutes).padStart(2, '0')}`;
+    }
+    return `${minutes}:${String(seconds).padStart(2, '0')}`;
+};
+
+const statusClass = computed<string>(() => {
+    switch(status.value) {
+        case EVENT_STATE.PENDING: return 'status-pending';
+        case EVENT_STATE.WAITLIST: return 'status-waitlist';
+        case EVENT_STATE.LIVE: return 'status-live';
+        default: return 'status-ended';
+    }
+});
+
 const statusString = computed<string>(() => {
     switch(status.value) {
         case EVENT_STATE.PENDING:
             return t('events.pending');
+        case EVENT_STATE.WAITLIST:
+            return t('events.waitlist');
         case EVENT_STATE.LIVE:
-            return t('events.live');
+            return elapsedString.value;
         default:
             return t('events.ended');
     }
 });
+
+let intervalId: ReturnType<typeof setInterval> | null = null;
+
+const clearCurrentInterval = () => {
+    if (intervalId !== null) {
+        clearInterval(intervalId);
+        intervalId = null;
+    }
+};
+
 const updateStatus = () => {
     const now = Date.now();
     const startTime = props.event.startTime.getTime();
     const endTime = props.event.stopTime.getTime();
-    
+    const prevStatus = status.value;
+
     if (now < startTime) {
-        status.value = EVENT_STATE.PENDING;
+        // Show waitlist if the event has a waitlist enabled and is at capacity
+        const hasWaitlist = props.event.participantsConfig?.hasWaitlist;
+        if (hasWaitlist && props.event.isFull()) {
+            status.value = EVENT_STATE.WAITLIST;
+        } else {
+            status.value = EVENT_STATE.PENDING;
+        }
     } else if (now >= startTime && now <= endTime) {
         status.value = EVENT_STATE.LIVE;
+        elapsedString.value = formatElapsed(now - startTime);
     } else {
         status.value = EVENT_STATE.COMPLETED;
     }
+
+    // When the status changes, adjust the tick interval
+    if (prevStatus !== status.value) {
+        clearCurrentInterval();
+        if (status.value === EVENT_STATE.LIVE) {
+            // Pick interval based on whether we're in hrs:min or min:sec range
+            const elapsed = now - startTime;
+            const tick = elapsed >= 3600000 ? 60000 : 1000;
+            intervalId = setInterval(updateStatus, tick);
+        } else if (status.value === EVENT_STATE.PENDING) {
+            // Check again once the event should start
+            intervalId = setInterval(updateStatus, 30000);
+        }
+        // COMPLETED: no interval needed
+    } else if (status.value === EVENT_STATE.LIVE) {
+        // Transition from sec ticks to min ticks once we cross the 1-hour mark
+        const elapsed = now - startTime;
+        if (elapsed >= 3600000 && elapsed - 1000 < 3600000) {
+            clearCurrentInterval();
+            intervalId = setInterval(updateStatus, 60000);
+        }
+    }
 };
+
 updateStatus();
-const interval = setInterval(updateStatus, 30000);
+// Initial interval — will be replaced by updateStatus when status changes
+if (intervalId === null) {
+    const now = Date.now();
+    const startTime = props.event.startTime.getTime();
+    const elapsed = now - startTime;
+
+    if (status.value === EVENT_STATE.LIVE) {
+        const tick = elapsed >= 3600000 ? 60000 : 1000;
+        intervalId = setInterval(updateStatus, tick);
+    } else if (status.value === EVENT_STATE.PENDING) {
+        intervalId = setInterval(updateStatus, 30000);
+    }
+}
 
 onUnmounted(() => {
-    clearInterval(interval);
+    clearCurrentInterval();
 });
 
 async function loadLocationData() {
@@ -157,8 +260,8 @@ loadLocationData()
     position: relative;
     border-radius: 10px;
     list-style-type: none;
-    box-shadow: var(--component-border) 0px 1px 4px;
-    background-color: var(--secondary-background-color);
+    overflow: hidden;
+    border: 1px solid var(--component-border-color);
 
     #header {
         #labels-list {
@@ -187,29 +290,58 @@ loadLocationData()
 
         .image {
             width: 100%;
-            height: 24rem;
+            height: 28rem;
             object-fit: cover;
-            border-radius: 10px 10px 0px 0px;
+            border-radius: 10px;
         }
     }
 
     #details {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
+        /* Overlay the details bar at the bottom of the image */
+        bottom: 0;
+        left: 0;
+        right: 0;
+        position: absolute;
+        border-radius: 0 0 10px 10px;
+        border-top: 1px solid var(--component-border-color);
         padding: 0.5rem 1rem 0.75rem 1rem;
 
+        #title {
+            font-family: 'Archivo', 'Helvetica Nue', 'Roboto';
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            color: var(--primary-label-color);
+        }
+
+        /* Bottom row with left info and right meta side by side */
+        #detail-row {
+            gap: 1rem;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+        }
+
         #detail-left {
-            #title {
-                font-weight: 600;
-                font-size: 1.1rem;
-                margin-bottom: 0.5rem;
-            }
+            min-width: 0;
 
             #location {
                 display: flex;
+                max-height: 24px;
                 font-size: 0.95rem;
                 align-items: center;
+
+                #location-name {
+                    overflow: hidden;
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
+                    color: var(--secondary-label-color);
+                }
 
                 .location-pin {
                     width: 1rem;
@@ -218,10 +350,11 @@ loadLocationData()
             }
 
             #start-date {
-                opacity: 0.5;
                 display: flex;
+                max-height: 24px;
                 font-size: 0.95rem;
                 align-items: center;
+                color: var(--secondary-label-color);
 
                 .calendar {
                     width: 1rem;
@@ -231,23 +364,69 @@ loadLocationData()
         }
 
         #detail-right {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: flex-end;
+            flex-shrink: 0;
+
             #status {
+                display: flex;
+                align-items: center;
                 font-size: 0.9rem;
-                font-weight: 600;
-                margin: 0.25rem 0rem;
+                font-weight: 500;
+                max-height: 24px;
+                gap: 0.35rem;
+
+                .status-dot {
+                    width: 8px;
+                    height: 8px;
+                    border-radius: 50%;
+                    flex-shrink: 0;
+                }
+
+                &.status-pending {
+                    color: var(--primary-label-color);
+                    .status-dot { background-color: var(--quaternary-brand-color); }
+                }
+
+                &.status-waitlist {
+                    color: var(--tertiary-brand-color);
+                    .status-dot { background-color: var(--tertiary-brand-color); }
+                }
+
+                &.status-live {
+                    color: var(--olympsis-red);
+                    .status-dot {
+                        background-color: var(--olympsis-red);
+                        animation: blink 1.5s ease-in-out infinite;
+                    }
+                }
+
+                &.status-ended {
+                    color: var(--olympsis-gray);
+                    .status-dot { background-color: var(--olympsis-gray); }
+                }
             }
 
             #participants {
                 display: flex;
+                max-height: 24px;
                 align-items: center;
                 flex-direction: row;
                 justify-content: end;
 
                 #count {
                     margin-left: 0.25rem;
+                    color: var(--secondary-label-color);
                 }
             }
         }
     }
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.2; }
 }
 </style>

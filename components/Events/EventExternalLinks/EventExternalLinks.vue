@@ -31,7 +31,7 @@ function openLink(url: string) {
         display: flex;
         cursor: pointer;
         align-items: center;
-        margin: 0.75rem 0rem;
+        margin: 0.5rem 0rem;
         margin-left: 0.5rem;
 
         &:hover .link-title {
@@ -40,16 +40,16 @@ function openLink(url: string) {
     }
 
     .icon {
-        width: 42px;
-        height: 42px;
+        display: flex;
+        padding: 0.25rem 0.60rem;
         flex-shrink: 0;
-
-        img {
-            padding: 0.5rem;
-            border-radius: 10px;
-            border: var(--icon-border-color) solid 1px;
-            background-color: var(--secondary-background-color);
-        }
+        align-items: center;
+        justify-content: center;
+        border-radius: 20px;
+        border: var(--component-border-color) solid 1px;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        background: rgba(255, 255, 255, 0.12);
     }
 
     .link-title {

@@ -2,7 +2,10 @@
     <div id="event-body">
         <div id="about">
             <h2>About</h2>
-            <div id="body">{{ event.body }}</div>
+            <div ref="bodyRef" id="body" :class="{ collapsed: !isExpanded }">{{ event.body }}</div>
+            <button v-if="isOverflowing" id="see-more" @click="isExpanded = !isExpanded">
+                {{ isExpanded ? 'See less' : 'See more' }}
+            </button>
         </div>
 
         <div id="actions">
@@ -41,6 +44,18 @@ const emit = defineEmits([
 const auth = useAuth();
 const session = useSessionStore();
 const primaryState = ref<VIEW_STATE>(VIEW_STATE.PENDING);
+
+// "See more" / "See less" toggle for long body text
+const bodyRef = ref<HTMLElement | null>(null);
+const isExpanded = ref(false);
+const isOverflowing = ref(false);
+
+onMounted(() => {
+    // Check if the body text exceeds the 10-line clamp height
+    if (bodyRef.value) {
+        isOverflowing.value = bodyRef.value.scrollHeight > bodyRef.value.clientHeight;
+    }
+});
 
 const isAuthenticated = computed<boolean>(() => {
     return auth.isAuthenticated.value;
@@ -163,11 +178,35 @@ function openExternalURL() {
         width: 100%;
         padding: 1rem;
         border-radius: 16px;
-        border: var(--icon-border-color) solid 1px;
-        background-color: var(--secondary-background-color);
+        border: var(--component-border-color) solid 1px;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        background: rgba(255, 255, 255, 0.12);
 
         #body {
             margin: 0.5rem 0rem;
+            line-height: 1.5;
+
+            /* Collapsed: clamp to 10 lines */
+            &.collapsed {
+                overflow: hidden;
+                display: -webkit-box;
+                -webkit-line-clamp: 8;
+                line-clamp: 8;
+                -webkit-box-orient: vertical;
+            }
+
+            /* Expanded: show full text */
+        }
+
+        #see-more {
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            padding: 0.25rem 0;
+            background: transparent;
+            font-weight: bold;
+            color: var(--primary-label-color);
         }
     }
 

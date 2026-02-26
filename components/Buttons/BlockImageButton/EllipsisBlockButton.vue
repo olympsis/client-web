@@ -39,9 +39,10 @@ defineProps({
         flex-direction: column;
         justify-content: center;
         color: var(--primary-label-color);
-        border-radius: var(--button-border-radius);
-        border: var(--icon-border-color) solid 1px;
-        background-color: var(--secondary-background-color);
+        border: var(--component-border-color) solid 1px;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        background: rgba(255, 255, 255, 0.12);
 
         img {
             width: 2.5rem;

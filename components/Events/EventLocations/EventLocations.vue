@@ -4,7 +4,7 @@
         <img v-if="mapURL" id="map" :src="mapURL"/>
         <div v-else id="map-placeholder"/>
         <div id="details">
-            <picture :style="{ width: '48px', height: '48px', margin: '0rem 0.5rem' }" class="icon">
+            <picture :style="{ margin: '0rem 0.5rem' }" class="icon">
                 <source srcset="@/assets/icons/pin-drop/pin.drop.white.svg" media="(prefers-color-scheme: dark)">
                 <img src="@/assets/icons/pin-drop/pin.drop.svg">
             </picture>
@@ -106,15 +106,15 @@ onMounted(() => {
     }
 
     .icon {
-        width: 42px;
-        height: 42px;
-
-        img {
-            padding: 0.5rem;
-            border-radius: 10px;
-            border: var(--icon-border-color) solid 1px;
-            background-color: var(--secondary-background-color);
-        }
+        display: flex;
+        padding: 0.25rem 0.60rem;
+        align-items: center;
+        justify-content: center;
+        border-radius: 20px;
+        border: var(--component-border-color) solid 1px;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        background: rgba(255, 255, 255, 0.12);
     }
 
     .title {

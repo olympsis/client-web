@@ -10,7 +10,7 @@
 
             <div id="actions">
                 <button @click="navigateToNewEvent">
-                    <img src="@/assets/icons/plus/plus.white.svg">
+                    <img src="@/assets/icons/calendar/calendar.add.white.svg">
                 </button>
                 <!-- <button @click="">
                     <img src="@/assets/icons/map/map.fill.svg">
@@ -24,7 +24,7 @@
 
                 <div id="actions">
                     <button @click="navigateToNewEvent">
-                        <img src="@/assets/icons/plus/plus.white.svg">
+                        <img src="@/assets/icons/calendar/calendar.add.white.svg">
                     </button>
                     <!-- <button @click="">
                         <img src="@/assets/icons/map/map.fill.svg">
@@ -45,10 +45,10 @@
             </button>
 
             <Drawer v-model:visible="showFilter" position="right">
-                <div class="section-header" :style="{fontWeight: 'bold'}">{{ $t('common.sports') }}</div>
+                <div class="section-header" :style="{fontWeight: 'bold', color: 'white'}">{{ $t('common.sports') }}</div>
                 <SportsFilter v-model:model-value="selectedSports"/>
 
-                <div class="section-header" :style="{fontWeight: 'bold'}">{{ $t('common.tags') }}</div>
+                <div class="section-header" :style="{fontWeight: 'bold', color: 'white'}">{{ $t('common.tags') }}</div>
                 <TagsFilter v-model:model-value="selectedTags"/>
             </Drawer>
         </div>
@@ -318,7 +318,10 @@ definePageMeta({
             display: flex;
             border-radius: 15px;
             padding: 0.25rem 0.5rem 0.25rem 0.5rem;
-            background-color: var(--primary-brand-color);
+            border: var(--component-border-color) solid 1px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            background: rgba(38, 46, 87, 0.85); /* --primary-brand-color at 0.85 opacity */
 
             button {
                 all: unset;
@@ -515,7 +518,10 @@ definePageMeta({
                 flex-direction: row;
                 border-radius: 15px;
                 padding: 0.25rem 0.5rem 0.25rem 0.5rem;
-                background-color: var(--primary-brand-color);
+                border: var(--component-border-color) solid 1px;
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                background: rgba(38, 46, 87, 0.85); /* --primary-brand-color at 0.85 opacity */
 
                 button {
                     all: unset;
@@ -557,5 +563,37 @@ definePageMeta({
 h1 {
     margin-right: 1rem;
     white-space: nowrap;
+}
+</style>
+
+<!-- Unscoped to override PrimeVue Drawer internal styles -->
+<style>
+.p-drawer .p-drawer-content,
+.p-drawer .p-drawer-header {
+    background: transparent;
+    border: none;
+}
+
+.p-drawer {
+    border: var(--component-border-color) solid 1px;
+    border-right: none; /* flush against viewport edge */
+    border-bottom: none;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.12) !important;
+}
+
+.p-drawer-close-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 20px;
+    border: var(--component-border-color) solid 1px !important;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.12) !important;
+    color: white !important;
 }
 </style>

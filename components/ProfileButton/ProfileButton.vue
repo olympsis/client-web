@@ -38,7 +38,7 @@ function handleImageFailure() {
     height: 40px;
     border-radius: 50%;
     object-fit: cover;
-    border: 3px solid var(--secondary-brand-color);
+    border: 3px solid var(--component-border-color);
 }
 
 .default-image {
@@ -50,7 +50,7 @@ function handleImageFailure() {
     align-items: center;
     justify-content: center;
     background-color: var(--olympsis-light-gray);
-    border: 1.5px solid var(--olympsis-gray);
+    border: 1.5px solid var(--component-border-color);
 
     img {
         width: 1.3rem;

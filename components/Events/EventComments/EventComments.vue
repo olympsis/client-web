@@ -202,24 +202,29 @@ async function handleRemoveReaction(payload: { commentId: string; reactionId: st
         textarea {
             width: 100%;
             resize: none;
-            border: unset;
+            border: var(--component-border-color) solid 1px;
             overflow: hidden;
             font-size: 0.8rem;
             line-height: 1.2rem;
             margin-right: 1rem;
             border-radius: 20px;
             padding: 0.4rem 0.75rem;
-            background-color: var(--secondary-background-color);
+            color: inherit;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.35);
         }
 
         button {
             height: 2rem;
-            border: unset;
             color: white;
             font-weight: bold;
             padding: 0rem 1rem;
             border-radius: 20px;
-            background-color: var(--primary-brand-color);
+            border: var(--component-border-color) solid 1px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            background: rgba(38, 46, 87, 0.85); /* --primary-brand-color at 0.85 opacity */
         }
     }
 

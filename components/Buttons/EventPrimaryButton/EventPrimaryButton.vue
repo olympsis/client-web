@@ -130,8 +130,10 @@ const pendingState = computed<EVENT_PENDING_STATE>(() => {
     flex-direction: column;
     justify-content: center;
     color: var(--primary-label-color);
-    border: var(--icon-border-color) solid 1px;
-    background-color: var(--secondary-background-color);
+    border: var(--component-border-color) solid 1px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.12);
 
     div {
         color: white;
@@ -150,23 +152,31 @@ const pendingState = computed<EVENT_PENDING_STATE>(() => {
     height: 2.5rem;
 }
 
+/* #pending is just a wrapper — strip its glass so only the inner state div renders a border */
+#pending {
+    border: none;
+    background: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
 #rsvp {
-    background-color: var(--primary-brand-color);
+    background: rgba(38, 46, 87, 0.85); /* --primary-brand-color with transparency */
 }
 
 #waitlist {
-    background-color: var(--tertiary-brand-color);
+    background: rgba(247, 160, 7, 0.85); /* --tertiary-brand-color with transparency */
 }
 
 #cancel {
-    background-color: var(--olympsis-red);
+    background: rgba(213, 0, 32, 0.85); /* --olympsis-red with transparency */
 }
 
 #completed {
-    background-color: var(--olympsis-gray);
+    background: rgba(118, 118, 118, 0.85); /* --olympsis-gray with transparency */
 }
 
 #live {
-    background-color: var(--olympsis-red);
+    background: rgba(213, 0, 32, 0.85); /* --olympsis-red with transparency */
 }
 </style>

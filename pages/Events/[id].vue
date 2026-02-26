@@ -1,8 +1,14 @@
 <template>
     <NavigationBar/>
-    <main id="event-detail-view">
-        <div 
-            v-if="failed !== undefined && failed !== true && event != undefined" 
+    <main id="event-detail-view" :class="{ 'dark-bg': isDarkBackground, 'light-bg': !isDarkBackground }">
+        <!-- Blurred event image background -->
+        <div
+            v-if="eventImageURL"
+            id="event-bg"
+            :style="{ backgroundImage: `url(${eventImageURL})` }"
+        ></div>
+        <div
+            v-if="failed !== undefined && failed !== true && event != undefined"
             id="event-detail"
             :style="{ '--grid-areas': gridTemplateAreas, '--grid-areas-mobile': gridTemplateAreasMobile }"
         >
@@ -39,7 +45,7 @@
 
             <!-- RSVP -->
             <dialog id="rsvp-modal" ref="rsvp-modal" class="dialog">
-                <EventRSVPModal v-if="event" :event="event" @close="hideRSVPModal" @rsvp="handleRSVPResponse"/>
+                <EventRSVPModal v-if="event" :event="event" :is-dark-background="isDarkBackground" @close="hideRSVPModal" @rsvp="handleRSVPResponse"/>
             </dialog>
 
             <!-- Event Participants -->
@@ -75,7 +81,7 @@ import { useModelStore } from '@/stores/model-store';
 import { UserSnippet } from '@/data/models/UserModels';
 import { useSessionStore } from '@/stores/session-store';
 import { generateImageURL } from '~/utils/image-helpers';
-import { computed, ref, type Ref, useTemplateRef, } from 'vue';
+import { computed, ref, watch, type Ref, useTemplateRef } from 'vue';
 import { Organization } from '@/data/models/OrganizationModels';
 import { VIEW_STATE, GROUP_ROLE, COMPETITION_FORMAT } from '@/data/Enums';
 import { Participant, ParticipantDao } from '@/data/models/GenericModels';
@@ -114,7 +120,89 @@ const event: Ref<Event | undefined> = ref(undefined);
 const authModal = useTemplateRef<HTMLDialogElement>('auth-modal');
 const rsvpModal = useTemplateRef<HTMLDialogElement>('rsvp-modal');
 const settingsModal = useTemplateRef<HTMLDialogElement>('settings-modal');
-const participantsModal = useTemplateRef<HTMLDialogElement>('participants-modal');  
+const participantsModal = useTemplateRef<HTMLDialogElement>('participants-modal');
+
+/**
+ * Tracks whether the event background image is dark.
+ * Used to flip text colors so content stays readable over the blurred background.
+ */
+const isDarkBackground = ref(true); // default to dark since we apply brightness(0.6)
+
+/**
+ * Loads the image into an offscreen canvas (scaled down for speed),
+ * samples every pixel, and computes average perceived luminance using
+ * the standard luminance formula: L = 0.299R + 0.587G + 0.114B.
+ * A threshold of 128 (out of 255) separates "dark" from "light".
+ *
+ * Fetches the image as a blob first to avoid CORS issues with
+ * cross-origin images (e.g. Google Cloud Storage) that would taint
+ * the canvas and block getImageData().
+ */
+async function analyzeImageBrightness(url: string) {
+    if (typeof window === 'undefined') return; // skip on SSR
+
+    try {
+        // Proxy through our server API to bypass CORS restrictions on GCS
+        const proxyURL = `/api/image-proxy?url=${encodeURIComponent(url)}`;
+        const response = await fetch(proxyURL);
+
+        if (!response.ok) {
+            isDarkBackground.value = true;
+            return;
+        }
+
+        const blob = await response.blob();
+        if (blob.size === 0) {
+            isDarkBackground.value = true;
+            return;
+        }
+
+        const blobURL = URL.createObjectURL(blob);
+
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            // Scale down for performance — 50x50 is enough to get an average
+            const size = 50;
+            canvas.width = size;
+            canvas.height = size;
+
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+                URL.revokeObjectURL(blobURL);
+                return;
+            }
+
+            ctx.drawImage(img, 0, 0, size, size);
+            const { data } = ctx.getImageData(0, 0, size, size);
+
+            const pixelCount = data.length / 4;
+            if (pixelCount === 0) {
+                URL.revokeObjectURL(blobURL);
+                return;
+            }
+
+            let totalLuminance = 0;
+            for (let i = 0; i < data.length; i += 4) {
+                const r = data[i] ?? 0;
+                const g = data[i + 1] ?? 0;
+                const b = data[i + 2] ?? 0;
+                totalLuminance += 0.299 * r + 0.587 * g + 0.114 * b;
+            }
+
+            // We also apply brightness(0.6) in CSS, so factor that into the comparison
+            const avgLuminance = (totalLuminance / pixelCount) * 0.6;
+            isDarkBackground.value = avgLuminance < 128;
+
+            URL.revokeObjectURL(blobURL);
+        };
+        img.onerror = () => URL.revokeObjectURL(blobURL);
+        img.src = blobURL;
+    } catch {
+        // If fetch fails, keep the default (dark background = white text)
+        isDarkBackground.value = true;
+    }
+}
 
 const eventID = computed<string>(() => {
     return Array.isArray(route.params.id) ? route.params.id.join(',') : route.params.id ?? '';
@@ -483,18 +571,41 @@ watch(data, (newData) => {
         })
     }
 }, { immediate: true });
+
+// Analyze the event image brightness once it's available (client-side only)
+watch(eventImageURL, (url) => {
+    if (url) analyzeImageBrightness(url);
+}, { immediate: true });
 </script>
 
 <style scoped>
 #event-detail-view {
     margin: 0 auto;
     margin-bottom: auto;
-    
+    position: relative;
+    min-height: 100vh;
+
+    /* Blurred event image that fills the entire view */
+    #event-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        filter: blur(40px) brightness(0.6);
+        transform: scale(1.1); /* prevents blur white edges */
+    }
+
     #event-detail {
         gap: 1rem;
         display: grid;
         margin-top: 3rem;
         position: relative;
+        z-index: 1;
         margin-bottom: 2rem;
         grid-template-areas: var(--grid-areas);
         grid-template-columns: 30rem 30rem;
@@ -732,6 +843,8 @@ watch(data, (newData) => {
         align-items: center;
         flex-direction: column;
         height: calc(100vh - 60px);
+        position: relative;
+        z-index: 1;
         
         img {
             margin-top: 5rem;
@@ -755,8 +868,11 @@ watch(data, (newData) => {
 
     #event-detail-settings-modal {
         border-radius: 20px;
+        border: var(--component-border-color) solid 1px;
         box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
-        background-color: var(--secondary-background-color);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        background: rgba(255, 255, 255, 0.12);
     }
 }
 
@@ -770,8 +886,11 @@ watch(data, (newData) => {
 
     #participants-modal {
         border-radius: 20px;
+        border: var(--component-border-color) solid 1px;
         box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
-        background-color: var(--secondary-background-color);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        background: rgba(255, 255, 255, 0.12);
     }
 }
 
@@ -786,8 +905,11 @@ watch(data, (newData) => {
     #event-rsvp-modal {
         border-radius: 20px;
         max-width: 25rem !important;
+        border: var(--component-border-color) solid 1px;
         box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
-        background-color: var(--secondary-background-color);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        background: rgba(255, 255, 255, 0.12);
     }
 }
 
@@ -802,8 +924,63 @@ watch(data, (newData) => {
     .auth-card {
         border-radius: 20px;
         max-width: 25rem !important;
+        border: var(--component-border-color) solid 1px;
         box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        background: rgba(255, 255, 255, 0.12);
     }
 }
 
+
+</style>
+
+<!--
+  Unscoped so the CSS variable overrides cascade into child components.
+  Scoped styles add [data-v-xxx] selectors that prevent children from
+  inheriting the overridden values.
+-->
+<style>
+#event-detail-view.dark-bg {
+    --primary-label-color: #FFFFFF;
+    --secondary-label-color: #D6D6D6;
+    --component-border-color: rgba(255, 255, 255, 0.15);
+    color: #FFFFFF;
+}
+
+#event-detail-view.light-bg {
+    --primary-label-color: #000000;
+    --secondary-label-color: #2C2C2E;
+    --component-border-color: rgba(0, 0, 0, 0.15);
+    color: #000000;
+}
+
+/*
+ * Force block-button icons to match the computed text color.
+ * brightness(0) makes any SVG black; adding invert(1) flips it to white.
+ * Works regardless of which <picture> source the browser selected.
+ * Only targets #bold-text-button-label so EventPrimaryButton icons
+ * (which are always white on colored backgrounds) stay unaffected.
+ */
+#event-detail-view.dark-bg #bold-text-button-label #button img,
+#event-detail-view.dark-bg #event-header img,
+#event-detail-view.dark-bg #event-locations .icon img,
+#event-detail-view.dark-bg #event-external-links .icon img {
+    filter: brightness(0) invert(1);
+}
+
+#event-detail-view.light-bg #bold-text-button-label #button img,
+#event-detail-view.light-bg #event-header img,
+#event-detail-view.light-bg #event-locations .icon img,
+#event-detail-view.light-bg #event-external-links .icon img {
+    filter: brightness(0);
+}
+
+#event-detail-view.dark-bg #event-comments textarea::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+#event-detail-view.light-bg #event-comments textarea::placeholder {
+    color: rgba(0, 0, 0, 0.5);
+}
 </style>

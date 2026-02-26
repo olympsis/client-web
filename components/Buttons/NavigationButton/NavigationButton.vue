@@ -46,21 +46,23 @@ defineProps({
     }
 }
 
-/* Light variant — white background, brand-colored text */
+/* Light variant — glass background, white text */
 .light {
-    background-color: white;
+    color: white;
+    border: var(--component-border-color) solid 1px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.12);
 
     .label {
         font-size: 1rem;
         font-weight: 400;
-        color: var(--primary-label-color);
+        color: white;
     }
-}
 
-/* In dark mode, light variant switches to the brand background */
-@media (prefers-color-scheme: dark) {
-    .light {
-        background-color: var(--primary-brand-color);
+    /* Force icon white since glass sits on the dark navbar */
+    .icon {
+        filter: brightness(0) invert(1);
     }
 }
 

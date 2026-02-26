@@ -17,7 +17,7 @@ const model = defineModel('value',{ required: true });
     width: 100%;
     display: flex;
     min-width: 0; /* Allow shrinking inside flex containers */
-    border-radius: 10px;
+    border-radius: 18px;
     align-items: center;
     padding: 0.25rem 0rem;
     background-color: var(--secondary-background-color);

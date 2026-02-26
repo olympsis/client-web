@@ -20,10 +20,10 @@
         </div>
         <div id="anonymous">
             <div id="content">
-                <div id="title">
+                <div id="title" :style="{ color: isDarkBackground ? '#FFFFFF' : '#000000' }">
                     Hide my RSVP
                 </div>
-                <div id="sub-title">
+                <div id="sub-title" :style="{ color: isDarkBackground ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)' }">
                     Keep your attendance private from others.
                 </div>
             </div>
@@ -36,8 +36,9 @@
 import { Event } from '@/data/models/EventModels';
 import Toggle from '~/components/Toggle/Toggle.vue';
 
-defineProps({
-    event: { type: Event, required: true }
+const props = defineProps({
+    event: { type: Event, required: true },
+    isDarkBackground: { type: Boolean, default: true }
 });
 
 const hideRSVP = ref(false);

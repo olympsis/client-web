@@ -65,7 +65,7 @@ function handleEventSharing() {
         padding: 0.5rem;
         position: absolute;
         border-radius: 50%;
-        border: 1px solid gray;
+        border: 1px solid var(--component-border-color);
         text-transform: capitalize;
         backdrop-filter: blur(20px);
         background-blend-mode: hard-light;

@@ -35,7 +35,7 @@
 
         <!-- Add Calendar Button -->
         <div id="add-calendar" @click="downloadEventAsCalendar">
-            <picture :style="{ width: '24px', height: '24px', margin: '0rem 0.5rem' }">
+            <picture :style="{ width: '24px', height: '24px', 'margin-right': '0.5rem' }">
                 <source srcset="@/assets/icons/calendar/calendar.month.white.svg" media="(prefers-color-scheme: dark)">
                 <img src="@/assets/icons/calendar/calendar.month.svg">
             </picture>
@@ -124,15 +124,15 @@ const hideLocation = computed<boolean>(() => {
         align-items: center;
 
         .icon {
-            width: 42px;
-            height: 42px;
-
-            img {
-                padding: 0.5rem;
-                border-radius: 10px;
-                border: var(--icon-border-color) solid 1px;
-                background-color: var(--secondary-background-color);
-            }
+            display: flex;
+            padding: 0.25rem 0.60rem;
+            align-items: center;
+            justify-content: center;
+            border-radius: 20px;
+            border: var(--component-border-color) solid 1px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.12);
         }
 
         .info {
@@ -170,10 +170,12 @@ const hideLocation = computed<boolean>(() => {
         cursor: pointer;
         width: fit-content;
         align-items: center;
-        border-radius: 10px;
-        padding: 0.5rem 1rem;
-        border: var(--icon-border-color) solid 1px;
-        background-color: var(--secondary-background-color);
+        border-radius: 20px;
+        padding: 0.25rem 1rem;
+        border: rgba(255, 255, 255, 0.15) solid 1px;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        background: rgba(255, 255, 255, 0.12);
     }
 }
 </style>

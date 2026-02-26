@@ -49,11 +49,10 @@ function getVariant(tag: string): 'default' | 'full' | 'paid' | 'waitlist' | 'to
         border-radius: 20px;
         align-items: center;
         justify-content: center;
-        border: 1px solid gray;
+        border: 1px solid var(--component-border-color);
         backdrop-filter: blur(20px);
         background: rgba(0, 0, 0, 0.56);
         -webkit-backdrop-filter: blur(20px);
-        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
     }
 }
 </style>

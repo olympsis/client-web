@@ -165,11 +165,16 @@ onMounted(() => {
     color: var(--primary-label-color);
     border-color: var(--primary-brand-color);
 }
-.p-tab-panels {
-    background: var(--primary-background-color);
-}
-.p-tablist-tab-list {
-    background: var(--primary-background-color);
+
+/* Strip all PrimeVue tab backgrounds so the glass on #body shows through */
+.p-tabs,
+.p-tablist,
+.p-tablist-tab-list,
+.p-tab,
+.p-tab-panels,
+.p-tabpanels,
+.p-tabpanel {
+    background: transparent;
 }
 #profile-page {
     width: 100%;
@@ -191,7 +196,12 @@ onMounted(() => {
             padding: 0.4rem;
             border-radius: 10px;
             border: var(--component-border) solid 1px;
-            background-color: var(--tertiary-background-color);
+
+            /* Glassmorphism — translucent bg with backdrop blur */
+            background: rgba(243, 242, 239, 0.40);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
 
             &:hover {
                 transform: scale(1.1);
@@ -221,7 +231,12 @@ onMounted(() => {
             padding: 0.4rem 1rem;
             border-radius: 10px;
             border: var(--component-border) solid 1px;
-            background-color: var(--tertiary-background-color);
+
+            /* Glassmorphism — translucent bg with backdrop blur */
+            background: rgba(243, 242, 239, 0.40);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
 
             &:hover {
                 transform: scale(1.1);
@@ -229,6 +244,19 @@ onMounted(() => {
         }
    }
 
+
+    /* Tabs section — glass card with rounded corners */
+    > #body {
+        border-radius: 20px;
+        overflow: hidden;
+        border: var(--component-border) solid 1px;
+
+        /* Glassmorphism */
+        background: rgba(243, 242, 239, 0.40);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+    }
 
     .nav-card {
         margin-top: auto;
@@ -369,6 +397,15 @@ onMounted(() => {
         border-radius: 20px;
         max-width: 25rem !important;
         box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+    }
+}
+
+/* Dark-mode glass tint — matches .glass in main.css */
+@media (prefers-color-scheme: dark) {
+    #profile-page #top button,
+    #profile-page .header .action,
+    #profile-page > #body {
+        background: rgba(0, 0, 0, 0.60);
     }
 }
 </style>

@@ -121,7 +121,14 @@ async function deleteEvent(deleteAll?: boolean) {
 #event-detail-settings-modal {
     min-width: 20rem;
     max-width: var(--dialog-max-width);
-    background-color: var(--secondary-background-color);
+
+    /* Glassmorphism — translucent bg with backdrop blur */
+    background: rgba(243, 242, 239, 0.40);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: var(--component-border) solid 1px;
+    border-radius: 20px;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
     
     #header {
         display: flex;
@@ -166,6 +173,13 @@ async function deleteEvent(deleteAll?: boolean) {
         max-width: 25rem !important;
         box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
         background-color: var(--secondary-background-color);
+    }
+}
+
+/* Dark-mode glass tint */
+@media (prefers-color-scheme: dark) {
+    #event-detail-settings-modal {
+        background: rgba(0, 0, 0, 0.60);
     }
 }
 </style>

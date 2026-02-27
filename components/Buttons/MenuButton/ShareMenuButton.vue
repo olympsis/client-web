@@ -42,7 +42,13 @@ const emits = defineEmits(
 #menu-button {
     height: 2.5rem;
     border-radius: 10px;
-    background-color: #D6D6D6;
+
+    /* Glassmorphism */
+    background: rgba(243, 242, 239, 0.40);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: var(--component-border) solid 1px;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
 
     &:hover {
         transform: scale(1.025);
@@ -78,10 +84,26 @@ const emits = defineEmits(
     }
 
     &.destructive {
-        background-color: var(--olympsis-red);
+        /* Red-tinted glass for destructive actions */
+        background: rgba(195, 43, 66, 0.65);
 
         .text {
             color: white;
+        }
+    }
+}
+
+/* Dark-mode glass tint */
+@media (prefers-color-scheme: dark) {
+    #menu-button {
+        background: rgba(0, 0, 0, 0.60);
+
+        .text {
+            color: white;
+        }
+
+        &.destructive {
+            background: rgba(195, 43, 66, 0.65);
         }
     }
 }

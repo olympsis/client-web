@@ -9,7 +9,7 @@
             </button>
 
             <div class="title">
-                Events Settings
+                Settings
             </div>
         </div>
 
@@ -58,7 +58,14 @@ defineEmits([
 
 <style scoped>
 #profile-settings {
-    background-color: var(--secondary-background-color);
+    /* Glassmorphism — translucent bg with backdrop blur */
+    background: rgba(243, 242, 239, 0.40);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: var(--component-border) solid 1px;
+    border-radius: 20px;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+
     #header {
         button {
             margin-left: 1rem;
@@ -78,7 +85,6 @@ defineEmits([
         flex-direction: column;
 
         button {
-            border: unset;
             padding: 1rem;
             display: flex;
             cursor: pointer;
@@ -87,11 +93,16 @@ defineEmits([
             align-items: center;
             color: var(--primary-label-color);
             border-radius: var(--button-border-radius);
-            background-color: var(--tertiary-background-color);
+
+            /* Glass button */
+            background: rgba(243, 242, 239, 0.40);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: var(--component-border) solid 1px;
+            box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
         }
 
         a {
-            border: unset;
             padding: 1rem;
             display: flex;
             cursor: pointer;
@@ -100,7 +111,13 @@ defineEmits([
             align-items: center;
             color: var(--primary-label-color);
             border-radius: var(--button-border-radius);
-            background-color: var(--tertiary-background-color);
+
+            /* Glass button */
+            background: rgba(243, 242, 239, 0.40);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: var(--component-border) solid 1px;
+            box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
         }
 
         .icon {
@@ -115,7 +132,9 @@ defineEmits([
             display: flex;
             color: white;
             align-items: center;
-            background-color: #8c1d1d;
+
+            /* Red-tinted glass for destructive actions */
+            background: rgba(195, 43, 66, 0.65);
         }
     }
 
@@ -125,6 +144,22 @@ defineEmits([
         display: flex;
         align-items: center;
         margin-right: 0.5rem;
+    }
+}
+
+/* Dark-mode glass tint */
+@media (prefers-color-scheme: dark) {
+    #profile-settings {
+        background: rgba(0, 0, 0, 0.60);
+
+        #actions button,
+        #actions a {
+            background: rgba(0, 0, 0, 0.60);
+        }
+
+        #actions .destructive {
+            background: rgba(195, 43, 66, 0.65);
+        }
     }
 }
 </style>

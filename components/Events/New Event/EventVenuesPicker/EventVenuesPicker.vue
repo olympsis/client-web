@@ -1,5 +1,30 @@
 <template>
-    <button id="venues-picker-button" @click="showPicker = true"> {{ pickerText }} </button>
+    <div>
+    <div id="venues-picker-card">
+        <!-- Header -->
+        <h4>{{ t('events.new.locations') }}</h4>
+        <div class="sub-label">{{ t('events.new.locationsSub') }}</div>
+
+        <!-- Content: venue cards + add button -->
+        <div id="venues-content">
+            <div v-for="(venue, i) in model" :key="i" class="venue-card">
+                <button class="remove-badge" @click="removeVenue(venue)">
+                    <img src="@/assets/icons/xmark/xmark.red.svg" />
+                </button>
+                <div class="venue-name">{{ venue.name }}</div>
+                <div class="venue-location">{{ formatVenueLocation(venue) }}</div>
+                <div class="venue-coords" v-if="venue.location">{{ venue.location.coordinates?.[1]?.toFixed(6) }}, {{ venue.location.coordinates?.[0]?.toFixed(6) }}</div>
+            </div>
+
+            <button class="add-location-btn" @click="showPicker = true">
+                <picture>
+                    <source srcset="@/assets/icons/pin-drop/pin.drop.white.svg" media="(prefers-color-scheme: dark)" />
+                    <img src="@/assets/icons/pin-drop/pin.drop.svg" />
+                </picture>
+                <span>Add a Location</span>
+            </button>
+        </div>
+    </div>
 
     <!-- Venue Picker Dialog -->
     <Dialog
@@ -127,6 +152,7 @@
             </div>
         </template>
     </Dialog>
+    </div>
 </template>
 
 <script setup lang="ts">
@@ -172,9 +198,11 @@ const selectedLocation = ref<{
     name: string;
 } | undefined>(undefined);
 
-const pickerText: ComputedRef<string> = computed(() => {
-    return model.value.length > 0 ? t('events.venues.changeVenues', { count: model.value.length }) : t('events.venues.pickVenues')
-});
+/** Build a city/state/postcode string for display in the venue card */
+function formatVenueLocation(venue: VenueDescriptor): string {
+    const parts = [venue.city, venue.state].filter(Boolean);
+    return parts.join(', ');
+}
 
 const venues: ComputedRef<VenueDescriptor[]> = computed(() => {
     const arr: VenueDescriptor[] = modelStore.getAllVenues().map((v) => {
@@ -536,16 +564,114 @@ async function lookUpCustomVenuesByName(name: string): Promise<VenueDescriptor[]
 </script>
 
 <style scoped>
-#venues-picker-button {
-    width: 100%;
-    height: 100%;
-    height: 7rem; 
-    border: unset;
+/* Self-contained card matching the EventHostsCard pattern */
+#venues-picker-card {
+    padding: 1rem;
+    border-radius: 20px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--component-border-color);
+    background-color: var(--component-background-color);
+
+    h4 {
+        margin-bottom: 0.25rem;
+        color: var(--primary-label-color);
+    }
+
+    .sub-label {
+        color: gray;
+        font-size: 0.8rem;
+        margin-bottom: 1rem;
+    }
+
+    .card-divider {
+        height: 1.5px;
+        margin: 0.75rem 0;
+        background-color: var(--olympsis-light-gray);
+    }
+}
+
+/* Row that holds venue cards and the add button */
+#venues-content {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+/* Individual venue display card */
+.venue-card {
+    position: relative;
+    padding: 0.75rem 1rem;
+    border-radius: 16px;
+    border: 1px solid var(--component-border-color);
+    background-color: color-mix(in srgb, var(--secondary-background-color) 80%, transparent);
+
+    .remove-badge {
+        all: unset;
+        cursor: pointer;
+        position: absolute;
+        top: -6px;
+        right: -6px;
+        width: 18px;
+        height: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+
+        img {
+            width: 14px;
+            height: 14px;
+        }
+    }
+
+    .venue-name {
+        font-weight: 700;
+        font-size: 1rem;
+        color: var(--primary-label-color);
+    }
+
+    .venue-location {
+        font-style: italic;
+        font-size: 0.85rem;
+        color: gray;
+    }
+
+    .venue-coords {
+        font-size: 0.85rem;
+        color: gray;
+    }
+}
+
+/* Pill-shaped "Add a Location" button */
+.add-location-btn {
+    all: unset;
+    gap: 0.4rem;
+    display: flex;
     cursor: pointer;
-    font-size: 0.9rem;
-    border-radius: 10px;
+    align-items: center;
+    border-radius: 20px;
+    padding: 0.4rem 0.75rem;
     color: var(--primary-label-color);
+    border: 1px solid var(--component-border);
     background-color: var(--secondary-background-color);
+    font-size: 0.85rem;
+
+    picture {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    img {
+        width: 1.2rem;
+        height: 1.2rem;
+    }
+
+    &:hover {
+        background-color: var(--tertiary-background-color);
+    }
 }
 
 #event-venues-popup-container {

@@ -361,6 +361,10 @@ definePageMeta({
             border: var(--component-border) solid 1px;
             background-color: var(--secondary-background-color);
 
+            &:hover {
+                background-color: var(--tertiary-background-color);
+            }
+
             #text {
                 font-size: 1rem;
                 font-weight: 500;

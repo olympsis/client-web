@@ -152,9 +152,15 @@ function closeMediaPicker() {
             height: 1.5rem;
             margin: 0.5rem;
             cursor: pointer;
-            margin-left: 8.5rem;
             border-radius: 5px;
+            margin-left: 8.5rem;
+            transform: scale(1);
             background-color: var(--primary-brand-color);
+        }
+
+        &:hover {
+            transition: transform 0.2s ease-in-out; 
+            transform: scale(0.95);
         }
     }
     

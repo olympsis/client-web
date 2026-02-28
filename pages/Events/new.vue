@@ -4,7 +4,7 @@
         <div id="left">
             <!-- Header -->
             <div id="header">
-                <button class="button" :style="{ marginRight: '1rem' }" @click="handleBackNavigation">
+                <button class="button glass" :style="{ marginRight: '1rem' }" @click="handleBackNavigation">
                     <picture class="centered">
                         <source srcset="@/assets/icons/chevron/chevron.left.white.svg" media="(prefers-color-scheme: dark)">
                         <img src="@/assets/icons/chevron/chevron.left.svg"/>
@@ -12,144 +12,136 @@
                 </button>
             </div>
 
-            <!-- Title -->
-            <input 
-                id="event-title"
-                :class="{
-                    label: newEventError !== NEW_EVENT_ERROR.NO_TITLE, 
-                    'title-error': newEventError === NEW_EVENT_ERROR.NO_TITLE 
-                }"
-                class="text-input"
-                type="text" 
-                :placeholder="t('events.new.title')"
-                v-model="manager.title" 
-            />
-
-            <!-- Config -->
-            <div id="event-type-config">
-                <EventTypePicker v-model:model-value="manager.eventType"/>
-                <EventVisibilityPicker v-model:model-value="manager.visibility"/>
-            </div>
-
-            <div id="note">
-                {{ t('events.new.fieldsRequired') }}
-            </div>
-
-            <!-- Sports Picker -->
-            <div id="event-sports-picker">
-                <div class="label">{{ t('events.new.sport') }}</div>
-                <div class="sub-label"> {{ t('events.new.sportSub') }} </div>
-                <MultiSportsPicker v-model:model-value="eventSports" :sports="session.sports"/>
-            </div>
-
-            <!-- Organizers Picker -->
-            <div id="event-organizers-picker" class="event-section">
-                <div :class="{ 
-                    label: newEventError !== NEW_EVENT_ERROR.NO_ORGANIZERS, 
-                    error: newEventError === NEW_EVENT_ERROR.NO_ORGANIZERS 
-                }"> {{ t('events.new.organizers') }} <div class="asterisk">*</div> </div>
-                <div class="sub-label"> {{ t('events.new.organizersSub') }} </div>
-                <EventOrganizersPicker v-model:model-value="manager.groups"/>
-            </div>
-
-            <!-- Description -->
-            <div id="event-description" :class="{ 'event-section': true }">
-                <div :class="{ 
-                    label: newEventError !== NEW_EVENT_ERROR.NO_DESCRIPTION, 
-                    error: newEventError === NEW_EVENT_ERROR.NO_DESCRIPTION 
-                }"> {{ t('events.new.description') }} <div class="asterisk">*</div> </div>
-                <div class="sub-label"> {{ t('events.new.descriptionSub') }} </div>
-                <textarea type="text" v-model="manager.description" class="text-large"/>
-            </div>
-
-           <!-- Start Date -->
-           <div id="event-start-date-picker" :class="{ 'event-section': true }">
-                <div 
+            <div id="section-one" class="section">
+                <!-- Title -->
+                <input 
+                    id="event-title"
                     :class="{
-                        label: newEventError !== NEW_EVENT_ERROR.INVALID_START_DATE,
-                        error: newEventError === NEW_EVENT_ERROR.INVALID_START_DATE 
+                        label: newEventError !== NEW_EVENT_ERROR.NO_TITLE, 
+                        'title-error': newEventError === NEW_EVENT_ERROR.NO_TITLE 
                     }"
-                > {{ t('events.new.startDate') }} <div class="asterisk">*</div> </div>
-                <div class="sub-label"> {{ t('events.new.startDateSub') }} </div>
-                <DatePicker 
-                    class="date-picker"
-                    v-model="manager.startDate" 
-                    showTime hourFormat="12" 
-                    :pt="{
-                         root: (options) => ({
-                            style: {
-                                'display': 'flex'
-                            }
-                        }),
-                        panel: (options) => ({
-                            style: {
-                                'color': 'var(--primary-label-color)',
-                                'background-color': 'var(--secondary-background-color)'
-                            }
-                        }),
-                        input: () => ({
-                            style: {
-                                'width': '100%',
-                                'border': 'unset',
-                                'outline': 'unset',
-                                'color': 'var(--primary-label-color)',
-                                'background-color': 'var(--secondary-background-color)'
-                            }
-                        }),
-                    }"
+                    class="text-input"
+                    type="text" 
+                    :placeholder="t('events.new.title')"
+                    v-model="manager.title" 
                 />
+
+                <div class="divider"></div>
+
+                <!-- Config -->
+                <div id="event-type-config">
+                    <EventTypePicker v-model:model-value="manager.eventType"/>
+                    <EventVisibilityPicker v-model:model-value="manager.visibility"/>
+                </div>
+
+                <div class="divider"></div>
+
+                <div id="event-time" :style="{'display': 'flex'}">
+                    <!-- Start Date -->
+                    <div id="event-start-date-picker" :class="{ 'event-section': true }">
+                        <div 
+                            :class="{
+                                label: newEventError !== NEW_EVENT_ERROR.INVALID_START_DATE,
+                                error: newEventError === NEW_EVENT_ERROR.INVALID_START_DATE 
+                            }"
+                        > {{ t('events.new.startDate') }} <div class="asterisk">*</div> </div>
+                        <div class="sub-label"> {{ t('events.new.startDateSub') }} </div>
+                        <DatePicker 
+                            class="date-picker"
+                            v-model="manager.startDate" 
+                            showTime hourFormat="12" 
+                            :pt="{
+                                root: (options) => ({
+                                    style: {
+                                        'display': 'flex'
+                                    }
+                                }),
+                                panel: (options) => ({
+                                    style: {
+                                        'color': 'var(--primary-label-color)',
+                                        'background-color': 'var(--secondary-background-color)'
+                                    }
+                                }),
+                                input: () => ({
+                                    style: {
+                                        'width': '100%',
+                                        'border': 'unset',
+                                        'outline': 'unset',
+                                        'color': 'var(--primary-label-color)',
+                                        'background-color': 'var(--secondary-background-color)'
+                                    }
+                                }),
+                            }"
+                        />
+                    </div>
+
+                    <!-- End Date -->
+                    <div id="event-end-date-picker" :class="{ 'event-section': true }">
+                        <div
+                            :class="{
+                                label: newEventError !== NEW_EVENT_ERROR.INVALID_END_DATE,
+                                error: newEventError === NEW_EVENT_ERROR.INVALID_END_DATE 
+                            }
+                        "> {{ t('events.new.endDate') }}<div class="asterisk">*</div>  </div>
+                        <div class="sub-label"> {{ t('events.new.endDateSub') }} </div>
+                        <DatePicker 
+                            class="date-picker"
+                            v-model="manager.endDate" 
+                            showTime hourFormat="12" 
+                            :pt="{
+                                root: (options) => ({
+                                    style: {
+                                        'display': 'flex'
+                                    }
+                                }),
+                                panel: (options) => ({
+                                    style: {
+                                        'color': 'var(--primary-label-color)',
+                                        'background-color': 'var(--secondary-background-color)'
+                                    }
+                                }),
+                                input: () => ({
+                                    style: {
+                                        'border': 'unset',
+                                        'outline': 'unset',
+                                        'color': 'var(--primary-label-color)',
+                                        'background-color': 'var(--secondary-background-color)'
+                                    }
+                                }),
+                            }"
+                        />
+                    </div>
+                </div>
             </div>
 
-            <!-- End Date -->
-            <div id="event-end-date-picker" :class="{ 'event-section': true }">
-                <div
-                    :class="{
-                        label: newEventError !== NEW_EVENT_ERROR.INVALID_END_DATE,
-                        error: newEventError === NEW_EVENT_ERROR.INVALID_END_DATE 
-                    }
-                "> {{ t('events.new.endDate') }}<div class="asterisk">*</div>  </div>
-                <div class="sub-label"> {{ t('events.new.endDateSub') }} </div>
-                <DatePicker 
-                    class="date-picker"
-                    v-model="manager.endDate" 
-                    showTime hourFormat="12" 
-                    :pt="{
-                        root: (options) => ({
-                            style: {
-                                'display': 'flex'
-                            }
-                        }),
-                        panel: (options) => ({
-                            style: {
-                                'color': 'var(--primary-label-color)',
-                                'background-color': 'var(--secondary-background-color)'
-                            }
-                        }),
-                        input: () => ({
-                            style: {
-                                'border': 'unset',
-                                'outline': 'unset',
-                                'color': 'var(--primary-label-color)',
-                                'background-color': 'var(--secondary-background-color)'
-                            }
-                        }),
-                    }"
-                />
+            <div id="section-two">
+                <EventHostsCard :sponsors="[]" :organizers="[]"/>
             </div>
+
+            <div id="section-three" class="section">
+                <!-- Sports Picker -->
+                <div id="event-sports-picker">
+                    <h4>{{ t('events.new.sport') }}</h4>
+                    <div class="sub-label"> {{ t('events.new.sportSub') }} </div>
+                    <MultiSportsPicker v-model:model-value="eventSports" :sports="session.sports"/>
+                </div>
+
+                <div class="divider"></div>
+
+                <!-- Body -->
+                <div id="event-description">
+                    <h4 :class="{
+                        error: newEventError === NEW_EVENT_ERROR.NO_DESCRIPTION
+                    }"> {{ t('events.new.description') }} </h4>
+                    <div class="sub-label"> {{ t('events.new.descriptionSub') }} </div>
+                    <textarea type="text" v-model="manager.description" class="text-large"/>
+                </div>
+            </div>           
         </div>
+
         <div id="right">
             <!-- Venues Picker -->
-            <div id="event-venue-picker" 
-                :class="{ 'event-section': true }"
-                :style="{ margin: 'unset', marginTop: '2.5rem', marginBottom: '1rem' }"
-            >
-                <div :class="{ 
-                    label: newEventError !== NEW_EVENT_ERROR.NO_VENUES, 
-                    error: newEventError === NEW_EVENT_ERROR.NO_VENUES 
-                }"> {{ t('events.new.locations') }} <div class="asterisk">*</div> </div>
-                <div class="sub-label"> {{ t('events.new.locationsSub') }} </div>
-                <EventVenuesPicker v-model:model-value="manager.venues"/>
-            </div>
+            <EventVenuesPicker class="venue-padding" v-model:model-value="manager.venues"/>
 
             <!-- Image Picker -->
             <div id="event-image-picker" v-if="eventSports.length > 0">
@@ -157,21 +149,21 @@
             </div>
 
             <!-- Event Tags -->
-            <div id="event-tags-picker">
-                <div class="label">{{ t('events.new.tags') }}</div>
+            <div id="event-tags-picker" class="section">
+                <h4>{{ t('events.new.tags') }}</h4>
                 <div class="sub-label"> {{ t('events.new.tagsSub') }} </div>
-                
+
                 <MultiTagsPicker :tags="session.tags" v-model:model-value="manager.tags"/>
             </div>
 
             <!-- Advanced Settings -->
-            <div id="advanced-settings" @click="showAdvancedSettings = true">
-                {{ t('events.new.advancedSettings') }}
+            <button id="advanced-settings" class="glass" @click="showAdvancedSettings = true">
                 <picture class="centered">
                     <source srcset="@/assets/icons/gear/gear.white.svg" media="(prefers-color-scheme: dark)">
                     <img src="@/assets/icons/gear/gear.svg"/>
                 </picture>
-            </div>
+                {{ t('events.new.advancedSettings') }}
+            </button>
 
             <!-- Primary Action -->
             <div id="action-wrapper">
@@ -219,7 +211,7 @@ import BoldTextButton from '~/components/Buttons/LoadingButtons/BoldTextButton/B
 import EventVenuesPicker from '~/components/Events/New Event/EventVenuesPicker/EventVenuesPicker.vue';
 import EventAdvancedSettings from '~/components/Events/New Event/EventAdvancedSettings/EventAdvancedSettings.vue';
 import EventVisibilityPicker from '~/components/Events/New Event/EventVisibilityPicker/EventVisibilityPicker.vue';
-import EventOrganizersPicker from '~/components/Events/New Event/EventOrganizersPicker/EventOrganizersPicker.vue';
+import EventHostsCard from '~/components/Events/New Event/EventHostsCard/EventHostsCard.vue';
 
 
 const { t } = useI18n();
@@ -334,7 +326,8 @@ useSeoMeta({
             font-weight: bold;
             padding: 0rem 1rem;
             border-radius: 10px;
-            background-color: var(--secondary-background-color);
+            font-family: 'Archivo';
+            background-color: var(--component-background-color);
         }
 
         #event-type-config {
@@ -359,18 +352,35 @@ useSeoMeta({
         flex-direction: column;
 
         #advanced-settings {
+            all: unset;
             gap: 0.5rem;
-            margin: 1rem 0rem;
-            display: flex;
             cursor: pointer;
-            font-weight: bold;
+            font-weight: 500;
+            margin: 1rem 0rem;
+            width: fit-content;
             align-items: center;
+            border-radius: 25px;
+            display: inline-flex;
+            padding: 0.5rem 1.25rem;
+            backdrop-filter: blur(20px);
+            color: var(--primary-label-color);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--component-border);
+            background-color: var(--secondary-background-color);
+
+            &:hover {
+                background-color: var(--tertiary-background-color);
+            }
         }
 
         #action-wrapper {
             margin-top: 5rem;
         }
     }
+}
+
+.venue-padding {
+    margin-top: 4rem;
 }
 
 @media (max-width: 1030px) {
@@ -393,6 +403,10 @@ useSeoMeta({
         }
     }
 }
+
+.venue-padding {
+    margin-top: 1rem;
+}
 }
 
 #header {
@@ -407,6 +421,19 @@ useSeoMeta({
     }
 }
 
+.section {
+    padding: 1rem;
+    border-radius: 20px;
+    border: 1px solid var(--component-border-color);
+    background-color: var(--component-background-color);
+}
+
+.divider {
+    height: 2px;
+    width: 100%;
+    background-color: var(--divider-color);
+}
+
 .centered {
     display: flex;
     align-items: center;
@@ -416,18 +443,19 @@ useSeoMeta({
 .button {
     all: unset;
     cursor: pointer;
-    padding: 0.5rem;
     height: fit-content;
     border-radius: 10px;
+    padding: 0.25rem 0.5rem;
+    border: 1px solid var(--component-border-color);
     background-color: var(--secondary-background-color);
 
     &:hover {
         transform: scale(1.1);
+        background-color: var(--tertiary-background-color);
     }
 }
 
 .date-picker {
-    padding: 0.5rem;
     border-radius: 10px;
     background-color: var(--secondary-background-color);
 }
@@ -439,6 +467,7 @@ useSeoMeta({
 .label {
     display: flex;
     font-weight: 500;
+    font-size: 0.9rem;
     color: var(--primary-label-color);
 }
 
@@ -455,19 +484,18 @@ useSeoMeta({
     font-size: 1.3rem;
     padding: 0rem 0.5rem;
     border-radius: 10px;
-    color: var(--primary-label-color);
-    background-color: var(--secondary-background-color);
 }
 
 .text-large {
     width: 100%;
-    height: 6rem;
+    height: 12rem;
     border: unset;
-    padding: 0.5rem;
-    font-size: 1.3rem;
-    border-radius: 10px;
+    resize: vertical;
+    padding: 0.75rem;
+    font-size: 1rem;
+    border-radius: 14px;
     color: var(--primary-label-color);
-    background-color: var(--secondary-background-color);
+    background-color: var(--primary-background-color);
 }
 
 .error {
@@ -484,11 +512,23 @@ useSeoMeta({
     color: var(--tertiary-brand-color);
 }
 
+#event-image-picker {
+    margin-top: 1rem;
+}
+
 #event-sports-picker {
-    margin: 0rem 1rem;
+    margin: 0rem;
+}
+
+#event-description {
+    margin-top: 0.75rem;
 }
 
 #event-tags-picker {
     margin-top: 1rem;
+
+    .sub-label {
+        margin-bottom: 0.5rem;
+    }
 }
 </style>

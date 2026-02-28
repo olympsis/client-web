@@ -71,7 +71,7 @@
 	--quaternary-brand-color: #A5E9E8;
 
 	--primary-background-color: #FFFFFF;
-	--secondary-background-color: #F4F4F7;
+	--secondary-background-color: #F3F2EF;
 	--tertiary-background-color: #FFFFFF;
 
 	--primary-label-color: #000000;
@@ -92,12 +92,15 @@
 	--button-border-radius: 10px;
 	--icon-border-color: rgb(0, 0, 0, 0.1);
 
+	--divider-color: #D9D9D9;
+	
 	--desktop-max-width: 58rem;
 
 	--navigation-label: #262E57;
 	--navigation-border: rgba(0, 0, 0, 0.15);
-	--component-border:  rgba(0, 0, 0, 0.20);
-	--component-border-color: color-mix(in srgb, #F3F2EF 60%, transparent);
+	--component-border: color-mix(in srgb, var(--olympsis-gray) 12%, transparent);;
+	--component-border-color: color-mix(in srgb, var(--secondary-background-color) 60%, transparent);
+	--component-background-color: color-mix(in srgb, var(--secondary-background-color) 40%, transparent);
 
 	--home-icon: url('@/assets/icons/home/home.svg');
     --home-icon-selected: url('@/assets/icons/home/home.fill.svg');
@@ -141,6 +144,8 @@
 		--navigation-border: rgba(255, 255, 255, 0.15);
 		--icon-border-color: rgb(255, 255, 255, 0.1);
 
+		--divider-color: var(--tertiary-background-color);
+
 		--component-border:  rgba(255, 255, 255, 0.20);
 
 		--home-icon: url('@/assets/icons/home/home.white.svg');
@@ -155,7 +160,8 @@
 		--chats-icon: url('@/assets/icons/bubble2/bubble.2.white.svg');
 		--chats-icon-selected: url('@/assets/icons/bubble2/bubble.2.fill.white.svg');
 
-		--component-border-color: color-mix(in srgb, #FFFFFF 40%, transparent);
+		--component-border-color: color-mix(in srgb, var(--secondary-background-color) 60%, transparent);
+		--component-background-color: color-mix(in srgb, var(--secondary-background-color) 40%, transparent);
 	}
 
 	.glass {

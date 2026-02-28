@@ -29,10 +29,15 @@ const props = defineProps({ text: { type: String, required: true }});
     font-weight: bold;
     font-style: italic;
     align-items: center;
+    border-radius: 20px;
     justify-content: center;
     text-transform: uppercase;
-    border-radius: var(--button-border-radius);
-    background-color: var(--primary-brand-color);
+    border: 1px solid var(--component-border-color);
+    background-color: color-mix(in srgb, var(--primary-brand-color) 85%, transparent);
+
+    &:hover {
+        background-color: color-mix(in srgb, var(--primary-brand-color) 75%, transparent);
+    }
 }
 
 /* HTML: <div class="loader"></div> */

@@ -20,15 +20,15 @@ const model = defineModel('value',{ required: true });
     border-radius: 18px;
     align-items: center;
     padding: 0.25rem 0rem;
-    background-color: var(--secondary-background-color);
     border: 1px solid var(--component-border);
+    background-color: var(--secondary-background-color);
     transition: border-color 0.2s ease;
 
     /* Focus styling when input inside is focused */
     &:focus-within {
-        border-color: #007AFF; /* Blue border - adjust to your preferred color */
+        border-color: var(--quaternary-brand-color); /* Blue border - adjust to your preferred color */
         outline: none;
-        box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.2); /* Optional: adds a subtle glow */
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--quaternary-brand-color) 10%, transparent);
     }
 
     picture {

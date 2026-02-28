@@ -35,8 +35,8 @@ function handleSelectedTag(tag: Tag) {
 #multi-tags-picker {
     gap: 0.5rem;
     display: flex;
-    padding: unset;
-    overflow-x: scroll;
+    padding: 1rem 0rem;
+    overflow-x: auto;
     flex-direction: row;
     list-style-type: none;
     margin-bottom: 0.5rem;
@@ -45,18 +45,24 @@ function handleSelectedTag(tag: Tag) {
         display: flex;
         cursor: pointer;
         align-items: center;
-        border-radius: 16px;
+        border-radius: 20px;
         white-space: nowrap;
-        margin-bottom: 0.5rem;
-        padding: 0.25rem 0.75rem;
+        padding: 0.35rem 0.85rem;
         justify-content: center;
         text-transform: capitalize;
+        color: var(--primary-label-color);
         border: var(--component-border) solid 1px;
         background-color: var(--secondary-background-color);
+
+        &:not(.selected):hover {
+            background-color: var(--tertiary-background-color);
+        }
     }
 
     .selected {
-        border: var(--secondary-brand-color) solid 1px;
+        color: white;
+        border-color: var(--primary-brand-color);
+        background-color: var(--primary-brand-color);
     }
 }
 </style>

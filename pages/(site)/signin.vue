@@ -40,9 +40,10 @@ async function handleSignInWithApple() {
 		} else {
 			auth.resetState();
 			session.resetSession();
+			// TODO:// remove after app launch — revert to /home
 			await navigateTo({
-				path: '/home',
-				query: { from: '/signin' } 
+				path: '/events',
+				query: { from: '/signin' }
 			});
 		}
 	}
@@ -51,14 +52,15 @@ async function handleSignInWithApple() {
 async function handleSignInWithGoogle() {
 	const response = await auth.signInWithGoogle();
 	if (response) {
-		if (response?.isNewUser) { 
+		if (response?.isNewUser) {
 			isSignedUp.value = true;
 		} else {
 			auth.resetState();
 			session.resetSession();
+			// TODO:// remove after app launch — revert to /home
 			await navigateTo({
-				path: '/home',
-				query: { from: '/signin' } 
+				path: '/events',
+				query: { from: '/signin' }
 			});
 		}
 	}
@@ -76,9 +78,10 @@ async function handleAuthCompletion(event: any) {
 		createState.value = VIEW_STATE.SUCCESS;
 		auth.resetState();
 		session.resetSession();
+		// TODO:// remove after app launch — revert to /groups/search
 		await navigateTo({
-			path: '/groups/search',
-			query: { from: '/signin' } 
+			path: '/events',
+			query: { from: '/signin' }
 		});
   } else {
       createState.value = VIEW_STATE.PENDING;

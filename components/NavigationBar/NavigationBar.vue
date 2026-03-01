@@ -1,6 +1,7 @@
 <template>
     <header id="navigation-bar">
-        <NuxtLink to="/home" id="logo">
+        <!-- TODO:// remove after app launch — revert to /home -->
+        <NuxtLink to="/events" id="logo">
             Olympsis
         </NuxtLink>
        

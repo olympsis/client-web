@@ -27,16 +27,18 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
         sessionStore.loadingState = VIEW_STATE.SUCCESS;
     }
     
-    // If authenticated user tries to access signin, redirect to home
+    // If authenticated user tries to access signin, redirect to events
     if (authStore.isAuthenticated && to.path === '/signin') {
-        return navigateTo('/home');
+        return navigateTo('/events');
     }
-    
-    // Handle /groups path redirection rule
-    if (to.path.startsWith('/groups')) {
-        const isGroupsSearchPattern = to.path === '/groups/search' || to.path.match(/^\/groups\/search\/(\d+)$/);
-        if (!isGroupsSearchPattern && sessionStore.user?.clubs?.length == 0) {
-            return navigateTo('/groups/search');
+
+    // TODO:// remove after app launch
+    // Redirect disabled routes (home, groups, rooms) to /events
+    if (to.path === '/home' || to.path.startsWith('/groups') || to.path.startsWith('/rooms')) {
+        // Allow group search detail pages for SEO/sharing links
+        const isGroupSearchDetail = to.path.match(/^\/groups\/search\/([a-zA-Z0-9]+)$/);
+        if (!isGroupSearchDetail) {
+            return navigateTo('/events');
         }
     }
     

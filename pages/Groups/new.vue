@@ -1,5 +1,4 @@
 <template>
-    <NavigationBar/>
     <div id="new-group-view">
         <div id="left">
             <!-- Header -->
@@ -92,7 +91,6 @@ import { GroupSelection, Sport, Tag } from '@/data/models/GenericModels';
 import { NewGroupManager, NEW_GROUP_ERROR } from '@/data/managers/NewGroupManager';
 
 import LocalePicker from '@/components/LocalePicker/LocalePicker.vue';
-import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
 import MultiTagsPicker from '~/components/MultiTagsPicker.vue/MultiTagsPicker.vue';
 import MultiSportsPicker from '@/components/MultiSportsPicker/MultiSportsPicker.vue';
 import GroupTypePicker from '~/components/Groups/New Group/GroupTypePicker/GroupTypePicker.vue';

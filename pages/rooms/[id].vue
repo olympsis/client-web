@@ -1,5 +1,4 @@
 <template>
-    <NavigationBar/>
     <main id="chat-room">
         <!-- Chat Room Header -->
         <div id="header">

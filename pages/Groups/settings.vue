@@ -1,5 +1,4 @@
 <template>
-    <NavigationBar/>
     <main id="group-settings-view">
         <!-- Group Header -->
         <div id="header">
@@ -114,7 +113,6 @@ import { useSessionStore } from '@/stores/session-store';
 import { Organization } from '@/data/models/OrganizationModels';
 
 import Dialog from 'primevue/dialog';
-import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
 import GroupSelector from '@/components/Groups/GroupSelector/GroupSelector.vue';
 import MemberListItem from '@/components/Groups/MemberListItem/MemberListItem.vue';
 import ChangeRankModal from '~/components/Modals/Groups/ChangeRank/ChangeRankModal.vue';

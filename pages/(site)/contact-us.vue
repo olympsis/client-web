@@ -1,5 +1,4 @@
 <template>
-	<TopBar/>
 	<main id="main">
 		<h2 class="header"> Reach out to us </h2>
 		<div class="container">
@@ -11,12 +10,10 @@
 			<a href="https://twitter.com/olympsis"><img src="@/assets/images/twitter.png"/></a>
 		</div>
 	</main>
-  <BottomBar/>
 </template>
   
 <script setup lang="ts">
-import TopBar from '~/components/site/TopBar/TopBar.vue';
-import BottomBar from '~/components/site/BottomBar/BottomBar.vue';
+definePageMeta({ layout: 'site' });
 
 useSeoMeta({
     title: 'Contact Us | Olympsis',

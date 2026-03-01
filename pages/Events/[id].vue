@@ -1,5 +1,4 @@
 <template>
-    <NavigationBar/>
     <main id="event-detail-view" :class="{ 'dark-bg': isDarkBackground, 'light-bg': !isDarkBackground }">
         <!-- Blurred event image background -->
         <div
@@ -90,7 +89,6 @@ import * as Sentry from '@sentry/nuxt';
 import AuthModal from '@/components/Auth/AuthModal/AuthModal.vue';
 import EventBody from '~/components/Events/EventBody/EventBody.vue';
 import EventMedia from '~/components/Events/EventMedia/EventMedia.vue';
-import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
 import EventHeader from '~/components/Events/EventHeader/EventHeader.vue';
 import EventFormats from '~/components/Events/EventFormats/EventFormats.vue';
 import EventComments from '~/components/Events/EventComments/EventComments.vue';

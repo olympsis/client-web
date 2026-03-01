@@ -1,7 +1,9 @@
 <template>
 	<div id="app">
 		<Toast/>
-		<NuxtPage/>
+		<NuxtLayout>
+			<NuxtPage/>
+		</NuxtLayout>
 		<LocationDialog/>
 	</div>
 </template>

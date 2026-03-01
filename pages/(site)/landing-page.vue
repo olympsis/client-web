@@ -1,5 +1,4 @@
 <template>
-	<TopBar/>
 	<main id="landing">
 		<!-- Hero Section — Basketball Background
 			 "How It Works" panel sits at the bottom of the hero,
@@ -81,12 +80,10 @@
 			</div>
 		</section>
 	</main>
-	<BottomBar/>
 </template>
 
 <script setup lang="ts">
-import TopBar from '~/components/site/TopBar/TopBar.vue';
-import BottomBar from '~/components/site/BottomBar/BottomBar.vue';
+definePageMeta({ layout: 'site' });
 
 useSeoMeta({
 	title: 'Olympsis — Find Your Game',

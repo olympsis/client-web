@@ -1,5 +1,4 @@
 <template>
-    <NavigationBar/>
     <main id="chats-view">
         <!-- Header -->
          <div id="header">
@@ -38,7 +37,6 @@ import { ChatRoom } from '@/data/models/ChatModels';
 import { computed, type ComputedRef, type Ref, ref } from 'vue';
 import { useSessionStore } from '@/stores/session-store';
 
-import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
 import ChatListItem from '@/components/Chats/ChatListItem/ChatListItem.vue';
 
 const router = useRouter();

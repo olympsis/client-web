@@ -1,5 +1,4 @@
 <template>
-	<TopBar/>
 	<main id="main">
 		<h2 class="header">What is Olympsis?</h2>
 		<div class="content-container">
@@ -11,12 +10,10 @@
 			<p class="text2">Our goal is to create something truly exceptional, and we value the input of our amazing community. We believe that your feedback is invaluable in shaping the future of our product. If you’re an iOS user and want to be a part of this journey, we invite you to join us in the alpha testing phase. Your insights and suggestions will play a pivotal role in making our project the best it can be. Together, we can create something extraordinary! Join us on the iOS platform and help us shape the future.</p>
 		</div>
 	</main>
-  <BottomBar/>
 </template>
 
 <script setup lang="ts">
-import TopBar from '~/components/site/TopBar/TopBar.vue';
-import BottomBar from '~/components/site/BottomBar/BottomBar.vue';
+definePageMeta({ layout: 'site' });
 
 useSeoMeta({
     title: 'About Us | Olympsis',

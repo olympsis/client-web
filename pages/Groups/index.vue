@@ -1,5 +1,4 @@
 <template>
-    <NavigationBar/>
     <main id="group-view">
         <GroupLogoAndBanner
             v-if="group"
@@ -78,7 +77,6 @@ import PostFeed from '@/components/Posts/PostFeed/PostFeed.vue';
 import GroupInfo from '~/components/Groups/GroupInfo/GroupInfo.vue';
 import GroupFeed from '~/components/Groups/GroupFeed/GroupFeed.vue';
 import NewPostView from '@/components/Posts/NewPostView/NewPostView.vue';
-import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
 import GroupSelector from '@/components/Groups/GroupSelector/GroupSelector.vue';
 import GroupNextEvent from '~/components/Groups/GroupNextEvent/GroupNextEvent.vue';
 import ChangeRankModal from '~/components/Modals/Groups/ChangeRank/ChangeRankModal.vue';

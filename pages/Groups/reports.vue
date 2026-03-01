@@ -1,5 +1,4 @@
 <template>
-    <NavigationBar/>
     <main id="group-reports-view">
         <!-- Header -->
         <div id="header">
@@ -24,7 +23,6 @@
 <script setup lang="ts">
 import { ref, type Ref } from 'vue';
 import { useRouter } from 'vue-router';
-import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
 
 const router = useRouter();
 const reports: Ref<any[]> = ref([]);

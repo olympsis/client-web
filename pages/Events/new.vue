@@ -1,5 +1,4 @@
 <template>
-    <NavigationBar/>
     <div id="new-event-view">
         <div id="left">
             <!-- Header -->
@@ -202,7 +201,6 @@ import { VIEW_STATE, NEW_EVENT_ERROR } from '~/data/Enums';
 
 import Drawer from 'primevue/drawer';
 import DatePicker from 'primevue/datepicker';
-import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
 import MultiTagsPicker from '~/components/MultiTagsPicker.vue/MultiTagsPicker.vue';
 import MultiSportsPicker from '~/components/MultiSportsPicker/MultiSportsPicker.vue';
 import EventTypePicker from '~/components/Events/New Event/EventTypePicker/EventTypePicker.vue';

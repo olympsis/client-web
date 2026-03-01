@@ -1,5 +1,4 @@
 <template>
-    <NavigationBar/>
     <main id="groups-search">
         <div id="header">
             <h1>Explore Groups</h1>
@@ -69,7 +68,6 @@ import { Location, Sport, Tag } from '@/data/models/GenericModels';
 import Drawer from 'primevue/drawer';
 import SearchBar from '@/components/SearchBar/SearchBar.vue';
 import SportsFilter from '~/components/SportsFilter/SportsFilter.vue';
-import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
 import ClubListCard from '@/components/Groups/Clubs/ClubListCard/ClubListCard.vue';
 import ClubListCardTemplate from '@/components/Groups/Clubs/ClubListCardTemplate/ClubListCardTemplate.vue';
 

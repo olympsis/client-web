@@ -1,5 +1,4 @@
 <template>
-    <NavigationBar/>
     <main id="profile-page">
         <div id="top">
             <button @click="profileSettingsModal?.show()">
@@ -87,7 +86,6 @@ import UserIcon from '@/components/UserIcon/UserIcon.vue';
 // import AwardsTab from '~/components/Profile/AwardsTab/AwardsTab.vue';
 // import GroupsTab from '~/components/Profile/GroupsTab/GroupsTab.vue';
 import EventsTab from '~/components/Profile/EventsTab/EventsTab.vue';
-import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
 import ProfileSettings from '~/components/Profile/ProfileSettings/ProfileSettings.vue';
 import EditProfileView from '~/components/Modals/Profile/EditProfile/EditProfileView.vue';
 
@@ -201,8 +199,7 @@ onMounted(() => {
             background: rgba(243, 242, 239, 0.40);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
-
+            
             &:hover {
                 transform: scale(1.1);
             }
@@ -236,8 +233,7 @@ onMounted(() => {
             background: rgba(243, 242, 239, 0.40);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
-
+            
             &:hover {
                 transform: scale(1.1);
             }
@@ -255,8 +251,7 @@ onMounted(() => {
         background: rgba(243, 242, 239, 0.40);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
-        box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
-    }
+            }
 
     .nav-card {
         margin-top: auto;
@@ -383,8 +378,7 @@ onMounted(() => {
     #edit-profile-view {
         border-radius: 20px;
         max-width: 25rem !important;
-        box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
-    }
+            }
 }
 
 #profile-settings-modal {
@@ -396,8 +390,7 @@ onMounted(() => {
     #profile-settings {
         border-radius: 20px;
         max-width: 25rem !important;
-        box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
-    }
+            }
 }
 
 /* Dark-mode glass tint — matches .glass in main.css */

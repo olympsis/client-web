@@ -1,5 +1,4 @@
 <template>
-    <NavigationBar/>
     <main id="home-view">
         <!-- Welcome -->
         <WelcomeCard :name="name" :state="state"/>
@@ -41,7 +40,6 @@ import { useSessionStore } from '@/stores/session-store';
 
 import QuickActions from '~/components/QuickActions/QuickActions.vue';
 import WelcomeCard from '@/components/Home/WelcomeCard/WelcomeCard.vue';
-import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
 import NearbyVenues from '~/components/Venues/NearbyVenues/NearbyVenues.vue';
 import EventsSection from '~/components/Events/EventsSection/EventsSection.vue';
 import MotivationalQuote from '~/components/MotivationalQuote/MotivationalQuote.vue';

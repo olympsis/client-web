@@ -64,8 +64,7 @@ defineEmits([
     -webkit-backdrop-filter: blur(20px);
     border: var(--component-border) solid 1px;
     border-radius: 20px;
-    box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
-
+    
     #header {
         button {
             margin-left: 1rem;
@@ -99,8 +98,7 @@ defineEmits([
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border: var(--component-border) solid 1px;
-            box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
-        }
+                    }
 
         a {
             padding: 1rem;
@@ -117,8 +115,7 @@ defineEmits([
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border: var(--component-border) solid 1px;
-            box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
-        }
+                    }
 
         .icon {
             /* width: 24px; */

@@ -1,5 +1,4 @@
 <template>
-  <NavigationBar/>
   <main id="signin">
     <AuthenticationCard 
         v-if="!isSignedUp" 
@@ -12,7 +11,6 @@
 		:state="createState"
 	/>
   </main>
-  <BottomBar/>
 </template>
 
 <script setup lang="ts">
@@ -22,11 +20,10 @@ import { VIEW_STATE } from '~/data/Enums';
 import { UserDTO } from '~/data/models/UserModels';
 import { AuthenticationFacade } from '~/data/facades/AuthenticationFacade';
 
-import TopBar from '~/components/site/TopBar/TopBar.vue';
-import BottomBar from '~/components/site/BottomBar/BottomBar.vue';
-import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
 import CreateUserCard from '~/components/Auth/CreateUserCard/CreateUserCard.vue';
 import AuthenticationCard from '~/components/Auth/AuthenticationCard/AuthenticationCard.vue';
+
+definePageMeta({ layout: 'site' });
 
 const auth = useAuth();
 const session = useSessionStore();

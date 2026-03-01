@@ -1,5 +1,4 @@
 <template>
-    <NavigationBar/>
     <main id="group-applications-view">
         <!-- Header -->
         <div id="header">
@@ -33,7 +32,6 @@ import { ClubApplication } from '@/data/models/ClubModels';
 import { GroupSelection } from '@/data/models/GenericModels';
 import { computed, type ComputedRef, ref, type Ref } from 'vue';
 
-import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
 import ClubApplicationCard from '@/components/Groups/Clubs/ClubApplicationCard/ClubApplicationCard.vue';
 
 const router = useRouter();

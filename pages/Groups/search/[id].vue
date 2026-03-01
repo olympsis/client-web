@@ -1,5 +1,4 @@
 <template>
-    <NavigationBar/>
     <div id="group-detail">
         <div id="sub-nav">
             <button class="button" @click="handleBackNavigation">
@@ -49,7 +48,6 @@ import * as Sentry from '@sentry/nuxt';
 import AuthModal from '~/components/Auth/AuthModal/AuthModal.vue';
 import GroupFeed from '~/components/Groups/GroupFeed/GroupFeed.vue';
 import GroupInfo from '~/components/Groups/GroupInfo/GroupInfo.vue';
-import NavigationBar from '~/components/NavigationBar/NavigationBar.vue';
 import GroupSmallSection from '~/components/Groups/GroupSmallSection/GroupSmallSection.vue';
 import GroupLogoAndBanner from '@/components/Groups/GroupLogoAndBanner/GroupLogoAndBanner.vue';
 

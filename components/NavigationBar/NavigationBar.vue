@@ -1,7 +1,7 @@
 <template>
     <header id="navigation-bar">
         <!-- TODO:// remove after app launch — revert to /home -->
-        <NuxtLink to="/events" id="logo">
+        <NuxtLink :to="isAuthenticated ? '/events' : '/landing-page'" id="logo">
             Olympsis
         </NuxtLink>
        
@@ -95,7 +95,9 @@ function hideMenu() {
     }
 
     .signin {
+        color: black;
         margin-left: 1rem;
+        background-color: white;
     }
 
     /* Keeps navbar from shifting while client resolves auth state */

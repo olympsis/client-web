@@ -32,6 +32,7 @@ export const useAuthStore = defineStore('auth', () => {
                 resolve();
                 return;
             }
+            
             const unsubscribe = onAuthStateChanged(auth, (user) => {
                 firebaseUser.value = user;
                 

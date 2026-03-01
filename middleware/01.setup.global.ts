@@ -27,8 +27,13 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
         sessionStore.loadingState = VIEW_STATE.SUCCESS;
     }
     
-    // If authenticated user tries to access signin, redirect to events
-    if (authStore.isAuthenticated && to.path === '/signin') {
+    // Authenticated users go to /events, unauthenticated go to landing page
+    if (to.path === '/') {
+        return navigateTo(authStore.isAuthenticated ? '/events' : '/landing-page');
+    }
+
+    // If authenticated user tries to access signin or landing page, redirect to events
+    if (authStore.isAuthenticated && (to.path === '/signin' || to.path === '/landing-page')) {
         return navigateTo('/events');
     }
 
@@ -44,10 +49,13 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     
     // Define public routes that don't require authentication
     const isPublicRoute = to.path === '/signin' ||
+                            to.path === '/landing-page' ||
+                            to.path === '/about-us' ||
                             to.path === '/contact-us' ||
                             to.path === '/terms-of-use' ||
                             to.path === '/privacy-policy' ||
-                            to.path.match(/^\/events\/([a-zA-Z0-9]+)$/) !== null || 
+                            to.path === '/events' ||
+                            to.path.match(/^\/events\/([a-zA-Z0-9]+)$/) !== null ||
                             to.path.match(/^\/groups\/search\/([a-zA-Z0-9]+)$/) !== null;
     
     // Redirect unauthenticated users from non-public routes

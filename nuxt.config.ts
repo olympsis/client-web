@@ -32,7 +32,7 @@ export default defineNuxtConfig({
 								APL_TEAM_ID: process.env.APL_TEAM_ID ?? "",
 
 								public: {
-												MODE: process.env.mode ?? "dev",
+												MODE: process.env.MODE ?? "dev",
 
 												API: process.env.API ?? "",
 												USER_ID: process.env.USER_ID ?? "",
@@ -55,9 +55,7 @@ export default defineNuxtConfig({
 
 				routeRules: {
 								// Sites routes
-								"/": {
-																								redirect: "/signin",
-								},
+								"/": { ssr: false },
 								"/signin": { ssr: false },
 								"/about-us": { prerender: true },
 								"/contact-us": { prerender: true },

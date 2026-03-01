@@ -7,13 +7,15 @@
         <h2>
             Organize sports together. Join groups, find locations, and get active!
         </h2>
-        <div class="auth-buttons">
-            <button id="apple-button" @click="signInWithApple">
+        <!-- TODO:// remove after app launch — re-enable sign in buttons -->
+        <div class="coming-soon">Coming Soon</div>
+        <div class="auth-buttons disabled">
+            <button id="apple-button" disabled>
                 <img src="@/assets/icons/auth/apple.svg"/>
                 Sign in with Apple
             </button>
 
-            <button id="google-button" @click="signInWithGoogle">
+            <button id="google-button" disabled>
                 <img src="@/assets/icons/auth/google.svg"/>
                 Sign in with Google
             </button>
@@ -70,15 +72,31 @@ function signInWithGoogle() {
         font-weight: normal;
     }
 
+    /* TODO:// remove after app launch */
+    .coming-soon {
+        color: var(--tertiary-brand-color);
+        font-weight: 700;
+        font-size: 0.9rem;
+        margin-top: 2.5rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+    }
+
     .auth-buttons {
         display: flex;
-        margin: 2.5rem 0rem;
+        margin: 1rem 0rem;
         flex-direction: column;
         justify-content: space-between;
 
         img {
             cursor: pointer;
         }
+    }
+
+    /* TODO:// remove after app launch */
+    .auth-buttons.disabled {
+        opacity: 0.5;
+        pointer-events: none;
     }
 
     #apple-button {

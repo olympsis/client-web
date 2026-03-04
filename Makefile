@@ -1,4 +1,4 @@
-VERSION ?= v0.1.0
+VERSION ?= v0.1.1
 PROJECT_ID := olympsis-485522
 LOCATION := us-central1-docker.pkg.dev
 SERVICE_NAME := client-web
@@ -19,7 +19,7 @@ image-dev:
 
 # Build and push to GCP Artifact Registry
 artifact:
-	docker build $(call BUILD_ARGS,$(ENV_FILE)) -t $(IMAGE_NAME) --platform linux/amd64 .
+	docker build $(call BUILD_ARGS,.env.prod) -t $(IMAGE_NAME) --platform linux/amd64 .
 	docker tag $(IMAGE_NAME) $(LOCATION)/$(PROJECT_ID)/$(SERVICE_NAME)/release:$(VERSION)
 	docker push $(LOCATION)/$(PROJECT_ID)/$(SERVICE_NAME)/release:$(VERSION)
 

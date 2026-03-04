@@ -1,6 +1,6 @@
-FROM oven/bun:latest
+# --- Build stage ---
+FROM oven/bun:latest AS build
 
-# Set working directory
 WORKDIR /app
 
 # Accept build arguments
@@ -27,7 +27,7 @@ ARG SENTRY_PROJECT
 ARG SENTRY_ORG
 ARG SENTRY_AUTH_TOKEN
 
-# Set environment variables from build args
+# Set environment variables for the Nuxt build
 ENV MODE=${MODE}
 ENV API=${API}
 ENV APL_KEY_ID=${APL_KEY_ID}
@@ -51,25 +51,25 @@ ENV SENTRY_PROJECT=${SENTRY_PROJECT}
 ENV SENTRY_ORG=${SENTRY_ORG}
 ENV SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN}
 
-# Copy package files first for better Docker layer caching
+# Install dependencies
 COPY package.json bun.lockb ./
-
-# Install dependencies using frozen lockfile for reproducible builds
 RUN bun install --frozen-lockfile
 
-# Copy source code
-COPY . .
-
 # Build the application
+COPY . .
 RUN bun run build
 
-# Expose the port (Cloud Run will use PORT environment variable)
+# --- Runtime stage (only the built output, no node_modules or source) ---
+FROM oven/bun:latest
+
+WORKDIR /app
+
+COPY --from=build /app/.output .output
+
 EXPOSE 80
 
-# Set environment variables for production
 ENV NODE_ENV=production
 ENV NITRO_HOST=0.0.0.0
 ENV NITRO_PORT=80
 
-# Start the application
 CMD ["bun", ".output/server/index.mjs"]

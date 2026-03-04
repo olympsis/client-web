@@ -43,7 +43,6 @@ const userImageURL = computed(() => {
     return session.user?.imageURL ? generateImageURL(session.user.imageURL) : undefined;
 });
 
-
 function toggleMenu() {
     isOpen.value = !isOpen.value;
 }
@@ -95,9 +94,12 @@ function hideMenu() {
     }
 
     .signin {
-        color: black;
         margin-left: 1rem;
         background-color: white;
+
+        :deep(.label) {
+            color: black;
+        }
     }
 
     /* Keeps navbar from shifting while client resolves auth state */

@@ -219,7 +219,6 @@ onMounted(() => {
 
     mapState.value = VIEW_STATE.LOADING;
 
-    
     const service = new SnapshotService();
     service.getMapSnapshot(`${city}, ${state} ${country}`)
         .then((blob) => {

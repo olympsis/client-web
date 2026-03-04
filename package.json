@@ -11,7 +11,7 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "gcp-build": "nuxt build",
-    "start": "NODE_ENV=production node .output/server/index.mjs"
+    "start": "NODE_ENV=production bun .output/server/index.mjs"
   },
   "dependencies": {
     "@nuxtjs/i18n": "^10.2.3",

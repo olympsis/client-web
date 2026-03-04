@@ -6,21 +6,21 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Development Server
 ```bash
-npm run dev
+bun run dev
 ```
 Starts the Nuxt development server on http://localhost:3000
 
 ### Build Commands
 ```bash
-npm run build        # Build for production
-npm run generate     # Generate static site
-npm run preview      # Preview production build
+bun run build        # Build for production
+bun run generate     # Generate static site
+bun run preview      # Preview production build
 ```
 
 ### Storybook
 ```bash
-npm run storybook       # Start Storybook dev server on port 6006
-npm run build-storybook # Build Storybook for production
+bun run storybook       # Start Storybook dev server on port 6006
+bun run build-storybook # Build Storybook for production
 ```
 
 ## Architecture Overview

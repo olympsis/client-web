@@ -53,25 +53,29 @@ const venueLocation = computed<string>(() => {
     }
 });
 
-function getCityStateCountry(): { city: string, state: string, country: string } {
+function getLocationCenter(): string | null {
     const firstVenue = props.event.venues.at(0);
-    if (firstVenue && !firstVenue.id) {
-        return { city: firstVenue.city!, state: firstVenue.state!, country: firstVenue.country! };
-    } else {
-        const firstVenue = props.venues.at(0);
-        if (!firstVenue) throw('Fatal error');
-        return { city: firstVenue.city!, state: firstVenue.state!, country: firstVenue.country! }
+    
+    if (firstVenue?.city && firstVenue?.state && firstVenue?.country) {
+        return `${firstVenue.city}, ${firstVenue.state}, ${firstVenue.country}`;
     }
+    
+    if (firstVenue?.location?.coordinates) {
+        return `${firstVenue.location.coordinates[0]}, ${firstVenue.location.coordinates[1]}`;
+    }
+    
+    return null;
 }
 
 onMounted(() => {
     if (mapURL.value) return;
-    const { city, state, country } = getCityStateCountry()
+    const center = getLocationCenter()
+    if (!center) return;
 
     mapState.value = VIEW_STATE.LOADING;
     
     const service = new SnapshotService();
-    service.getMapSnapshot(`${city}, ${state} ${country}`)
+    service.getMapSnapshot(center)
         .then((blob) => {
             mapURL.value = URL.createObjectURL(blob);
             mapState.value = VIEW_STATE.SUCCESS;

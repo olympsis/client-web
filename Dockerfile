@@ -1,8 +1,4 @@
-# Use the official Node.js 22 image for Cloud Run compatibility
-FROM node:22-alpine
-
-# Install pnpm globally
-RUN npm install -g pnpm
+FROM oven/bun:latest
 
 # Set working directory
 WORKDIR /app
@@ -56,16 +52,16 @@ ENV SENTRY_ORG=${SENTRY_ORG}
 ENV SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN}
 
 # Copy package files first for better Docker layer caching
-COPY package*.json ./
+COPY package.json bun.lockb ./
 
-# Install dependencies
-RUN pnpm i
+# Install dependencies using frozen lockfile for reproducible builds
+RUN bun install --frozen-lockfile
 
 # Copy source code
 COPY . .
 
 # Build the application
-RUN pnpm run build
+RUN bun run build
 
 # Expose the port (Cloud Run will use PORT environment variable)
 EXPOSE 80
@@ -75,6 +71,5 @@ ENV NODE_ENV=production
 ENV NITRO_HOST=0.0.0.0
 ENV NITRO_PORT=80
 
-
 # Start the application
-CMD ["node", ".output/server/index.mjs"]
+CMD ["bun", ".output/server/index.mjs"]

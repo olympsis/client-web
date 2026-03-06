@@ -190,6 +190,11 @@
                 />
             </template>
         </Drawer>
+
+        <!-- Auth Modal - shown when unauthenticated user tries to create an event -->
+        <dialog id="auth-modal" ref="auth-modal" class="dialog">
+            <AuthModal class="auth-card" @cancel="hideAuthModal" @user-authenticated="handleNewUserAuthentication"/>
+        </dialog>
     </div>
 </template>
 
@@ -210,13 +215,21 @@ import EventVenuesPicker from '~/components/Events/New Event/EventVenuesPicker/E
 import EventAdvancedSettings from '~/components/Events/New Event/EventAdvancedSettings/EventAdvancedSettings.vue';
 import EventVisibilityPicker from '~/components/Events/New Event/EventVisibilityPicker/EventVisibilityPicker.vue';
 import EventHostsCard from '~/components/Events/New Event/EventHostsCard/EventHostsCard.vue';
+import AuthModal from '@/components/Auth/AuthModal/AuthModal.vue';
 
 
 const { t } = useI18n();
 const toast = useToast();
 const router = useRouter();
+const auth = useAuth();
 const session = useSessionStore();
 const manager = useNewEventManager();
+
+const authModal = useTemplateRef<HTMLDialogElement>('auth-modal');
+
+const isAuthenticated = computed<boolean>(() => {
+    return auth.isAuthenticated.value;
+});
 const state = ref<VIEW_STATE>(VIEW_STATE.PENDING);
 const newEventError = ref<NEW_EVENT_ERROR | null>(null);
 
@@ -234,7 +247,35 @@ watch(eventSports, () => {
     manager.selectedSport = eventSports.value[0];
 }, { immediate: true });
  
+function showAuthModal() {
+    if (authModal.value) {
+        authModal.value.showModal();
+    } else {
+        console.error('Failed to find reference to Auth Modal');
+    }
+}
+
+function hideAuthModal() {
+    if (authModal.value) {
+        authModal.value.close();
+    } else {
+        console.error('Failed to find reference to Auth Modal');
+    }
+}
+
+function handleNewUserAuthentication() {
+    auth.initAuth();
+    session.init();
+    hideAuthModal();
+}
+
 function createNewEvent() {
+    // Show auth modal if user is not authenticated
+    if (!isAuthenticated.value) {
+        showAuthModal();
+        return;
+    }
+
     state.value = VIEW_STATE.LOADING;
 
     try {
@@ -527,6 +568,28 @@ useSeoMeta({
 
     .sub-label {
         margin-bottom: 0.5rem;
+    }
+}
+
+#auth-modal {
+    border: unset;
+    width: fit-content;
+    height: fit-content;
+    margin: auto;
+    background: transparent;
+
+    &::backdrop {
+        backdrop-filter: blur(5px);
+    }
+
+    .auth-card {
+        border-radius: 20px;
+        max-width: 25rem !important;
+        border: var(--component-border-color) solid 1px;
+        box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        background: rgba(255, 255, 255, 0.12);
     }
 }
 </style>

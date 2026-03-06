@@ -4,29 +4,41 @@ import { useAuthStore } from "../stores/auth-store";
 
 export default defineNuxtRouteMiddleware(async (to, from) => {
     if (import.meta.server) return;
-    
+
     const authStore = useAuthStore();
     const sessionStore = useSessionStore();
-    
+
     // Check if this is navigation between routes
     const isNavigating = !!from.name;
-    
+
+    // Routes that can be viewed without authentication or session initialization
+    const isPublicRoute = to.path === '/signin' ||
+                          to.path === '/landing-page' ||
+                          to.path === '/about-us' ||
+                          to.path === '/contact-us' ||
+                          to.path === '/terms-of-use' ||
+                          to.path === '/privacy-policy' ||
+                          to.path === '/events' ||
+                          to.path === '/events/new' ||
+                          to.path.match(/^\/events\/([a-zA-Z0-9]+)$/) !== null ||
+                          to.path.match(/^\/groups\/search\/([a-zA-Z0-9]+)$/) !== null;
+
     // Initialize auth if needed
     if (!authStore.isAuthInitialized) {
         await authStore.initAuth();
     }
 
-    // Load session data only if not already loaded
-    if (authStore.isAuthInitialized && !sessionStore.hasLoaded) {
+    // Only init session for authenticated users on non-public routes
+    if (authStore.isAuthenticated && !sessionStore.hasLoaded && !isPublicRoute) {
         await sessionStore.init();
     }
 
-    // If this is navigation (not initial load) and we're already loaded, 
+    // If this is navigation (not initial load) and we're already loaded,
     // force success state and don't reload
     if (isNavigating && sessionStore.hasLoaded) {
         sessionStore.loadingState = VIEW_STATE.SUCCESS;
     }
-    
+
     // Authenticated users go to /events, unauthenticated go to landing page
     if (to.path === '/') {
         return navigateTo(authStore.isAuthenticated ? '/events' : '/landing-page');
@@ -46,18 +58,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
             return navigateTo('/events');
         }
     }
-    
-    // Define public routes that don't require authentication
-    const isPublicRoute = to.path === '/signin' ||
-                            to.path === '/landing-page' ||
-                            to.path === '/about-us' ||
-                            to.path === '/contact-us' ||
-                            to.path === '/terms-of-use' ||
-                            to.path === '/privacy-policy' ||
-                            to.path === '/events' ||
-                            to.path.match(/^\/events\/([a-zA-Z0-9]+)$/) !== null ||
-                            to.path.match(/^\/groups\/search\/([a-zA-Z0-9]+)$/) !== null;
-    
+
     // Redirect unauthenticated users from non-public routes
     if (!authStore.isAuthenticated && !isPublicRoute) {
         return navigateTo({

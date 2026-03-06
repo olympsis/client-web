@@ -71,18 +71,18 @@ export const useSessionStore = defineStore('session-store', () => {
 
             const config = useRuntimeConfig();
 
-            // Initialize auth if needed
-            if (!authStore.isAuthInitialized && config.public.MODE != 'dev') {
+            // Initialize auth if needed (auth store handles dev mode internally)
+            if (!authStore.isAuthInitialized) {
                 await authStore.initAuth();
             }
 
-            /**
-             * If we fail to authenticate for any reason we should re-route to the login page.
-             * What could possibly go wrong...
-             */
-            if (!authStore.isAuthenticated && config.public.MODE != 'dev') {
-                navigateTo({ path: '/signin' });
-            };
+            // If auth failed, redirect to sign in (skip in dev mode)
+            if (!authStore.isAuthenticated) {
+                if (config.public.MODE !== 'dev') {
+                    await navigateTo({ path: '/signin' });
+                }
+                return;
+            }
 
             // Make Check In request to server
             const service = new UserService();

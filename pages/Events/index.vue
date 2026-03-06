@@ -72,6 +72,7 @@
                 <button class="button" @click="retryFetchEvents">{{ $t('common.tryAgain') }}</button>
             </div>
         </div>
+
     </main>
 </template>
 

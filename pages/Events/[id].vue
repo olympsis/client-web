@@ -913,6 +913,9 @@ watch(eventImageURL, (url) => {
 
 #auth-modal {
     border: unset;
+    width: fit-content;
+    height: fit-content;
+    margin: auto;
     background: transparent;
 
     &::backdrop {

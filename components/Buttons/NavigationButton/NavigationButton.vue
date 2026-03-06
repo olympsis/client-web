@@ -73,7 +73,7 @@ defineProps({
     .label {
         font-size: 1rem;
         font-weight: 400;
-        color: var(--primary-label-color);
+        color: black;
     }
 }
 </style>

@@ -26,7 +26,7 @@ export default defineEventHandler((event) => {
     //   - Self + inline (for Nuxt/Vue hydration)
     const csp = [
         "default-src 'self'",
-        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.firebaseio.com https://apis.google.com https://www.googletagmanager.com",
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.apple-mapkit.com https://*.firebaseio.com https://apis.google.com https://www.googletagmanager.com",
         "style-src 'self' 'unsafe-inline'",
         "img-src 'self' data: blob: https://snapshot.apple-mapkit.com https://*.apple-mapkit.com https://*.googleapis.com https://www.googletagmanager.com",
         "font-src 'self' data:",

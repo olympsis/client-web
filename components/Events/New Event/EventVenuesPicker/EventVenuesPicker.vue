@@ -8,7 +8,7 @@
         <!-- Content: venue cards + add button -->
         <div id="venues-content">
             <div v-for="(venue, i) in model" :key="i" class="venue-card">
-                <button class="remove-badge" @click="removeVenue(venue)">
+                <button class="remove-badge" @click="removeVenueFromModel(venue)">
                     <img src="@/assets/icons/xmark/xmark.red.svg" />
                 </button>
                 <div class="venue-name">{{ venue.name }}</div>
@@ -16,7 +16,7 @@
                 <div class="venue-coords" v-if="venue.location">{{ venue.location.coordinates?.[1]?.toFixed(6) }}, {{ venue.location.coordinates?.[0]?.toFixed(6) }}</div>
             </div>
 
-            <button class="add-location-btn" @click="showPicker = true">
+            <button class="add-location-btn" @click="openPicker">
                 <picture>
                     <source srcset="@/assets/icons/pin-drop/pin.drop.white.svg" media="(prefers-color-scheme: dark)" />
                     <img src="@/assets/icons/pin-drop/pin.drop.svg" />
@@ -26,245 +26,417 @@
         </div>
     </div>
 
-    <!-- Venue Picker Dialog -->
-    <Dialog
-        ref="op"
-        id="event-venues-popup"
-        v-model:visible="showPicker"
-        blockScroll
-        position="center"
-        :style="{'height': '80vh', 'width': '100%', 'max-width': '32rem', 'overflow-y': 'scroll', 'background-color': 'var(--primary-background-color)'}"
-    >
-        <template #container="{ closeCallback }">
-            <div id="event-venues-popup-container" :key="randomKey">
-                <!-- Popup Header -->
-                <div id="popup-header">
-                    <button id="cancel" @click="dismissModal(closeCallback)"> {{ $t('common.cancel') }} </button>
+    <!-- Location Picker Dialog -->
+    <dialog id="locations-dialog" ref="locations-dialog" class="dialog">
+        <div id="locations-picker">
+            <!-- Header -->
+            <div class="picker-header">
+                <button class="header-icon-btn" @click="closePicker">
+                    <picture>
+                        <source srcset="@/assets/icons/xmark/xmark.white.svg" media="(prefers-color-scheme: dark)" />
+                        <img src="@/assets/icons/xmark/xmark.svg" />
+                    </picture>
+                </button>
 
-                    {{ t('events.venues.title') }}
+                <span class="picker-title">{{ t('events.venues.title') }}</span>
 
-                    <button id="done" @click="dismissModal(closeCallback)"> {{ t('events.organizers.done') }} </button>
-                </div>
+                <!-- Plus/confirm button: visible when a location is selected -->
+                <button
+                    v-if="pickerState !== 'search'"
+                    class="header-icon-btn confirm-btn"
+                    @click="confirmSelection"
+                >
+                    <picture>
+                        <img src="@/assets/icons/add/add.white.svg" />
+                    </picture>
+                </button>
+                <span v-else class="header-icon-spacer"></span>
+            </div>
 
-                <!-- Sub Header/Navigation -->
+            <!-- Search Bar -->
+            <div class="search-wrapper">
+                <SearchBar v-model:value="searchText" placeholder="Address, Coordinates...." />
+            </div>
 
-                <div id="sub-header">
-                    <div v-if="!isCustomLocation" @click="isCustomLocation = true" :style="{ display: 'flex', alignItems: 'center', fontSize: '0.8rem' }">
-                        {{ t('events.venues.customLocation') }}
-                        <picture class="centered" :style="{ height: '24px', width: '24px' }">
-                            <source srcset="@/assets/icons/chevron/chevron.right.white.svg" media="(prefers-color-scheme: dark)">
-                            <img src="@/assets/icons/chevron/chevron.right.svg" class="chevron"/>
+            <!-- SELECTED STATE: selected item + map -->
+            <template v-if="pickerState === 'selected' && selectedResult">
+                <div class="selected-item">
+                    <div class="item-icon">
+                        <picture>
+                            <source srcset="@/assets/icons/pin-drop/pin.drop.white.svg" media="(prefers-color-scheme: dark)" />
+                            <img src="@/assets/icons/pin-drop/pin.drop.svg" />
                         </picture>
                     </div>
-
-                    <div v-else class="custom-location-header">
-                        <div @click="isCustomLocation = false" :style="{ display: 'flex', alignItems: 'center', fontSize: '0.8rem' }">
-                            <picture class="centered" :style="{ height: '24px', width: '24px' }">
-                                <source srcset="@/assets/icons/chevron/chevron.left.white.svg" media="(prefers-color-scheme: dark)">
-                                <img src="@/assets/icons/chevron/chevron.left.svg" class="chevron"/>
-                            </picture>
-
-                            {{ t('events.venues.backToVenues') }}
-                        </div>
-                        <div v-if="selectedLocation" @click="clearSelectedLocation" :style="{ fontSize: '0.8rem', color: 'var(--tertiary-brand-color)' }"> {{ t('events.venues.clearSelection') }} </div>
+                    <div class="item-details">
+                        <div class="item-name">{{ selectedResult.name }}</div>
+                        <div class="item-address">{{ selectedResult.streetAddress }}</div>
+                        <div class="item-locality">{{ selectedResult.localityLine }}</div>
                     </div>
+                    <button class="deselect-btn" @click="deselectResult">
+                        <img src="@/assets/icons/xmark/xmark.red.svg" />
+                    </button>
                 </div>
 
-                <!-- Selected Location -->
-                <div id="selected-location" v-if="selectedLocation && isCustomLocation">
-                    <div class="selected-location-details">
-                        <div class="location-title">{{ t('events.venues.selectedLocation') }}</div>
-                        <div class="location-name-input">
-                            <label for="location-name">{{ t('events.venues.locationName') }}</label>
-                            <input 
-                                id="location-name" 
-                                v-model="selectedLocation.name" 
-                                :placeholder="t('events.detail.customLocation')"
-                            />
-                        </div>
-                        <div class="location-coordinates">
-                            Lat: {{ selectedLocation.latitude.toFixed(6) }}, 
-                            Lng: {{ selectedLocation.longitude.toFixed(6) }}
-                        </div>
-                        <div class="location-address" v-if="selectedLocation.address">
-                            {{ selectedLocation.address }}
-                        </div>
-                        <button class="use-location-btn" @click="useSelectedLocation">
-                            {{ t('events.venues.useThisLocation') }}
-                        </button>
+                <div ref="mapContainer" class="map-view"></div>
+            </template>
+
+            <!-- CUSTOM STATE: editable item + map -->
+            <template v-if="pickerState === 'custom'">
+                <div class="selected-item custom-item">
+                    <div class="item-icon">
+                        <picture>
+                            <source srcset="@/assets/icons/pin-drop/pin.drop.white.svg" media="(prefers-color-scheme: dark)" />
+                            <img src="@/assets/icons/pin-drop/pin.drop.svg" />
+                        </picture>
                     </div>
+                    <div class="item-details">
+                        <input
+                            class="custom-input custom-input-name"
+                            v-model="customName"
+                            placeholder="Location name"
+                        />
+                        <input
+                            class="custom-input"
+                            v-model="customAddress"
+                            placeholder="Street address"
+                        />
+                        <input
+                            class="custom-input"
+                            v-model="customLocality"
+                            placeholder="City, State ZIP"
+                        />
+                    </div>
+                    <button class="deselect-btn" @click="deselectResult">
+                        <img src="@/assets/icons/xmark/xmark.red.svg" />
+                    </button>
                 </div>
 
-                <!-- Popup Body -->
-                <div id="popup-body">
-                    <ScrollPanel :style="{ 'height': '70vh' }" v-if="!isCustomLocation">
+                <div class="map-instructions" v-if="!customCoords">
+                    <img class="icon" src="@/assets/icons/pin-drop/pin-drop.gray.svg">
+                    {{ t('events.venues.tapToSelect') }}
+                </div>
+                <div ref="mapContainer" class="map-view"></div>
+            </template>
 
-                        <!-- Selected Venues -->
-                        <div v-if="!isSearching">
-                            <div id="selected-venues">
-                                <div v-for="venue in model" class="selected-venue">
-                                    <picture id="remove-button" @click="removeVenue(venue)">
-                                        <source srcset="@/assets/icons/xmark/xmark.white.svg" media="(prefers-color-scheme: dark)"/>
-                                        <img src="@/assets/icons/xmark/xmark.svg"/>
-                                    </picture>
-                                    <div class="name">{{ venue.name }}</div>
-                                    <div class="location">{{ `${venue.city}, ${venue.state}` }}</div>
-                                </div>
-                            </div>
+            <!-- SEARCH STATE: custom location option + results list -->
+            <template v-if="pickerState === 'search'">
+                <div class="results-list">
+                    <!-- Add a custom location -->
+                    <button class="location-item" @click="startCustomLocation">
+                        <div class="item-icon custom-icon">
+                            <span>&#10022;</span>
+                        </div>
+                        <div class="item-details">
+                            <div class="item-name">{{ t('events.venues.customLocation') }}</div>
+                            <div class="item-address">Address, Coordinates</div>
+                        </div>
+                    </button>
+                    <div class="item-divider"></div>
 
-                            <div id="add-button" @click="isSearching = true">
+                    <!-- Search results -->
+                    <template v-for="(result, i) in searchResults" :key="i">
+                        <button class="location-item" @click="selectResult(result)">
+                            <div class="item-icon">
                                 <picture>
-                                    <source srcset="@/assets/icons/add/add.white.svg" media="(prefers-color-scheme: dark)"/>
-                                    <img src="@/assets/icons/add/add.svg"/>
+                                    <source srcset="@/assets/icons/pin-drop/pin.drop.white.svg" media="(prefers-color-scheme: dark)" />
+                                    <img src="@/assets/icons/pin-drop/pin.drop.svg" />
                                 </picture>
-                                {{ t('events.venues.addVenue') }}
                             </div>
-                        </div>
-
-                        <!-- Venues Search -->
-                        <div v-else>
-                            <div id="search-container">
-                                <SearchBar v-model:value="searchText" :class="{ 'custom-location': isCustomLocation }"/>
-                                <p id="venues-count-label">{{ venuesCount }}</p>
+                            <div class="item-details">
+                                <div class="item-name">{{ result.name }}</div>
+                                <div class="item-address">{{ result.streetAddress }}</div>
+                                <div class="item-locality">{{ result.localityLine }}</div>
                             </div>
-
-                            <ul id="search-results">
-                                <li v-for="venue in venues" class="venue-result" @click="selectVenue(venue)">
-                                    <div class="title">
-                                        <div class="name">{{ venue.name }}</div>
-                                        <img v-if="venue.type === 'internal'" src="@/assets/icons/checkmark/checkmark.tertiary.svg">
-                                    </div>
-                                    <div class="location">{{ `${venue.city}, ${venue.state}` }}</div>
-                                </li>
-                            </ul>
-                        </div>
-                    </ScrollPanel>
-
-                    <div v-else>
-                        <!-- Map View -->
-                        <div class="map-instructions" v-if="!selectedLocation">
-                            <img class="icon" :style="{ marginRight: '0.25rem' }" src="@/assets/icons/pin-drop/pin-drop.gray.svg">
-                            {{ t('events.venues.tapToSelect') }}
-                        </div>
-                        <div ref="mapContainer" id="map" :key="'map-' + isCustomLocation"></div>
-                    </div>
+                        </button>
+                        <div class="item-divider"></div>
+                    </template>
                 </div>
-            </div>
-        </template>
-    </Dialog>
+            </template>
+        </div>
+    </dialog>
     </div>
 </template>
 
 <script setup lang="ts">
-import * as Sentry from "@sentry/nuxt";
-import { computed, ref, watch, onMounted } from 'vue';
-import type { Ref, ComputedRef } from 'vue';
+import type { Ref } from 'vue';
 import { useModelStore } from '@/stores/model-store';
+import { ref, watch, onMounted, nextTick } from 'vue';
 import { useSessionStore } from '@/stores/session-store';
-import { getMapkitServerToken, generateMapkitAuthToken } from '~/utils/map-helpers';
 import { VenueDescriptor } from '@/data/models/GenericModels';
+import { getMapkitServerToken, generateMapkitAuthToken } from '~/utils/map-helpers';
 
-import Dialog from 'primevue/dialog';
-import ScrollPanel from 'primevue/scrollpanel';
+import * as Sentry from "@sentry/nuxt";
 import SearchBar from '@/components/SearchBar/SearchBar.vue';
 
-// Define mapkit as a property of the window object
+// MapKit global type
 declare global {
-  interface Window {
-    mapkit?: any;
-  }
+    interface Window {
+        mapkit?: any;
+    }
 }
 
-let map: any = null;
-let locationMarker: any = null;
+// ── Local types ──────────────────────────────────────────────────────────────
+
+/** Rich search result for display purposes (more detail than VenueDescriptor) */
+interface LocationItem {
+    name: string;
+    streetAddress: string;   // e.g. "20 W 34th St"
+    localityLine: string;    // e.g. "New York, NY 10001"
+    city: string;
+    state: string;
+    country: string;
+    latitude: number;
+    longitude: number;
+}
+
+type PickerState = 'search' | 'selected' | 'custom';
+
+// ── Refs & stores ────────────────────────────────────────────────────────────
 
 const { t } = useI18n();
 const sessionStore = useSessionStore();
 const modelStore = useModelStore();
 const model = defineModel<VenueDescriptor[]>({ default: [] });
 
-const op = ref();
-const randomKey = ref(0);
-const searchText = ref('');
-const showPicker = ref(false);
-const mapInitialized = ref(false);
-const mapContainer = ref<HTMLElement | null>(null);
-const isSearching = ref(false);
-const isCustomLocation = ref(false);
-const selectedLocation = ref<{
-    latitude: number;
-    longitude: number;
-    address?: string;
-    name: string;
-} | undefined>(undefined);
+let map: any = null;
+let locationMarker: any = null;
 
-/** Build a city/state/postcode string for display in the venue card */
+const dialogRef = useTemplateRef<HTMLDialogElement>('locations-dialog');
+const mapContainer = ref<HTMLElement | null>(null);
+
+const searchText = ref('');
+const pickerState = ref<PickerState>('search');
+const selectedResult = ref<LocationItem | undefined>(undefined);
+const searchResults: Ref<LocationItem[]> = ref([]);
+
+// Custom location fields
+const customName = ref('');
+const customAddress = ref('');
+const customLocality = ref('');
+const customCoords = ref<{ latitude: number; longitude: number } | undefined>(undefined);
+
+// ── Outer card helpers ───────────────────────────────────────────────────────
+
+/** Build a city/state string for display in the venue card */
 function formatVenueLocation(venue: VenueDescriptor): string {
-    const parts = [venue.city, venue.state].filter(Boolean);
-    return parts.join(', ');
+    return [venue.city, venue.state].filter(Boolean).join(', ');
 }
 
-const venues: ComputedRef<VenueDescriptor[]> = computed(() => {
-    const arr: VenueDescriptor[] = modelStore.getAllVenues().map((v) => {
-        return VenueDescriptor.decode({
-            'type': 'internal',
-            'id': v.id,
-            'name': v.name,
-            'city': v.city,
-            'state': v.state,
-            'country': v.country
-        });
-    })
-    arr.push(...venuesResult.value);
+function removeVenueFromModel(venue: VenueDescriptor) {
+    const index = model.value.findIndex((v) => v.name === venue.name);
+    if (index !== -1) {
+        model.value.splice(index, 1);
+    } else {
+        Sentry.captureMessage(`Failed to remove venue(${venue.name}) from selected list`);
+    }
+}
 
-    return arr.filter((v: VenueDescriptor) => { 
-        if (v.type !== 'internal') return true;
-        return v.name?.toLowerCase().includes(searchText.value.toLowerCase());
-     });
-});
-const venuesResult: Ref<VenueDescriptor[]> = ref([]);
-const venuesCount: ComputedRef<string> = computed(() => {
-    return t('events.venues.nearYou', { count: venues.value.length });
-});
+// ── Dialog open / close ──────────────────────────────────────────────────────
+
+function openPicker() {
+    resetPickerState();
+    dialogRef.value?.showModal();
+}
+
+function closePicker() {
+    resetPickerState();
+    dialogRef.value?.close();
+}
+
+function resetPickerState() {
+    pickerState.value = 'search';
+    searchText.value = '';
+    selectedResult.value = undefined;
+    searchResults.value = [];
+    customName.value = '';
+    customAddress.value = '';
+    customLocality.value = '';
+    customCoords.value = undefined;
+    destroyMap();
+}
+
+// ── Search ───────────────────────────────────────────────────────────────────
 
 let debounceTimeout: number | null = null;
-watch(searchText, (newValue, oldValue) => {
+
+watch(searchText, (newValue) => {
+    // If user starts typing while in selected/custom state, go back to search
+    if (pickerState.value !== 'search' && newValue) {
+        pickerState.value = 'search';
+        selectedResult.value = undefined;
+        destroyMap();
+    }
+
     if (debounceTimeout !== null) {
         clearTimeout(debounceTimeout);
     }
 
-    // Set a new debounce timeout
     debounceTimeout = window.setTimeout(async () => {
-        if (newValue) {
-            debounceTimeout = null;
-            venuesResult.value = await lookUpCustomVenuesByName(newValue);
-        } else {
-            venuesResult.value = []
+        debounceTimeout = null;
+        if (newValue && newValue.trim().length > 0) {
+            searchResults.value = await searchLocations(newValue);
         }
+        // Don't clear searchResults when text is empty — preserves results
+        // so the user can deselect and still see the previous list.
+        // Results are only cleared on resetPickerState() (open/close).
     }, 500);
 });
 
+/** Search Apple Maps + internal venues for the given query */
+async function searchLocations(query: string): Promise<LocationItem[]> {
+    const results: LocationItem[] = [];
+
+    // Add matching internal venues from the model store
+    const internalVenues = modelStore.getAllVenues()
+        .filter((v) => v.name?.toLowerCase().includes(query.toLowerCase()))
+        .map((v): LocationItem => ({
+            name: v.name ?? '',
+            streetAddress: '',
+            localityLine: [v.city, v.state].filter(Boolean).join(', '),
+            city: v.city ?? '',
+            state: v.state ?? '',
+            country: v.country ?? '',
+            latitude: v.location?.coordinates?.[1] ?? 0,
+            longitude: v.location?.coordinates?.[0] ?? 0,
+        }));
+    results.push(...internalVenues);
+
+    // Search Apple Maps for POIs and addresses
+    try {
+        const mapkitToken = await getMapkitServerToken();
+
+        const params = new URLSearchParams();
+        params.set('q', query);
+        params.set('lang', navigator.language);
+
+        // Allow both POI and address results so users can search by
+        // name ("Central Park"), street address, or coordinates
+        params.set('resultTypeFilter', 'poi,address');
+
+        // Bias results toward the user's location
+        const userLocation = sessionStore.lastKnownLocation;
+        if (userLocation) {
+            params.set('searchLocation', `${userLocation.latitude},${userLocation.longitude}`);
+        }
+
+        const response = await fetch(
+            `https://maps-api.apple.com/v1/search?${params.toString()}`,
+            { headers: { 'Authorization': `Bearer ${mapkitToken}` } }
+        );
+
+        const data = await response.json();
+        const apiResults = data['results'] ?? [];
+
+        for (const r of apiResults) {
+            const addr = r['structuredAddress'] ?? {};
+            const streetParts = [addr['subThoroughfare'], addr['thoroughfare']].filter(Boolean);
+
+            results.push({
+                name: r['name'] ?? '',
+                streetAddress: streetParts.join(' '),
+                localityLine: [addr['locality'], addr['administrativeAreaCode'], addr['postCode']].filter(Boolean).join(', '),
+                city: addr['locality'] ?? '',
+                state: addr['administrativeAreaCode'] ?? '',
+                country: addr['countryCode'] ?? '',
+                latitude: r['coordinate']?.['latitude'] ?? 0,
+                longitude: r['coordinate']?.['longitude'] ?? 0,
+            });
+        }
+    } catch (error) {
+        console.error('Apple Maps search failed:', error);
+    }
+
+    return results;
+}
+
+// ── Selection ────────────────────────────────────────────────────────────────
+
+function selectResult(result: LocationItem) {
+    selectedResult.value = result;
+    pickerState.value = 'selected';
+    searchText.value = '';
+
+    // Initialize map after DOM updates
+    nextTick(() => {
+        setTimeout(() => {
+            initMapForLocation(result.latitude, result.longitude, false);
+        }, 100);
+    });
+}
+
+function deselectResult() {
+    selectedResult.value = undefined;
+    customCoords.value = undefined;
+    pickerState.value = 'search';
+    destroyMap();
+}
+
+/** Confirm the selection and add it to the model */
+function confirmSelection() {
+    if (pickerState.value === 'selected' && selectedResult.value) {
+        const r = selectedResult.value;
+        const venue = new VenueDescriptor(
+            'external',
+            undefined,
+            r.name,
+            r.city,
+            r.state,
+            r.country,
+            r.latitude,
+            r.longitude
+        );
+        model.value.push(venue);
+    } else if (pickerState.value === 'custom' && customCoords.value) {
+        const venue = new VenueDescriptor(
+            'custom',
+            undefined,
+            customName.value || t('events.detail.customLocation'),
+            customLocality.value.split(',')[0]?.trim() ?? '',
+            customLocality.value.split(',')[1]?.trim() ?? '',
+            '',
+            customCoords.value.latitude,
+            customCoords.value.longitude
+        );
+        model.value.push(venue);
+    }
+
+    closePicker();
+}
+
+// ── Custom location ──────────────────────────────────────────────────────────
+
+function startCustomLocation() {
+    pickerState.value = 'custom';
+    searchText.value = '';
+    customName.value = '';
+    customAddress.value = '';
+    customLocality.value = '';
+    customCoords.value = undefined;
+
+    nextTick(() => {
+        setTimeout(() => {
+            // Initialize map centered on user location, tap-to-place enabled
+            const userLocation = sessionStore.lastKnownLocation;
+            const lat = userLocation?.latitude ?? 40.7128;
+            const lng = userLocation?.longitude ?? -74.006;
+            initMapForLocation(lat, lng, true);
+        }, 100);
+    });
+}
+
+// ── MapKit ───────────────────────────────────────────────────────────────────
+
 onMounted(() => {
-    // Check if MapKit JS is already loaded
-    if (window.mapkit) {
-        initializeMap();
-    } else {
-        // Load MapKit JS script
-        loadMapKitJS().then(() => {
-            initializeMap();
-        }).catch(error => {
+    if (!window.mapkit) {
+        loadMapKitJS().catch(error => {
             console.error('Failed to load MapKit JS:', error);
         });
     }
 });
 
-// Function to load MapKit JS dynamically
 async function loadMapKitJS(): Promise<void> {
     return new Promise((resolve, reject) => {
-        if (window.mapkit) {
-            resolve();
-            return;
-        }
+        if (window.mapkit) { resolve(); return; }
 
         const script = document.createElement('script');
         script.src = 'https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js';
@@ -276,148 +448,95 @@ async function loadMapKitJS(): Promise<void> {
     });
 }
 
-function initializeMap() {
+async function ensureMapKitInitialized(): Promise<void> {
     if (!window.mapkit) {
-        console.error('MapKit JS is not loaded yet');
+        await loadMapKitJS();
+    }
+
+    // MapKit init is idempotent if already initialized, but we guard anyway
+    if (!window.mapkit._initialized) {
+        window.mapkit.init({
+            authorizationCallback: function(done: (token: string) => void) {
+                generateMapkitAuthToken().then((token: string) => done(token));
+            },
+            language: navigator.language
+        });
+        window.mapkit._initialized = true;
+    }
+}
+
+/**
+ * Create a map in the mapContainer, centered on the given coordinates.
+ * @param allowTap - if true, allows the user to tap the map to place/move a pin
+ */
+async function initMapForLocation(latitude: number, longitude: number, allowTap: boolean) {
+    try {
+        await ensureMapKitInitialized();
+    } catch (error) {
+        console.error('Failed to initialize MapKit:', error);
         return;
     }
 
-    window.mapkit.init({
-        authorizationCallback: function(done: (arg0: string) => void) {
-            generateMapkitAuthToken()
-                .then((token: string) => { 
-                    done(token); 
-                });
-        },
-        language: navigator.language
-    });
+    if (!mapContainer.value || !window.mapkit) return;
+
+    destroyMap();
 
     const options = {
         showsZoomControl: true,
         showsUserLocation: true,
-        tracksUserLocation: true,
         showsMapTypeControl: false,
         showsPointsOfInterest: true,
-    }
-    
-    // Initialize the map when custom location is selected
-    watch(isCustomLocation, (newValue) => {
-        if (newValue) {
-            // Wait for DOM update
-            setTimeout(() => {
-                 // Force new map creation
-                selectedLocation.value = undefined;
-                mapInitialized.value = false;
-                map = null;
+    };
 
-                // Check if mapkit is available
-                if (!window.mapkit) {
-                    console.error('MapKit JS is not available. Attempting to load it now.');
-                    loadMapKitJS().then(() => {
-                        initializeMapInstance(options);
-                        mapInitialized.value = true;
-                    }).catch(error => {
-                        console.error('Failed to load MapKit JS:', error);
-                    });
-                    return;
-                }
-                
-                initializeMapInstance(options);
-                mapInitialized.value = true;
-            }, 300);
-        }
-    });
-}
-
-// Helper function to initialize map instance after checking mapkit availability
-function initializeMapInstance(options: any) {
-    if (!window.mapkit || !mapContainer.value) {
-        console.error('MapKit or map container is not available');
-        return;
-    }
-
-    if (map) {
-        map.removeEventListener('single-tap', handleMapClick);
-        map.destroy(); // Add this if MapKit has a destroy method
-        map = null;
-    }
-    
-    // Force layout recalculation before creating the map
-    const container = mapContainer.value as HTMLElement;
-    container.style.display = 'none';
-
-    // This forces a layout recalculation
-    void container.offsetHeight;
-    container.style.display = 'block';
-    
-    // Create map with the container
     map = new window.mapkit.Map(mapContainer.value, options);
-    
-    // Set adaptive color scheme
     map.colorScheme = window.mapkit.Map.ColorSchemes.Adaptive;
-    
-    // Add click event listener for location selection
-    map.addEventListener('single-tap', handleMapClick);
-    
-    // If user location is available, center the map on it
-    const userLocation = sessionStore.lastKnownLocation;
-    if (userLocation) {
-        const span = new window.mapkit.CoordinateSpan(0.016, 0.016);
-        const center = new window.mapkit.Coordinate(userLocation.latitude, userLocation.longitude);
-        const region = new window.mapkit.CoordinateRegion(center, span);
-        map.setRegionAnimated(region);
+
+    // Center on the location
+    const center = new window.mapkit.Coordinate(latitude, longitude);
+    const span = new window.mapkit.CoordinateSpan(0.016, 0.016);
+    map.setRegionAnimated(new window.mapkit.CoordinateRegion(center, span));
+
+    // Add pin if we have a specific location (not just user location for custom)
+    if (!allowTap) {
+        addMarker(latitude, longitude);
     }
-    
-    // If there's already a selected location, show it on the map
-    if (selectedLocation.value) {
-        addMarkerAtLocation(
-            selectedLocation.value.latitude, 
-            selectedLocation.value.longitude
-        );
+
+    // Enable tap-to-place for custom locations
+    if (allowTap) {
+        map.addEventListener('single-tap', handleMapTap);
     }
 }
 
-function handleMapClick(event: any) {
-    // Get the map point from the event and convert it to coordinates
+function handleMapTap(event: any) {
     const coordinate = map.convertPointOnPageToCoordinate(event.pointOnPage);
 
-    // Update selected location
-    selectedLocation.value = {
+    customCoords.value = {
         latitude: coordinate.latitude,
-        longitude: coordinate.longitude,
-        name: t('events.detail.customLocation')
+        longitude: coordinate.longitude
     };
-    
-    // Add or update marker
-    addMarkerAtLocation(coordinate.latitude, coordinate.longitude);
-    
-    // Reverse geocode to get address
+
+    addMarker(coordinate.latitude, coordinate.longitude);
+
+    // Reverse geocode to fill in address fields
     reverseGeocode(coordinate.latitude, coordinate.longitude);
 }
 
-function addMarkerAtLocation(latitude: number, longitude: number) {
-    // Check if mapkit is loaded
+function addMarker(latitude: number, longitude: number) {
     if (!window.mapkit || !map) return;
-    
-    // Remove existing marker if it exists
+
     if (locationMarker) {
         map.removeAnnotation(locationMarker);
     }
-    
-    // Create new marker
+
     const coordinate = new window.mapkit.Coordinate(latitude, longitude);
-    
     locationMarker = new window.mapkit.MarkerAnnotation(coordinate, {
         color: "#c969e0",
         title: "Selected Location",
         animates: true,
         selected: true
     });
-    
-    // Add marker to map
+
     map.addAnnotation(locationMarker);
-    
-    // Center map on the marker
     map.setCenterAnimated(coordinate);
 }
 
@@ -426,145 +545,43 @@ async function reverseGeocode(latitude: number, longitude: number) {
         const mapkitToken = await getMapkitServerToken();
         const response = await fetch(
             `https://maps-api.apple.com/v1/reverseGeocode?loc=${latitude},${longitude}`,
-            {
-                headers: {
-                    'Authorization': `Bearer ${mapkitToken}`
-                }
-            }
+            { headers: { 'Authorization': `Bearer ${mapkitToken}` } }
         );
-        
+
         if (response.ok) {
             const data = await response.json();
-            if (data.results && data.results.length > 0) {
-                const result = data.results[0];
-                const address = formatAddress(result.structuredAddress);
-                
-                if (selectedLocation.value) {
-                    selectedLocation.value.address = address;
+            if (data.results?.length > 0) {
+                const addr = data.results[0].structuredAddress;
+                if (addr) {
+                    const streetParts = [addr.subThoroughfare, addr.thoroughfare].filter(Boolean);
+                    if (!customName.value) {
+                        customName.value = streetParts.join(' ') || t('events.detail.customLocation');
+                    }
+                    customAddress.value = streetParts.join(' ');
+                    customLocality.value = [addr.locality, addr.administrativeAreaCode, addr.postCode].filter(Boolean).join(', ');
                 }
             }
         }
     } catch (error) {
-        console.error('Error reverse geocoding:', error);
+        console.error('Reverse geocode failed:', error);
     }
 }
 
-function formatAddress(structuredAddress: any): string {
-    if (!structuredAddress) return '';
-    
-    const parts = [];
-    
-    if (structuredAddress.thoroughfare) parts.push(structuredAddress.thoroughfare);
-    if (structuredAddress.locality) parts.push(structuredAddress.locality);
-    if (structuredAddress.administrativeArea) parts.push(structuredAddress.administrativeArea);
-    if (structuredAddress.countryCode) parts.push(structuredAddress.countryCode);
-    
-    return parts.join(', ');
-}
-
-function clearSelectedLocation() {
-    selectedLocation.value = undefined;
-    
-    if (locationMarker && map) {
-        map.removeAnnotation(locationMarker);
+function destroyMap() {
+    if (map) {
+        try {
+            map.removeEventListener('single-tap', handleMapTap);
+            map.destroy();
+        } catch { /* map may already be destroyed */ }
+        map = null;
         locationMarker = null;
     }
 }
-
-function useSelectedLocation() {
-    if (!selectedLocation.value) return;
-    
-    // Create a new venue from the selected location
-    const location = selectedLocation.value;
-    const addressParts = location.address ? location.address.split(', ') : [];
-    
-    const customVenue = new VenueDescriptor(
-        'custom',
-        undefined,
-        location.name,
-        addressParts.length > 1 ? addressParts[1] : '',
-        addressParts.length > 2 ? addressParts[2] : '',
-        addressParts.length > 3 ? addressParts[3] : '',
-        location.latitude,
-        location.longitude
-    );
-    
-    // Add the custom venue to the model
-    model.value.push(customVenue);
-    
-    // Return to venue list
-    isCustomLocation.value = false;
-}
-
-function dismissModal(callback: () => void) {
-    isSearching.value = false;
-    isCustomLocation.value = false;
-    // Reset map if needed
-    if (map) {
-        map.removeEventListener('click', handleMapClick);
-        map = null;
-    }
-    callback();
-}
-
-function selectVenue(venue: VenueDescriptor) {
-    const index = model.value.findIndex((v) => v.name == venue.name);
-    if (index == -1) {
-        model.value.push(venue);
-    }
-    
-    searchText.value = '';
-    isSearching.value = false;
-    isCustomLocation.value = false;
-}
-
-function removeVenue(venue: VenueDescriptor) {
-    const index = model.value.findIndex((v) => v.name == venue.name);
-    if (index != -1) {
-        model.value.splice(index, 1);
-        randomKey.value += 1;
-    } else {
-        Sentry.captureMessage(`Failed to remove venue(${venue.name}) from selected list`);
-    }
-}
-
-async function lookUpCustomVenuesByName(name: string): Promise<VenueDescriptor[]> {
-    const mapkitToken = await getMapkitServerToken();
-    
-    let searchLocation = '';
-    const userLocation = sessionStore.lastKnownLocation;
-    if (userLocation) {
-        searchLocation = `${userLocation?.latitude},${userLocation?.longitude}`
-    }
-    const resultCategories = 'poi, pointOfInterest'
-    const response = await fetch(`https://maps-api.apple.com/v1/search?q=${name}&resultTypeFilter=${resultCategories}&userLocation=${searchLocation}`, 
-        {
-            headers: {
-                'Authorization': `Bearer ${mapkitToken}`
-            }
-        }
-    );
-
-    const data = await response.json();
-    const results = data['results'];
-    return results.map((r: any) => {
-        return new VenueDescriptor(
-            'external',
-            undefined,
-            r['name'],
-            r['structuredAddress']['locality'],
-            r['structuredAddress']['administrativeAreaCode'],
-            r['country'],
-            r['coordinate']['latitude'],
-            r['coordinate']['longitude'],
-        );
-    });
-}
-
 </script>
 
 <style scoped>
-/* Self-contained card matching the EventHostsCard pattern */
+/* ── Outer card (matches EventHostsCard pattern) ─────────────────────────── */
+
 #venues-picker-card {
     padding: 1rem;
     border-radius: 20px;
@@ -583,15 +600,8 @@ async function lookUpCustomVenuesByName(name: string): Promise<VenueDescriptor[]
         font-size: 0.8rem;
         margin-bottom: 1rem;
     }
-
-    .card-divider {
-        height: 1.5px;
-        margin: 0.75rem 0;
-        background-color: var(--olympsis-light-gray);
-    }
 }
 
-/* Row that holds venue cards and the add button */
 #venues-content {
     display: flex;
     align-items: center;
@@ -599,11 +609,14 @@ async function lookUpCustomVenuesByName(name: string): Promise<VenueDescriptor[]
     gap: 0.75rem;
 }
 
-/* Individual venue display card */
 .venue-card {
     position: relative;
     padding: 0.75rem 1rem;
     border-radius: 16px;
+    flex: 1 1 calc(50% - 0.75rem);
+    max-width: calc(50% - 0.375rem);
+    min-width: 0;
+    box-sizing: border-box;
     border: 1px solid var(--component-border-color);
     background-color: color-mix(in srgb, var(--secondary-background-color) 80%, transparent);
 
@@ -611,8 +624,8 @@ async function lookUpCustomVenuesByName(name: string): Promise<VenueDescriptor[]
         all: unset;
         cursor: pointer;
         position: absolute;
-        top: -6px;
-        right: -6px;
+        top: 4px;
+        right: 4px;
         width: 18px;
         height: 18px;
         display: flex;
@@ -620,22 +633,25 @@ async function lookUpCustomVenuesByName(name: string): Promise<VenueDescriptor[]
         justify-content: center;
         border-radius: 50%;
 
-        img {
-            width: 14px;
-            height: 14px;
-        }
+        img { width: 14px; height: 14px; }
     }
 
     .venue-name {
         font-weight: 700;
         font-size: 1rem;
         color: var(--primary-label-color);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .venue-location {
         font-style: italic;
         font-size: 0.85rem;
         color: gray;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .venue-coords {
@@ -644,7 +660,6 @@ async function lookUpCustomVenuesByName(name: string): Promise<VenueDescriptor[]
     }
 }
 
-/* Pill-shaped "Add a Location" button */
 .add-location-btn {
     all: unset;
     gap: 0.4rem;
@@ -664,234 +679,263 @@ async function lookUpCustomVenuesByName(name: string): Promise<VenueDescriptor[]
         justify-content: center;
     }
 
-    img {
-        width: 1.2rem;
-        height: 1.2rem;
-    }
+    img { width: 1.2rem; height: 1.2rem; }
 
     &:hover {
         background-color: var(--tertiary-background-color);
     }
 }
 
-#event-venues-popup-container {
+/* ── Dialog ──────────────────────────────────────────────────────────────── */
+
+#locations-dialog {
+    border: unset;
+    padding: 0;
+    width: fit-content;
+    height: fit-content;
+    margin: auto;
+    background: transparent;
+    max-width: 100vw;
+    max-height: 100vh;
+
+    &::backdrop {
+        backdrop-filter: blur(5px);
+        background: rgba(0, 0, 0, 0.3);
+    }
+}
+
+/* ── Picker container ────────────────────────────────────────────────────── */
+
+#locations-picker {
+    width: 32rem;
+    max-width: 95vw;
+    max-height: 85vh;
+    overflow-y: auto;
+    border-radius: 20px;
+    border: var(--component-border-color) solid 1px;
+    background-color: var(--tertiary-background-color);
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+}
+
+/* ── Header ──────────────────────────────────────────────────────────────── */
+
+.picker-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem 0.5rem;
+}
+
+.picker-title {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--primary-label-color);
+}
+
+.header-icon-btn {
+    all: unset;
+    cursor: pointer;
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 15px;
+    backdrop-filter: blur(20px);
+    padding: 0rem 0.25rem 0rem 0.25rem;
+    -webkit-backdrop-filter: blur(20px);
+    background: var(--component-background-color);
+    border: var(--component-border-color) solid 1px;
+
+    picture, img {
+        width: 1.1rem;
+        height: 1.1rem;
+    }
+}
+
+.confirm-btn {
+    border-radius: 15px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    background: rgba(38, 46, 87, 0.85);
+    padding: 0rem 0.25rem 0rem 0.25rem;
+    border: var(--component-border-color) solid 1px;
+}
+
+/* Spacer to keep title centered when + button is hidden */
+.header-icon-spacer {
+    width: 2rem;
+    height: 2rem;
+}
+
+/* ── Search wrapper ──────────────────────────────────────────────────────── */
+
+.search-wrapper {
+    padding: 0.5rem 1.25rem;
+
+    #search-bar {
+        background: var(--component-background-color);
+        border: var(--component-border-color) solid 1px;
+
+        input {
+            background: var(--component-background-color);
+        }
+    }
+}
+
+/* ── Results list ────────────────────────────────────────────────────────── */
+
+.results-list {
+    max-height: 60vh;
+    padding: 0 0.5rem 0.5rem 0.5rem;
+    overflow-y: auto;
+}
+
+.location-item {
+    all: unset;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
     width: 100%;
-    max-width: 32rem;
-    overflow-x: hidden;
-    background-color: var(--primary-background-color);
+    padding: 0.75rem;
+    cursor: pointer;
+    box-sizing: border-box;
 
-    #popup-header {
-        display: flex;
-        margin: 1rem;
-        color: var(--primary-label-color);
-        justify-content: space-between;
-
-        #cancel {
-            border: unset;
-            cursor: pointer;
-            font-size: 0.8rem;
-            background-color: unset;
-            color: var(--primary-label-color);
-        }
-
-        #done {
-            color: white;
-            border: unset;
-            cursor: pointer;
-            border-radius: 10px;
-            padding: 0.5rem 1rem;
-            text-transform: uppercase;
-            background-color: var(--primary-brand-color);           
-        }
-    }
-
-    #sub-header {
-        margin: 1rem;
-        display: flex;
-        cursor: pointer;
-        justify-content: right;
-        color: var(--primary-label-color);
-        
-        .custom-location-header {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-        }
-    }
-
-    #selected-location {
-        margin: 1rem;
-        padding: 1rem;
-        border-radius: 10px;
+    &:hover {
         background-color: var(--secondary-background-color);
-        
-        .selected-location-details {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            
-            .location-title {
-                font-weight: bold;
-                color: var(--primary-label-color);
-            }
-            
-            .location-coordinates, .location-address {
-                font-size: 0.9rem;
-                color: var(--secondary-label-color);
-            }
-            
-            .use-location-btn {
-                margin-top: 0.5rem;
-                color: white;
-                border: unset;
-                cursor: pointer;
-                border-radius: 10px;
-                padding: 0.5rem 1rem;
-                background-color: var(--primary-brand-color);
-            }
-
-            .location-name-input {
-                margin-bottom: 0.5rem;
-                
-                label {
-                    display: block;
-                    font-size: 0.9rem;
-                    margin-bottom: 0.25rem;
-                    color: var(--secondary-label-color);
-                }
-                
-                input {
-                    width: 100%;
-                    padding: 0.5rem;
-                    border-radius: 5px;
-                    border: 1px solid var(--border-color, #ccc);
-                    color: var(--primary-label-color);
-                }
-            }
-        }
+        border-radius: 12px;
     }
+}
 
-    #popup-body {
-        background-color: var(--primary-background-color);
-        
-        #map {
-            width: 100%;
-            height: 60vh;
-            display: block;
-            position: relative;
-            margin: 0 auto;
-        }
-        
-        .map-instructions {
-            display: flex;
-            font-size: 0.8rem;
-            text-align: center;
-            color: #7a797980;
-            align-items: center;
-            padding: 0.5rem 1rem;
-            justify-content: center;
-        }
-        
-        #selected-venues {
-            display: grid;
-            margin: 0rem 1.5rem;
-            grid-template-columns: 1fr 1fr;
+.item-icon {
+    flex-shrink: 0;
+    width: 1.5rem;
+    height: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 0.1rem;
+    color: var(--primary-label-color);
 
-            .selected-venue {
-                margin: 1rem;
-                padding: 1rem;
-                cursor: pointer;
-                border-radius: 10px;
-                background-color: var(--secondary-background-color);
+    picture, img {
+        width: 1.2rem;
+        height: 1.2rem;
+    }
+}
 
-                #remove-button {
-                    img {
-                        width: 1rem;
-                        height: 1rem;
-                    }
-                }
-                .name {
-                    color: var(--primary-label-color);
-                }
+.custom-icon {
+    font-size: 1.2rem;
+}
 
-                .location {
-                    color: gray;
-                }
-            }
-        }
+.item-details {
+    flex: 1;
+    min-width: 0;
+}
 
-        #add-button {
-            height: 6rem;
-            display: flex;
-            cursor: pointer;
-            margin: 1rem 2rem;
-            align-items: center;
-            flex-direction: column;
-            justify-content: center;
-            
-            font-size: 0.6rem;
-            border-radius: 10px;
-            color: var(--primary-label-color);
-            background-color: var(--secondary-background-color);
+.item-name {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--primary-label-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
-            picture {
-                img {
-                    width: 1rem;
-                    height: 1rem;
-                }
-            }
-        }
+.item-address {
+    font-size: 0.8rem;
+    color: var(--secondary-label-color, gray);
+}
 
-        #search-container {
-            margin: 0.6rem;
+.item-locality {
+    font-size: 0.8rem;
+    color: var(--secondary-label-color, gray);
+}
 
-            button {
-                all: unset;
-                width: 100%;
-                text-align: end;
-                cursor: pointer;
-                font-size: 0.8rem;
-                color: var(--secondary-brand-color);
-            }
+.item-divider {
+    height: 1px;
+    margin: 0 1.25rem 0 3rem;
+    background-color: var(--component-border-color);
+}
 
-            .custom-location {
-                border: 1px solid var(--secondary-brand-color);
-            }
+/* ── Selected item ───────────────────────────────────────────────────────── */
 
-            .custom-location-text {
-                font-weight: bold;
-            }
+.selected-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.75rem 1.25rem;
+}
 
-            #venues-count-label {
-                font-size: 0.7rem;
-                margin: 0rem 1rem;
-                color: var(--tertiary-brand-color);
-            }
-        }
+.deselect-btn {
+    all: unset;
+    cursor: pointer;
+    flex-shrink: 0;
+    width: 1.6rem;
+    height: 1.65rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 0.25rem;
 
-        #search-results {
-            .venue-result {
-                padding: 0;
-                margin: 1rem;
-                cursor: pointer;
-                list-style-type: none;
+    border-radius: 15px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    background: color-mix(in srgb, var(--olympsis-red) 25%, transparent);
+    padding: 0.15rem 0.5rem 0.15rem 0.5rem;
+    border: var(--component-border-color) solid 1px;
 
-                .title {
-                    display: flex;
-                    align-items: center;
-                    color: var(--primary-label-color);
+    img {
+        width: 0.9rem;
+        height: 0.9rem;
+    }
+}
 
-                    img {
-                        width: 1rem;
-                        height: 1rem;
-                        margin-left: 0.5rem;
-                    }
-                }
-                .location {
-                    color: gray;
-                }
-            }
-        }
+/* ── Custom location inputs ──────────────────────────────────────────────── */
+
+.custom-input {
+    width: 100%;
+    border: none;
+    background: transparent;
+    color: var(--primary-label-color);
+    font-family: inherit;
+    padding: 0;
+    outline: none;
+}
+
+.custom-input-name {
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.custom-input::placeholder {
+    color: var(--secondary-label-color, gray);
+}
+
+/* ── Map ─────────────────────────────────────────────────────────────────── */
+
+.map-view {
+    width: 100%;
+    height: 30vh;
+    min-height: 250px;
+    display: block;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    overflow: hidden;
+}
+
+.map-instructions {
+    display: flex;
+    font-size: 0.8rem;
+    text-align: center;
+    color: #7a797980;
+    align-items: center;
+    padding: 0.5rem 1.25rem;
+    justify-content: center;
+    gap: 0.25rem;
+
+    .icon {
+        width: 1rem;
+        height: 1rem;
     }
 }
 </style>

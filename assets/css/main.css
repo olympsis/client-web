@@ -98,7 +98,7 @@
 
 	--navigation-label: #262E57;
 	--navigation-border: rgba(0, 0, 0, 0.15);
-	--component-border: color-mix(in srgb, var(--olympsis-gray) 12%, transparent);;
+	--component-border: color-mix(in srgb, var(--olympsis-gray) 12%, transparent);
 	--component-border-color: color-mix(in srgb, var(--secondary-background-color) 60%, transparent);
 	--component-background-color: color-mix(in srgb, var(--secondary-background-color) 40%, transparent);
 

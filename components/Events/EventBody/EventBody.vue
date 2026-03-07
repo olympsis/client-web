@@ -2,7 +2,7 @@
     <div id="event-body">
         <div id="about">
             <h2>About</h2>
-            <div ref="bodyRef" id="body" :class="{ collapsed: !isExpanded }">{{ event.body }}</div>
+            <div ref="bodyRef" id="body" :class="{ collapsed: !isExpanded }" v-html="event.body"></div>
             <button v-if="isOverflowing" id="see-more" @click="isExpanded = !isExpanded">
                 {{ isExpanded ? 'See less' : 'See more' }}
             </button>
@@ -196,7 +196,20 @@ function openExternalURL() {
                 -webkit-box-orient: vertical;
             }
 
-            /* Expanded: show full text */
+            /* Rich text content styles */
+            :deep(a) {
+                color: var(--tertiary-brand-color);
+                text-decoration: underline;
+            }
+
+            :deep(ul), :deep(ol) {
+                padding-left: 1.5rem;
+                margin: 0.25rem 0;
+            }
+
+            :deep(p) {
+                margin: 0;
+            }
         }
 
         #see-more {

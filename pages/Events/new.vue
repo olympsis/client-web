@@ -133,7 +133,7 @@
                         error: newEventError === NEW_EVENT_ERROR.NO_DESCRIPTION
                     }"> {{ t('events.new.description') }} </h4>
                     <div class="sub-label"> {{ t('events.new.descriptionSub') }} </div>
-                    <textarea type="text" v-model="manager.description" class="text-large"/>
+                    <EventDescriptionEditor v-model="manager.description" />
                 </div>
             </div>           
         </div>
@@ -216,6 +216,7 @@ import EventAdvancedSettings from '~/components/Events/New Event/EventAdvancedSe
 import EventVisibilityPicker from '~/components/Events/New Event/EventVisibilityPicker/EventVisibilityPicker.vue';
 import EventHostsCard from '~/components/Events/New Event/EventHostsCard/EventHostsCard.vue';
 import AuthModal from '@/components/Auth/AuthModal/AuthModal.vue';
+import EventDescriptionEditor from '~/components/Events/New Event/EventDescriptionEditor/EventDescriptionEditor.vue';
 
 
 const { t } = useI18n();
@@ -523,18 +524,6 @@ useSeoMeta({
     font-size: 1.3rem;
     padding: 0rem 0.5rem;
     border-radius: 10px;
-}
-
-.text-large {
-    width: 100%;
-    height: 12rem;
-    border: unset;
-    resize: vertical;
-    padding: 0.75rem;
-    font-size: 1rem;
-    border-radius: 14px;
-    color: var(--primary-label-color);
-    background-color: var(--primary-background-color);
 }
 
 .error {

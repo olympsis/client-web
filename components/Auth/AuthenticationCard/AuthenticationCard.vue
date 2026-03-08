@@ -47,7 +47,7 @@ function signInWithGoogle() {
 <style scoped>
 #authentication-card {
     margin: auto;
-    height: 30rem;
+    height: 28rem;
     display: flex;
     max-width: 25rem;
     padding: 2rem 2rem;

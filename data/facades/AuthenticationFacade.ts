@@ -1,8 +1,9 @@
-import { 
-    getAuth, 
-    OAuthProvider, 
-    signInWithPopup ,
-    GoogleAuthProvider, 
+import {
+    getAuth,
+    OAuthProvider,
+    signInWithPopup,
+    signInWithCredential,
+    GoogleAuthProvider,
     getAdditionalUserInfo,
     reauthenticateWithPopup,
     type AuthError,
@@ -35,46 +36,98 @@ class AuthenticationFacade {
     private userService = new UserService();
 
     /**
-     * Requests the user to sign in with apple with either a popup or a new page
+     * Uses Apple's native Sign In with Apple JS SDK to authenticate, then
+     * links the Apple credential to Firebase Auth via signInWithCredential.
+     * This avoids needing Firebase Hosting for the OAuth popup handler.
      * @returns AuthFacadeResponse Object that contains the data needed from the auth services
      */
     async signInWithApple(): Promise<AuthFacadeResponse | null> {
-        const provider = new OAuthProvider('apple.com');
+        const config = useRuntimeConfig();
 
         try {
-            const result: any = await signInWithPopup(this.auth, provider);
+            // Use Apple's native JS SDK — shows Apple's own auth overlay
+            const appleAuth = (window as any).AppleID.auth;
+            appleAuth.init({
+                clientId: config.public.APL_SERVICE_ID,
+                scope: 'name email',
+                redirectURI: 'https://bellicosely-servantless-loyd.ngrok-free.dev',
+                usePopup: true,
+            });
+
+            const appleResponse = await appleAuth.signIn();
+            const { id_token: appleIdToken, code } = appleResponse.authorization;
+            const appleUser = appleResponse.user; // Only present on first authorization
+
+            // Create a Firebase OAuthCredential from Apple's id_token and sign in.
+            // We pass only the idToken — the authorization code is not a nonce.
+            const oauthProvider = new OAuthProvider('apple.com');
+            const credential = oauthProvider.credential({
+                idToken: appleIdToken,
+            });
+            const result = await signInWithCredential(this.auth, credential);
             const user = result.user;
             const additional = getAdditionalUserInfo(result);
-    
+
+            // Build the full name from Apple's user object (first auth only),
+            // Firebase user profile, or fall back to a default.
+            const appleName = appleUser
+                ? [appleUser.name?.firstName, appleUser.name?.lastName].filter(Boolean).join(' ')
+                : '';
+            const fullName = appleName || user.displayName || '';
+
             const response: AuthFacadeResponse = {
-                fullName: user.displayName,
-                email: user.email,
-                idToken: result._tokenResponse.idToken,
+                fullName,
+                email: appleUser?.email || user.email || '',
+                idToken: await user.getIdToken(),
                 isNewUser: additional?.isNewUser
-            } 
+            }
 
-            if (additional?.isNewUser) {
-                const request = new AuthRequest(
-                    response.fullName.split(' ')[0],
-                    response.fullName.split(' ')[1],
-                    response.email,
-                    response.idToken
-                );
-                const res = await this.authService.register(request);
-                if (!res) return null;
-
-                logEvent(this.analytics, 'apple_signup');
-            } else {
+            // For new users, don't register yet — the sign-in page will collect
+            // any missing profile info first, then call registerUser().
+            if (!additional?.isNewUser) {
                 logEvent(this.analytics, 'apple_signin');
             }
             return response;
         } catch(error: any) {
+            // User closed the Apple popup — not an error worth reporting
+            if (error?.error === 'popup_closed_by_user') return null;
+
             Sentry.withScope((scope) => {
                 scope.setExtra('action', 'apple_signin');
                 Sentry.captureException(error);
             });
             console.error(`Failed to sign user in with Apple. Error Code (${error.code}): ${error.message}`);
             return null;
+        }
+    }
+
+    /**
+     * Registers a new user with the backend after profile info has been collected.
+     * Called from the sign-in page once we have first name, last name, and email.
+     * @param response - the auth response containing the user's info and token
+     * @returns true if registration succeeded
+     */
+    async registerUser(response: AuthFacadeResponse): Promise<boolean> {
+        try {
+            const nameParts = response.fullName ? response.fullName.split(' ') : [];
+            const request = new AuthRequest(
+                nameParts[0] || '',
+                nameParts.slice(1).join(' ') || '',
+                response.email,
+                response.idToken
+            );
+            const res = await this.authService.register(request);
+            if (!res) return false;
+
+            logEvent(this.analytics, 'apple_signup');
+            return true;
+        } catch (error) {
+            Sentry.withScope((scope) => {
+                scope.setExtra('action', 'register_user');
+                Sentry.captureException(error);
+            });
+            console.error(`Failed to register user. Error: ${error}`);
+            return false;
         }
     }
 
@@ -97,18 +150,9 @@ class AuthenticationFacade {
                 idToken: result._tokenResponse.idToken,
                 isNewUser: additional?.isNewUser
             }
-            if (additional?.isNewUser) {
-                const request = new AuthRequest(
-                    response.fullName.split(' ')[0],
-                    response.fullName.split(' ')[1],
-                    response.email,
-                    response.idToken
-                );
-                const res = await this.authService.register(request);
-                if (!res) return null;
-
-                logEvent(this.analytics, 'google_signup');
-            } else {
+            // For new users, don't register yet — the sign-in page will collect
+            // any missing profile info first, then call registerUser().
+            if (!additional?.isNewUser) {
                 logEvent(this.analytics, 'google_signin');
             }
             return response;

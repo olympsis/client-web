@@ -38,6 +38,7 @@ export default defineNuxtConfig({
       USER_ID: process.env.USER_ID ?? "",
 
       APP_ID: process.env.APL_APP_ID ?? "",
+      APL_SERVICE_ID: process.env.APL_SERVICE_ID ?? "",
 
       MAPKIT_ORIGIN: process.env.MAPKIT_ORIGIN ?? "",
 
@@ -74,6 +75,9 @@ export default defineNuxtConfig({
 
   app: {
     head: {
+      script: [
+        { src: "https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js", defer: true },
+      ],
       link: [
         { rel: "icon", type: "image/x-icon", href: "/favicon.ico" },
         { rel: "apple-touch-icon", type: "image/x-icon", href: "/favicon.ico" },

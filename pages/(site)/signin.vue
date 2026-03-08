@@ -7,16 +7,9 @@
     />
 	<CompleteProfileCard
 		v-if="step === 'complete-profile'"
-		:initial-first-name="authResponse?.fullName?.split(' ')[0]"
-		:initial-last-name="authResponse?.fullName?.split(' ')[1]"
+		:initial-full-name="authResponse?.fullName"
 		:initial-email="authResponse?.email"
-		:state="profileState"
 		@submit="handleProfileCompletion"
-	/>
-    <CreateUserCard
-		v-if="step === 'create-user'"
-		@submit="handleAuthCompletion"
-		:state="createState"
 	/>
   </main>
 </template>
@@ -24,11 +17,9 @@
 <script setup lang="ts">
 import { navigateTo } from '#app';
 import { ref, type Ref } from 'vue';
-import { VIEW_STATE } from '~/data/Enums';
 import { UserDTO } from '~/data/models/UserModels';
 import { AuthenticationFacade, type AuthFacadeResponse } from '~/data/facades/AuthenticationFacade';
 
-import CreateUserCard from '~/components/Auth/CreateUserCard/CreateUserCard.vue';
 import AuthenticationCard from '~/components/Auth/AuthenticationCard/AuthenticationCard.vue';
 import CompleteProfileCard from '~/components/Auth/CompleteProfileCard/CompleteProfileCard.vue';
 
@@ -38,65 +29,29 @@ const auth = useAuth();
 const session = useSessionStore();
 const authenticator = new AuthenticationFacade();
 
-// Tracks which step of the sign-up flow we're on
-type SignInStep = 'auth' | 'complete-profile' | 'create-user';
+type SignInStep = 'auth' | 'complete-profile';
 const step: Ref<SignInStep> = ref('auth');
 
 const authResponse: Ref<AuthFacadeResponse | null> = ref(null);
-const profileState = ref(VIEW_STATE.PENDING);
-const createState = ref(VIEW_STATE.PENDING);
 
-/**
- * Checks if a new user is missing required profile info (name/email).
- * Apple often doesn't provide these after the first authorization.
- */
-function needsProfileCompletion(response: AuthFacadeResponse): boolean {
-	const nameParts = response.fullName ? response.fullName.trim().split(' ') : [];
-	const hasFirstName = (nameParts[0] ?? '').length > 0;
-	const hasLastName = (nameParts[1] ?? '').length > 0;
-	const hasEmail = (response.email ?? '').length > 0;
-	return !hasFirstName || !hasLastName || !hasEmail;
-}
-
-/**
- * Handles the new user flow after authentication.
- * If profile info is missing, shows the profile completion card.
- * Otherwise registers with the backend and moves to username/sports.
- */
-async function handleNewUser(response: AuthFacadeResponse) {
-	authResponse.value = response;
-	if (needsProfileCompletion(response)) {
-		step.value = 'complete-profile';
-	} else {
-		await registerAndContinue(response);
-	}
-}
-
-/**
- * Registers the user with the backend and advances to username/sports step.
- */
-async function registerAndContinue(response: AuthFacadeResponse) {
-	const registered = await authenticator.registerUser(response);
-	if (registered) {
-		step.value = 'create-user';
-	} else {
-		console.error('Failed to register user with backend');
-	}
+async function navigateToApp() {
+	auth.resetState();
+	session.resetSession();
+	// TODO:// remove after app launch — revert to /home
+	await navigateTo({
+		path: '/events',
+		query: { from: '/signin' }
+	});
 }
 
 async function handleSignInWithApple() {
 	const response = await auth.signInWithApple();
 	if (response) {
 		if (response.isNewUser) {
-			await handleNewUser(response);
+			authResponse.value = response;
+			step.value = 'complete-profile';
 		} else {
-			auth.resetState();
-			session.resetSession();
-			// TODO:// remove after app launch — revert to /home
-			await navigateTo({
-				path: '/events',
-				query: { from: '/signin' }
-			});
+			await navigateToApp();
 		}
 	}
 }
@@ -105,57 +60,48 @@ async function handleSignInWithGoogle() {
 	const response = await auth.signInWithGoogle();
 	if (response) {
 		if (response.isNewUser) {
-			await handleNewUser(response);
+			authResponse.value = response;
+			step.value = 'complete-profile';
 		} else {
-			auth.resetState();
-			session.resetSession();
-			// TODO:// remove after app launch — revert to /home
-			await navigateTo({
-				path: '/events',
-				query: { from: '/signin' }
-			});
+			await navigateToApp();
 		}
 	}
 }
 
 /**
- * Called when the user submits the CompleteProfileCard.
- * Updates the auth response with user-provided info, registers
- * with the backend, then advances to the username/sports step.
+ * Called when the user submits the full profile form.
+ * Registers with the backend, updates user data, then navigates to /events.
  */
-async function handleProfileCompletion(event: { firstName: string, lastName: string, email: string }) {
+async function handleProfileCompletion(event: {
+	firstName: string,
+	lastName: string,
+	email: string,
+	username: string,
+	sports: any[]
+}) {
 	if (!authResponse.value) return;
 
-	profileState.value = VIEW_STATE.LOADING;
-
-	// Update the stored auth response with user-provided info
+	// Update auth response with user-provided info and register
 	authResponse.value.fullName = `${event.firstName} ${event.lastName}`;
 	authResponse.value.email = event.email;
 
-	await registerAndContinue(authResponse.value);
-	profileState.value = VIEW_STATE.PENDING;
-}
+	const registered = await authenticator.registerUser(authResponse.value);
+	if (!registered) {
+		console.error('Failed to register user with backend');
+		return;
+	}
 
-async function handleAuthCompletion(event: any) {
-  const userData = new UserDTO();
-  userData.username = event.username
-  userData.sports = event.sports
+	// Update user profile with username and sports
+	const userData = new UserDTO();
+	userData.username = event.username;
+	userData.sports = event.sports.map((s: any) => s.name);
 
-  createState.value = VIEW_STATE.LOADING;
-
-  const created = await authenticator.completeUserSignUp(userData);
-  if (created) {
-		createState.value = VIEW_STATE.SUCCESS;
-		auth.resetState();
-		session.resetSession();
-		// TODO:// remove after app launch — revert to /groups/search
-		await navigateTo({
-			path: '/events',
-			query: { from: '/signin' }
-		});
-  } else {
-      createState.value = VIEW_STATE.PENDING;
-  }
+	const completed = await authenticator.completeUserSignUp(userData);
+	if (completed) {
+		await navigateToApp();
+	} else {
+		console.error('Failed to complete user signup');
+	}
 }
 
 const config = useRuntimeConfig();
@@ -168,7 +114,6 @@ useSeoMeta({
         appId: config.public.APP_ID
     }
 });
-
 </script>
 
 <style scoped>
@@ -182,10 +127,6 @@ useSeoMeta({
 	background-position: center;
 	background-repeat: no-repeat;
 	background-image: url('@/assets/images/sports.webp');
-}
-
-#create-user-card {
-	margin: auto;
 }
 
 @media screen and (max-width: 599px) {

@@ -1,139 +1,370 @@
 <template>
-    <div id="complete-profile-card">
-        <h1>Complete Your Profile</h1>
-        <h2>We need a few more details to finish setting up your account.</h2>
+    <div id="complete-profile">
+        <div id="content">
+            <img src="@/assets/images/logo.png" class="icon logo-dark" />
+            <img src="@/assets/images/logo.white.png" class="icon logo-light" />
 
-        <div class="field">
-            <h3>First Name</h3>
-            <input type="text" v-model="firstName" autocomplete="given-name" placeholder="First name" />
+            <h1>Getting to know you</h1>
+            <p class="subtitle">What's your handle? Favorite sports?</p>
+
+            <!-- Full Name -->
+            <div class="field">
+                <h3>Enter your Fullname</h3>
+                <input
+                    type="text"
+                    v-model="fullName"
+                    autocomplete="name"
+                    :placeholder="fullNamePlaceholder"
+                />
+            </div>
+
+            <!-- Email -->
+            <div class="field">
+                <h3>Enter your Email</h3>
+                <input
+                    type="email"
+                    v-model="email"
+                    autocomplete="email"
+                    placeholder="email@example.com"
+                />
+            </div>
+
+            <!-- Username -->
+            <div class="field">
+                <h3>Enter your new Username</h3>
+                <div class="input-wrapper">
+                    <input
+                        type="text"
+                        v-model="username"
+                        autocomplete="off"
+                        placeholder="@username"
+                    />
+                    <div class="indicator">
+                        <img v-if="usernameState === VIEW_STATE.SUCCESS" src="@/assets/icons/check/check.svg" />
+                        <img v-if="usernameState === VIEW_STATE.FAILURE" src="@/assets/icons/xmark/xmark.red.svg" />
+                        <div v-if="usernameState === VIEW_STATE.LOADING" class="spinner" />
+                    </div>
+                </div>
+                <p class="hint">Must be between 5 and 15 characters and contain no special characters</p>
+            </div>
+
+            <!-- Sports Selection -->
+            <div id="sports-section">
+                <h3>Select your interests</h3>
+                <p class="hint">This helps us customize your experience</p>
+
+                <div id="sports-list">
+                    <li
+                        v-for="sport in session.sports"
+                        :key="sport.name"
+                        :class="{ sport: true, selected: isSelected(sport) }"
+                        @click="toggleSport(sport)"
+                    >
+                        {{ sport.name }}
+                    </li>
+                </div>
+            </div>
+
+            <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
+
+            <div id="action-row">
+                <button id="continue-button" @click="handleSubmit">Continue</button>
+            </div>
         </div>
-
-        <div class="field">
-            <h3>Last Name</h3>
-            <input type="text" v-model="lastName" autocomplete="family-name" placeholder="Last name" />
-        </div>
-
-        <div class="field">
-            <h3>Email</h3>
-            <input type="email" v-model="email" autocomplete="email" placeholder="Email address" />
-        </div>
-
-        <p v-if="hasError" class="error">Please fill in all fields to continue.</p>
-
-        <button id="action-button" @click="handleSubmit">
-            <TextButton text="Continue" success-text="Success" failure-text="Failed" :model-value="state" />
-        </button>
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { VIEW_STATE } from '~/data/Enums';
-import TextButton from '~/components/Buttons/LoadingButtons/TextButton/TextButton.vue';
-
+import { Sport } from '~/data/models/GenericModels';
+import { useSessionStore } from '~/stores/session-store';
+import { UserService } from '~/data/services/UserService';
 const props = defineProps<{
     /** Pre-fill values from whatever Apple/Firebase provided */
-    initialFirstName?: string
-    initialLastName?: string
+    initialFullName?: string
     initialEmail?: string
 }>();
 
-const state = defineModel('state', { default: VIEW_STATE.PENDING });
 const emits = defineEmits(['submit']);
 
-const firstName = ref(props.initialFirstName ?? '');
-const lastName = ref(props.initialLastName ?? '');
-const email = ref(props.initialEmail ?? '');
-const hasError = ref(false);
+const session = useSessionStore();
+const userService = new UserService();
 
-function handleSubmit() {
-    if (!firstName.value.trim() || !lastName.value.trim() || !email.value.trim()) {
-        hasError.value = true;
+const fullName = ref(props.initialFullName ?? '');
+const email = ref(props.initialEmail ?? '');
+const username = ref('');
+const selectedSports = ref<Sport[]>([]);
+const errorMessage = ref('');
+const usernameState = ref<VIEW_STATE>(VIEW_STATE.PENDING);
+
+const fullNamePlaceholder = 'Joel Joseph';
+
+// Debounced username availability check
+let isInitialRun = true;
+let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+
+watch(username, (newValue) => {
+    if (isInitialRun) {
+        isInitialRun = false;
         return;
     }
-    hasError.value = false;
+
+    if (newValue !== '') {
+        if (debounceTimer !== null) {
+            clearTimeout(debounceTimer);
+        }
+        debounceTimer = setTimeout(() => {
+            checkUsernameAvailability()
+                .catch(() => { usernameState.value = VIEW_STATE.FAILURE; })
+                .then(() => { debounceTimer = null; });
+        }, 250);
+    } else {
+        if (debounceTimer !== null) {
+            clearTimeout(debounceTimer);
+        }
+        usernameState.value = VIEW_STATE.PENDING;
+    }
+});
+
+async function checkUsernameAvailability() {
+    usernameState.value = VIEW_STATE.LOADING;
+    const isAvailable = await userService.usernameAvailability(username.value);
+    usernameState.value = isAvailable ? VIEW_STATE.SUCCESS : VIEW_STATE.FAILURE;
+}
+
+function isSelected(sport: Sport): boolean {
+    return selectedSports.value.some(s => s.name === sport.name);
+}
+
+function toggleSport(sport: Sport) {
+    const index = selectedSports.value.findIndex(s => s.name === sport.name);
+    if (index !== -1) {
+        selectedSports.value.splice(index, 1);
+    } else {
+        selectedSports.value.push(sport);
+    }
+}
+
+function handleSubmit() {
+    errorMessage.value = '';
+
+    if (!fullName.value.trim()) {
+        errorMessage.value = 'Please enter your full name.';
+        return;
+    }
+    if (!email.value.trim()) {
+        errorMessage.value = 'Please enter your email.';
+        return;
+    }
+    if (!username.value.trim() || usernameState.value !== VIEW_STATE.SUCCESS) {
+        errorMessage.value = 'Please choose an available username.';
+        return;
+    }
+    if (selectedSports.value.length === 0) {
+        errorMessage.value = 'Please select at least one sport.';
+        return;
+    }
+
+    const nameParts = fullName.value.trim().split(' ');
     emits('submit', {
-        firstName: firstName.value.trim(),
-        lastName: lastName.value.trim(),
+        firstName: nameParts[0] || '',
+        lastName: nameParts.slice(1).join(' ') || '',
         email: email.value.trim(),
+        username: username.value.trim(),
+        sports: selectedSports.value,
     });
 }
 </script>
 
 <style scoped>
-#complete-profile-card {
-    margin: auto;
+#complete-profile {
+    width: 100%;
+    height: 100%;
     display: flex;
-    max-width: 25rem;
-    padding: 2rem 2rem;
+    overflow-y: auto;
     align-items: center;
-    border-radius: 10px;
-    flex-direction: column;
+    justify-content: flex-start;
+    padding-top: 6rem;
     background-color: var(--secondary-background-color);
+}
+
+#content {
+    width: 100%;
+    max-width: 35rem;
+    padding: 3rem 2rem;
+
+    .icon {
+        width: 3rem;
+        height: 2.5rem;
+        margin-bottom: 1rem;
+    }
+
+    /* Show dark logo in light mode, white logo in dark mode */
+    .logo-light { display: none; }
+    .logo-dark { display: block; }
+
+    @media (prefers-color-scheme: dark) {
+        .logo-light { display: block; }
+        .logo-dark { display: none; }
+    }
 
     h1 {
-        color: var(--primary-label-color);
-        font-size: 1rem;
-        text-align: center;
-        margin: 0.5rem 0rem;
-    }
-
-    h2 {
-        font-size: 0.8em;
-        text-align: center;
-        font-weight: normal;
-        margin-bottom: 1rem;
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
         color: var(--primary-label-color);
     }
 
-    .field {
+    .subtitle {
+        font-size: 0.9rem;
+        margin-bottom: 2rem;
+        color: var(--secondary-label-color);
+    }
+}
+
+.field {
+    margin-bottom: 1.5rem;
+
+    h3 {
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: var(--primary-label-color);
+    }
+
+    input {
         width: 100%;
-        margin-bottom: 0.75rem;
+        height: 2.75rem;
+        border: unset;
+        font-size: 1rem;
+        border-radius: 8px;
+        padding: 0rem 1rem;
+        color: var(--primary-label-color);
+        background-color: var(--tertiary-background-color);
+    }
 
-        h3 {
-            font-size: 0.9rem;
-            font-weight: normal;
-            color: var(--primary-label-color);
-        }
+    .input-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
 
         input {
-            width: 100%;
-            height: 2rem;
-            border: unset;
-            font-size: 1rem;
-            border-radius: 5px;
-            margin: 0.25rem 0rem;
-            padding: 0rem 0.5rem;
-            color: var(--primary-label-color);
+            flex: 1;
+        }
+
+        .indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.75rem;
+            height: 2.75rem;
+            border-radius: 8px;
             background-color: var(--tertiary-background-color);
+
+            img {
+                width: 1.25rem;
+                height: 1.25rem;
+            }
+
+            .spinner {
+                border: 0.2rem solid #f3f3f3;
+                border-top: 0.2rem solid var(--primary-brand-color);
+                border-radius: 50%;
+                width: 1.25rem;
+                height: 1.25rem;
+                animation: spin 1s linear infinite;
+            }
+
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
         }
     }
 
-    .error {
-        color: #e74c3c;
+    .hint {
+        color: var(--secondary-label-color);
         font-size: 0.75rem;
-        margin-bottom: 0.5rem;
+        margin-top: 0.25rem;
+    }
+}
+
+#sports-section {
+    margin-bottom: 1.5rem;
+
+    h3 {
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+        color: var(--primary-label-color);
     }
 
-    #action-button {
-        height: 2.5rem;
+    .hint {
+        color: var(--secondary-label-color);
+        font-size: 0.75rem;
+        margin-bottom: 0.75rem;
+    }
+
+    #sports-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        padding: 0;
+        max-height: 10rem;
+        overflow-y: auto;
+        list-style-type: none;
+
+        .sport {
+            display: flex;
+            cursor: pointer;
+            align-items: center;
+            border-radius: 20px;
+            white-space: nowrap;
+            padding: 0.4rem 0.85rem;
+            font-size: 0.85rem;
+            text-transform: capitalize;
+            color: var(--primary-label-color);
+            border: var(--component-border) solid 1px;
+            background-color: var(--tertiary-background-color);
+            transition: border-color 0.15s ease;
+        }
+
+        .selected {
+            border-color: var(--secondary-brand-color);
+        }
+    }
+}
+
+.error {
+    color: #e74c3c;
+    font-size: 0.8rem;
+    margin-bottom: 1rem;
+}
+
+#action-row {
+    display: flex;
+    justify-content: flex-end;
+
+    #continue-button {
+        height: 2.75rem;
         color: white;
         display: flex;
         border: unset;
         cursor: pointer;
-        border-radius: 5px;
-        font-style: italic;
-        border-color: unset;
+        font-weight: 500;
+        font-size: 0.95rem;
+        border-radius: 25px;
         align-items: center;
-        padding: 0.5rem 1rem;
-        text-transform: uppercase;
+        padding: 0.5rem 2rem;
         background-color: var(--primary-brand-color);
     }
-}
 
-@media (max-width: 25rem) {
-    #complete-profile-card {
-        border-radius: unset;
+    @media (prefers-color-scheme: dark) {
+        #continue-button {
+            color: black;
+            background-color: white;
+        }
     }
 }
 </style>

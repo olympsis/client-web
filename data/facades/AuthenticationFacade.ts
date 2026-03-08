@@ -50,7 +50,7 @@ class AuthenticationFacade {
             appleAuth.init({
                 clientId: config.public.APL_SERVICE_ID,
                 scope: 'name email',
-                redirectURI: 'https://bellicosely-servantless-loyd.ngrok-free.dev',
+                redirectURI: window.location.origin,
                 usePopup: true,
             });
 

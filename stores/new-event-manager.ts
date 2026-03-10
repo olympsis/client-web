@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { defineStore } from "pinia";
 import * as Sentry from '@sentry/nuxt';
-import { EVENT_TYPE, EVENT_VISIBILITY, MEDIA_TYPE, NEW_EVENT_ERROR } from "~/data/Enums";
+import { EVENT_TYPE, EVENT_VISIBILITY, MEDIA_TYPE, NEW_EVENT_ERROR, EVENT_CREATION_STEP } from "~/data/Enums";
 import { EventDao, EventLink, NewEventDao, TeamsConfig, type EventConfig, type EventFormatConfig, type ParticipantsConfig, type RecurrenceOptions } from "~/data/models/EventModels";
 import { GroupSelection, Sport, Tag, VenueDescriptor } from "~/data/models/GenericModels";
 import { UploadService } from '~/data/services/UploadService';
@@ -123,12 +123,18 @@ export const useNewEventManager = defineStore('new-event-manager', () => {
         const dao = generateNewEventData();
 
         try {
-            if (!dao.mediaURL) throw('Event Image Required!');
+            if (!dao.mediaURL) throw({ step: EVENT_CREATION_STEP.IMAGE_UPLOAD, cause: 'Event image required' });
 
             // Upload event image if it's needed
-            const img = await uploadEventImage(dao.mediaURL);
-            if (img) {
-                dao.mediaURL = img;
+            let uploadedURL: string | undefined;
+            try {
+                uploadedURL = await uploadEventImage(dao.mediaURL);
+            } catch (uploadError) {
+                throw({ step: EVENT_CREATION_STEP.IMAGE_UPLOAD, cause: uploadError });
+            }
+
+            if (uploadedURL) {
+                dao.mediaURL = uploadedURL;
                 isCustomImage = true;
             }
 
@@ -143,17 +149,18 @@ export const useNewEventManager = defineStore('new-event-manager', () => {
             if (id) {
                 return id
             } else {
-                throw('Failed to create event no ID returned.')
+                throw({ step: EVENT_CREATION_STEP.CREATE_EVENT, cause: 'No ID returned by the server' });
             }
-        } catch(error) {
+        } catch(error: any) {
             // Only delete the uploaded image on error if it's a custom uploaded one
             if (dao.mediaURL && isCustomImage) await uploadService.deleteImage(dao.mediaURL, 'olympsis-event-images');
             Sentry.withScope((scope) => {
                 scope.setExtra('action', 'create_event');
-                Sentry.captureException(error);
+                scope.setExtra('step', error?.step);
+                Sentry.captureException(error?.cause ?? error);
             });
-            console.error(`Failed to create new event. Error: ${error}`)
-            return null;
+            console.error(`Failed to create new event. Error: ${error?.cause ?? error}`)
+            throw error;
         }
     }
 

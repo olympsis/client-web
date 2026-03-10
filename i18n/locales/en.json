@@ -109,7 +109,8 @@
       "seoTitle": "New Event | Olympsis",
       "seoDescription": "Creating a new event on Olympsis",
       "errorCreate": "Failed to create event!",
-      "errorCouldNot": "Could not create event!"
+      "errorCouldNot": "Could not create event!",
+      "errorImageUpload": "Failed to upload event image. Please try again."
     },
     "detail": {
       "notFound": "Sorry, we failed to find the event",

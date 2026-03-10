@@ -213,7 +213,7 @@
 import { computed, ref } from 'vue';
 import { useToast } from 'primevue/usetoast';
 import {  Sport } from '~/data/models/GenericModels';
-import { VIEW_STATE, NEW_EVENT_ERROR } from '~/data/Enums';
+import { VIEW_STATE, NEW_EVENT_ERROR, EVENT_CREATION_STEP } from '~/data/Enums';
 
 import Drawer from 'primevue/drawer';
 import DatePicker from 'primevue/datepicker';
@@ -317,7 +317,13 @@ function createNewEvent() {
                 .catch((error: any) => {
                     state.value = VIEW_STATE.FAILURE;
                     console.error('Failed to create event. Error: ', error);
-                    toast.add({ severity: 'error', summary: 'Error', detail: t('events.new.errorCreate'), life: 3000 });
+
+                    // Show a specific message depending on which step failed
+                    const detail = error?.step === EVENT_CREATION_STEP.IMAGE_UPLOAD
+                        ? t('events.new.errorImageUpload')
+                        : t('events.new.errorCreate');
+                    toast.add({ severity: 'error', summary: 'Error', detail, life: 3000 });
+
                     setTimeout(() => {
                         state.value = VIEW_STATE.PENDING;
                     }, 250);

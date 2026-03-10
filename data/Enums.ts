@@ -435,6 +435,12 @@ enum NEW_EVENT_ERROR {
     INVALID_PARTICIPANTS=7
 }
 
+/** Identifies which step failed during event creation */
+enum EVENT_CREATION_STEP {
+    IMAGE_UPLOAD = 'image_upload',
+    CREATE_EVENT = 'create_event'
+}
+
 enum RSVP_STATUS {
     YES=1,
     MAYBE=0
@@ -727,6 +733,7 @@ export {
     stringToMediaType,
 
     NEW_EVENT_ERROR,
+    EVENT_CREATION_STEP,
 
     SPORTS,
     sportToString,

@@ -170,7 +170,18 @@
             </div>
         </div>
 
-        <Drawer v-model:visible="showAdvancedSettings" position="right">
+        <Drawer
+            v-model:visible="showAdvancedSettings"
+            position="right"
+            :pt="{
+                root: {
+                    style: {
+                        'background-color': 'var(--primary-background-color)',
+                        'color': 'var(--primary-label-color)',
+                    }
+                }
+            }"
+        >
             <template #container="{ closeCallback }">
                 <div id="header" :style="{ display: 'flex', alignItems: 'center' }">
                     <h2>{{ t('events.new.advancedSettings') }}</h2>
@@ -181,7 +192,7 @@
                         </picture>
                     </button>
                 </div>
-                
+
                 <EventAdvancedSettings
                     v-model:event-config="manager.config"
                     v-model:teams-config="manager.teamsConfig"

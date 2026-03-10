@@ -381,6 +381,7 @@ onUnmounted(() => {
 #event-advanced-settings {
     width: 100%;
     padding: 1rem;
+    color: var(--primary-label-color);
 
     #body {
         margin-top: 1rem;
@@ -422,7 +423,7 @@ onUnmounted(() => {
     }
 
     .sub-header {
-        color: gray;
+        color: var(--secondary-label-color);
         font-size: 0.9rem;
     }
 }
@@ -434,10 +435,11 @@ onUnmounted(() => {
 
     .sub-section-header {
         font-size: 0.85rem;
+        color: var(--primary-label-color);
     }
 
     .sub-section-sub-header {
-        color: gray;
+        color: var(--secondary-label-color);
         font-size: 0.7rem;
     }
 }
@@ -456,6 +458,8 @@ onUnmounted(() => {
         margin-top: 0.5rem;
         border-radius: 10px;
         padding: 0rem 0.5rem;
+        color: var(--primary-label-color);
+        background-color: var(--secondary-background-color);
     }
 }
 
@@ -467,6 +471,7 @@ onUnmounted(() => {
     font-size: 1.25rem;
     border-radius: 10px;
     padding: 0rem 0.5rem;
+    color: var(--primary-label-color);
     background-color: var(--secondary-background-color);
 }
 
@@ -477,6 +482,7 @@ onUnmounted(() => {
         cursor: pointer;
         border-radius: 10px;
         padding: 0.5rem 1rem;
+        color: var(--primary-label-color);
         background-color: var(--secondary-background-color);
 
         &.selected {

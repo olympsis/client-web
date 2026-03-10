@@ -340,6 +340,10 @@ onMounted(() => {
     }
 });
 
+onUnmounted(() => {
+    manager.$reset();
+});
+
 useSeoMeta({
     title: () => t('events.new.seoTitle'),
     description: () => t('events.new.seoDescription'),

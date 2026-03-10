@@ -41,7 +41,7 @@ export const useNewEventManager = defineStore('new-event-manager', () => {
      * @returns a NewEventError or null if an error exists or not
      */
     function validateNewEventData() : NEW_EVENT_ERROR | null {
-        if (title.value === '') {
+        if (title.value.trim() === '') {
             return NEW_EVENT_ERROR.NO_TITLE;
         }
         if (groups.value.length === 0) {
@@ -61,6 +61,14 @@ export const useNewEventManager = defineStore('new-event-manager', () => {
         }
         if (image.value === '') {
             return NEW_EVENT_ERROR.NO_IMAGE;
+        }
+        // Validate min participants doesn't exceed max when both are set
+        if (participantsConfig.value) {
+            const min = participantsConfig.value.minParticipants ?? 0;
+            const max = participantsConfig.value.maxParticipants ?? 0;
+            if (max > 0 && min > max) {
+                return NEW_EVENT_ERROR.INVALID_PARTICIPANTS;
+            }
         }
         return null;
     }
@@ -172,6 +180,27 @@ export const useNewEventManager = defineStore('new-event-manager', () => {
         }
     }
 
+    /** Resets all form state back to defaults */
+    function $reset() {
+        selectedSport.value = undefined;
+        title.value = '';
+        image.value = '';
+        description.value = '';
+        tags.value = [];
+        externalLinks.value = [];
+        groups.value = [];
+        venues.value = [];
+        eventType.value = EVENT_TYPE.REGULAR;
+        visibility.value = EVENT_VISIBILITY.PUBLIC;
+        startDate.value = new Date();
+        endDate.value = new Date(startDate.value.getTime() + (60 * 60 * 1000));
+        config.value = undefined;
+        teamsConfig.value = undefined;
+        formatConfig.value = undefined;
+        participantsConfig.value = undefined;
+        recurrenceOptions.value = undefined;
+    }
+
     return {
         selectedSport,
 
@@ -181,7 +210,7 @@ export const useNewEventManager = defineStore('new-event-manager', () => {
 
         tags,
         externalLinks,
-        
+
         groups,
         venues,
         eventType,
@@ -196,6 +225,7 @@ export const useNewEventManager = defineStore('new-event-manager', () => {
         participantsConfig,
         recurrenceOptions,
 
+        $reset,
         validateNewEventData,
         generateNewEventData,
         createNewEvent,

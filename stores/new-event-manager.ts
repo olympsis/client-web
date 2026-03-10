@@ -62,6 +62,12 @@ export const useNewEventManager = defineStore('new-event-manager', () => {
         if (image.value === '') {
             return NEW_EVENT_ERROR.NO_IMAGE;
         }
+        // Validate recurrence end date is after event start date
+        if (recurrenceOptions.value) {
+            if (recurrenceOptions.value.endTime.getTime() <= startDate.value.getTime()) {
+                return NEW_EVENT_ERROR.INVALID_END_DATE;
+            }
+        }
         // Validate min participants doesn't exceed max when both are set
         if (participantsConfig.value) {
             const min = participantsConfig.value.minParticipants ?? 0;

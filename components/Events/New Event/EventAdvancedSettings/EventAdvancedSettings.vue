@@ -30,7 +30,7 @@
                 <div class="sub-section-sub-header">{{ t('events.advanced.minParticipantsSub') }}</div>
 
                 <div id="input" class="participants-slider">
-                    <input type="number" v-model="min"/>
+                    <input type="number" min="0" v-model="min"/>
                 </div>
             </div>
 
@@ -39,7 +39,7 @@
                 <div class="sub-section-sub-header">{{ t('events.advanced.maxParticipantsSub') }}</div>
 
                 <div id="input" class="participants-slider">
-                    <input type="number" v-model="max"/>
+                    <input type="number" min="0" v-model="max"/>
                 </div>
             </div>
 
@@ -117,7 +117,7 @@
 
                 <div :style="{ display: 'flex', fontSize: '0.8rem', alignItems: 'center', marginLeft: '1rem', fontWeight: 'bold', lineHeight: '0.5rem', marginTop: '1rem' }">
                     {{ t('events.advanced.every') }}
-                    <input type="number" :style="{ width: '4rem', marginLeft: '0.5rem', marginTop: 'unset' }" class="input" v-model="recurrenceInterval"/>
+                    <input type="number" min="1" :style="{ width: '4rem', marginLeft: '0.5rem', marginTop: 'unset' }" class="input" v-model="recurrenceInterval"/>
                 </div>
 
                 <div class="actions">

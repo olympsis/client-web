@@ -121,6 +121,13 @@ function closeMediaPicker() {
     showMediaPicker.value = false;
 }
 
+onUnmounted(() => {
+    // Revoke any lingering ObjectURL to prevent memory leaks
+    if (uploadedMediaURL.value) {
+        URL.revokeObjectURL(uploadedMediaURL.value);
+    }
+});
+
 </script>
 
 <style scoped>

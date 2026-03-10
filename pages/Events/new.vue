@@ -1,5 +1,5 @@
 <template>
-    <div id="new-event-view">
+    <div id="new-event-view" :class="{ submitting: isSubmitting }">
         <div id="left">
             <!-- Header -->
             <div id="header">
@@ -253,6 +253,11 @@ const eventSport = computed<Sport>(() => {
 const eventSports = ref<Sport[]>([]);
 const showAdvancedSettings = ref<boolean>(false);
 
+/** True while the event is being created — used to disable form inputs */
+const isSubmitting = computed<boolean>(() => {
+    return state.value === VIEW_STATE.LOADING || state.value === VIEW_STATE.SUCCESS;
+});
+
 /** Returns true when the user has started filling out the form */
 const hasUnsavedChanges = computed<boolean>(() => {
     return manager.title.trim() !== ''
@@ -392,6 +397,13 @@ useSeoMeta({
     display: flex;
     justify-content: center;
     background-color: var(--primary-background-color);
+
+    /* Prevent interaction and dim the form while submitting */
+    &.submitting #left,
+    &.submitting #right {
+        pointer-events: none;
+        opacity: 0.6;
+    }
 
     #left {
         display: flex;

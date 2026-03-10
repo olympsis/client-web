@@ -53,6 +53,9 @@ export const useNewEventManager = defineStore('new-event-manager', () => {
         if (venues.value.length === 0) {
             return NEW_EVENT_ERROR.NO_VENUES;
         }
+        if (startDate.value.getTime() <= Date.now()) {
+            return NEW_EVENT_ERROR.INVALID_START_DATE;
+        }
         if (startDate.value.getTime() > endDate.value.getTime()) {
             return NEW_EVENT_ERROR.INVALID_END_DATE;
         }
@@ -81,7 +84,7 @@ export const useNewEventManager = defineStore('new-event-manager', () => {
                 MEDIA_TYPE.IMAGE,
                 title.value,
                 description.value,
-                [selectedSport.value?.name.split(' ')[1]!],
+                [selectedSport.value?.name.split(' ').slice(1).join(' ')!],
                 tags.value.map((t: Tag) => t.name),
                 config.value,
                 formatConfig.value,

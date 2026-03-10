@@ -85,7 +85,7 @@ class NewEventManager {
                 mediaType,
                 title,
                 description,
-                sports.map((s: Sport) => s.name.split(' ')[1]!),
+                sports.map((s: Sport) => s.name.split(' ').slice(1).join(' ')),
                 tags.map((t: Tag) => t.name),
                 config,
                 formatConfig,

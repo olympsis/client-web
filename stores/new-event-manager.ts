@@ -41,7 +41,7 @@ export const useNewEventManager = defineStore('new-event-manager', () => {
      * @returns a NewEventError or null if an error exists or not
      */
     function validateNewEventData() : NEW_EVENT_ERROR | null {
-        if (title.value.trim() === '') {
+        if (title.value.trim() === '' || title.value.trim().length > 100) {
             return NEW_EVENT_ERROR.NO_TITLE;
         }
         if (groups.value.length === 0) {

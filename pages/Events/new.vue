@@ -13,16 +13,17 @@
 
             <div id="section-one" class="section">
                 <!-- Title -->
-                <input 
+                <input
                     id="event-title"
                     :class="{
-                        label: newEventError !== NEW_EVENT_ERROR.NO_TITLE, 
-                        'title-error': newEventError === NEW_EVENT_ERROR.NO_TITLE 
+                        label: newEventError !== NEW_EVENT_ERROR.NO_TITLE,
+                        'title-error': newEventError === NEW_EVENT_ERROR.NO_TITLE
                     }"
                     class="text-input"
-                    type="text" 
+                    type="text"
+                    maxlength="100"
                     :placeholder="t('events.new.title')"
-                    v-model="manager.title" 
+                    v-model="manager.title"
                 />
 
                 <div class="divider"></div>

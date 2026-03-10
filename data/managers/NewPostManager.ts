@@ -64,7 +64,7 @@ export class NewPostManager {
     public generateNewPostModel(id: string, dao: PostDao): Post {
         const user = this.sessionStore.user;
         const poster = new UserSnippet(
-            user?.uuid,
+            user?.userId,
             user?.firstName,
             user?.lastName,
             user?.username,

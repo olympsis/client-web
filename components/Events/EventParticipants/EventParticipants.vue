@@ -5,7 +5,7 @@
             <ParticipantListItem 
                 v-for="participant in event.participants.slice(0, 3)"
                 :participant="participant" 
-                :is-user="session.user?.uuid === participant.user?.uuid"
+                :is-user="session.user?.userId === participant.user?.userId"
                 :is-admin="isAdmin"
             />
         </ul>
@@ -58,7 +58,7 @@ const isAdmin = computed<boolean>(() => {
     const adminGroups = session.groups.filter((g) => {
         const group = g.club ?? g.organization;
         if (!group) return false;
-        return group.members?.find((m) => m.user?.uuid === session.user?.uuid && m.role !== GROUP_ROLE.MEMBER);
+        return group.members?.find((m) => m.user?.userId === session.user?.userId && m.role !== GROUP_ROLE.MEMBER);
     });
     return adminGroups.find((g) => {
         const group = g.club ?? g.organization;
@@ -68,7 +68,7 @@ const isAdmin = computed<boolean>(() => {
 });
 
 const hideParticipants = computed<boolean>(() => {
-    if (isAdmin.value || props.event.participants.find((p) => p.user?.uuid == session.user?.uuid)) return false;
+    if (isAdmin.value || props.event.participants.find((p) => p.user?.userId == session.user?.userId)) return false;
     return props.event.participantsConfig?.hideParticipants ?? false;
 });
 

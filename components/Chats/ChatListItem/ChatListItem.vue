@@ -44,8 +44,8 @@ const groupName: ComputedRef<string> = computed(() => {
 });
 
 const isMember: ComputedRef<boolean> = computed(() => {
-    const uuid = session.user?.uuid;
-    return props.room?.members.find((m) => m.uuid == uuid) !== undefined;
+    const userId = session.user?.userId;
+    return props.room?.members.find((m) => m.userId == userId) !== undefined;
 });
 
 async function joinRoom() {
@@ -57,7 +57,7 @@ async function joinRoom() {
             props.room.members.push(
                 new ChatMember(
                     '',
-                    session.user?.uuid ?? '',
+                    session.user?.userId ?? '',
                     'online',
                     Math.floor(Date.now() / 1000)
                 )

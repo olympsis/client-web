@@ -96,10 +96,10 @@ const clubService = new ClubService();
 const buttonState = ref(VIEW_STATE.PENDING);
 
 const isMember = computed<Boolean>(() => {
-    const uuid = session.user?.uuid;
-    if (!uuid) return false;
+    const userId = session.user?.userId;
+    if (!userId) return false;
 
-    return groupMembers.value.find((m) => m.user?.uuid === uuid) !== undefined;
+    return groupMembers.value.find((m) => m.user?.userId === userId) !== undefined;
 });
 
 const groupMembers = computed<Member[]>(() => {

@@ -60,8 +60,8 @@ const toggle = (event: any) => {
 
 onMounted(() => {
     const user = session.user;
-    if (user && user.uuid) {
-        if (props.comment.user?.uuid === user.uuid) {
+    if (user && user.userId) {
+        if (props.comment.user?.userId === user.userId) {
             items.value = [
                 {
                     label: 'Options',

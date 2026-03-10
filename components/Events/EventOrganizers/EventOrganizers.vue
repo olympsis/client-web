@@ -31,7 +31,7 @@ const props = defineProps({
 
 const poster = computed<Participant>(() => {
     let snippet = new UserSnippet(
-        props.event.poster?.uuid,
+        props.event.poster?.userId,
         props.event.poster?.firstName,
         props.event.poster?.lastName,
         props.event.poster?.username,

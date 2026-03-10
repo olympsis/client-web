@@ -20,7 +20,7 @@
             <ParticipantListItem 
                 v-for="participant in participants" 
                 :participant="participant" 
-                :is-user="uuid === participant.user?.uuid"
+                :is-user="userId === participant.user?.userId"
                 :is-admin="isAdmin"
                 :has-menu="true"
                 @kicked="handleKickParticipant"
@@ -30,10 +30,10 @@
         <!-- Event WaitList -->
         <ul v-if="waitList.length > 0" id="wait-list" >
             <div id="label">Wait List</div>
-            <ParticipantListItem 
-                v-for="participant in waitList" 
-                :participant="participant" 
-                :is-user="uuid === participant.user?.uuid"
+            <ParticipantListItem
+                v-for="participant in waitList"
+                :participant="participant"
+                :is-user="userId === participant.user?.userId"
                 :is-admin="isAdmin"
                 :has-menu="true"
                 @kicked="handleKickParticipant"
@@ -75,15 +75,15 @@ const waitList = computed<Participant[]>(() => {
     });
 });
 
-const uuid = computed<string | undefined>(() => {
-    return session.user?.uuid;
+const userId = computed<string | undefined>(() => {
+    return session.user?.userId;
 });
 
 const isAdmin = computed<boolean>(() => {
     const adminGroups = session.groups.filter((g) => {
         const group = g.club ?? g.organization;
         if (!group) return false;
-        return group.members?.find((m) => m.user?.uuid === uuid.value && m.role !== GROUP_ROLE.MEMBER);
+        return group.members?.find((m) => m.user?.userId === userId.value && m.role !== GROUP_ROLE.MEMBER);
     });
     return adminGroups.find((g) => {
         const group = g.club ?? g.organization;

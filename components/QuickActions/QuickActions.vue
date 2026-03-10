@@ -23,7 +23,7 @@
 <script setup lang="ts">
 const session = useSessionStore();
 const hasEvent = computed<Boolean>(() => {
-    return session.events?.mostRecentForUser(session.user?.uuid ?? '') != undefined;
+    return session.events?.mostRecentForUser(session.user?.userId ?? '') != undefined;
 });
 const hasGroup = computed<Boolean>(() => {
     return session.user?.clubs != undefined || session.user?.organizations != undefined;

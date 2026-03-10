@@ -77,7 +77,7 @@ const canLeaveGroup = computed<boolean>(() => {
     const user = session.user;
     if (user && members.value) {
         const member = members.value.find((m) =>
-            m.user?.uuid === user.uuid
+            m.user?.userId === user.userId
         );
         return member?.role !== 'owner';
     } else {
@@ -89,7 +89,7 @@ const canDeleteGroup = computed<boolean>(() => {
     const user = session.user;
     if (user && members.value) {
         const member = members.value.find((m) =>
-            m.user?.uuid === user.uuid
+            m.user?.userId === user.userId
         );
         return member?.role === 'owner';
     } else {

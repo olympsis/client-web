@@ -29,7 +29,7 @@ const props = defineProps({
         type: Array as PropType<CommentReaction[]>,
         default: () => []
     },
-    currentUserUuid: {
+    currentUserId: {
         type: String,
         default: ''
     }
@@ -51,14 +51,14 @@ const groupedReactions = computed<ReactionGroup[]>(() => {
         if (existing) {
             existing.count++;
             // Track if the current user has this reaction type
-            if (reaction.user?.uuid === props.currentUserUuid) {
+            if (reaction.user?.userId === props.currentUserId) {
                 existing.currentUserReactionId = reaction.id;
             }
         } else {
             groups.set(reaction.type, {
                 type: reaction.type,
                 count: 1,
-                currentUserReactionId: reaction.user?.uuid === props.currentUserUuid ? reaction.id : undefined
+                currentUserReactionId: reaction.user?.userId === props.currentUserId ? reaction.id : undefined
             });
         }
     }

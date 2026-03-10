@@ -11,7 +11,7 @@ export default {
 const data = {
   id: "6493b93fd69bf7890c99785f",
   user: {
-    uuid: "0cd71e07-cfba-4a10-9d41-c0af122612f6",
+    user_id: "0cd71e07-cfba-4a10-9d41-c0af122612f6",
     username: "joeljojo",
     image_url: "profile-images/C775179C-52A6-4311-969A-E220408C7D1D.jpeg",
   },

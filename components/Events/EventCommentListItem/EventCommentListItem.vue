@@ -13,7 +13,7 @@
                 <!-- Grouped reaction badges (e.g. 👍 3) — click to toggle off your own -->
                 <ReactionDisplay
                     :reactions="comment.reactions"
-                    :currentUserUuid="currentUserUuid"
+                    :currentUserId="currentUserId"
                     @toggle="handleReactionToggle"
                 />
                 <!-- Smiley button to open/close the emoji picker -->
@@ -58,9 +58,9 @@ const emit = defineEmits(['report', 'delete', 'addReaction', 'removeReaction']);
 const menu = ref();
 const showPicker = ref(false);
 
-/** Current user's UUID for highlighting their reactions */
-const currentUserUuid = computed<string>(() => {
-    return session.user?.uuid ?? '';
+/** Current user's ID for highlighting their reactions */
+const currentUserId = computed<string>(() => {
+    return session.user?.userId ?? '';
 });
 
 /**
@@ -68,10 +68,10 @@ const currentUserUuid = computed<string>(() => {
  * Used to disable those types in the picker (one-per-type enforcement).
  */
 const currentUserReactionTypes = computed<COMMENT_REACTION_TYPE[]>(() => {
-    const uuid = currentUserUuid.value;
-    if (!uuid) return [];
+    const userId = currentUserId.value;
+    if (!userId) return [];
     return props.comment.reactions
-        .filter((r) => r.user?.uuid === uuid)
+        .filter((r) => r.user?.userId === userId)
         .map((r) => r.type);
 });
 
@@ -131,8 +131,8 @@ const fullName = computed<string>(() => {
  */
 onMounted(() => {
     const user = session.user;
-    if (user && user.uuid) {
-        if (props.comment.user?.uuid === user.uuid) {
+    if (user && user.userId) {
+        if (props.comment.user?.userId === user.userId) {
             items.value = [
                 {
                     label: 'Options',

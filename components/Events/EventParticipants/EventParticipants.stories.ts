@@ -13,7 +13,7 @@ const event: Event = Event.decode({
     "id": "event-id",
     "type": "event",
     "poster": {
-        uuid: "",
+        user_id: "",
         username: "",
         avatar: "",
     },

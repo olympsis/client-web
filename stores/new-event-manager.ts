@@ -87,9 +87,9 @@ export const useNewEventManager = defineStore('new-event-manager', () => {
      */
     function generateNewEventData() : EventDao {
         const user = session.user;
-        const uuid = user?.uuid;
+        const userId = user?.userId;
 
-        if (uuid) {
+        if (userId) {
             return new EventDao(
                 undefined,
                 groups.value,

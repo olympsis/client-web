@@ -63,11 +63,11 @@ export class EventService extends BaseService {
         }
     }
 
-    async getUserPastEvents(uuid: string): Promise<Event[]> {
+    async getUserPastEvents(userId: string): Promise<Event[]> {
         try {
             const headers = await this.getAuthHeaders();
 
-            const endpoint = new Endpoint(`/v1/events/past/user/${uuid}`);
+            const endpoint = new Endpoint(`/v1/events/past/user/${userId}`);
             const [status, _headers, body] = await this.http.request(Method.GET, endpoint, undefined, headers);
 
             if (status !== 200) return [];

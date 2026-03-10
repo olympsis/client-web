@@ -15,19 +15,19 @@ nextWeek.setDate(nextWeek.getDate() + 7);
 // Sample users data
 const sampleUsers: Array<UserSnippet | undefined> = [
     UserSnippet.decode({
-        uuid: "123e4567-e89b-12d3-a456-426614174000",
+        user_id: "123e4567-e89b-12d3-a456-426614174000",
         username: "johndoe",
         name: "John Doe",
         avatar_url: "https://example.com/avatar1.jpg"
     }),
     UserSnippet.decode({
-        uuid: "223e4567-e89b-12d3-a456-426614174001",
+        user_id: "223e4567-e89b-12d3-a456-426614174001",
         username: "janedoe",
         name: "Jane Doe",
         avatar_url: "https://example.com/avatar2.jpg"
     }),
     UserSnippet.decode({
-        uuid: "323e4567-e89b-12d3-a456-426614174002",
+        user_id: "323e4567-e89b-12d3-a456-426614174002",
         username: "mikebrown",
         name: "Mike Brown",
         avatar_url: "https://example.com/avatar3.jpg"

@@ -13,7 +13,7 @@ export const Basic: Story = {
   name: "UserIcon",
   args: {
     user: UserSnippet.decode({
-      uuid: "0",
+      user_id: "0",
       username: "john-doe",
       image_url: "profile-images/78B944B9-F969-4D11-B940-BFA0C9E83A7F.jpeg",
     }),

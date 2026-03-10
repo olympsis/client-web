@@ -203,7 +203,7 @@ export class NewGroupManager {
         const timestamp = new Date();
 
         const snippet = new UserSnippet(
-            user?.uuid,
+            user?.userId,
             user?.username ?? 'olympsis-user',
             user?.imageURL
         );

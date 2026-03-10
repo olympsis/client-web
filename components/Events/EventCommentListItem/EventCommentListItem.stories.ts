@@ -15,7 +15,7 @@ const twelveHoursAgo = new Date(Date.now() - 12 * 60 * 60 * 1000);
 const sampleComment = EventComment.decode({
     id: "comment-001",
     user: {
-        uuid: "user-001",
+        user_id: "user-001",
         first_name: "Joel",
         last_name: "Joseph",
         username: "joeljoseph",
@@ -27,25 +27,25 @@ const sampleComment = EventComment.decode({
     reactions: [
         {
             id: "reaction-001",
-            user: { uuid: "user-002", first_name: "Alex", last_name: "Smith", username: "alexsmith" },
+            user: { user_id: "user-002", first_name: "Alex", last_name: "Smith", username: "alexsmith" },
             type: "thumbs_up",
             created_at: twelveHoursAgo.toISOString()
         },
         {
             id: "reaction-002",
-            user: { uuid: "user-003", first_name: "Jordan", last_name: "Lee", username: "jordanlee" },
+            user: { user_id: "user-003", first_name: "Jordan", last_name: "Lee", username: "jordanlee" },
             type: "thumbs_up",
             created_at: twelveHoursAgo.toISOString()
         },
         {
             id: "reaction-003",
-            user: { uuid: "user-002", first_name: "Alex", last_name: "Smith", username: "alexsmith" },
+            user: { user_id: "user-002", first_name: "Alex", last_name: "Smith", username: "alexsmith" },
             type: "fire",
             created_at: twelveHoursAgo.toISOString()
         },
         {
             id: "reaction-004",
-            user: { uuid: "user-001", first_name: "Joel", last_name: "Joseph", username: "joeljoseph" },
+            user: { user_id: "user-001", first_name: "Joel", last_name: "Joseph", username: "joeljoseph" },
             type: "heart",
             created_at: twelveHoursAgo.toISOString()
         }
@@ -56,7 +56,7 @@ const sampleComment = EventComment.decode({
 const sampleCommentNoReactions = EventComment.decode({
     id: "comment-002",
     user: {
-        uuid: "user-002",
+        user_id: "user-002",
         first_name: "Alex",
         last_name: "Smith",
         username: "alexsmith",

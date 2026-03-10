@@ -74,9 +74,9 @@ class NewEventManager {
         externalLinks?: EventLink[]
     ) : EventDao {
         const user = this.sessionStore.user;
-        const uuid = user?.uuid;
+        const userId = user?.userId;
 
-        if (uuid) {
+        if (userId) {
             return new EventDao(
                 undefined,
                 organizers,

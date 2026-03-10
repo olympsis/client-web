@@ -10,7 +10,7 @@ const data: Post = Post.decode({
   type: "post",
   poster: {
     id: "",
-    uuid: "uuuu",
+    user_id: "uuuu",
     username: "john-doe",
     image_url: "profile-images/4A148BB8-F712-4152-BC8A-1A9416F134EF.jpeg",
   },

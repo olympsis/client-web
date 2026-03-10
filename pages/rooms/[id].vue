@@ -22,7 +22,7 @@
         <!-- Chat Room Messages -->
         <ul id="body" ref="messageContainer">
             <li v-for="message in messages" :key="message.id">
-                <MessageBubble :message="message" :is-user="message.sender === session.user?.uuid"/>
+                <MessageBubble :message="message" :is-user="message.sender === session.user?.userId"/>
             </li>
         </ul>
 
@@ -165,7 +165,7 @@ async function handleSend() {
         const message = {
             type: 'text',
             body: text.value.trim(),
-            sender: session.user?.uuid,
+            sender: session.user?.userId,
         };
 
         socket.send(JSON.stringify(message));

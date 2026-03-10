@@ -111,10 +111,10 @@ const toggle = (event: any) => {
 };
 
 async function toggleLike() {
-    const uuid = session.user?.uuid;
-    if (!uuid) { return; }
+    const userId = session.user?.userId;
+    if (!userId) { return; }
 
-    const hasLiked = props.post.likes?.find((l) => l.uuid === uuid);
+    const hasLiked = props.post.likes?.find((l) => l.userId === userId);
     if (hasLiked) {
         try {
             const un_liked = await service.unLikePost(props.post.id, hasLiked.id);
@@ -134,7 +134,7 @@ async function toggleLike() {
             const id = await service.likePost(props.post.id);
             const like = new Like(
                 id,
-                uuid,
+                userId,
                 new Date().getTime()/1000
             );
 
@@ -160,9 +160,9 @@ async function handleDeletion() {
 
 onMounted(() => {
     // Handle if user liked post
-    const uuid = session.user?.uuid;
-    if (!uuid) { return; }
-    if (props.post.likes?.find((l) => l.uuid === uuid)) {
+    const userId = session.user?.userId;
+    if (!userId) { return; }
+    if (props.post.likes?.find((l) => l.userId === userId)) {
         isLiked.value = true;
     }
 });

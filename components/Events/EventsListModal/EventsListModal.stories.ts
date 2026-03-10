@@ -21,7 +21,7 @@ const events: Event[] = [
         "id": "event-id",
         "type": "event",
         "poster": {
-            uuid: "",
+            user_id: "",
             username: "",
             avatar: "",
         },
@@ -46,7 +46,7 @@ const events: Event[] = [
         "id": "event-id-1",
         "type": "event",
         "poster": {
-          uuid: "user-uuid-1",
+          user_id: "user-uuid-1",
           username: "jane_doe",
           avatar: "avatars/jane_doe.jpg",
         },
@@ -71,7 +71,7 @@ const events: Event[] = [
         "id": "event-id-2",
         "type": "event",
         "poster": {
-          uuid: "user-uuid-2",
+          user_id: "user-uuid-2",
           username: "michael_smith",
           avatar: "avatars/michael_smith.jpg",
         },
@@ -96,7 +96,7 @@ const events: Event[] = [
         "id": "event-id-3",
         "type": "event",
         "poster": {
-          uuid: "user-uuid-3",
+          user_id: "user-uuid-3",
           username: "emily_johnson",
           avatar: "avatars/emily_johnson.jpg",
         },

@@ -37,7 +37,7 @@ const isAdmin = computed<boolean>(() => {
     const group = session.selectedGroup?.club ?? session.selectedGroup?.organization;
     if (!group) return false;
 
-    const member = group.members?.find((m) => m.user?.uuid === user.uuid);
+    const member = group.members?.find((m) => m.user?.userId === user.userId);
     if (!member) return false;
 
     return member.role !== GROUP_ROLE.MEMBER;

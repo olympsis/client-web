@@ -18,13 +18,13 @@ const comments = {
 // Template likes
 const likes = {
     post1Likes: [
-        new Like("like-1", userSnippets.sarah.uuid!, Math.floor(Date.now() / 1000) - 3600),
-        new Like("like-2", userSnippets.mike.uuid!, Math.floor(Date.now() / 1000) - 3000),
-        new Like("like-3", userSnippets.emma.uuid!, Math.floor(Date.now() / 1000) - 2400)
+        new Like("like-1", userSnippets.sarah.userId!, Math.floor(Date.now() / 1000) - 3600),
+        new Like("like-2", userSnippets.mike.userId!, Math.floor(Date.now() / 1000) - 3000),
+        new Like("like-3", userSnippets.emma.userId!, Math.floor(Date.now() / 1000) - 2400)
     ],
     post2Likes: [
-        new Like("like-4", userSnippets.chris.uuid!, Math.floor(Date.now() / 1000) - 7200),
-        new Like("like-5", userSnippets.alex.uuid!, Math.floor(Date.now() / 1000) - 6600)
+        new Like("like-4", userSnippets.chris.userId!, Math.floor(Date.now() / 1000) - 7200),
+        new Like("like-5", userSnippets.alex.userId!, Math.floor(Date.now() / 1000) - 6600)
     ]
 };
 
@@ -59,7 +59,7 @@ export const samplePosts = [
         "Finally mastered that backhand serve! 🎾",
         undefined,
         ["https://example.com/tennis.jpg"],
-        [new Like("like-6", userSnippets.emma.uuid!, Math.floor(Date.now() / 1000) - 1800)],
+        [new Like("like-6", userSnippets.emma.userId!, Math.floor(Date.now() / 1000) - 1800)],
         [new Comment("comment-5", userSnippets.chris, "Looking sharp!", Math.floor(Date.now() / 1000) - 1200)],
         Math.floor(Date.now() / 1000) - 43200
     ),
@@ -70,7 +70,7 @@ export const samplePosts = [
         "Morning yoga session to start the day right 🧘‍♀️",
         undefined,
         ["https://example.com/yoga.jpg"],
-        [new Like("like-7", userSnippets.sarah.uuid!, Math.floor(Date.now() / 1000) - 900)],
+        [new Like("like-7", userSnippets.sarah.userId!, Math.floor(Date.now() / 1000) - 900)],
         [new Comment("comment-6", userSnippets.alex, "So peaceful!", Math.floor(Date.now() / 1000) - 600)],
         Math.floor(Date.now() / 1000) - 21600
     ),
@@ -82,8 +82,8 @@ export const samplePosts = [
         undefined,
         ["https://example.com/basketball-1.jpg", "https://example.com/basketball-2.jpg"],
         [
-            new Like("like-8", userSnippets.mike.uuid!, Math.floor(Date.now() / 1000) - 2700),
-            new Like("like-9", userSnippets.alex.uuid!, Math.floor(Date.now() / 1000) - 1500)
+            new Like("like-8", userSnippets.mike.userId!, Math.floor(Date.now() / 1000) - 2700),
+            new Like("like-9", userSnippets.alex.userId!, Math.floor(Date.now() / 1000) - 1500)
         ],
         [
             new Comment("comment-7", userSnippets.sarah, "Great practice session!", Math.floor(Date.now() / 1000) - 1800),

@@ -351,17 +351,17 @@ class ParticipantDao extends Codable<ParticipantDao> {
 
 class Like extends Codable<Like> {
     id: string;
-    uuid: string;
+    userId: string;
     createdAt: Date;
 
     constructor(
         id: string,
-        uuid: string,
+        userId: string,
         createdAt: Date
     ) {
         super();
         this.id = id;
-        this.uuid = uuid;
+        this.userId = userId;
         this.createdAt = createdAt;
     }
 
@@ -373,8 +373,8 @@ class Like extends Codable<Like> {
                 object['id'] = data['id'];
             }
 
-            if (data['uuid']) {
-                object['uuid'] = data['uuid'];
+            if (data['user_id']) {
+                object['userId'] = data['user_id'];
             }
 
             if (data['created_at']) {
@@ -429,24 +429,24 @@ class Comment extends Codable<Comment> {
 }
 
 class CommentDao extends Codable<CommentDao> {
-    uuid?: string;
+    userId?: string;
     text?: string;
     createdAt?: Date;
 
     constructor(
-        uuid?: string,
+        userId?: string,
         text?: string,
         createdAt?: Date
     ) {
         super();
-        this.uuid = uuid;
+        this.userId = userId;
         this.text = text;
         this.createdAt = createdAt;
     }
 
     override encode(): { [key: string]: any; } {
         const data: { [key: string]: any; } = {};
-        data['uuid'] = this.uuid;
+        data['user_id'] = this.userId;
         data['text'] = this.text;
 
         return data;
@@ -516,7 +516,7 @@ class Member extends Codable<Member> {
 class MemberDao extends Codable<MemberDao> {
     id: string | undefined;
     role: string | undefined;
-    uuid: string | undefined;
+    userId: string | undefined;
 
     static override decode<Member>(data: { [key: string]: any }): Member {
         const object = Object();
@@ -528,8 +528,8 @@ class MemberDao extends Codable<MemberDao> {
             if (data['role']) {
                 object['role'] = data['role'];
             }
-            if (data['uuid']) {
-                object['uuid'] = data['uuid'];
+            if (data['user_id']) {
+                object['userId'] = data['user_id'];
             }
         }
 
@@ -539,15 +539,15 @@ class MemberDao extends Codable<MemberDao> {
 
     override encode(): { [key: string]: any } {
         const data: { [key: string]: any } = {};
-    
+
         if (this.id) {
             data['id'] = this.id;
         }
         if (this.role) {
             data['role'] = this.role;
         }
-        if (this.uuid) {
-            data['uuid'] = this.uuid;
+        if (this.userId) {
+            data['user_id'] = this.userId;
         }
     
         return data;

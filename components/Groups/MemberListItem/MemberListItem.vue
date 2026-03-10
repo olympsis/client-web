@@ -48,7 +48,7 @@ const options = ref<any[]>([]);
 const session = useSessionStore();
 
 const isUser = computed<boolean>(() => {
-    return session.user?.uuid === props.member.user?.uuid;
+    return session.user?.userId === props.member.user?.userId;
 });
 
 const toggleMenu = (event: any) => {
@@ -60,17 +60,17 @@ onMounted(() => {
     const _options = [];
     const session = useSessionStore();
 
-    const uuid = session.user?.uuid;
-    if (!uuid) return;
+    const userId = session.user?.userId;
+    if (!userId) return;
 
     const selectedGroup = session.selectedGroup?.club ?? session.selectedGroup?.organization;
     if (!selectedGroup) return;
 
-    const admin = selectedGroup.members?.find((m) => m.user?.uuid === uuid);
+    const admin = selectedGroup.members?.find((m) => m.user?.userId === userId);
     if (!admin) return;
     
     if (admin.role === 'owner' || admin.role === 'admin') {
-        if (uuid !== props.member.user?.uuid) {
+        if (userId !== props.member.user?.userId) {
             if (props.member.role != 'owner') {
                 _options.push(
                     {
@@ -134,7 +134,7 @@ onMounted(() => {
         }
         
     } else {
-        if (uuid !== props.member.user?.uuid) {
+        if (userId !== props.member.user?.userId) {
             _options.push(
                     {
                         label: 'Report User',

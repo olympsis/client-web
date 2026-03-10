@@ -67,7 +67,7 @@ const isAdmin = computed<boolean>(() => {
     const adminGroups = session.groups.filter((g) => {
         const group = g.club ?? g.organization;
         if (!group) return false;
-        return group.members?.find((m) => m.user?.uuid === session.user?.uuid && m.role !== GROUP_ROLE.MEMBER);
+        return group.members?.find((m) => m.user?.userId === session.user?.userId && m.role !== GROUP_ROLE.MEMBER);
     });
     return adminGroups.find((g) => {
         const group = g.club ?? g.organization;
@@ -99,7 +99,7 @@ const venueLocation = computed<string>(() => {
 
 const hideLocation = computed<boolean>(() => {
     // If user is an admin or an event participant show location
-    if (isAdmin.value || props.event.participants.find((p) => p.user?.uuid === session.user?.uuid)) return false;
+    if (isAdmin.value || props.event.participants.find((p) => p.user?.userId === session.user?.userId)) return false;
     return props.event.config?.hideLocation ?? false;
 });
 

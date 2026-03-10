@@ -66,7 +66,7 @@ async function addComment() {
     if (!text) return;
 
     const user = session.user;
-    if (!user?.uuid) return;
+    if (!user?.userId) return;
 
     const eventId = event.value.id;
 
@@ -77,7 +77,7 @@ async function addComment() {
         text,
         eventId,
         new Date(),
-        undefined,// new UserSnippet(user.uuid, user.firstName, user.lastName, user.username, user.imageURL),
+        undefined,// new UserSnippet(user.userId, user.firstName, user.lastName, user.username, user.imageURL),
         []
     );
 
@@ -124,7 +124,7 @@ async function handleAddReaction(payload: { commentId: string; type: COMMENT_REA
     if (!comment) return;
 
     const user = session.user;
-    if (!user?.uuid) return;
+    if (!user?.userId) return;
 
     // Build an optimistic reaction with a temporary ID
     const tempId = `temp-${Date.now()}`;
@@ -132,7 +132,7 @@ async function handleAddReaction(payload: { commentId: string; type: COMMENT_REA
         tempId,
         payload.type,
         new Date(),
-        new UserSnippet(user.uuid, user.firstName, user.lastName, user.username, user.imageURL)
+        new UserSnippet(user.userId, user.firstName, user.lastName, user.username, user.imageURL)
     );
 
     // Optimistic update: add reaction immediately

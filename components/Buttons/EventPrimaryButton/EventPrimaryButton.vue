@@ -92,7 +92,7 @@ const pendingState = computed<EVENT_PENDING_STATE>(() => {
     const user = session.user;
     const participants = event.value?.participants;
     if (user) {
-        const participant = participants?.find((p) => p.user?.uuid === user?.uuid);
+        const participant = participants?.find((p) => p.user?.userId === user?.userId);
         if (participant !== undefined) {
             return EVENT_PENDING_STATE.CANCEL;
         }

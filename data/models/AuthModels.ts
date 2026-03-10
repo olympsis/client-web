@@ -33,20 +33,20 @@ class AuthRequest {
 }
 
 class AuthResponse {
-    uuid: string | undefined
+    userId: string | undefined
     firstName: string | undefined
     lastName: string | undefined
     email: string | undefined
     token: string
 
     constructor(
-        uuid: string | undefined,
+        userId: string | undefined,
         firstName: string | undefined,
         lastName: string | undefined,
         email: string | undefined,
         token: string
     ){
-        this.uuid = uuid
+        this.userId = userId
         this.firstName = firstName
         this.lastName = lastName
         this.email = email
@@ -55,9 +55,9 @@ class AuthResponse {
 
     static decode<AuthResponse>(data: { [key: string]: any }): AuthResponse {
         const object = Object()
-        
-        if (data['uuid']) {
-            object['uuid'] = data['uuid']
+
+        if (data['user_id']) {
+            object['userId'] = data['user_id']
         }
         if (data['first_name']) {
             object['firstName'] = data['first_name']

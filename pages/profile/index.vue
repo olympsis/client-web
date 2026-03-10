@@ -127,11 +127,11 @@ function hideEditModal() {
 }
 
 async function fetchPastEvents() {
-    const uuid = session.user?.uuid;
-    if (!uuid) return;
-    
+    const userId = session.user?.userId;
+    if (!userId) return;
+
     try {
-        session.pastEvents = await eventService.getUserPastEvents(uuid);
+        session.pastEvents = await eventService.getUserPastEvents(userId);
     } catch(error) {
         Sentry.withScope((scope) => {
             scope.setExtra('action', 'fetch-user-past-events');

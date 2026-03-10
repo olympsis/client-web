@@ -85,7 +85,7 @@ const eventState = computed<EVENT_STATE>(() => {
 });
 
 const isAuthorized = computed<boolean>(() => {
-    return session.user?.uuid === event.value?.poster?.uuid;
+    return session.user?.userId === event.value?.poster?.userId;
 });
 
 function handleEventStatusChange() {

@@ -74,14 +74,14 @@ const model = defineModel<GroupSelection[]>({ default: [] });
 
 const sessionStore = useSessionStore();
 const availableGroups: ComputedRef<GroupSelection[]> = computed(() => {
-    const uuid = sessionStore.user?.uuid;
-    
+    const userId = sessionStore.user?.userId;
+
     return sessionStore.groups.filter((g) => {
         switch (g.type) {
             case GROUP_TYPE.ORGANIZATION:
-                return g.organization?.members?.find((m) => m.user?.uuid === uuid)?.role != GROUP_ROLE.MEMBER;
+                return g.organization?.members?.find((m) => m.user?.userId === userId)?.role != GROUP_ROLE.MEMBER;
             default:
-            return g.club?.members?.find((m) => m.user?.uuid === uuid)?.role != GROUP_ROLE.MEMBER;
+            return g.club?.members?.find((m) => m.user?.userId === userId)?.role != GROUP_ROLE.MEMBER;
         }
     });
 });

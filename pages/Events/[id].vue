@@ -230,7 +230,7 @@ const isAdmin = computed<boolean>(() => {
     const adminGroups = session.groups.filter((g) => {
         const group = g.club ?? g.organization;
         if (!group) return false;
-        return group.members?.find((m) => m.user?.uuid === session.user?.uuid && m.role !== GROUP_ROLE.MEMBER);
+        return group.members?.find((m) => m.user?.userId === session.user?.userId && m.role !== GROUP_ROLE.MEMBER);
     });
     return adminGroups.find((g) => {
         const group = g.club ?? g.organization;
@@ -241,7 +241,7 @@ const isAdmin = computed<boolean>(() => {
 
 const hideLocation = computed<boolean>(() => {
     // If user is an admin or an event participant show location
-    if (isAdmin.value || event.value?.participants.find((p) => p.user?.uuid === session.user?.uuid)) return false;
+    if (isAdmin.value || event.value?.participants.find((p) => p.user?.userId === session.user?.userId)) return false;
     return event.value?.config?.hideLocation ?? false;
 });
 
@@ -362,7 +362,7 @@ function handleRSVPResponse(_event: any) {
 async function handleResponse(response: number, hide: boolean | undefined = undefined) {
     const user = session.user;
     let snippet = new UserSnippet(
-        user?.uuid,
+        user?.userId,
         user?.firstName,
         user?.lastName,
         user?.username ,
@@ -379,7 +379,7 @@ async function handleResponse(response: number, hide: boolean | undefined = unde
     try {
         let dao = new ParticipantDao(
             undefined,
-            session.user?.uuid,
+            session.user?.userId,
             response,
             hide,
             undefined

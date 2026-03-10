@@ -54,8 +54,8 @@ const state = computed<VIEW_STATE>(() => {
 });
 
 const events = computed<Event[]>(() => {
-    const uuid = sessionStore.user?.uuid ?? '';
-    return sessionStore.events.userNextEvents(uuid) ?? [];
+    const userId = sessionStore.user?.userId ?? '';
+    return sessionStore.events.userNextEvents(userId) ?? [];
 });
 
 const venues = computed<Venue[]>(() => {

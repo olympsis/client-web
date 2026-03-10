@@ -56,10 +56,10 @@ function handleCommentReport(event: any) {
 async function handleAddComment(text: string) {
     if (text === '') { return; }
     const user = session.user;
-    if (!user?.uuid) { return; }
+    if (!user?.userId) { return; }
 
     const dao = new CommentDao(
-        user.uuid,
+        user.userId,
         text
     );
 
@@ -67,7 +67,7 @@ async function handleAddComment(text: string) {
         const id = await service.addComment(props.post.id, dao);
         const comment = new Comment(
             id,
-            new UserSnippet(user.uuid, user.username, user.imageURL),
+            new UserSnippet(user.userId, user.username, user.imageURL),
             text,
             new Date()
         );

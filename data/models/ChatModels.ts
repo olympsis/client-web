@@ -133,19 +133,19 @@ class ChatRoomsResponse extends Codable<ChatRoomsResponse> {
 
 class ChatMember extends Codable<ChatMember> {
     id: string;
-    uuid: string;
+    userId: string;
     status: string;
     joinedAt: number;
 
     constructor(
         id: string,
-        uuid: string,
+        userId: string,
         status: string,
         joinedAt: number
     ){
         super();
         this.id = id;
-        this.uuid = uuid;
+        this.userId = userId;
         this.status = status;
         this.joinedAt = joinedAt;
     }
@@ -156,13 +156,13 @@ class ChatMember extends Codable<ChatMember> {
         }
 
         const id = data['id'];
-        const uuid = data['uuid'];
+        const userId = data['user_id'];
         const status = data['status'];
         const joinedAt = data['joined_at'];
 
         return new ChatMember(
             id,
-            uuid,
+            userId,
             status,
             joinedAt
         );

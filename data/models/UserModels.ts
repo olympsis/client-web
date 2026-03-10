@@ -5,7 +5,7 @@ import { Codable } from './Models';
 import { Organization } from './OrganizationModels';
 
 class UserData extends Codable<UserData> {
-    uuid: string | undefined;
+    userId: string | undefined;
     username: string | undefined;
     firstName: string | undefined;
     lastName: string | undefined;
@@ -17,13 +17,13 @@ class UserData extends Codable<UserData> {
     organizations: string[] | undefined;
     sports: string[] = [];
     deviceToken: string | undefined;
-    
+
     static override decode<UserData>(data: { [key: string]: any }): UserData {
         const object = Object();
 
         if (data) {
-            if (data['uuid']) {
-                object['uuid'] = data['uuid'];
+            if (data['user_id']) {
+                object['userId'] = data['user_id'];
             }
             if (data['username']) {
                 object['username'] = data['username'];
@@ -67,7 +67,7 @@ class UserData extends Codable<UserData> {
     /** Converts this UserData into a lightweight UserSnippet. */
     toUserSnippet(): UserSnippet {
         return new UserSnippet(
-            this.uuid,
+            this.userId,
             this.firstName,
             this.lastName,
             this.username,
@@ -77,7 +77,7 @@ class UserData extends Codable<UserData> {
 }
 
 class UserDTO {
-    uuid: string | undefined;
+    userId: string | undefined;
     username: string | undefined;
     imageURL: string | undefined;
     visibility: string | undefined;
@@ -92,8 +92,8 @@ class UserDTO {
         const object = Object();
 
         if (data) {
-            if (data['uuid']) {
-                object['uuid'] = data['uuid'];
+            if (data['user_id']) {
+                object['userId'] = data['user_id'];
             }
             if (data['username']) {
                 object['username'] = data['username'];
@@ -157,27 +157,27 @@ class UserDTO {
         if (this.deviceToken != undefined) {
             json['device_token'] = this.deviceToken
         }
-        
+
         return json
     }
 }
 
 class UserSnippet extends Codable<UserSnippet> {
-    uuid: string | undefined;
+    userId: string | undefined;
     firstName: string | undefined;
     lastName: string | undefined;
     username: string | undefined;
     imageURL: string | undefined;
 
     constructor(
-        uuid: string | undefined,
+        userId: string | undefined,
         firstName: string | undefined,
         lastName: string | undefined,
         username: string | undefined,
         imageURL: string | undefined
     ){
         super();
-        this.uuid = uuid;
+        this.userId = userId;
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
@@ -186,10 +186,10 @@ class UserSnippet extends Codable<UserSnippet> {
 
     static override decode<UserSnippet>(data: { [key: string]: any }): UserSnippet {
         const object = Object()
-        
+
         if (data) {
-            if (data['uuid']) {
-                object['uuid'] = data['uuid']
+            if (data['user_id']) {
+                object['userId'] = data['user_id']
             }
             if (data['first_name']) {
                 object['firstName'] = data['first_name']
@@ -214,8 +214,8 @@ class UserSnippet extends Codable<UserSnippet> {
     override encode(): { [key: string]: any; } {
         let data: { [key: string]: any } = {}
 
-        data['uuid'] = this.uuid;
-        
+        data['user_id'] = this.userId;
+
         if (this.firstName) {
             data['first_name'] = this.firstName
         }
@@ -223,11 +223,11 @@ class UserSnippet extends Codable<UserSnippet> {
         if (this.lastName) {
             data['last_name'] = this.lastName
         }
- 
+
         if (this.username) {
             data['username'] = this.username;
         }
-        
+
         if (this.imageURL) {
             data['image_url'] = this.imageURL;
         }
@@ -263,7 +263,7 @@ class CheckIn {
                 object['token'] = data['token'];
             }
         }
-        
+
         Object.setPrototypeOf(object, CheckIn.prototype);
         return object;
     }

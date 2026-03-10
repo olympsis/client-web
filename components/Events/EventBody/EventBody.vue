@@ -84,7 +84,7 @@ const eventVisibility = computed<string>(() => {
 
 async function cancelRSVPResponse() {
     let index = event.value?.participants?.findIndex((p) => {
-        return p.user?.uuid === session.user?.uuid;
+        return p.user?.userId === session.user?.userId;
     });
 
     if (index != undefined && index !== -1) {
@@ -109,7 +109,7 @@ function getPendingEventState(): EVENT_PENDING_STATE {
     const user = session.user;
     const participants = event.value?.participants ?? [];
     if (user) {
-        if (participants?.find((p) => p.user?.uuid === user?.uuid)) {
+        if (participants?.find((p) => p.user?.userId === user?.userId)) {
             return EVENT_PENDING_STATE.CANCEL;
         }
     }

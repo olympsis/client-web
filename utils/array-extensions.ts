@@ -1,16 +1,16 @@
 import { Event } from "~/data/models/EventModels";
 
-Array.prototype.userNextEvents = function <T extends Event>(this: T[], uuid: string): T[] | undefined {
+Array.prototype.userNextEvents = function <T extends Event>(this: T[], userId: string): T[] | undefined {
     if (this.length === 0) return undefined;
     return this
-        .filter((e) => e.participants?.some((participant) => participant.user?.uuid === uuid))
+        .filter((e) => e.participants?.some((participant) => participant.user?.userId === userId))
         .sort((a, b) => a.startTime.getTime() - b.startTime.getTime());
 };
 
-Array.prototype.mostRecentForUser = function <T extends Event>(this: T[], uuid: string): T | undefined {
+Array.prototype.mostRecentForUser = function <T extends Event>(this: T[], userId: string): T | undefined {
     if (this.length === 0) return undefined;
     return this
-        .filter((e) => e.participants?.some((participant) => participant.user?.uuid === uuid))
+        .filter((e) => e.participants?.some((participant) => participant.user?.userId === userId))
         .sort((a, b) => a.startTime.getTime() - b.startTime.getTime())
         .at(0);
 };

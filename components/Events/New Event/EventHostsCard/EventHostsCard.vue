@@ -38,7 +38,7 @@
         </div>
 
         <!-- Sponsors section (visible when sponsors have been added) -->
-        <div v-if="sponsors.length > 0" class="section">
+        <!-- <div v-if="sponsors.length > 0" class="section">
             <div class="divider"></div>
             
             <h4>Sponsors</h4>
@@ -47,7 +47,6 @@
                     <div v-for="(sponsor, i) in sponsors" :key="i" class="item-row">
                         <div class="badge-wrapper">
                             <GroupBadge :type="1" :imageURL="sponsor.imageURL" :size="2.5" />
-                            <!-- Red X overlay for removing a sponsor -->
                             <button v-if="removable" class="remove-badge" @click="emit('removeSponsor', i)">
                                 <img src="@/assets/icons/xmark/xmark.red.svg" />
                             </button>
@@ -63,10 +62,10 @@
                     <span>Add Sponsors</span>
                 </button>
             </div>
-        </div>
+        </div> -->
 
         <!-- Bottom action buttons for sections that don't have items yet -->
-        <div v-if="!organizers.length || !sponsors.length" id="actions-row">
+        <!-- <div v-if="!organizers.length || !sponsors.length" id="actions-row">
             <button v-if="!organizers.length" class="action-btn" @click="emit('addOrganizers')">
                 <picture>
                     <source srcset="@/assets/icons/group/group.white.svg" media="(prefers-color-scheme: dark)" />
@@ -81,7 +80,7 @@
                 </picture>
                 <span>Add Sponsors</span>
             </button>
-        </div>
+        </div> -->
     </div>
 </template>
 

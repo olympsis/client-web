@@ -63,6 +63,17 @@ class UserData extends Codable<UserData> {
         Object.setPrototypeOf(object, UserData.prototype);
         return object;
     }
+
+    /** Converts this UserData into a lightweight UserSnippet. */
+    toUserSnippet(): UserSnippet {
+        return new UserSnippet(
+            this.uuid,
+            this.firstName,
+            this.lastName,
+            this.username,
+            this.imageURL
+        );
+    }
 }
 
 class UserDTO {

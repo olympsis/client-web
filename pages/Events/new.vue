@@ -114,7 +114,7 @@
             </div>
 
             <div id="section-two">
-                <EventHostsCard :sponsors="[]" :organizers="[]"/>
+                <EventHostsCard :poster="session.user?.toUserSnippet()" :sponsors="[]" :organizers="[]"/>
             </div>
 
             <div id="section-three" class="section">

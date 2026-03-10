@@ -126,6 +126,10 @@ function closeMediaPicker() {
 #images-list {
     display: flex;
     overflow: scroll;
+    padding: 1rem;
+    border-radius: 20px;
+    border: 1px solid var(--component-border-color);
+    background-color: var(--component-background-color);
 
     .image-card {
         width: 10rem;

@@ -67,6 +67,7 @@ function handleTap(format: COMPETITION_FORMAT) {
             font-size: 0.95rem;
             font-weight: 500;
             margin-bottom: 0.15rem;
+            color: black;
         }
 
         .sub-title {

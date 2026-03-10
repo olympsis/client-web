@@ -318,7 +318,7 @@ function createNewEvent() {
                     state.value = VIEW_STATE.SUCCESS;
                     setTimeout(() => {
                         router.push(`/events/${id}`);
-                    }, 500);
+                    }, 1000);
                 })
                 .catch((error: any) => {
                     state.value = VIEW_STATE.FAILURE;

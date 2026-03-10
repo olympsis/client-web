@@ -89,9 +89,9 @@ const availableGroups: ComputedRef<GroupSelection[]> = computed(() => {
 function getGroupName(group: GroupSelection) : string {
     switch (group.type) {
         case GROUP_TYPE.CLUB:
-            return group.club?.name ?? 'olympsis-group'
+            return group.club?.name ?? t('events.organizers.unknownGroup')
         case GROUP_TYPE.ORGANIZATION:
-            return group.organization?.name ?? 'olympsis-group'
+            return group.organization?.name ?? t('events.organizers.unknownGroup')
     }
 }
 
@@ -122,14 +122,14 @@ function isSelected(group: GroupSelection) : boolean {
 function generateDisplayString() {
     if (model.value.length == 1) {
         const group = model.value[0].club ?? model.value[0].organization
-        return group?.name ?? 'olympsis-group';
+        return group?.name ?? t('events.organizers.unknownGroup');
     } else if (model.value.length == 2) {
         const group1 = model.value[0].club ?? model.value[0].organization
         const group2 = model.value[1].club ?? model.value[1].organization
-        return `${group1?.name ?? 'olympsis-group'} & ${group2?.name ?? 'olympsis-group'}`
+        return `${group1?.name ?? t('events.organizers.unknownGroup')} & ${group2?.name ?? t('events.organizers.unknownGroup')}`
     } else if (model.value.length > 2) {
         const group = model.value[0].club ?? model.value[0].organization
-        return `${group?.name ?? 'olympsis-group'} ${t('events.organizers.andOthers', { count: model.value.length - 1 })}`
+        return `${group?.name ?? t('events.organizers.unknownGroup')} ${t('events.organizers.andOthers', { count: model.value.length - 1 })}`
     } else {
         return t('events.organizers.selectGroup');
     }

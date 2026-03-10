@@ -157,13 +157,22 @@
       "externalLinksSub": "Ajouter des liens pour les pages d'inscription, sites web d'événements, etc.",
       "linkTitle": "Titre",
       "linkURL": "URL",
-      "addLink": "Ajouter un Lien"
+      "addLink": "Ajouter un Lien",
+      "weekly": "Hebdomadaire",
+      "monthly": "Mensuel"
     },
     "organizers": {
       "title": "Organisateurs",
       "done": "Terminé",
       "selectGroup": "Sélectionnez au moins un Groupe",
-      "andOthers": "et {count} autres"
+      "andOthers": "et {count} autres",
+      "unknownGroup": "Groupe Inconnu",
+      "addOrganizers": "Ajouter des Organisateurs"
+    },
+    "hosts": {
+      "postedBy": "Publié par",
+      "unknownUser": "Utilisateur Inconnu",
+      "upload": "Télécharger"
     },
     "venues": {
       "pickVenues": "Choisir Lieu(x)",

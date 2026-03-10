@@ -157,13 +157,22 @@
       "externalLinksSub": "Add links for registration pages, event websites, etc.",
       "linkTitle": "Title",
       "linkURL": "URL",
-      "addLink": "Add Link"
+      "addLink": "Add Link",
+      "weekly": "Weekly",
+      "monthly": "Monthly"
     },
     "organizers": {
       "title": "Organizers",
       "done": "Done",
       "selectGroup": "Select at least one Group",
-      "andOthers": "& {count} others"
+      "andOthers": "& {count} others",
+      "unknownGroup": "Unknown Group",
+      "addOrganizers": "Add Organizers"
+    },
+    "hosts": {
+      "postedBy": "Posted by",
+      "unknownUser": "Unknown User",
+      "upload": "Upload"
     },
     "venues": {
       "pickVenues": "Pick Venue(s)",

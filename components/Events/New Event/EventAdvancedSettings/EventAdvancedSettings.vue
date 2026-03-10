@@ -125,13 +125,13 @@
                         @click="frequency = EVENT_RECURRENCE_FREQUENCY.WEEKLY"
                         :class="{selected: frequency === EVENT_RECURRENCE_FREQUENCY.WEEKLY}"
                     >
-                        WEEKLY
+                        {{ t('events.advanced.weekly') }}
                     </button>
-                    <button 
+                    <button
                         @click="frequency = EVENT_RECURRENCE_FREQUENCY.MONTHLY"
                         :class="{selected: frequency === EVENT_RECURRENCE_FREQUENCY.MONTHLY}"
                     >
-                        MONTHLY
+                        {{ t('events.advanced.monthly') }}
                     </button>
                 </div>
             </div>
@@ -206,7 +206,12 @@
                         </button>
                     </div>
                     <input class="input title-input" v-model="draft.title" :placeholder="t('events.advanced.linkTitle')"/>
-                    <input class="input" v-model="draft.url" :placeholder="t('events.advanced.linkURL')"/>
+                    <input
+                        class="input"
+                        :class="{ 'invalid-url': draft.url.trim() !== '' && !isValidURL(draft.url.trim()) }"
+                        v-model="draft.url"
+                        :placeholder="t('events.advanced.linkURL')"
+                    />
                 </div>
 
                 <!-- Add link button -->
@@ -259,11 +264,21 @@ function removeLink(index: number) {
     linkDrafts.splice(index, 1);
 }
 
-/** Sync linkDrafts to the manager store, filtering out entries with no URL */
+/** Only allow http/https URLs to prevent javascript: and data: injection */
+function isValidURL(url: string): boolean {
+    try {
+        const parsed = new URL(url);
+        return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+    } catch {
+        return false;
+    }
+}
+
+/** Sync linkDrafts to the manager store, filtering out empty and invalid URLs */
 watch(linkDrafts, (drafts) => {
     manager.externalLinks = drafts
-        .filter((d) => d.url.trim() !== '')
-        .map((d) => new EventLink(d.title.trim() || 'External Link', d.url.trim()));
+        .filter((d) => d.url.trim() !== '' && isValidURL(d.url.trim()))
+        .map((d) => new EventLink(d.title.trim() || t('events.advanced.externalLinks'), d.url.trim()));
 }, { deep: true });
 
 watch(hidePoster, () => {
@@ -539,6 +554,10 @@ onUnmounted(() => {
 
     .title-input {
         font-weight: 600;
+    }
+
+    .invalid-url {
+        border: 1px solid #e74c3c !important;
     }
 }
 

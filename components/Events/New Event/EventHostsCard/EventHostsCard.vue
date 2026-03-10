@@ -2,7 +2,7 @@
     <div id="event-hosts-card">
         <!-- Posted by -->
         <div id="poster-section">
-            <h4>Posted by</h4>
+            <h4>{{ t('events.hosts.postedBy') }}</h4>
             <div class="user-row">
                 <UserIcon :user="poster" :size="2.5"/>
                 <span class="name">{{ posterName }}</span>
@@ -13,7 +13,7 @@
         <div v-if="organizers.length > 0" class="section">
             <div class="divider"></div>
 
-            <h4>Organizers</h4>
+            <h4>{{ t('events.organizers.title') }}</h4>
             <div class="section-content">
                 <div class="items-list">
                     <div v-for="(org, i) in organizers" :key="i" class="item-row">
@@ -32,7 +32,7 @@
                         <source srcset="@/assets/icons/group/group.white.svg" media="(prefers-color-scheme: dark)" />
                         <img src="@/assets/icons/group/group.svg" />
                     </picture>
-                    <span>Add Organizers</span>
+                    <span>{{ t('events.organizers.addOrganizers') }}</span>
                 </button>
             </div>
         </div>
@@ -91,6 +91,8 @@ import { UserSnippet } from '~/data/models/UserModels';
 import UserIcon from '~/components/UserIcon/UserIcon.vue';
 import GroupBadge from '~/components/Groups/GroupBadge/GroupBadge.vue';
 
+const { t } = useI18n();
+
 export interface OrganizerItem {
     type: number; // 0 = club, 1 = organization
     name: string;
@@ -117,12 +119,11 @@ const emit = defineEmits<{
     (e: 'removeSponsor', index: number): void;
 }>();
 
-/** Falls back to "John Doe" when no poster is provided */
 const posterName = computed<string>(() => {
-    if (!props.poster) return 'John Doe';
+    if (!props.poster) return t('events.hosts.unknownUser');
     const first = props.poster.firstName ?? '';
     const last = props.poster.lastName ?? '';
-    return `${first} ${last}`.trim() || props.poster.username || 'John Doe';
+    return `${first} ${last}`.trim() || props.poster.username || t('events.hosts.unknownUser');
 });
 </script>
 

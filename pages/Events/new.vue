@@ -252,6 +252,14 @@ const eventSport = computed<Sport>(() => {
 const eventSports = ref<Sport[]>([]);
 const showAdvancedSettings = ref<boolean>(false);
 
+/** Returns true when the user has started filling out the form */
+const hasUnsavedChanges = computed<boolean>(() => {
+    return manager.title.trim() !== ''
+        || manager.description !== ''
+        || manager.groups.length > 0
+        || manager.venues.length > 0
+        || manager.image !== '';
+});
 
 // Sports selection watcher
 watch(eventSports, () => {
@@ -333,7 +341,15 @@ function handleBackNavigation() {
     }
 }
 
+/** Warns the user before closing/refreshing the tab with unsaved changes */
+function onBeforeUnload(e: BeforeUnloadEvent) {
+    if (hasUnsavedChanges.value) {
+        e.preventDefault();
+    }
+}
+
 onMounted(() => {
+    window.addEventListener('beforeunload', onBeforeUnload);
     if (session.sports.length > 0) {
         eventSports.value.push(session.sports[0] as Sport)
         manager.selectedSport = session.sports[0] as Sport;
@@ -341,6 +357,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
+    window.removeEventListener('beforeunload', onBeforeUnload);
     manager.$reset();
 });
 

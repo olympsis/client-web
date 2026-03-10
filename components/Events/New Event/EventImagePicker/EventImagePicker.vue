@@ -17,7 +17,7 @@
                 <source srcset="@/assets/icons/add/add.white.svg" media="(prefers-color-scheme: dark)"/>
                 <img src="@/assets/icons/add/add.svg"/>
             </picture>
-            Upload
+            {{ t('events.hosts.upload') }}
         </div>
         
         <div v-if="uploadedMediaURL" id="preview" class="event-image" @click="uploadedMediaURL ? selectAnImage(uploadedMediaURL) : () => {}">
@@ -54,6 +54,7 @@ import Dialog from 'primevue/dialog';
 import MediaPicker from '@/components/MediaPicker/MediaPicker.vue';
 import type { Sport } from '~/data/models/GenericModels';
 
+const { t } = useI18n();
 const selectedSport = defineModel<Sport>('selectedSport', { required: true });
 const selectedImage = defineModel('selectedImage', { default: '' });
 

@@ -432,7 +432,9 @@ enum NEW_EVENT_ERROR {
     NO_IMAGE=4,
     INVALID_START_DATE=5,
     INVALID_END_DATE=6,
-    INVALID_PARTICIPANTS=7
+    INVALID_PARTICIPANTS=7,
+    NO_SPORT=8,
+    SHORT_DESCRIPTION=9
 }
 
 /** Identifies which step failed during event creation */

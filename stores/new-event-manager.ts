@@ -35,37 +35,45 @@ export const useNewEventManager = defineStore('new-event-manager', () => {
     const recurrenceOptions = ref<RecurrenceOptions | undefined>(undefined);
 
     /**
-     * Validates the new event data and determines wether or not it is valid.
-     * The parameters are the new event data that can be undefined or not set.
-     * 
-     * @returns a NewEventError or null if an error exists or not
+     * Validates the new event data and collects all validation errors.
+     *
+     * @returns an array of all validation errors found (empty if valid)
      */
-    function validateNewEventData() : NEW_EVENT_ERROR | null {
+    function validateNewEventData() : NEW_EVENT_ERROR[] {
+        const errors: NEW_EVENT_ERROR[] = [];
+
         if (title.value.trim() === '' || title.value.trim().length > 100) {
-            return NEW_EVENT_ERROR.NO_TITLE;
+            errors.push(NEW_EVENT_ERROR.NO_TITLE);
         }
-        if (groups.value.length === 0) {
-            return NEW_EVENT_ERROR.NO_ORGANIZERS;
+        if (!selectedSport.value) {
+            errors.push(NEW_EVENT_ERROR.NO_SPORT);
         }
-        if (description.value === '') {
-            return NEW_EVENT_ERROR.NO_DESCRIPTION;
+        // Description must exist and have at least 3 words
+        const wordCount = description.value.trim().split(/\s+/).filter(Boolean).length;
+        if (description.value.trim() === '') {
+            errors.push(NEW_EVENT_ERROR.NO_DESCRIPTION);
+        } else if (wordCount < 3) {
+            errors.push(NEW_EVENT_ERROR.SHORT_DESCRIPTION);
         }
         if (venues.value.length === 0) {
-            return NEW_EVENT_ERROR.NO_VENUES;
+            errors.push(NEW_EVENT_ERROR.NO_VENUES);
         }
         if (startDate.value.getTime() <= Date.now()) {
-            return NEW_EVENT_ERROR.INVALID_START_DATE;
+            errors.push(NEW_EVENT_ERROR.INVALID_START_DATE);
         }
         if (startDate.value.getTime() > endDate.value.getTime()) {
-            return NEW_EVENT_ERROR.INVALID_END_DATE;
+            errors.push(NEW_EVENT_ERROR.INVALID_END_DATE);
         }
         if (image.value === '') {
-            return NEW_EVENT_ERROR.NO_IMAGE;
+            errors.push(NEW_EVENT_ERROR.NO_IMAGE);
+        }
+        if (groups.value.length === 0) {
+            errors.push(NEW_EVENT_ERROR.NO_ORGANIZERS);
         }
         // Validate recurrence end date is after event start date
         if (recurrenceOptions.value) {
             if (recurrenceOptions.value.endTime.getTime() <= startDate.value.getTime()) {
-                return NEW_EVENT_ERROR.INVALID_END_DATE;
+                errors.push(NEW_EVENT_ERROR.INVALID_END_DATE);
             }
         }
         // Validate min participants doesn't exceed max when both are set
@@ -73,10 +81,10 @@ export const useNewEventManager = defineStore('new-event-manager', () => {
             const min = participantsConfig.value.minParticipants ?? 0;
             const max = participantsConfig.value.maxParticipants ?? 0;
             if (max > 0 && min > max) {
-                return NEW_EVENT_ERROR.INVALID_PARTICIPANTS;
+                errors.push(NEW_EVENT_ERROR.INVALID_PARTICIPANTS);
             }
         }
-        return null;
+        return errors;
     }
 
     /**

@@ -57,6 +57,7 @@ RUN bun install --frozen-lockfile
 
 # Build the application
 COPY . .
+ENV NODE_OPTIONS="--max-old-space-size=4096"
 RUN bun run build
 
 # --- Runtime stage (only the built output, no node_modules or source) ---

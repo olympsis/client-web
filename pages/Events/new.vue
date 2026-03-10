@@ -11,13 +11,13 @@
                 </button>
             </div>
 
-            <div id="section-one" class="section">
+            <div id="section-one" :class="{ section: true, 'section-invalid': hasError(NEW_EVENT_ERROR.NO_TITLE) || hasError(NEW_EVENT_ERROR.INVALID_START_DATE) || hasError(NEW_EVENT_ERROR.INVALID_END_DATE) }">
                 <!-- Title -->
                 <input
                     id="event-title"
                     :class="{
-                        label: newEventError !== NEW_EVENT_ERROR.NO_TITLE,
-                        'title-error': newEventError === NEW_EVENT_ERROR.NO_TITLE
+                        label: !hasError(NEW_EVENT_ERROR.NO_TITLE),
+                        'title-error': hasError(NEW_EVENT_ERROR.NO_TITLE)
                     }"
                     class="text-input"
                     type="text"
@@ -39,17 +39,17 @@
                 <div id="event-time" :style="{'display': 'flex'}">
                     <!-- Start Date -->
                     <div id="event-start-date-picker" :class="{ 'event-section': true }">
-                        <div 
+                        <div
                             :class="{
-                                label: newEventError !== NEW_EVENT_ERROR.INVALID_START_DATE,
-                                error: newEventError === NEW_EVENT_ERROR.INVALID_START_DATE 
+                                label: !hasError(NEW_EVENT_ERROR.INVALID_START_DATE),
+                                error: hasError(NEW_EVENT_ERROR.INVALID_START_DATE)
                             }"
                         > {{ t('events.new.startDate') }} <div class="asterisk">*</div> </div>
                         <div class="sub-label"> {{ t('events.new.startDateSub') }} </div>
-                        <DatePicker 
+                        <DatePicker
                             class="date-picker"
-                            v-model="manager.startDate" 
-                            showTime hourFormat="12" 
+                            v-model="manager.startDate"
+                            showTime hourFormat="12"
                             :pt="{
                                 root: (options) => ({
                                     style: {
@@ -79,15 +79,15 @@
                     <div id="event-end-date-picker" :class="{ 'event-section': true }">
                         <div
                             :class="{
-                                label: newEventError !== NEW_EVENT_ERROR.INVALID_END_DATE,
-                                error: newEventError === NEW_EVENT_ERROR.INVALID_END_DATE 
+                                label: !hasError(NEW_EVENT_ERROR.INVALID_END_DATE),
+                                error: hasError(NEW_EVENT_ERROR.INVALID_END_DATE)
                             }
                         "> {{ t('events.new.endDate') }}<div class="asterisk">*</div>  </div>
                         <div class="sub-label"> {{ t('events.new.endDateSub') }} </div>
-                        <DatePicker 
+                        <DatePicker
                             class="date-picker"
-                            v-model="manager.endDate" 
-                            showTime hourFormat="12" 
+                            v-model="manager.endDate"
+                            showTime hourFormat="12"
                             :pt="{
                                 root: (options) => ({
                                     style: {
@@ -118,10 +118,10 @@
                 <EventHostsCard :poster="session.user?.toUserSnippet()" :sponsors="[]" :organizers="[]"/>
             </div>
 
-            <div id="section-three" class="section">
+            <div id="section-three" :class="{ section: true, 'section-invalid': hasError(NEW_EVENT_ERROR.NO_SPORT) || hasError(NEW_EVENT_ERROR.NO_DESCRIPTION) || hasError(NEW_EVENT_ERROR.SHORT_DESCRIPTION) }">
                 <!-- Sports Picker -->
                 <div id="event-sports-picker">
-                    <h4>{{ t('events.new.sport') }}</h4>
+                    <h4 :class="{ error: hasError(NEW_EVENT_ERROR.NO_SPORT) }">{{ t('events.new.sport') }}</h4>
                     <div class="sub-label"> {{ t('events.new.sportSub') }} </div>
                     <MultiSportsPicker v-model:model-value="eventSports" :sports="session.sports"/>
                 </div>
@@ -131,9 +131,11 @@
                 <!-- Body -->
                 <div id="event-description">
                     <h4 :class="{
-                        error: newEventError === NEW_EVENT_ERROR.NO_DESCRIPTION
+                        error: hasError(NEW_EVENT_ERROR.NO_DESCRIPTION) || hasError(NEW_EVENT_ERROR.SHORT_DESCRIPTION)
                     }"> {{ t('events.new.description') }} </h4>
-                    <div class="sub-label"> {{ t('events.new.descriptionSub') }} </div>
+                    <div class="sub-label" :class="{ 'error-hint': hasError(NEW_EVENT_ERROR.SHORT_DESCRIPTION) }">
+                        {{ hasError(NEW_EVENT_ERROR.SHORT_DESCRIPTION) ? t('events.new.descriptionMinWords') : t('events.new.descriptionSub') }}
+                    </div>
                     <EventDescriptionEditor v-model="manager.description" />
                 </div>
             </div>           
@@ -141,7 +143,7 @@
 
         <div id="right">
             <!-- Venues Picker -->
-            <EventVenuesPicker class="venue-padding" v-model:model-value="manager.venues"/>
+            <EventVenuesPicker :class="{ 'venue-padding': true, 'section-invalid': hasError(NEW_EVENT_ERROR.NO_VENUES) }" v-model:model-value="manager.venues"/>
 
             <!-- Image Picker -->
             <div id="event-image-picker" v-if="eventSports.length > 0">
@@ -244,7 +246,12 @@ const isAuthenticated = computed<boolean>(() => {
     return auth.isAuthenticated.value;
 });
 const state = ref<VIEW_STATE>(VIEW_STATE.PENDING);
-const newEventError = ref<NEW_EVENT_ERROR | null>(null);
+const newEventErrors = ref<NEW_EVENT_ERROR[]>([]);
+
+/** Check if a specific validation error is active */
+function hasError(error: NEW_EVENT_ERROR): boolean {
+    return newEventErrors.value.includes(error);
+}
 
 const eventSport = computed<Sport>(() => {
     return eventSports.value[0] as Sport;
@@ -272,6 +279,17 @@ watch(eventSports, () => {
     if (eventSports.value.length == 0) return;
     manager.selectedSport = eventSports.value[0];
 }, { immediate: true });
+
+// Clear validation errors as the user fixes fields
+watch(
+    () => [manager.title, manager.description, manager.selectedSport, manager.venues, manager.startDate, manager.endDate],
+    () => {
+        if (newEventErrors.value.length > 0) {
+            newEventErrors.value = manager.validateNewEventData();
+        }
+    },
+    { deep: true }
+);
  
 function showAuthModal() {
     if (authModal.value) {
@@ -305,13 +323,13 @@ function createNewEvent() {
     state.value = VIEW_STATE.LOADING;
 
     try {
-        const isInvalid = manager.validateNewEventData();
-        
-        if (isInvalid != null) {
-            newEventError.value = isInvalid;
+        const errors = manager.validateNewEventData();
+
+        if (errors.length > 0) {
+            newEventErrors.value = errors;
             state.value = VIEW_STATE.PENDING;
         } else {
-            newEventError.value = null;
+            newEventErrors.value = [];
             manager.createNewEvent()
                 .then((id: string | null) => {
                     if (!id) throw('No ID returned by the server.')
@@ -517,6 +535,18 @@ useSeoMeta({
     border-radius: 20px;
     border: 1px solid var(--component-border-color);
     background-color: var(--component-background-color);
+    transition: border-color 0.3s ease;
+}
+
+/* Highlights sections with missing required data after a submit attempt */
+.section-invalid {
+    border-color: rgba(220, 53, 69, 0.7);
+}
+
+/* Apply invalid border to venue picker's inner card */
+.section-invalid:deep(#venues-picker-card) {
+    border-color: rgba(220, 53, 69, 0.7);
+    transition: border-color 0.3s ease;
 }
 
 .divider {
@@ -581,6 +611,11 @@ useSeoMeta({
     color: red;
     display: flex;
     font-weight: bold;
+}
+
+.error-hint {
+    color: rgba(220, 53, 69, 0.9) !important;
+    font-weight: 500;
 }
 
 .title-error {

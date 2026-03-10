@@ -3,9 +3,13 @@
         <!-- Posted by -->
         <div id="poster-section">
             <h4>{{ t('events.hosts.postedBy') }}</h4>
-            <div class="user-row">
+            <div v-if="poster" class="user-row">
                 <UserIcon :user="poster" :size="2.5"/>
                 <span class="name">{{ posterName }}</span>
+            </div>
+            <div v-else class="user-row loading">
+                <div class="avatar-placeholder"></div>
+                <div class="name-placeholder"></div>
             </div>
         </div>
 
@@ -153,6 +157,23 @@ h4 {
         font-weight: 700;
         font-size: 1.1rem;
         color: var(--primary-label-color);
+    }
+}
+
+/* Skeleton placeholders shown while session user loads */
+.user-row.loading {
+    .avatar-placeholder {
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 50%;
+        background-color: var(--secondary-background-color);
+    }
+
+    .name-placeholder {
+        width: 8rem;
+        height: 1rem;
+        border-radius: 4px;
+        background-color: var(--secondary-background-color);
     }
 }
 

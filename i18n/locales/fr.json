@@ -96,6 +96,7 @@
       "organizersSub": "Les clubs/organisations affiliés à cet événement.",
       "description": "Description",
       "descriptionSub": "Donnez des détails sur l'événement",
+      "descriptionMinWords": "La description doit contenir au moins 3 mots",
       "startDate": "Date/Heure de Début",
       "startDateSub": "Quand cet événement commence-t-il ?",
       "endDate": "Date/Heure de Fin",

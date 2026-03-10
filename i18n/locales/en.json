@@ -96,6 +96,7 @@
       "organizersSub": "The clubs/organizations affiliated with this event.",
       "description": "Body",
       "descriptionSub": "Give details about your event",
+      "descriptionMinWords": "Description must be at least 3 words",
       "startDate": "Start Date/Time",
       "startDateSub": "When does this event start?",
       "endDate": "End Date/Time",

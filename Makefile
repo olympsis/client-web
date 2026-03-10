@@ -1,4 +1,4 @@
-VERSION ?= v0.1.4
+VERSION ?= v0.1.5
 PROJECT_ID := olympsis-485522
 LOCATION := us-central1-docker.pkg.dev
 SERVICE_NAME := client-web

@@ -22,8 +22,25 @@ export default defineEventHandler(async () => {
         });
     }
 
-    // Clean escaped newlines that may come from env vars
-    const cleanedKey = privateKeyPem.replace(/\\n/g, '\n');
+    // Clean the PEM key that may arrive mangled from env vars / Docker build-args.
+    // Handles: literal "\n" strings, double-escaped "\\n", surrounding quotes,
+    // and keys stored as a single line without any newline markers.
+    let cleanedKey = privateKeyPem
+        .replace(/^["']|["']$/g, '')   // strip surrounding quotes
+        .replace(/\\n/g, '\n');        // convert literal \n to real newlines
+
+    // If the key is still a single line (no real newlines between header/footer),
+    // reconstruct proper PEM format by inserting newlines every 64 chars.
+    if (!cleanedKey.includes('\n') || cleanedKey.split('\n').length <= 3) {
+        const base64Body = cleanedKey
+            .replace(/-----BEGIN PRIVATE KEY-----/g, '')
+            .replace(/-----END PRIVATE KEY-----/g, '')
+            .replace(/\s/g, '');
+
+        // Re-wrap at 64-char lines per PEM spec
+        const wrapped = base64Body.match(/.{1,64}/g)?.join('\n') ?? base64Body;
+        cleanedKey = `-----BEGIN PRIVATE KEY-----\n${wrapped}\n-----END PRIVATE KEY-----`;
+    }
 
     const privateKey = await importPKCS8(cleanedKey, 'ES256');
 

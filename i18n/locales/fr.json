@@ -28,7 +28,25 @@
     "signUp": "S'inscrire",
     "email": "E-mail",
     "password": "Mot de Passe",
-    "forgotPassword": "Mot de Passe Oublié?"
+    "forgotPassword": "Mot de Passe Oublié?",
+    "completeProfile": {
+      "title": "Faisons connaissance",
+      "subtitle": "Quel est votre pseudo ? Vos sports préférés ?",
+      "fullName": "Entrez votre nom complet",
+      "fullNamePlaceholder": "Jean Dupont",
+      "email": "Entrez votre e-mail",
+      "emailPlaceholder": "email@exemple.com",
+      "username": "Entrez votre nouveau nom d'utilisateur",
+      "usernamePlaceholder": "@utilisateur",
+      "usernameHint": "Doit contenir entre 5 et 15 caractères et aucun caractère spécial",
+      "selectInterests": "Sélectionnez vos centres d'intérêt",
+      "interestsHint": "Cela nous aide à personnaliser votre expérience",
+      "continue": "Continuer",
+      "errorFullName": "Veuillez entrer votre nom complet.",
+      "errorEmail": "Veuillez entrer votre e-mail.",
+      "errorUsername": "Veuillez choisir un nom d'utilisateur disponible.",
+      "errorSports": "Veuillez sélectionner au moins un sport."
+    }
   },
   "nav": {
     "home": "Accueil",

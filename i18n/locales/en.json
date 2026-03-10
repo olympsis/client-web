@@ -28,7 +28,25 @@
     "signUp": "Sign Up",
     "email": "Email",
     "password": "Password",
-    "forgotPassword": "Forgot Password?"
+    "forgotPassword": "Forgot Password?",
+    "completeProfile": {
+      "title": "Getting to know you",
+      "subtitle": "What's your handle? Favorite sports?",
+      "fullName": "Enter your Fullname",
+      "fullNamePlaceholder": "John Doe",
+      "email": "Enter your Email",
+      "emailPlaceholder": "email@example.com",
+      "username": "Enter your new Username",
+      "usernamePlaceholder": "@username",
+      "usernameHint": "Must be between 5 and 15 characters and contain no special characters",
+      "selectInterests": "Select your interests",
+      "interestsHint": "This helps us customize your experience",
+      "continue": "Continue",
+      "errorFullName": "Please enter your full name.",
+      "errorEmail": "Please enter your email.",
+      "errorUsername": "Please choose an available username.",
+      "errorSports": "Please select at least one sport."
+    }
   },
   "nav": {
     "home": "Home",

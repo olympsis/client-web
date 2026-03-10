@@ -4,40 +4,40 @@
             <img src="@/assets/images/logo.png" class="icon logo-dark" />
             <img src="@/assets/images/logo.white.png" class="icon logo-light" />
 
-            <h1>Getting to know you</h1>
-            <p class="subtitle">What's your handle? Favorite sports?</p>
+            <h1>{{ t('auth.completeProfile.title') }}</h1>
+            <p class="subtitle">{{ t('auth.completeProfile.subtitle') }}</p>
 
             <!-- Full Name -->
             <div class="field">
-                <h3>Enter your Fullname</h3>
+                <h3>{{ t('auth.completeProfile.fullName') }}</h3>
                 <input
                     type="text"
                     v-model="fullName"
                     autocomplete="name"
-                    :placeholder="fullNamePlaceholder"
+                    :placeholder="t('auth.completeProfile.fullNamePlaceholder')"
                 />
             </div>
 
             <!-- Email -->
             <div class="field">
-                <h3>Enter your Email</h3>
+                <h3>{{ t('auth.completeProfile.email') }}</h3>
                 <input
                     type="email"
                     v-model="email"
                     autocomplete="email"
-                    placeholder="email@example.com"
+                    :placeholder="t('auth.completeProfile.emailPlaceholder')"
                 />
             </div>
 
             <!-- Username -->
             <div class="field">
-                <h3>Enter your new Username</h3>
+                <h3>{{ t('auth.completeProfile.username') }}</h3>
                 <div class="input-wrapper">
                     <input
                         type="text"
                         v-model="username"
                         autocomplete="off"
-                        placeholder="@username"
+                        :placeholder="t('auth.completeProfile.usernamePlaceholder')"
                     />
                     <div class="indicator">
                         <img v-if="usernameState === VIEW_STATE.SUCCESS" src="@/assets/icons/check/check.svg" />
@@ -45,13 +45,13 @@
                         <div v-if="usernameState === VIEW_STATE.LOADING" class="spinner" />
                     </div>
                 </div>
-                <p class="hint">Must be between 5 and 15 characters and contain no special characters</p>
+                <p class="hint">{{ t('auth.completeProfile.usernameHint') }}</p>
             </div>
 
             <!-- Sports Selection -->
             <div id="sports-section">
-                <h3>Select your interests</h3>
-                <p class="hint">This helps us customize your experience</p>
+                <h3>{{ t('auth.completeProfile.selectInterests') }}</h3>
+                <p class="hint">{{ t('auth.completeProfile.interestsHint') }}</p>
 
                 <div id="sports-list">
                     <li
@@ -68,7 +68,7 @@
             <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
 
             <div id="action-row">
-                <button id="continue-button" @click="handleSubmit">Continue</button>
+                <button id="continue-button" @click="handleSubmit">{{ t('auth.completeProfile.continue') }}</button>
             </div>
         </div>
     </div>
@@ -80,6 +80,8 @@ import { VIEW_STATE } from '~/data/Enums';
 import { Sport } from '~/data/models/GenericModels';
 import { useSessionStore } from '~/stores/session-store';
 import { UserService } from '~/data/services/UserService';
+
+const { t } = useI18n();
 const props = defineProps<{
     /** Pre-fill values from whatever Apple/Firebase provided */
     initialFullName?: string
@@ -97,8 +99,6 @@ const username = ref('');
 const selectedSports = ref<Sport[]>([]);
 const errorMessage = ref('');
 const usernameState = ref<VIEW_STATE>(VIEW_STATE.PENDING);
-
-const fullNamePlaceholder = 'Joel Joseph';
 
 // Debounced username availability check
 let isInitialRun = true;
@@ -150,19 +150,19 @@ function handleSubmit() {
     errorMessage.value = '';
 
     if (!fullName.value.trim()) {
-        errorMessage.value = 'Please enter your full name.';
+        errorMessage.value = t('auth.completeProfile.errorFullName');
         return;
     }
     if (!email.value.trim()) {
-        errorMessage.value = 'Please enter your email.';
+        errorMessage.value = t('auth.completeProfile.errorEmail');
         return;
     }
     if (!username.value.trim() || usernameState.value !== VIEW_STATE.SUCCESS) {
-        errorMessage.value = 'Please choose an available username.';
+        errorMessage.value = t('auth.completeProfile.errorUsername');
         return;
     }
     if (selectedSports.value.length === 0) {
-        errorMessage.value = 'Please select at least one sport.';
+        errorMessage.value = t('auth.completeProfile.errorSports');
         return;
     }
 
@@ -184,7 +184,7 @@ function handleSubmit() {
     display: flex;
     overflow-y: auto;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: center;
     padding-top: 6rem;
     background-color: var(--secondary-background-color);
 }

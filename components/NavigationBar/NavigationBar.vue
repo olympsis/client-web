@@ -1,9 +1,16 @@
 <template>
     <header id="navigation-bar">
         <!-- TODO:// remove after app launch — revert to /home -->
-        <NuxtLink :to="isAuthenticated ? '/events' : '/landing-page'" id="logo">
-            Olympsis
-        </NuxtLink>
+        <ClientOnly>
+            <NuxtLink :to="isAuthenticated ? '/events' : '/landing-page'" id="logo">
+                Olympsis
+            </NuxtLink>
+            <template #fallback>
+                <NuxtLink to="/landing-page" id="logo">
+                    Olympsis
+                </NuxtLink>
+            </template>
+        </ClientOnly>
        
         <div class="routes">
             <NavigationButton to="/events" :text="$t('nav.events')" icon="--events-icon" variant="light"/>

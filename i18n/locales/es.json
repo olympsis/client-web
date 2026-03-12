@@ -96,7 +96,7 @@
       "organizersSub": "Los clubes/organizaciones afiliados con este evento.",
       "description": "Descripción",
       "descriptionSub": "Proporciona detalles sobre el evento",
-      "descriptionMinWords": "La descripción debe tener al menos 3 palabras",
+      "descriptionMinWords": "La descripción debe tener al menos 10 caracteres",
       "startDate": "Fecha/Hora de Inicio",
       "startDateSub": "¿Cuándo comienza este evento?",
       "endDate": "Fecha/Hora de Fin",
@@ -111,7 +111,9 @@
       "seoDescription": "Creando un nuevo evento en Olympsis",
       "errorCreate": "¡Error al crear el evento!",
       "errorCouldNot": "¡No se pudo crear el evento!",
-      "errorImageUpload": "Error al subir la imagen del evento. Inténtalo de nuevo."
+      "errorImageUpload": "Error al subir la imagen del evento. Inténtalo de nuevo.",
+      "validationError": "Información faltante",
+      "validationErrorDetail": "Por favor completa las secciones resaltadas."
     },
     "detail": {
       "notFound": "Lo sentimos, no pudimos encontrar el evento",

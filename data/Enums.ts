@@ -346,23 +346,23 @@ enum EVENT_VISIBILITY {
     GROUPS = 'groups',
     PRIVATE = 'private'
 }
-function eventVisibilityToNumber(visibility: EVENT_VISIBILITY): number {
+function eventVisibilityToString(visibility: EVENT_VISIBILITY): string {
     switch (visibility) {
         default:
-            return 0;
+            return 'PUBLIC';
         case EVENT_VISIBILITY.GROUPS:
-            return 1;
+            return 'GROUP';
         case EVENT_VISIBILITY.PRIVATE:
-            return 2;
+            return 'PRIVATE';
     }
 }
-function numberToEventVisibility(visibility: number): EVENT_VISIBILITY {
+function stringToEventVisibility(visibility: string): EVENT_VISIBILITY {
     switch (visibility) {
-        default: 
+        default:
             return EVENT_VISIBILITY.PUBLIC;
-        case 1:
+        case 'GROUP':
             return EVENT_VISIBILITY.GROUPS;
-        case 2:
+        case 'PRIVATE':
             return EVENT_VISIBILITY.PRIVATE;
     }
 }
@@ -719,8 +719,8 @@ export {
     numberToEventType,
     
     EVENT_VISIBILITY,
-    eventVisibilityToNumber,
-    numberToEventVisibility,
+    eventVisibilityToString,
+    stringToEventVisibility,
     
     GROUP_ROLE,
     stringToGroupRole,

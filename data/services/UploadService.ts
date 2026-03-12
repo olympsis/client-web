@@ -37,7 +37,7 @@ export class UploadService extends BaseService {
         // End of Malakbel code
         // const [status, _headers, body] = await this.http.upload(endpoint, FileType.JPEG, file, headers);
 
-        if (status !== 201) {
+        if (status === 200) {
             if (body) {
                 return ImageUploadResponse.decode(body);
             }

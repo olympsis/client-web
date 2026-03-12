@@ -48,11 +48,11 @@ export const useNewEventManager = defineStore('new-event-manager', () => {
         if (!selectedSport.value) {
             errors.push(NEW_EVENT_ERROR.NO_SPORT);
         }
-        // Description must exist and have at least 3 words
-        const wordCount = description.value.trim().split(/\s+/).filter(Boolean).length;
-        if (description.value.trim() === '') {
+        // Description must exist and have at least 10 characters
+        const descLength = description.value.trim().length;
+        if (descLength === 0) {
             errors.push(NEW_EVENT_ERROR.NO_DESCRIPTION);
-        } else if (wordCount < 3) {
+        } else if (descLength < 10) {
             errors.push(NEW_EVENT_ERROR.SHORT_DESCRIPTION);
         }
         if (venues.value.length === 0) {
@@ -66,9 +66,6 @@ export const useNewEventManager = defineStore('new-event-manager', () => {
         }
         if (image.value === '') {
             errors.push(NEW_EVENT_ERROR.NO_IMAGE);
-        }
-        if (groups.value.length === 0) {
-            errors.push(NEW_EVENT_ERROR.NO_ORGANIZERS);
         }
         // Validate recurrence end date is after event start date
         if (recurrenceOptions.value) {
@@ -137,14 +134,16 @@ export const useNewEventManager = defineStore('new-event-manager', () => {
         const dao = generateNewEventData();
 
         try {
-            if (!dao.mediaURL) throw({ step: EVENT_CREATION_STEP.IMAGE_UPLOAD, cause: 'Event image required' });
+            if (!dao.mediaURL && !image.value) throw({ step: EVENT_CREATION_STEP.IMAGE_UPLOAD, cause: 'Event image required' });
 
             // Upload event image if it's needed
             let uploadedURL: string | undefined;
-            try {
-                uploadedURL = await uploadEventImage(dao.mediaURL);
-            } catch (uploadError) {
-                throw({ step: EVENT_CREATION_STEP.IMAGE_UPLOAD, cause: uploadError });
+            if (image.value) {
+                try {
+                    uploadedURL = await uploadEventImage(image.value);
+                } catch (uploadError) {
+                    throw({ step: EVENT_CREATION_STEP.IMAGE_UPLOAD, cause: uploadError });
+                }
             }
 
             if (uploadedURL) {
@@ -187,12 +186,15 @@ export const useNewEventManager = defineStore('new-event-manager', () => {
     async function uploadEventImage(url: string): Promise<string | undefined> {
         const service = new UploadService();
 
-        // Make sure that this isn't an internal image
-        if (!url.includes('event-images/')) {
+        // Only upload if this is a user-selected file (blob: or data: URL).
+        // Any other URL (e.g. "event-images/..." or "events/event-media/...") is
+        // already on the server and doesn't need re-uploading.
+        const isLocalFile = url.startsWith('blob:') || url.startsWith('data:');
+        if (isLocalFile) {
             const data = await fetch(url);
             const buffer = await data.arrayBuffer();
             const name = `${uuidv4()}.jpeg`;
-            const response = await service.uploadImage(buffer, name, 'olympsis-event-images');
+            const response = await service.uploadImage(buffer, name, 'olympsis-event-media');
             if (response?.url) {
                 return response.url.replace(/^olympsis-/, '');
             } else {

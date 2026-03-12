@@ -156,7 +156,7 @@ class NewEventManager {
             const data = await fetch(url);
             const buffer = await data.arrayBuffer();
             const name = `${uuidv4()}.jpeg`;
-            const response = await this.uploadService.uploadImage(buffer, name, 'olympsis-event-images');
+            const response = await this.uploadService.uploadImage(buffer, name, 'olympsis-event-media');
             if (response?.url) {
                 return response.url.replace(/^olympsis-/, '');
             } else {

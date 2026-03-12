@@ -96,7 +96,7 @@
       "organizersSub": "The clubs/organizations affiliated with this event.",
       "description": "Body",
       "descriptionSub": "Give details about your event",
-      "descriptionMinWords": "Description must be at least 3 words",
+      "descriptionMinWords": "Description must be at least 10 characters",
       "startDate": "Start Date/Time",
       "startDateSub": "When does this event start?",
       "endDate": "End Date/Time",
@@ -111,7 +111,9 @@
       "seoDescription": "Creating a new event on Olympsis",
       "errorCreate": "Failed to create event!",
       "errorCouldNot": "Could not create event!",
-      "errorImageUpload": "Failed to upload event image. Please try again."
+      "errorImageUpload": "Failed to upload event image. Please try again.",
+      "validationError": "Missing Information",
+      "validationErrorDetail": "Please fill in the highlighted sections."
     },
     "detail": {
       "notFound": "Sorry, we failed to find the event",

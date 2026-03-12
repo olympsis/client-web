@@ -8,8 +8,8 @@ import {
     MEDIA_TYPE,
     COMPETITION_FORMAT,
     COMMENT_REACTION_TYPE,
-    eventVisibilityToNumber,
-    numberToEventVisibility,
+    eventVisibilityToString,
+    stringToEventVisibility,
     GROUP_TYPE,
     stringToMediaType,
     stringToCompetitionFormat,
@@ -192,7 +192,7 @@ class Event extends Codable<Event> {
             // Comments
             object['comments'] = data['comments'] ? data['comments'].map((c: any) => EventComment.decode(c)) : [];
 
-            object['visibility'] = numberToEventVisibility(data['visibility']);
+            object['visibility'] = stringToEventVisibility(data['visibility']);
             object['externalLinks'] = data['external_links'] ? data['external_links'].map((l: any) => EventLink.decode(l)) : [];
             object['isSensitive'] = data['is_sensitive'] || false;
             
@@ -294,7 +294,7 @@ class Event extends Codable<Event> {
         }
 
         if (this.visibility) {
-            data['visibility'] = eventVisibilityToNumber(this.visibility);
+            data['visibility'] = eventVisibilityToString(this.visibility);
         }
         if (this.externalLinks && this.externalLinks.length > 0) {
             data['external_links'] = this.externalLinks.map((l) => l.encode());
@@ -523,7 +523,7 @@ class EventDao extends Codable<EventDao> {
         }
         
         if (this.visibility !== undefined) {
-            data['visibility'] = eventVisibilityToNumber(this.visibility);
+            data['visibility'] = eventVisibilityToString(this.visibility);
         }
         if (this.externalLinks && this.externalLinks.length > 0) {
             data['external_links'] = this.externalLinks.map((l) => l.encode());

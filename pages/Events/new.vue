@@ -36,6 +36,7 @@
 
                 <div class="divider"></div>
 
+                <!-- Date -->
                 <div id="event-time" :style="{'display': 'flex'}">
                     <!-- Start Date -->
                     <div id="event-start-date-picker" :class="{ 'event-section': true }">
@@ -44,7 +45,7 @@
                                 label: !hasError(NEW_EVENT_ERROR.INVALID_START_DATE),
                                 error: hasError(NEW_EVENT_ERROR.INVALID_START_DATE)
                             }"
-                        > {{ t('events.new.startDate') }} <div class="asterisk">*</div> </div>
+                        > {{ t('events.new.startDate') }}</div>
                         <div class="sub-label"> {{ t('events.new.startDateSub') }} </div>
                         <DatePicker
                             class="date-picker"
@@ -82,7 +83,7 @@
                                 label: !hasError(NEW_EVENT_ERROR.INVALID_END_DATE),
                                 error: hasError(NEW_EVENT_ERROR.INVALID_END_DATE)
                             }
-                        "> {{ t('events.new.endDate') }}<div class="asterisk">*</div>  </div>
+                        "> {{ t('events.new.endDate') }} </div>
                         <div class="sub-label"> {{ t('events.new.endDateSub') }} </div>
                         <DatePicker
                             class="date-picker"
@@ -328,6 +329,7 @@ function createNewEvent() {
         if (errors.length > 0) {
             newEventErrors.value = errors;
             state.value = VIEW_STATE.PENDING;
+            toast.add({ severity: 'warn', summary: t('events.new.validationError'), detail: t('events.new.validationErrorDetail'), life: 3000 });
         } else {
             newEventErrors.value = [];
             manager.createNewEvent()
@@ -543,8 +545,9 @@ useSeoMeta({
     border-color: rgba(220, 53, 69, 0.7);
 }
 
-/* Apply invalid border to venue picker's inner card */
-.section-invalid:deep(#venues-picker-card) {
+/* Apply invalid border to child component cards */
+.section-invalid:deep(#venues-picker-card),
+.section-invalid:deep(#event-hosts-card) {
     border-color: rgba(220, 53, 69, 0.7);
     transition: border-color 0.3s ease;
 }

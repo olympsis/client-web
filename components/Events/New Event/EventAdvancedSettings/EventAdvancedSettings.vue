@@ -1,13 +1,13 @@
 <template>
     <div id="event-advanced-settings">
-        <!-- Poster option -->
-        <div id="hide-poster" class="section" :style="{ display: 'flex', flexDirection: 'row'}">
+        <!-- Poster option (temporarily disabled) -->
+        <!-- <div id="hide-poster" class="section" :style="{ display: 'flex', flexDirection: 'row'}">
             <div id="left">
                 <h4>{{ t('events.advanced.hidePoster') }}</h4>
                 <div class="sub-header">{{ t('events.advanced.hidePosterSub') }}</div>
             </div>
             <ToggleSwitch v-model="hidePoster" :style="{ 'margin-left': '1rem', 'margin-top': '0.5rem' }"/>
-        </div>
+        </div> -->
 
         <!-- Participant options -->
         <div id="participants" class="section">

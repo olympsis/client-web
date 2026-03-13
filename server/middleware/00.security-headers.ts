@@ -24,13 +24,19 @@ export default defineEventHandler((event) => {
     //   - Sentry ingest (*.ingest.us.sentry.io)
     //   - Google Analytics (*.google-analytics.com)
     //   - Self + inline (for Nuxt/Vue hydration)
+    const config = useRuntimeConfig();
+    const isDev = config.public.MODE === 'dev';
+
+    // In dev mode, allow localhost connections for the local API server
+    const devConnectSrc = isDev ? ' http://localhost http://localhost:*' : '';
+
     const csp = [
         "default-src 'self'",
         "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.apple-mapkit.com https://appleid.cdn-apple.com https://*.firebaseio.com https://apis.google.com https://www.googletagmanager.com",
         "style-src 'self' 'unsafe-inline'",
         "img-src 'self' data: blob: https://snapshot.apple-mapkit.com https://*.apple-mapkit.com https://*.googleapis.com https://www.googletagmanager.com",
         "font-src 'self' data:",
-        "connect-src 'self' wss: https://api.olympsis.com https://maps-api.apple.com https://*.apple-mapkit.com https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com https://*.ingest.us.sentry.io https://*.google-analytics.com https://appleid.apple.com",
+        `connect-src 'self' wss: https://api.olympsis.com https://maps-api.apple.com https://*.apple-mapkit.com https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com https://*.ingest.us.sentry.io https://*.google-analytics.com https://appleid.apple.com${devConnectSrc}`,
         "frame-src 'self' https://*.firebaseapp.com https://apis.google.com https://appleid.apple.com",
         "object-src 'none'",
         "base-uri 'self'",

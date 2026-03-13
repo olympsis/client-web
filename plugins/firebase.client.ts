@@ -5,8 +5,8 @@ import { getAnalytics } from "firebase/analytics";
 export default defineNuxtPlugin(nuxtApp => {
     const config = useRuntimeConfig();
 
-    // Skip Firebase init when API key is missing (e.g. in Storybook)
-    if (!config.public.FB_API_KEY) {
+    // Skip Firebase init in dev mode (default user via USER_ID) or when API key is missing (Storybook)
+    if (config.public.MODE === 'dev' || !config.public.FB_API_KEY) {
         return;
     }
 

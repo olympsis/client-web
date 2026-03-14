@@ -241,6 +241,19 @@ const auth = useAuth();
 const session = useSessionStore();
 const manager = useNewEventManager();
 
+// Kick off session init when an authenticated user visits this page.
+// This route is public, so the global middleware skips session.init().
+// Without this, session.user stays undefined and event creation fails.
+watch(
+    () => auth.isAuthenticated.value,
+    (authenticated) => {
+        if (authenticated && !session.hasLoaded) {
+            session.init();
+        }
+    },
+    { immediate: true }
+);
+
 const authModal = useTemplateRef<HTMLDialogElement>('auth-modal');
 
 const isAuthenticated = computed<boolean>(() => {
@@ -382,11 +395,20 @@ function onBeforeUnload(e: BeforeUnloadEvent) {
 
 onMounted(() => {
     window.addEventListener('beforeunload', onBeforeUnload);
-    if (session.sports.length > 0) {
-        eventSports.value.push(session.sports[0] as Sport)
-        manager.selectedSport = session.sports[0] as Sport;
-    }
 });
+
+// Set the default sport once sports are available.
+// Sports are fetched async in app.vue, so they may not be ready at mount time.
+watch(
+    () => session.sports,
+    (sports) => {
+        if (sports.length > 0 && eventSports.value.length === 0) {
+            eventSports.value.push(sports[0] as Sport);
+            manager.selectedSport = sports[0] as Sport;
+        }
+    },
+    { immediate: true }
+);
 
 onUnmounted(() => {
     window.removeEventListener('beforeunload', onBeforeUnload);

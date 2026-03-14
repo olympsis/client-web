@@ -311,7 +311,7 @@ class ParticipantDao extends Codable<ParticipantDao> {
             if (data['user_id']) {
                 object['userID'] = data['user_id'];
             }
-            if (data['status']) {
+            if (data['status'] != undefined) {
                 object['status'] = data['status'];
             }
             if (data['is_anonymous']) {
@@ -335,7 +335,7 @@ class ParticipantDao extends Codable<ParticipantDao> {
         if (this.userID) {
             data['user_id'] = this.userID;
         }
-        if (this.status) {
+        if (this.status != undefined) {
             data['status'] = this.status;
         }
         if (this.isAnonymous != undefined) {

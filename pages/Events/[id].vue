@@ -82,7 +82,7 @@ import { useSessionStore } from '@/stores/session-store';
 import { generateImageURL } from '~/utils/image-helpers';
 import { computed, ref, watch, type Ref, useTemplateRef } from 'vue';
 import { Organization } from '@/data/models/OrganizationModels';
-import { VIEW_STATE, GROUP_ROLE, COMPETITION_FORMAT } from '@/data/Enums';
+import { VIEW_STATE, GROUP_ROLE, COMPETITION_FORMAT, EVENT_RSVP_STATUS } from '@/data/Enums';
 import { Participant, ParticipantDao } from '@/data/models/GenericModels';
 
 import * as Sentry from '@sentry/nuxt';
@@ -105,6 +105,22 @@ const auth = useAuth();
 const route = useRoute();
 const session = useSessionStore();
 const modelStore = useModelStore();
+
+// Kick off session init when an authenticated user visits this page.
+// This route is public (SSR-rendered for SEO), so the global middleware
+// skips session.init(). Without this, session.user stays undefined and
+// user-dependent features (delete button, RSVP, comments) won't work.
+if (import.meta.client) {
+    watch(
+        () => auth.isAuthenticated.value,
+        (authenticated) => {
+            if (authenticated && !session.hasLoaded) {
+                session.init();
+            }
+        },
+        { immediate: true }
+    );
+}
 
 const clubs: Ref<Array<Club>> = ref([]);
 const venues: Ref<Array<Venue>> = ref([]);
@@ -368,13 +384,16 @@ async function handleResponse(response: number, hide: boolean | undefined = unde
         user?.username ,
         user?.imageURL
     );
-    let ptp: Participant = Participant.decode({
-        'id': `${111}`,
-        'status': response,
-        'user': snippet,
-        'is_anonymous': hide,
-        'created_at': Date.now()
-    });
+    // Build the participant directly instead of using Participant.decode(),
+    // because decode() calls UserSnippet.decode() which expects snake_case
+    // keys (user_id, first_name, etc.) but our snippet has camelCase props.
+    let ptp = new Participant(
+        `${111}`,
+        snippet,
+        response === 1 ? EVENT_RSVP_STATUS.YES : EVENT_RSVP_STATUS.MAYBE,
+        new Date(),
+        hide
+    );
     
     try {
         let dao = new ParticipantDao(

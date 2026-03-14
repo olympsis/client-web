@@ -1,0 +1,7 @@
+# Exclude Storybook files from production builds
+**/*.stories.ts
+**/*.stories.js
+**/*.stories.tsx
+**/*.stories.jsx
+**/*.stories.mdx
+.storybook/

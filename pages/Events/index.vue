@@ -183,7 +183,10 @@ async function fetchEvents(fetchCompleted: boolean = false) {
     state.value = VIEW_STATE.LOADING;
 
     let _events: Event[];
-    const sports = session.user?.sports.join(',') ?? 'all'
+    // Use selected filter sports if any, otherwise fall back to user prefs
+    const sports = selectedSports.value.length > 0
+        ? selectedSports.value.map((s) => s.name.toLowerCase()).join(',')
+        : session.user?.sports.join(',') ?? 'all';
     let location = session.lastKnownLocation;
     if (!location) { 
         location = new Location(
@@ -237,6 +240,81 @@ useSeoMeta({
     ogDescription: t('events.seoDescription')
 });
 
+const FILTER_STORAGE_KEY = 'olympsis-event-filters';
+
+/** Saves current filter selections to localStorage */
+function saveFiltersToStorage() {
+    const data = {
+        sports: selectedSports.value.map((s) => s.name),
+        tags: selectedTags.value.map((t) => t.name)
+    };
+    localStorage.setItem(FILTER_STORAGE_KEY, JSON.stringify(data));
+}
+
+/**
+ * Restores filter selections from localStorage.
+ * Returns true if saved filters were found and applied.
+ */
+function restoreFiltersFromStorage(): boolean {
+    const raw = localStorage.getItem(FILTER_STORAGE_KEY);
+    if (!raw) return false;
+
+    try {
+        const data = JSON.parse(raw) as { sports: string[]; tags: string[] };
+        if (!data.sports?.length && !data.tags?.length) return false;
+
+        // Match saved names against available sports/tags from the session
+        data.sports.forEach((name) => {
+            const found = session.sports.find((sp) => sp.name === name);
+            if (found) selectedSports.value.push(found);
+        });
+        data.tags.forEach((name) => {
+            const found = session.tags.find((tg) => tg.name === name);
+            if (found) selectedTags.value.push(found);
+        });
+
+        return selectedSports.value.length > 0 || selectedTags.value.length > 0;
+    } catch {
+        return false;
+    }
+}
+
+// Snapshot of filters when the drawer opens, so we can detect changes on close
+let previousSports: string[] = [];
+let previousTags: string[] = [];
+
+watch(showFilter, (visible) => {
+    if (visible) {
+        // Drawer opened — snapshot current selections
+        previousSports = selectedSports.value.map((s) => s.name);
+        previousTags = selectedTags.value.map((t) => t.name);
+    } else {
+        // Drawer closed — check what changed
+        const currentSports = selectedSports.value.map((s) => s.name);
+        const currentTags = selectedTags.value.map((t) => t.name);
+
+        // Detect if any new filters were added (not just removed)
+        const addedSports = currentSports.some((s) => !previousSports.includes(s));
+        const addedTags = currentTags.some((t) => !previousTags.includes(t));
+
+        const changed = currentSports.length !== previousSports.length
+            || currentSports.some((s, i) => s !== previousSports[i])
+            || currentTags.length !== previousTags.length
+            || currentTags.some((t, i) => t !== previousTags[i]);
+
+        if (changed) {
+            saveFiltersToStorage();
+
+            // Only re-fetch from server if filters were added.
+            // Removing filters just narrows the existing set, which
+            // the filteredEvents computed handles client-side.
+            if (addedSports || addedTags) {
+                retryFetchEvents();
+            }
+        }
+    }
+});
+
 session.$subscribe((mutation: any, _) => {
     const payload = mutation.payload;
     if (payload?.lastKnownLocation) {
@@ -245,15 +323,17 @@ session.$subscribe((mutation: any, _) => {
 });
 
 onMounted(async () => {
-    // Preselect user favorite sports
-    // TODO: Add the ability to remember selections
-    const session = useSessionStore();
-    session.user?.sports?.forEach((s) => {
-        const found = session.sports.find((sp) => sp.name.includes(s));
-        if (found) {
-            selectedSports.value.push(found);
-        }
-    })
+    // Restore last-used filters from localStorage.
+    // If none are saved, fall back to the user's profile sport preferences.
+    const restored = restoreFiltersFromStorage();
+    if (!restored) {
+        session.user?.sports?.forEach((s) => {
+            const found = session.sports.find((sp) => sp.name.includes(s));
+            if (found) {
+                selectedSports.value.push(found);
+            }
+        });
+    }
 
     // Request location if needed - the subscription will re-fetch events when location is obtained
     session.loadVenuesAndEvents();

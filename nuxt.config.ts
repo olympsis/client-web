@@ -2,7 +2,7 @@ import Aura from "@primevue/themes/aura";
 
 export default defineNuxtConfig({
   compatibilityDate: "2025-01-01",
-  devtools: { enabled: true },
+  devtools: { enabled: process.env.NODE_ENV !== 'production' },
 
   css: [
     "~/assets/css/main.css",
@@ -130,5 +130,14 @@ export default defineNuxtConfig({
 
   sourcemap: {
     client: "hidden",
+  },
+
+  vite: {
+    build: {
+      // Reduce peak memory by limiting parallel operations during bundling
+      rollupOptions: {
+        maxParallelFileOps: 2,
+      },
+    },
   },
 });

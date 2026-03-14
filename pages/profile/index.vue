@@ -148,7 +148,7 @@ useSeoMeta({
 });
 
 onMounted(() => {
-    fetchPastEvents();
+    // fetchPastEvents();
 });
 
 </script>

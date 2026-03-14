@@ -103,7 +103,7 @@ export const useNewEventManager = defineStore('new-event-manager', () => {
                 MEDIA_TYPE.IMAGE,
                 title.value,
                 description.value,
-                [selectedSport.value?.name.split(' ').slice(1).join(' ')!],
+                [selectedSport.value?.name.toLowerCase()!],
                 tags.value.map((t: Tag) => t.name),
                 config.value,
                 formatConfig.value,

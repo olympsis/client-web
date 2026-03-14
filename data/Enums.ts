@@ -154,6 +154,8 @@ function stringToCompetitionFormat(formatString: string): COMPETITION_FORMAT {
         return COMPETITION_FORMAT.VERSUS_2;
       case '3v3':
         return COMPETITION_FORMAT.VERSUS_3;
+      case '4v4':
+        return COMPETITION_FORMAT.VERSUS_4;
       case '5v5':
         return COMPETITION_FORMAT.VERSUS_5;
       case '6v6':

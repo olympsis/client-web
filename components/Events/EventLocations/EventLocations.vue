@@ -61,7 +61,7 @@ function getLocationCenter(): string | null {
     }
     
     if (firstVenue?.location?.coordinates) {
-        return `${firstVenue.location.coordinates[0]}, ${firstVenue.location.coordinates[1]}`;
+        return `${firstVenue.location.coordinates[1]}, ${firstVenue.location.coordinates[0]}`;
     }
     
     return null;

@@ -59,6 +59,7 @@ import type { Sport } from '~/data/models/GenericModels';
 const { t } = useI18n();
 const selectedSport = defineModel<Sport>('selectedSport', { required: true });
 const selectedImage = defineModel('selectedImage', { default: '' });
+const selectedBlob = defineModel<Blob | undefined>('selectedBlob', { default: undefined });
 
 const images: ComputedRef<string[]> = computed(() => {
     return selectedSport.value.images;
@@ -110,6 +111,7 @@ function handleFileUpload(event: any) {
 function handleCroppedMediaData(data: Array<CroppedMedia>) {
     if (data?.[0]) {
         uploadedMediaURL.value = data[0].url;
+        selectedBlob.value = data[0].blob;
     }
     closeMediaPicker();
 }
@@ -124,6 +126,7 @@ function removeUploadedFile() {
     if (uploadedMediaURL.value) {
         URL.revokeObjectURL(uploadedMediaURL.value);
         uploadedMediaURL.value = undefined;
+        selectedBlob.value = undefined;
     }
 }
 

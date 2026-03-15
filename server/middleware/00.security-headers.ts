@@ -36,7 +36,7 @@ export default defineEventHandler((event) => {
         "style-src 'self' 'unsafe-inline'",
         "img-src 'self' data: blob: https://snapshot.apple-mapkit.com https://*.apple-mapkit.com https://*.googleapis.com https://www.googletagmanager.com",
         "font-src 'self' data:",
-        `connect-src 'self' wss: https://api.olympsis.com https://maps-api.apple.com https://*.apple-mapkit.com https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com https://*.ingest.us.sentry.io https://*.google-analytics.com https://appleid.apple.com${devConnectSrc}`,
+        `connect-src 'self' blob: wss: https://api.olympsis.com https://maps-api.apple.com https://*.apple-mapkit.com https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com https://*.ingest.us.sentry.io https://*.google-analytics.com https://appleid.apple.com${devConnectSrc}`,
         "frame-src 'self' https://*.firebaseapp.com https://apis.google.com https://appleid.apple.com",
         "object-src 'none'",
         "base-uri 'self'",

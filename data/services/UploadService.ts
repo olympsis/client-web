@@ -4,7 +4,7 @@ import { BaseService } from './BaseService';
 
 export class UploadService extends BaseService {
 
-    public async uploadImage(file: ArrayBuffer, name: string, bucket: string): Promise<ImageUploadResponse> {
+    public async uploadImage(file: ArrayBuffer | Blob, name: string, bucket: string): Promise<ImageUploadResponse> {
         const headers = await this.getAuthHeaders();
         headers.set('X-Filename', name);
 

@@ -18,13 +18,15 @@ export class NewPostManager {
 
     constructor() {}
 
-    public async handleImageUpload(url: string): Promise<ImageUploadResponse> {
+    public async handleImageUpload(data: Blob | string): Promise<ImageUploadResponse> {
         try {
-            const response = await fetch(url);
-            const blob = await response.arrayBuffer();
-            
+            // Accept a Blob directly (preferred) or fall back to fetching a URL
+            const uploadData: Blob | ArrayBuffer = data instanceof Blob
+                ? data
+                : await (await fetch(data)).arrayBuffer();
+
             const name = `${uuidv4()}.jpeg`;
-            return await this.uploadService.uploadImage(blob, name, 'olympsis-post-images');
+            return await this.uploadService.uploadImage(uploadData, name, 'olympsis-post-images');
         } catch (error) {
             console.error('Failed to upload image. Error: ', error)
             throw('Failed to upload image');

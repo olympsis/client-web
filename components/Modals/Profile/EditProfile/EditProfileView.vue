@@ -108,6 +108,7 @@ const mediaModalRef = useTemplateRef<HTMLDialogElement>('media-picker-modal');
 const mediaPickerImages = ref<File[]>([]);
 const mediaCropShape = ref(CROP_SHAPE.CIRCLE);
 const newImageURL = ref<string | undefined>(undefined);
+const newImageBlob = ref<Blob | undefined>(undefined);
 const profileImageURL = ref<string | undefined>(undefined);
 
 const country = ref<string | undefined>(undefined);
@@ -166,6 +167,7 @@ function handleFileUpload(event: any) {
 function handleCroppedMediaData(data: Array<CroppedMedia>) {
     if (data?.[0]) {
         newImageURL.value = data[0].url;
+        newImageBlob.value = data[0].blob;
         profileImageURL.value = data[0].url;
     }
     hideMediaPicker();
@@ -199,12 +201,10 @@ async function updateUserProfile() {
     }
 
     // Upload new image if we have one
-    if (newImageURL.value) {
+    if (newImageURL.value && newImageBlob.value) {
         try {
-            const data = await fetch(newImageURL.value);
-            const buffer = await data.arrayBuffer();
             const name = `${uuidv4()}.jpeg`;
-            const response = await uploadService.uploadImage(buffer, name, 'olympsis-profile-images');
+            const response = await uploadService.uploadImage(newImageBlob.value, name, 'olympsis-profile-images');
             if (response?.url) {
                 update.imageURL = response.url.replace(/^olympsis-/, '');
             } else {

@@ -103,7 +103,7 @@ const filteredClubs: ComputedRef<Club[]> = computed(() => {
         // Check if club contains any of the selected sports
         const includesSport = !c.sports ? false : 
             c.sports.some((s: string) => 
-                selectedSports.value.some(sp => sp.name.split(' ')[1] === s)
+                selectedSports.value.some(sp => sp.name.toLowerCase() === s.toLowerCase())
             );
 
         // Check if club contains any of the selected tags

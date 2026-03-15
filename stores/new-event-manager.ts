@@ -15,6 +15,7 @@ export const useNewEventManager = defineStore('new-event-manager', () => {
 
     const title = ref<string>('');
     const image = ref<string>('');
+    const imageBlob = ref<Blob | undefined>(undefined);
     const description = ref<string>('');
 
     const tags = ref<Tag[]>([]);
@@ -191,10 +192,14 @@ export const useNewEventManager = defineStore('new-event-manager', () => {
         // already on the server and doesn't need re-uploading.
         const isLocalFile = url.startsWith('blob:') || url.startsWith('data:');
         if (isLocalFile) {
-            const data = await fetch(url);
-            const buffer = await data.arrayBuffer();
+            // Use the stored blob directly if available, avoiding a fetch(blobURL)
+            // which can be blocked by CSP connect-src restrictions.
+            const uploadData: Blob | ArrayBuffer = imageBlob.value
+                ? imageBlob.value
+                : await (await fetch(url)).arrayBuffer();
+
             const name = `${uuidv4()}.jpeg`;
-            const response = await service.uploadImage(buffer, name, 'olympsis-event-media');
+            const response = await service.uploadImage(uploadData, name, 'olympsis-event-media');
             if (response?.url) {
                 return response.url.replace(/^olympsis-/, '');
             } else {
@@ -208,6 +213,7 @@ export const useNewEventManager = defineStore('new-event-manager', () => {
         selectedSport.value = undefined;
         title.value = '';
         image.value = '';
+        imageBlob.value = undefined;
         description.value = '';
         tags.value = [];
         externalLinks.value = [];
@@ -229,6 +235,7 @@ export const useNewEventManager = defineStore('new-event-manager', () => {
 
         title,
         image,
+        imageBlob,
         description,
 
         tags,

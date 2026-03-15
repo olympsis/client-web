@@ -148,7 +148,7 @@
 
             <!-- Image Picker -->
             <div id="event-image-picker" v-if="eventSports.length > 0">
-                <EventImagePicker v-model:selected-sport="eventSport" v-model:selected-image="manager.image" />
+                <EventImagePicker v-model:selected-sport="eventSport" v-model:selected-image="manager.image" v-model:selected-blob="manager.imageBlob" />
             </div>
 
             <!-- Event Tags -->

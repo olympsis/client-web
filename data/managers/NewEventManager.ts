@@ -85,7 +85,7 @@ class NewEventManager {
                 mediaType,
                 title,
                 description,
-                sports.map((s: Sport) => s.name.split(' ').slice(1).join(' ')),
+                sports.map((s: Sport) => s.name.toLowerCase()),
                 tags.map((t: Tag) => t.name),
                 config,
                 formatConfig,
@@ -150,18 +150,21 @@ class NewEventManager {
      * @param url - the name of the image data on the client
      * @returns either a url of the uploaded image or undefined on failure
      */
-    private async uploadEventImage(url: string): Promise<string | undefined> {
-        // Make sure that this isn't an internal image
-        if (!url.includes('event-images/')) {
-            const data = await fetch(url);
-            const buffer = await data.arrayBuffer();
-            const name = `${uuidv4()}.jpeg`;
-            const response = await this.uploadService.uploadImage(buffer, name, 'olympsis-event-media');
-            if (response?.url) {
-                return response.url.replace(/^olympsis-/, '');
-            } else {
-                throw('Failed to upload event image')
-            }
+    private async uploadEventImage(data: Blob | string): Promise<string | undefined> {
+        // If it's an internal image path, no upload needed
+        if (typeof data === 'string' && data.includes('event-images/')) return;
+
+        // Accept a Blob directly (preferred) or fall back to fetching a URL
+        const uploadData: Blob | ArrayBuffer = data instanceof Blob
+            ? data
+            : await (await fetch(data)).arrayBuffer();
+
+        const name = `${uuidv4()}.jpeg`;
+        const response = await this.uploadService.uploadImage(uploadData, name, 'olympsis-event-media');
+        if (response?.url) {
+            return response.url.replace(/^olympsis-/, '');
+        } else {
+            throw('Failed to upload event image')
         }
     }
 }

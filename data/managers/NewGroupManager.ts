@@ -84,7 +84,7 @@ export class NewGroupManager {
                     undefined,
                     title,
                     description,
-                    sports.map((s) => s.name.split(' ')[1]),
+                    sports.map((s) => s.name.toLowerCase()),
                     hometown.subAdministrativeArea,
                     hometown.administrativeArea,
                     hometown.country,
@@ -101,7 +101,7 @@ export class NewGroupManager {
                     undefined,
                     title,
                     description,
-                    sports.map((s) => s.name.split(' ')[1]),
+                    sports.map((s) => s.name.toLowerCase()),
                     hometown.subAdministrativeArea,
                     hometown.administrativeArea,
                     hometown.country,
@@ -119,13 +119,15 @@ export class NewGroupManager {
      * Handles uploading image data to our blob storage and returning the url
      * @param url path of the image data we are uploading
      */
-    public async handleImageUpload(url: string, bucket: 'olympsis-club-images' | 'olympsis-org-images'): Promise<ImageUploadResponse> {
+    public async handleImageUpload(data: Blob | string, bucket: 'olympsis-club-images' | 'olympsis-org-images'): Promise<ImageUploadResponse> {
         try {
-            const response = await fetch(url);
-            const blob = await response.arrayBuffer();
-            
+            // Accept a Blob directly (preferred) or fall back to fetching a URL
+            const uploadData: Blob | ArrayBuffer = data instanceof Blob
+                ? data
+                : await (await fetch(data)).arrayBuffer();
+
             const name = `${uuidv4()}.jpeg`;
-            return await this.uploadService.uploadImage(blob, name, bucket);
+            return await this.uploadService.uploadImage(uploadData, name, bucket);
         } catch (error) {
             console.error('Failed to upload image. Error: ', error);
             Sentry.withScope((scope) => {

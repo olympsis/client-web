@@ -68,7 +68,10 @@
             <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
 
             <div id="action-row">
-                <button id="continue-button" @click="handleSubmit">{{ t('auth.completeProfile.continue') }}</button>
+                <button id="continue-button" :disabled="props.loading" @click="handleSubmit">
+                    <div v-if="props.loading" class="button-spinner" />
+                    <span v-else>{{ t('auth.completeProfile.continue') }}</span>
+                </button>
             </div>
         </div>
     </div>
@@ -86,6 +89,8 @@ const props = defineProps<{
     /** Pre-fill values from whatever Apple/Firebase provided */
     initialFullName?: string
     initialEmail?: string
+    /** When true, disables the form while the parent processes the submission */
+    loading?: boolean
 }>();
 
 const emits = defineEmits(['submit']);
@@ -356,14 +361,35 @@ function handleSubmit() {
         font-size: 0.95rem;
         border-radius: 25px;
         align-items: center;
+        justify-content: center;
         padding: 0.5rem 2rem;
         background-color: var(--primary-brand-color);
+        transition: opacity 0.15s ease;
+
+        &:disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .button-spinner {
+            border: 0.15rem solid rgba(255, 255, 255, 0.3);
+            border-top: 0.15rem solid white;
+            border-radius: 50%;
+            width: 1.1rem;
+            height: 1.1rem;
+            animation: spin 1s linear infinite;
+        }
     }
 
     @media (prefers-color-scheme: dark) {
         #continue-button {
             color: black;
             background-color: white;
+
+            .button-spinner {
+                border-color: rgba(0, 0, 0, 0.3);
+                border-top-color: black;
+            }
         }
     }
 }

@@ -9,6 +9,7 @@
 		v-if="step === 'complete-profile'"
 		:initial-full-name="authResponse?.fullName"
 		:initial-email="authResponse?.email"
+		:loading="isSubmitting"
 		@submit="handleProfileCompletion"
 	/>
   </main>
@@ -72,6 +73,8 @@ async function handleSignInWithGoogle() {
  * Called when the user submits the full profile form.
  * Registers with the backend, updates user data, then navigates to /events.
  */
+const isSubmitting = ref(false);
+
 async function handleProfileCompletion(event: {
 	firstName: string,
 	lastName: string,
@@ -79,28 +82,38 @@ async function handleProfileCompletion(event: {
 	username: string,
 	sports: any[]
 }) {
-	if (!authResponse.value) return;
+	if (!authResponse.value || isSubmitting.value) return;
+	isSubmitting.value = true;
 
-	// Update auth response with user-provided info and register
-	authResponse.value.fullName = `${event.firstName} ${event.lastName}`;
-	authResponse.value.email = event.email;
+	try {
+		// Update auth response with user-provided info and register
+		authResponse.value.fullName = `${event.firstName} ${event.lastName}`;
+		authResponse.value.email = event.email;
 
-	const registered = await authenticator.registerUser(authResponse.value);
-	if (!registered) {
-		console.error('Failed to register user with backend');
-		return;
-	}
+		const registered = await authenticator.registerUser(authResponse.value);
+		if (!registered) {
+			console.error('Failed to register user with backend');
+			return;
+		}
 
-	// Update user profile with username and sports
-	const userData = new UserDTO();
-	userData.username = event.username;
-	userData.sports = event.sports.map((s: any) => s.name);
+		// Extract sport names as plain strings for the server (expects string[])
+		const sportNames: string[] = event.sports.map((s: any) =>
+			typeof s === 'string' ? s : String(s.name)
+		);
 
-	const completed = await authenticator.completeUserSignUp(userData);
-	if (completed) {
-		await navigateToApp();
-	} else {
-		console.error('Failed to complete user signup');
+		// Update user profile with username and sports
+		const userData = new UserDTO();
+		userData.username = event.username;
+		userData.sports = sportNames;
+
+		const completed = await authenticator.completeUserSignUp(userData);
+		if (completed) {
+			await navigateToApp();
+		} else {
+			console.error('Failed to complete user signup');
+		}
+	} finally {
+		isSubmitting.value = false;
 	}
 }
 

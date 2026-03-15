@@ -28,7 +28,9 @@ export class UserService extends BaseService {
 
         let data = JSON.stringify(user.encode());
         let endpoint = new Endpoint('/v1/users/user')
-        const [status, _headers, body] = await this.http.request(Method.PUT, endpoint, data, headers);
+        const [status, _headers, body] = await this.withRetry(
+            () => this.http.request(Method.PUT, endpoint, data, headers)
+        );
 
         if (status !== 200) return null;
         if (!body) return null;

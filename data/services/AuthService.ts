@@ -24,9 +24,25 @@ export class AuthService {
 
         const data = JSON.stringify(request.encode());
         const endpoint = new Endpoint("/v1/auth/register");
-        
+        const maxRetries = 3;
+
         try {
-            const [status, _headers, body] = await this.http.request(Method.POST, endpoint, data, headers);
+            let status: number = 0;
+            let body: any = null;
+
+            for (let attempt = 0; attempt <= maxRetries; attempt++) {
+                const [s, _headers, b] = await this.http.request(Method.POST, endpoint, data, headers);
+                status = s;
+                body = b;
+
+                // Only retry on 500-level errors
+                if (status < 500 || attempt === maxRetries) break;
+
+                const delay = Math.pow(2, attempt) * 1000;
+                console.warn(`Register failed with status ${status}, retrying in ${delay}ms (attempt ${attempt + 1}/${maxRetries})`);
+                await new Promise(resolve => setTimeout(resolve, delay));
+            }
+
             if (status === 200) {
                 if (body) {
                     return AuthResponse.decode(body);

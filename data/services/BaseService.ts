@@ -40,4 +40,35 @@ export class BaseService {
         }
         return headers;
     }
+
+    /**
+     * Retries an async operation up to maxRetries times with exponential backoff
+     * when the operation returns a 500-level status code.
+     * @param fn - function that returns [status, ...rest] tuple
+     * @param maxRetries - number of retry attempts (default 3)
+     * @returns the result of the operation
+     */
+    protected async withRetry<T extends [number, ...any[]]>(
+        fn: () => Promise<T>,
+        maxRetries: number = 3
+    ): Promise<T> {
+        let lastResult: T | undefined;
+
+        for (let attempt = 0; attempt <= maxRetries; attempt++) {
+            lastResult = await fn();
+            const status = lastResult[0];
+
+            // Only retry on 500-level errors
+            if (status < 500 || attempt === maxRetries) {
+                return lastResult;
+            }
+
+            // Exponential backoff: 1s, 2s, 4s
+            const delay = Math.pow(2, attempt) * 1000;
+            console.warn(`Request failed with status ${status}, retrying in ${delay}ms (attempt ${attempt + 1}/${maxRetries})`);
+            await new Promise(resolve => setTimeout(resolve, delay));
+        }
+
+        return lastResult!;
+    }
 }

@@ -38,6 +38,7 @@ export default defineEventHandler((event) => {
         "font-src 'self' data:",
         `connect-src 'self' blob: wss: https://api.olympsis.com https://maps-api.apple.com https://*.apple-mapkit.com https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com https://*.ingest.us.sentry.io https://*.google-analytics.com https://appleid.apple.com${devConnectSrc}`,
         "frame-src 'self' https://*.firebaseapp.com https://apis.google.com https://appleid.apple.com",
+        "worker-src 'self' blob:",
         "object-src 'none'",
         "base-uri 'self'",
     ].join('; ');

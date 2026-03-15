@@ -32,9 +32,11 @@
             :style="{ 'top': '10px', 'height': '65vh', 'overflow': 'hidden', 'max-width': '32rem' }"
         >
             <template #container>
-                <MediaPicker 
-                    :crop-shape="mediaCropShape" 
-                    :medias="mediaPickerImages" 
+                <MediaPicker
+                    v-if="showMediaPicker"
+                    :crop-shape="mediaCropShape"
+                    :medias="mediaPickerImages"
+                    @close="closeMediaPicker"
                     @cropped-media-results="handleCroppedMediaData"
                 />
             </template>
@@ -96,18 +98,26 @@ function handleFileImageSelection() {
     }
 }
 
-function handleFileUpload(event: any) { 
-    mediaPickerImages.value.push(...event.target.files);
+function handleFileUpload(event: any) {
+    const files = Array.from(event.target.files as FileList);
+    if (files.length === 0) return;
+
+    // Replace any previous selection so the cropper always has fresh data
+    mediaPickerImages.value = files as File[];
     showMediaPicker.value = true;
 }
 
 function handleCroppedMediaData(data: Array<CroppedMedia>) {
-    if (data) {
-        if (data[0]) {
-            uploadedMediaURL.value = data[0]?.url
-        }
+    if (data?.[0]) {
+        uploadedMediaURL.value = data[0].url;
     }
     closeMediaPicker();
+}
+
+function closeMediaPicker() {
+    showMediaPicker.value = false;
+    // Clear file list so next upload starts fresh
+    mediaPickerImages.value = [];
 }
 
 function removeUploadedFile() {
@@ -115,10 +125,6 @@ function removeUploadedFile() {
         URL.revokeObjectURL(uploadedMediaURL.value);
         uploadedMediaURL.value = undefined;
     }
-}
-
-function closeMediaPicker() {
-    showMediaPicker.value = false;
 }
 
 onUnmounted(() => {

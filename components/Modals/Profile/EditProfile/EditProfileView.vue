@@ -23,9 +23,10 @@
                 <div id="template" v-else>
                     
                 </div>
-                <input 
-                    ref="image-input" 
-                    type="file" 
+                <input
+                    ref="image-input"
+                    type="file"
+                    accept="image/*"
                     :style="{ display: 'none' }"
                     @change="handleFileUpload"
                 />
@@ -63,9 +64,10 @@
 
             <dialog id="media-picker-modal" ref="media-picker-modal">
                 <MediaPicker
-                    v-model:medias="mediaPickerImages" 
-                    :crop-shape="mediaCropShape" 
-                    @close="hideMediaPicker" 
+                    v-if="showMediaPicker"
+                    v-model:medias="mediaPickerImages"
+                    :crop-shape="mediaCropShape"
+                    @close="hideMediaPicker"
                     @cropped-media-results="handleCroppedMediaData"
                 />
             </dialog>
@@ -138,9 +140,12 @@ function handleLocaleChanged(event: any) {
     closeLocaleModal();
 }
 
+const showMediaPicker = ref(false);
+
 function handleFileImageSelection() {
     if (imageInputRef.value) {
-        mediaPickerImages.value.pop();
+        // Clear previous selection
+        mediaPickerImages.value = [];
         imageInputRef.value.value = '';
         if (newImageURL.value) {
             URL.revokeObjectURL(newImageURL.value);
@@ -149,27 +154,28 @@ function handleFileImageSelection() {
     }
 }
 
-function handleFileUpload(event: any) { 
-    mediaPickerImages.value.push(...event.target.files);
-    showMediaPicker()
+function handleFileUpload(event: any) {
+    const files = Array.from(event.target.files as FileList);
+    if (files.length === 0) return;
+
+    mediaPickerImages.value = files as File[];
+    showMediaPicker.value = true;
+    mediaModalRef.value?.show();
 }
 
 function handleCroppedMediaData(data: Array<CroppedMedia>) {
-    if (data) {
-        if (data[0]) {
-            newImageURL.value = data[0]?.url
-            profileImageURL.value = data[0]?.url
-        }
+    if (data?.[0]) {
+        newImageURL.value = data[0].url;
+        profileImageURL.value = data[0].url;
     }
     hideMediaPicker();
 }
 
-function showMediaPicker() {
-    mediaModalRef.value?.show();
-}
-
 function hideMediaPicker() {
+    showMediaPicker.value = false;
     mediaModalRef.value?.close();
+    // Clear file list so next upload starts fresh
+    mediaPickerImages.value = [];
 }
 
 async function updateUserProfile() {
@@ -185,7 +191,7 @@ async function updateUserProfile() {
     }
 
     update.sports = userSports.value.map((s) => {
-        return s.name.split(' ')[1]
+        return s.name.toLowerCase();
     });
 
     if (homeTownCoordinates.value.length > 0) {

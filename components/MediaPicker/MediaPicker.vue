@@ -9,32 +9,35 @@
         </div>
 
         <!-- Media Picker Body/Cropper -->
-        <Cropper
-            class="cropper"
-            ref="cropperRef"
-            :src="currentMediaURL"
-            :zoom-speed="0.5"
-            :scaling-restriction="{
-                minScale: 1,
-                maxScale: 3
-            }"
-            :stencil-component="getStencilComponent()"
-            :stencil-props="{
-                handlers: {},
-                movable: false,
-                resizable: false,
-                aspectRatio: getAspectRatio(),
-                previewClass: 'preview',
-                class: {
-                    'cropper-stencil': true,
-                    'circle': cropShape === CROP_SHAPE.CIRCLE
-                }
-            }"
-            :resize-image="{
-                adjustStencil: false
-            }"
-            image-restriction="stencil"
-        />
+        <div id="cropper-wrapper">
+            <Cropper
+                v-if="currentMediaURL"
+                class="cropper"
+                ref="cropperRef"
+                :src="currentMediaURL"
+                :zoom-speed="0.5"
+                :stencil-component="getStencilComponent()"
+                :stencil-props="{
+                    handlers: {},
+                    movable: false,
+                    resizable: false,
+                    aspectRatio: getAspectRatio(),
+                    previewClass: 'preview',
+                    class: {
+                        'cropper-stencil': true,
+                        'circle': cropShape === CROP_SHAPE.CIRCLE
+                    }
+                }"
+                :resize-image="{
+                    adjustStencil: false
+                }"
+                image-restriction="stencil"
+            />
+            <!-- Loading state while the image is being read -->
+            <div v-else id="loading">
+                <div class="spinner-loader"/>
+            </div>
+        </div>
 
         <!-- Media Picker Footer -->
         <div id="footer">
@@ -49,7 +52,7 @@ import 'vue-advanced-cropper/dist/style.css';
 import { CROP_SHAPE } from '~/data/Enums';
 import { type CroppedMedia } from '@/data/GlobalData';
 import { Cropper, CircleStencil, RectangleStencil } from 'vue-advanced-cropper';
-import { ref, computed, type PropType, onMounted, onUpdated, watch, onUnmounted } from 'vue';
+import { ref, computed, type PropType, onMounted, watch, onUnmounted } from 'vue';
 
 const emit = defineEmits<{
     (e: 'close'): void,
@@ -74,8 +77,8 @@ const currentMediaIndex = ref<number>(0);
 const mediaURLS = ref<Array<string>>([]);
 
 const cropperRef = ref<InstanceType<typeof Cropper> | null>(null);
-const currentMediaURL = computed<string | undefined> (() => mediaURLS.value[currentMediaIndex.value]);
-const currentMediaIndexString = computed<string>(() =>`${currentMediaIndex.value + 1}/${medias.value.length}`);
+const currentMediaURL = computed<string | undefined>(() => mediaURLS.value[currentMediaIndex.value]);
+const currentMediaIndexString = computed<string>(() => `${currentMediaIndex.value + 1}/${medias.value.length}`);
 
 const croppedMediaData = ref<Array<CroppedMedia>>([]);
 
@@ -83,18 +86,35 @@ onMounted(() => {
     generateURLS();
 });
 
-watch(medias.value, () => {
-   generateURLS();
-});
+watch(() => medias.value, () => {
+    generateURLS();
+}, { deep: true });
 
-function generateURLS() {
-    // Clear up array just in case of leftover data
+/**
+ * Reads each file as a data URL (base64) instead of a blob URL.
+ * Data URLs are more reliably handled by the cropper library
+ * across browsers (especially Safari / iOS).
+ */
+async function generateURLS() {
+    // Reset state
     mediaURLS.value = [];
     croppedMediaData.value = [];
+    currentMediaIndex.value = 0;
 
-    // Generate a url for each selected media provided
-    const urls = medias.value.map((m) => URL.createObjectURL(m));
+    // Read each file as a data URL for reliable cross-browser rendering
+    const urls = await Promise.all(
+        medias.value.map((file) => readFileAsDataURL(file))
+    );
     mediaURLS.value.push(...urls);
+}
+
+function readFileAsDataURL(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = () => reject(reader.error);
+        reader.readAsDataURL(file);
+    });
 }
 
 function getStencilComponent() {
@@ -132,31 +152,45 @@ async function getCroppedImage(): Promise<CroppedMedia | null> {
     if (!cropperRef.value) return null;
 
     const { canvas } = cropperRef.value.getResult();
+    if (!canvas) return null;
+
     return new Promise((resolve) => {
-        canvas?.toBlob((blob) => {
-            if (blob) {
-                resolve({
-                    url: URL.createObjectURL(blob),
-                    blob
-                });
-            } else {
-                resolve(null);
-            }
-        }, 'image/jpeg', 0.5);
+        try {
+            canvas.toBlob((blob) => {
+                if (blob) {
+                    resolve({
+                        url: URL.createObjectURL(blob),
+                        blob
+                    });
+                } else {
+                    console.error('MediaPicker: canvas.toBlob returned null');
+                    resolve(null);
+                }
+            }, 'image/jpeg', 0.85);
+        } catch (error) {
+            console.error('MediaPicker: Failed to export canvas:', error);
+            resolve(null);
+        }
     });
 }
+
+// NOTE: We intentionally do NOT revoke cropped blob URLs here.
+// The parent component owns those URLs (for preview display)
+// and is responsible for revoking them when done.
 </script>
 
 <style scoped>
 #media-picker-container {
-
     height: 65vh;
     width: 100vw;
     max-width: 32rem;
+    display: flex;
+    flex-direction: column;
     box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
 
     #header {
         height: 4rem;
+        min-height: 4rem;
         display: flex;
         padding: 0rem 1rem;
         align-items: center;
@@ -180,15 +214,29 @@ async function getCroppedImage(): Promise<CroppedMedia | null> {
         }
     }
 
-    .cropper {
+    #cropper-wrapper {
         flex: 1;
-        width: 100%;
-        height: calc(100% - 8rem);
+        min-height: 0;
+        position: relative;
         background-color: black;
+
+        .cropper {
+            width: 100%;
+            height: 100%;
+        }
+
+        #loading {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
     }
 
     #footer {
         height: 4rem;
+        min-height: 4rem;
         display: flex;
         align-items: center;
         justify-content: space-around;
@@ -198,47 +246,6 @@ async function getCroppedImage(): Promise<CroppedMedia | null> {
         h1 {
             font-size: 1rem;
             color: var(--primary-label-color);
-        }
-    }
-
-    #picker-header {
-        margin: 1rem;
-        display: flex;
-        justify-content: space-between;
-    }
-
-    #picker-body {
-        overflow: hidden;
-        width: fit-content;
-
-        #placeholder {
-            width: 100%;
-            height: 100%;
-            background-color: gray;
-        }
-
-        #image {
-            height: auto;
-            max-width: 32rem;
-            aspect-ratio: auto;
-        }
-
-        #crop-box {
-            cursor: grab;
-            position: absolute;
-            border: 5px solid var(--primary-brand-color);
-        }
-
-        #picker-body {
-            width: 100%;
-            height: auto;
-        }
-    }
-
-    #image-container {
-        #image-canvas {
-            width: 100%;
-            height: auto;
         }
     }
 }

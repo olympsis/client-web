@@ -36,36 +36,6 @@ class AuthenticationFacade {
     private userService = new UserService();
 
     /**
-     * Generates a cryptographic nonce for Apple Sign In.
-     * Returns both the raw nonce (for Firebase) and the SHA-256 hash (for Apple).
-     */
-    private async generateNonce(): Promise<{ raw: string, hashed: string }> {
-        const raw = crypto.randomUUID();
-        const encoder = new TextEncoder();
-        const hashBuffer = await crypto.subtle.digest('SHA-256', encoder.encode(raw));
-        const hashed = Array.from(new Uint8Array(hashBuffer))
-            .map(b => b.toString(16).padStart(2, '0'))
-            .join('');
-        return { raw, hashed };
-    }
-
-    /**
-     * Decodes a JWT payload using Base64URL (handles URL-safe characters).
-     */
-    private decodeJwtPayload(token: string): Record<string, any> | null {
-        const parts = token.split('.');
-        if (parts.length < 2 || !parts[1]) return null;
-        try {
-            const base64 = parts[1]
-                .replace(/-/g, '+')
-                .replace(/_/g, '/');
-            return JSON.parse(atob(base64));
-        } catch {
-            return null;
-        }
-    }
-
-    /**
      * Uses Apple's native Sign In with Apple JS SDK to authenticate, then
      * links the Apple credential to Firebase Auth via signInWithCredential.
      * This avoids needing Firebase Hosting for the OAuth popup handler.
@@ -75,60 +45,39 @@ class AuthenticationFacade {
         const config = useRuntimeConfig();
 
         try {
-            // Guard against the Apple SDK failing to load
-            if (!(window as any).AppleID) {
-                console.error('Apple Sign In SDK not loaded');
-                return null;
-            }
-
-            // Generate a nonce for replay-attack protection. The hashed version
-            // goes to Apple (embedded in the id_token), the raw version goes to
-            // Firebase so it can verify SHA-256(raw) matches the token claim.
-            const nonce = await this.generateNonce();
-
+            // Use Apple's native JS SDK — shows Apple's own auth overlay
             const appleAuth = (window as any).AppleID.auth;
             appleAuth.init({
                 clientId: config.public.APL_SERVICE_ID,
                 scope: 'name email',
                 redirectURI: window.location.origin,
                 usePopup: true,
-                nonce: nonce.hashed,
             });
 
             const appleResponse = await appleAuth.signIn();
-            const { id_token: appleIdToken } = appleResponse.authorization;
-            // Apple only provides the user object on the very first authorization.
-            // If the user re-authorizes, this will be undefined.
-            const appleUser = appleResponse.user;
+            const { id_token: appleIdToken, code } = appleResponse.authorization;
+            const appleUser = appleResponse.user; // Only present on first authorization
 
-            // Create a Firebase OAuthCredential with the id_token and raw nonce.
+            // Create a Firebase OAuthCredential from Apple's id_token and sign in.
+            // We pass only the idToken — the authorization code is not a nonce.
             const oauthProvider = new OAuthProvider('apple.com');
             const credential = oauthProvider.credential({
                 idToken: appleIdToken,
-                rawNonce: nonce.raw,
             });
             const result = await signInWithCredential(this.auth, credential);
             const user = result.user;
             const additional = getAdditionalUserInfo(result);
 
             // Build the full name from Apple's user object (first auth only),
-            // Firebase user profile, or fall back to empty.
+            // Firebase user profile, or fall back to a default.
             const appleName = appleUser
                 ? [appleUser.name?.firstName, appleUser.name?.lastName].filter(Boolean).join(' ')
                 : '';
             const fullName = appleName || user.displayName || '';
 
-            // Try multiple sources for email: Apple user object, Firebase user,
-            // then the id_token JWT which always contains the email claim.
-            let email = appleUser?.email || user.email || '';
-            if (!email) {
-                const jwt = this.decodeJwtPayload(appleIdToken);
-                email = jwt?.email || '';
-            }
-
             const response: AuthFacadeResponse = {
                 fullName,
-                email,
+                email: appleUser?.email || user.email || '',
                 idToken: await user.getIdToken(),
                 isNewUser: additional?.isNewUser
             }
@@ -140,11 +89,8 @@ class AuthenticationFacade {
             }
             return response;
         } catch(error: any) {
-            // User dismissed the Apple popup or cancelled — not reportable errors
-            if (error?.error === 'popup_closed_by_user' ||
-                error?.error === 'user_cancelled_authorize') {
-                return null;
-            }
+            // User closed the Apple popup — not an error worth reporting
+            if (error?.error === 'popup_closed_by_user') return null;
 
             Sentry.withScope((scope) => {
                 scope.setExtra('action', 'apple_signin');

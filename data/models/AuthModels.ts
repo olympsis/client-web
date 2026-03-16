@@ -18,13 +18,16 @@ class AuthRequest {
 
     encode(): { [key: string]: any } {
         let json: { [key: string]: any } = {}
-        if (this.firstName) {
+        // Always include name/email fields even if empty — using truthy checks
+        // previously caused empty strings to be omitted, leaving server-side
+        // pointer fields nil which led to nil-pointer panics.
+        if (this.firstName != undefined) {
             json['first_name'] = this.firstName
         }
-        if (this.lastName) {
+        if (this.lastName != undefined) {
             json['last_name'] = this.lastName
         }
-        if (this.email) {
+        if (this.email != undefined) {
             json['email'] = this.email
         }
         json['token'] = this.token

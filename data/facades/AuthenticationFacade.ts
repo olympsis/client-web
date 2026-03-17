@@ -45,6 +45,12 @@ class AuthenticationFacade {
         const config = useRuntimeConfig();
 
         try {
+            // Guard against the Apple SDK failing to load
+            if (!(window as any).AppleID) {
+                console.error('Apple Sign In SDK not loaded');
+                return null;
+            }
+
             // Use Apple's native JS SDK — shows Apple's own auth overlay
             const appleAuth = (window as any).AppleID.auth;
             appleAuth.init({
@@ -119,7 +125,6 @@ class AuthenticationFacade {
             const res = await this.authService.register(request);
             if (!res) return false;
 
-            logEvent(this.analytics, 'apple_signup');
             return true;
         } catch (error) {
             Sentry.withScope((scope) => {

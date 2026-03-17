@@ -25,8 +25,7 @@ onMounted(async () => {
 	} catch(error) {
 		console.error("Something Unexpected Happened!")
 	}
-
-})
+});
 
 useHead({
 	htmlAttrs: {

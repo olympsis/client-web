@@ -336,7 +336,7 @@ onMounted(async () => {
     }
 
     // Request location if needed - the subscription will re-fetch events when location is obtained
-    session.loadVenuesAndEvents();
+    // session.loadVenuesAndEvents();
 
     fetchEvents()
         .then((resp) => {

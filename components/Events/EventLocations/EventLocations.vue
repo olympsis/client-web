@@ -76,8 +76,8 @@ onMounted(() => {
     
     const service = new SnapshotService();
     service.getMapSnapshot(center)
-        .then((blob) => {
-            mapURL.value = URL.createObjectURL(blob);
+        .then((data) => {
+            mapURL.value = generateImageURL(data.url);
             mapState.value = VIEW_STATE.SUCCESS;
         })
         .catch((error) => {

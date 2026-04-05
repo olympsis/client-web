@@ -1,6 +1,7 @@
 import { getAuth } from 'firebase/auth';
 import { Courrier, Method, Endpoint, Scheme } from 'malakbel';
 import { AuthRequest, AuthResponse } from '../models/AuthModels';
+import { AUTH_STATUS } from '../Enums';
 
 /**
  * Contains the all of the network calls needed to handle authentication with the server.
@@ -63,8 +64,7 @@ export class AuthService {
      * @param request - object containing user info
      * @returns a promise containing an AuthResponse Object or null if failed
      */
-    async login(request: AuthRequest): Promise<AuthResponse | null>  {
-        const auth = getAuth();
+    async login(request: AuthRequest): Promise<AuthResponse | AUTH_STATUS | null>  {
         let headers = new Map<string, string>();
 
         const data = JSON.stringify(request.encode());
@@ -72,6 +72,35 @@ export class AuthService {
 
         try {
             const [status, _headers, body] = await this.http.request(Method.POST, endpoint, data, headers);
+            if (status === 200) {
+                if (body) {
+                    return AuthResponse.decode(body);
+                } else {
+                    console.error('Failed to decode AuthResponse response body.');
+                }
+            } else if (status == 404) {
+                console.error('Failed to get user data. It does not exist...')
+                return AUTH_STATUS.not_finished
+            }
+        } catch(error) {
+            console.error(`Failed to log in user. Error: ${error}`)
+        }
+
+        return null;
+    }
+
+    async modify(request: AuthRequest): Promise<AuthResponse | null> {
+        const auth = getAuth();
+        let token = await auth.currentUser?.getIdToken() ?? ""
+
+        let headers = new Map<string, string>();
+        headers.set('Authorization', token);
+
+        const data = JSON.stringify(request.encode());
+        const endpoint = new Endpoint("/v1/auth/modify");
+
+        try {
+            const [status, _headers, body] = await this.http.request(Method.PUT, endpoint, data, headers);
             if (status === 200) {
                 if (body) {
                     return AuthResponse.decode(body);

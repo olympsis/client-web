@@ -23,6 +23,10 @@ import { AuthenticationFacade, type AuthFacadeResponse } from '~/data/facades/Au
 
 import AuthenticationCard from '~/components/Auth/AuthenticationCard/AuthenticationCard.vue';
 import CompleteProfileCard from '~/components/Auth/CompleteProfileCard/CompleteProfileCard.vue';
+import { AuthService } from '~/data/services/AuthService';
+import { AuthRequest } from '~/data/models/AuthModels';
+import { AUTH_STATUS } from '~/data/Enums';
+import { UserService } from '~/data/services/UserService';
 
 definePageMeta({ layout: 'site' });
 
@@ -32,6 +36,7 @@ const authenticator = new AuthenticationFacade();
 
 type SignInStep = 'auth' | 'complete-profile';
 const step: Ref<SignInStep> = ref('auth');
+const isNewUser: Ref<boolean> = ref(false);
 
 const authResponse: Ref<AuthFacadeResponse | null> = ref(null);
 
@@ -49,9 +54,20 @@ async function handleSignInWithApple() {
 	const response = await auth.signInWithApple();
 	if (response) {
 		if (response.isNewUser) {
+			isNewUser.value = true;
 			authResponse.value = response;
 			step.value = 'complete-profile';
 		} else {
+			let service = new AuthService()
+			let request = new AuthRequest(undefined, undefined, undefined, response.idToken);
+
+			let res = await service.login(request)
+			if (res == AUTH_STATUS.not_finished) {
+				authResponse.value = response;
+				step.value = 'complete-profile';
+				return
+			}
+
 			await navigateToApp();
 		}
 	}
@@ -61,9 +77,20 @@ async function handleSignInWithGoogle() {
 	const response = await auth.signInWithGoogle();
 	if (response) {
 		if (response.isNewUser) {
+			isNewUser.value = true;
 			authResponse.value = response;
 			step.value = 'complete-profile';
 		} else {
+			let service = new AuthService()
+			let request = new AuthRequest(undefined, undefined, undefined, response.idToken);
+
+			let res = await service.login(request)
+			if (res == AUTH_STATUS.not_finished) {
+				authResponse.value = response;
+				step.value = 'complete-profile';
+				return
+			}
+
 			await navigateToApp();
 		}
 	}
@@ -90,11 +117,30 @@ async function handleProfileCompletion(event: {
 		authResponse.value.fullName = `${event.firstName} ${event.lastName}`;
 		authResponse.value.email = event.email;
 
-		const registered = await authenticator.registerUser(authResponse.value);
-		if (!registered) {
-			console.error('Failed to register user with backend');
-			return;
+		if (isNewUser.value) {
+			const registered = await authenticator.registerUser(authResponse.value);
+			if (!registered) {
+				isSubmitting.value = false;
+				console.error('Failed to register auth user with backend');
+				return;
+			}
+		} else {
+			let service = new AuthService();
+			const nameParts = authResponse.value.fullName ? authResponse.value.fullName.split(' ') : [];
+			let request = new AuthRequest(
+				nameParts[0] || '',
+				nameParts.slice(1).join(' ') || '',
+				authResponse.value.email,
+				authResponse.value.idToken
+			)
+			const resp = await service.modify(request);
+			if (!resp) {
+				isSubmitting.value = false;
+				console.error('Failed to update auth user with backend');
+				return;
+			}
 		}
+		
 
 		// Extract sport names as plain strings for the server (expects string[])
 		const sportNames: string[] = event.sports.map((s: any) =>
@@ -106,12 +152,23 @@ async function handleProfileCompletion(event: {
 		userData.username = event.username;
 		userData.sports = sportNames;
 
-		const completed = await authenticator.completeUserSignUp(userData);
-		if (completed) {
-			await navigateToApp();
+		if (!isNewUser.value) {
+			let service = new UserService()
+			const update = await service.createUserData(userData);
+			if (!update) {
+				console.error('Failed to complete user signup');
+			} else {
+				await navigateToApp();
+			}
 		} else {
-			console.error('Failed to complete user signup');
+			const completed = await authenticator.completeUserSignUp(userData);
+			if (completed) {
+				await navigateToApp();
+			} else {
+				console.error('Failed to complete user signup');
+			}
 		}
+		
 	} finally {
 		isSubmitting.value = false;
 	}

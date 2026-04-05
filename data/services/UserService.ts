@@ -23,6 +23,20 @@ export class UserService extends BaseService {
         }
     }
 
+    async createUserData(user: UserDTO): Promise<UserData | null> {
+        const headers = await this.getAuthHeaders();
+
+        let data = JSON.stringify(user.encode());
+        let endpoint = new Endpoint('/v1/users/user')
+        const [status, _headers, body] = await this.withRetry(
+            () => this.http.request(Method.POST, endpoint, data, headers)
+        );
+
+        if (status !== 201) return null;
+        if (!body) return null;
+        return UserData.decode(body);
+    }
+
     async updateUserData(user: UserDTO): Promise<UserData | null> {
         const headers = await this.getAuthHeaders();
 

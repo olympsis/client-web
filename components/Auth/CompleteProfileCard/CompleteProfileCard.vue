@@ -86,10 +86,8 @@ import { UserService } from '~/data/services/UserService';
 
 const { t } = useI18n();
 const props = defineProps<{
-    /** Pre-fill values from whatever Apple/Firebase provided */
     initialFullName?: string
     initialEmail?: string
-    /** When true, disables the form while the parent processes the submission */
     loading?: boolean
 }>();
 

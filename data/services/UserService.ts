@@ -27,7 +27,7 @@ export class UserService extends BaseService {
         const headers = await this.getAuthHeaders();
 
         let data = JSON.stringify(user.encode());
-        let endpoint = new Endpoint('/v1/users/user')
+        let endpoint = new Endpoint('/v1/users')
         const [status, _headers, body] = await this.withRetry(
             () => this.http.request(Method.POST, endpoint, data, headers)
         );

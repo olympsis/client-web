@@ -84,6 +84,9 @@ export class AuthService {
             }
         } catch(error) {
             console.error(`Failed to log in user. Error: ${error}`)
+            if (String(error).includes('404')) {
+                return AUTH_STATUS.not_finished
+            }
         }
 
         return null;

@@ -2,7 +2,7 @@
     <div id="event-organizers">
         <h2>Hosted by</h2>
         <ul id="list">
-            <ParticipantListItem v-if="event.config?.hidePoster" :participant="poster"/>
+            <ParticipantListItem v-if="!event.config?.hidePoster" :participant="poster"/>
 
             <li v-for="organizer in organizers" class="organizer">
                 <GroupBadge :type="organizer.type" :imageURL="organizer.imageURL" :size="2.5" />

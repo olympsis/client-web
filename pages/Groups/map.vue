@@ -75,7 +75,7 @@ import { Venue } from '@/data/models/VenueModels';
 import { Event } from '@/data/models/EventModels';
 import { useModelStore } from '@/stores/model-store';
 import { useSessionStore } from '@/stores/session-store';
-import { generateMapkitAuthToken } from '~/utils/map-helpers';
+import { getMapkitServerToken } from '~/utils/map-helpers';
 import { createVNode, onMounted, ref, render, computed, type Ref, type ComputedRef } from 'vue';
 
 import Dialog from 'primevue/dialog';
@@ -128,9 +128,9 @@ onMounted(() => {
 
     mapkit.init({
         authorizationCallback: function(done: (arg0: string) => void) {
-            generateMapkitAuthToken()
-                .then((token: string) => { 
-                    done(token); 
+            getMapkitServerToken()
+                .then((token: string) => {
+                    done(token);
                 });
         },
         language: navigator.language

@@ -58,7 +58,6 @@ export const useSessionStore = defineStore('session-store', () => {
     var locationState = ref<VIEW_STATE>(VIEW_STATE.PENDING);
     var lastKnownLocation: Ref<Location | undefined> = ref(undefined);
 
-    var mapkitToken: Ref<string | undefined> = ref(undefined);
     var mapKitServerToken: Ref<string | undefined> = ref(undefined);
 
     /**
@@ -265,7 +264,6 @@ export const useSessionStore = defineStore('session-store', () => {
         announcements,
         lastKnownLocation,
 
-        mapkitToken,
         mapKitServerToken,
 
         clubService,

@@ -26,11 +26,6 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
-    // Server-only secrets (never sent to the client)
-    MAPKIT_KEY: process.env.MAPKIT_KEY ?? "",
-    APL_KEY_ID: process.env.APL_KEY_ID ?? "",
-    APL_TEAM_ID: process.env.APL_TEAM_ID ?? "",
-
     public: {
       MODE: process.env.MODE ?? "dev",
 

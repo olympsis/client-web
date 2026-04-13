@@ -4,7 +4,7 @@
         <img v-if="mapURL" id="map" :src="mapURL"/>
         <div v-else id="map-placeholder"/>
         <div id="details">
-            <picture :style="{ margin: '0rem 0.5rem' }" class="icon">
+            <picture :style="{ margin: '0rem 0.5rem', height: 'fit-content' }" class="icon">
                 <source srcset="@/assets/icons/pin-drop/pin.drop.white.svg" media="(prefers-color-scheme: dark)">
                 <img src="@/assets/icons/pin-drop/pin.drop.svg">
             </picture>
@@ -56,12 +56,12 @@ const venueLocation = computed<string>(() => {
 function getLocationCenter(): string | null {
     const firstVenue = props.event.venues.at(0);
     
-    if (firstVenue?.city && firstVenue?.state && firstVenue?.country) {
-        return `${firstVenue.city}, ${firstVenue.state}, ${firstVenue.country}`;
-    }
-    
     if (firstVenue?.location?.coordinates) {
         return `${firstVenue.location.coordinates[1]}, ${firstVenue.location.coordinates[0]}`;
+    }
+
+    if (firstVenue?.city && firstVenue?.state && firstVenue?.country) {
+        return `${firstVenue.city}, ${firstVenue.state}, ${firstVenue.country}`;
     }
     
     return null;
@@ -99,6 +99,7 @@ onMounted(() => {
 
     #details {
         display: flex;
+        align-items: center;
     }
 
     #map-placeholder {

@@ -208,7 +208,79 @@ function openExternalURL() {
             }
 
             :deep(p) {
-                margin: 0;
+                margin: 0 0 0.5rem 0;
+            }
+
+            :deep(p:last-child) {
+                margin-bottom: 0;
+            }
+
+            :deep(h1), :deep(h2), :deep(h3), :deep(h4), :deep(h5), :deep(h6) {
+                margin: 0.75rem 0 0.25rem 0;
+                line-height: 1.3;
+            }
+
+            :deep(h1) { font-size: 1.4rem; }
+            :deep(h2) { font-size: 1.2rem; }
+            :deep(h3) { font-size: 1.1rem; }
+
+            :deep(strong), :deep(b) {
+                font-weight: 700;
+            }
+
+            :deep(em), :deep(i) {
+                font-style: italic;
+            }
+
+            :deep(blockquote) {
+                margin: 0.5rem 0;
+                padding: 0.25rem 0.75rem;
+                border-left: 3px solid var(--tertiary-brand-color);
+                opacity: 0.85;
+            }
+
+            :deep(img) {
+                max-width: 100%;
+                height: auto;
+                border-radius: 8px;
+                margin: 0.5rem 0;
+            }
+
+            :deep(pre) {
+                margin: 0.5rem 0;
+                padding: 0.75rem;
+                border-radius: 8px;
+                overflow-x: auto;
+                background: rgba(0, 0, 0, 0.2);
+            }
+
+            :deep(code) {
+                font-family: monospace;
+                font-size: 0.9em;
+            }
+
+            :deep(hr) {
+                border: none;
+                border-top: 1px solid rgba(255, 255, 255, 0.2);
+                margin: 0.75rem 0;
+            }
+
+            :deep(table) {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 0.5rem 0;
+            }
+
+            :deep(th), :deep(td) {
+                padding: 0.4rem 0.6rem;
+                border: 1px solid rgba(255, 255, 255, 0.15);
+                text-align: left;
+            }
+
+            :deep(br) {
+                content: '';
+                display: block;
+                margin: 0.25rem 0;
             }
         }
 

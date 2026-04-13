@@ -45,7 +45,27 @@ async function getMapkitServerToken() : Promise<string> {
     return token;
 }
 
+/**
+ * Fetches a MapKit JS auth token (JWT) from the local Nuxt server endpoint.
+ * This JWT contains the alg, kid, and origin claims that mapkit.init() requires.
+ * Distinct from the access token used for REST API calls.
+ * Caches the token in the session store.
+ *
+ * @returns a promise containing the JWT string
+ */
+async function generateMapkitAuthToken() : Promise<string> {
+    const session = useSessionStore();
+    if (session.mapkitToken) {
+        return session.mapkitToken;
+    }
+
+    const { token } = await $fetch<{ token: string }>('/api/mapkit/token');
+    session.mapkitToken = token;
+    return token;
+}
+
 export {
     getDirections,
     getMapkitServerToken,
+    generateMapkitAuthToken,
 }

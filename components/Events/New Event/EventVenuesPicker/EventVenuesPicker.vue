@@ -163,7 +163,7 @@ import { useModelStore } from '@/stores/model-store';
 import { ref, watch, onMounted, nextTick } from 'vue';
 import { useSessionStore } from '@/stores/session-store';
 import { VenueDescriptor } from '@/data/models/GenericModels';
-import { getMapkitServerToken } from '~/utils/map-helpers';
+import { getMapkitServerToken, generateMapkitAuthToken } from '~/utils/map-helpers';
 
 import * as Sentry from "@sentry/nuxt";
 import SearchBar from '@/components/SearchBar/SearchBar.vue';
@@ -313,10 +313,13 @@ async function searchLocations(query: string): Promise<LocationItem[]> {
         // name ("Central Park"), street address, or coordinates
         params.set('resultTypeFilter', 'poi,address');
 
-        // Bias results toward the user's location
+        // Use the user's location for relevance ranking and country filtering
         const userLocation = sessionStore.lastKnownLocation;
         if (userLocation) {
-            params.set('searchLocation', `${userLocation.latitude},${userLocation.longitude}`);
+            params.set('userLocation', `${userLocation.latitude},${userLocation.longitude}`);
+            if (userLocation.countryCode) {
+                params.set('limitToCountries', userLocation.countryCode);
+            }
         }
 
         const response = await fetch(
@@ -457,7 +460,7 @@ async function ensureMapKitInitialized(): Promise<void> {
     if (!window.mapkit._initialized) {
         window.mapkit.init({
             authorizationCallback: function(done: (token: string) => void) {
-                getMapkitServerToken().then((token: string) => done(token));
+                generateMapkitAuthToken().then((token: string) => done(token));
             },
             language: navigator.language
         });

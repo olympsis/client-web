@@ -26,6 +26,11 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
+    // Server-only secrets for MapKit JWT signing (used by /api/mapkit/token)
+    MAPKIT_KEY: process.env.MAPKIT_KEY ?? "",
+    APL_KEY_ID: process.env.APL_KEY_ID ?? "",
+    APL_TEAM_ID: process.env.APL_TEAM_ID ?? "",
+
     public: {
       MODE: process.env.MODE ?? "dev",
 

@@ -103,6 +103,9 @@ export const useSessionStore = defineStore('session-store', () => {
             // Set has loaded to true
             hasLoaded.value = true;
             loadingState.value = VIEW_STATE.SUCCESS;
+
+            // Get user location on every app open and persist it
+            _initLocation();
         } catch (error) {
             Sentry.withScope((scope) => {
                 scope.setExtra('action', 'check_in');
@@ -225,6 +228,20 @@ export const useSessionStore = defineStore('session-store', () => {
      * 
      * @param data CheckIn data from the server
      */
+    /**
+     * Fetches the user's location and stores it in the session.
+     * Runs on every app open so lastKnownLocation is always available.
+     * Non-blocking — location failure doesn't affect the rest of init.
+     */
+    async function _initLocation() {
+        try {
+            const coords = await location.getPositionWithTimeout();
+            lastKnownLocation.value = coords.location;
+        } catch (error) {
+            console.error('Failed to get user location on init:', error);
+        }
+    }
+
     function _loadGroupData(data: CheckIn) {
         // Load in groups
         data.clubs?.forEach((c) => groups.value.push(new GroupSelection(GROUP_TYPE.CLUB, c, undefined)));

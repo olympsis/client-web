@@ -36,9 +36,9 @@ const sampleUsers: Array<UserSnippet | undefined> = [
 
 // Create sample participants
 const createParticipants = () => [
-    new Participant(sampleUsers[0], EVENT_RSVP_STATUS.YES, Math.floor(Date.now() / 1000) - 7200),
-    new Participant(sampleUsers[1], EVENT_RSVP_STATUS.YES, Math.floor(Date.now() / 1000) - 3600),
-    new Participant(sampleUsers[2], EVENT_RSVP_STATUS.MAYBE, Math.floor(Date.now() / 1000) - 1800)
+    new Participant(sampleUsers[0]?.userId, sampleUsers[0], EVENT_RSVP_STATUS.YES, new Date()),
+    new Participant(sampleUsers[1]?.userId, sampleUsers[1], EVENT_RSVP_STATUS.YES, new Date()),
+    new Participant(sampleUsers[2]?.userId, sampleUsers[2], EVENT_RSVP_STATUS.MAYBE, new Date())
 ];
 
 // Sample venue data
@@ -65,7 +65,7 @@ const sampleEvents: Event[] = [
             id: "club_001"
         }],
         venues: [sampleVenue],
-        image_url: "event-images/basketball-0.jpg",
+        media_url: "event-media/d9567739-5831-4462-a358-ccd33f7b8073.jpg",
         title: "Pickup Basketball Game",
         body: "Casual pickup basketball game. All skill levels welcome!",
         sports: ["basketball"],

@@ -92,6 +92,9 @@
 	--button-border-radius: 10px;
 	--icon-border-color: rgb(0, 0, 0, 0.1);
 
+	--outer-border-radius: 15px;
+	--inner-border-radius: 10px;
+
 	--divider-color: #D9D9D9;
 	
 	--desktop-max-width: 58rem;

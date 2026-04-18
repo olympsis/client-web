@@ -62,6 +62,10 @@
             </div>
 
             <ul v-else-if="state === VIEW_STATE.SUCCESS && eventSections.length > 0" id="events-list">
+                <div id="up-next-section" v-if="upNextEvent" :style="{'margin-bottom': '2rem'}" @click="navigateTo(`events/${upNextEvent.id}`)">
+                    <h4>Up Next</h4>
+                    <SmallEventListItem :event="upNextEvent"/>
+                </div>
                 <EventsSection v-if="recentlyCreatedEvents.length > 0" :title="$t('events.section.new')" :events="recentlyCreatedEvents" :show-full-time="true" v-model:state="state" />
                 <EventsSection v-for="section in eventSections" :title="section.dayString" :events="section.events" v-model:state="state" :show-full-time="true"/>
             </ul>
@@ -92,6 +96,7 @@ import SearchBar from '@/components/SearchBar/SearchBar.vue';
 import TagsFilter from '~/components/TagsFilter/TagsFilter.vue';
 import SportsFilter from '~/components/SportsFilter/SportsFilter.vue';
 import EventsSection from '~/components/Events/EventsSection/EventsSection.vue';
+import SmallEventListItem from '~/components/Events/SmallEventListItem/SmallEventListItem.vue';
 
 const { t } = useI18n();
 const router = useRouter();
@@ -173,6 +178,13 @@ const eventSections = computed<EventSection[]>(() => {
     // Use getTime() instead of getMilliseconds() to sort by the full timestamp
     return sections
         .sort((a, b) => a.date.getTime() - b.date.getTime());
+});
+
+const upNextEvent = computed<Event | null>(() => {
+    const userId = session.user?.userId;
+    if (!userId) return null;
+
+    return events.value.mostRecentForUser(userId) ?? null;
 });
 
 function navigateToNewEvent() {

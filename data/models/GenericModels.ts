@@ -170,7 +170,15 @@ class VenueDescriptor {
         const object = Object();
 
         if (data) {
-            if (data['venue_id']) {
+            // TODO: remove this zero-ObjectID guard once the server stops emitting
+            // "000000000000000000000000" for descriptors that have no backing Venue
+            // (custom / ad-hoc locations). The fix will land server-side — at that
+            // point `data['venue_id']` will be omitted/null and the plain falsy
+            // check below is sufficient. Keeping the workaround until then so
+            // EventListItem/EventHeader/array-extensions/etc. don't fire 404s
+            // against /v1/venues/000000000000000000000000.
+            const ZERO_OBJECT_ID = '000000000000000000000000';
+            if (data['venue_id'] && data['venue_id'] !== ZERO_OBJECT_ID) {
                 object['venueId'] = data['venue_id'];
             }
             if (data['name']) {

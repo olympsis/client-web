@@ -32,7 +32,12 @@ const props = defineProps({
      * Initial map center as [lng, lat]. Defaults to NYC if not provided so the
      * map at least renders something rather than going blank.
      */
-    center: { type: Array as () => number[], default: () => [-73.9776, 40.7655] }
+    center: { type: Array as () => number[], default: () => [-73.9776, 40.7655] },
+    /**
+     * Initial coordinate span in degrees (lat/lng delta) for the default zoom.
+     * 0.1 ≈ a city-wide view; smaller = more zoomed in.
+     */
+    initialSpan: { type: Number, default: 0.1 }
 });
 
 const emit = defineEmits<{
@@ -63,9 +68,15 @@ onMounted(async () => {
 
     if (!mapContainer.value) return;
 
+    // Default region zooms in on the user's location (passed via `center`)
+    // with a tight neighborhood-level span. Without this MapKit picks a
+    // wider continental default that hides nearby pins.
     const center = new mapkit.Coordinate(props.center[1], props.center[0]);
+    const span = new mapkit.CoordinateSpan(props.initialSpan, props.initialSpan);
+    const region = new mapkit.CoordinateRegion(center, span);
+
     map = new mapkit.Map(mapContainer.value, {
-        center,
+        region,
         showsZoomControl: false,
         showsUserLocation: true,
         tracksUserLocation: false,
@@ -111,6 +122,21 @@ async function loadMapKitJS(): Promise<void> {
 watch(() => [props.mode, props.events, props.venues], () => {
     if (map) renderAnnotations();
 }, { deep: true });
+
+// If the parent supplies the user location asynchronously (geolocation often
+// resolves after first paint), recenter the map once it arrives. We only
+// recenter if the user hasn't already panned — checking against the prior
+// center keeps the map respectful of manual navigation.
+let lastAppliedCenter: number[] = [...(props.center as number[])];
+watch(() => props.center, (next) => {
+    if (!map || !next || next.length < 2) return;
+    const sameAsLast = next[0] === lastAppliedCenter[0] && next[1] === lastAppliedCenter[1];
+    if (sameAsLast) return;
+    lastAppliedCenter = [...next];
+    const center = new mapkit.Coordinate(next[1], next[0]);
+    const span = new mapkit.CoordinateSpan(props.initialSpan, props.initialSpan);
+    map.setRegionAnimated(new mapkit.CoordinateRegion(center, span));
+});
 
 // ── Annotation rendering ─────────────────────────────────────────────────────
 

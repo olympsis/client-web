@@ -19,15 +19,22 @@
             >{{ pill.label }}</li>
         </ul>
 
-        <!-- Court count + a row of court icons (one per VenueUnit) -->
+        <!-- Court count + a row of court icons (one per VenueUnit). Each icon
+             takes its color from the corresponding unit's `surfaceColor` so a
+             venue with mixed surfaces reads correctly (e.g. 2 clay + 2 hard
+             courts show two warm-brown icons + two blue icons). -->
         <div v-if="unitCount > 0" class="courts">
             <div class="courts-label">
                 <span class="courts-count">{{ courtCountLabel }}</span>
                 <span v-if="surfaceLabel" class="courts-surface">({{ surfaceLabel }})</span>
             </div>
             <ul class="court-icons">
-                <li v-for="(_, i) in unitCount" :key="i" class="court-icon-cell">
-                    <span class="icon icon-court"/>
+                <li
+                    v-for="(unit, i) in venue.units"
+                    :key="unit.id ?? i"
+                    class="court-icon-cell"
+                >
+                    <span class="icon icon-court" :style="{ backgroundColor: unit.surfaceColor || undefined }"/>
                 </li>
             </ul>
         </div>
@@ -323,8 +330,14 @@ const hoursLabel = computed<string>(() => summarizeHours(props.venue.availabilit
         border: 1px solid var(--component-border-color);
         background: rgba(0, 0, 0, 0.25);
     }
+    /*
+       Default court icon color is the primary label color so it matches the
+       header text (white on dark cover images, black on light). The inline
+       style binding on each icon overrides this with the unit's
+       server-supplied `surfaceColor` when one is present.
+    */
     .court-icon-cell .icon-court {
-        background-color: #b85b3a;
+        background-color: var(--primary-label-color);
     }
 }
 

@@ -22,9 +22,11 @@
             <!-- Bottom row: amenity icons left, transit badges right -->
             <div id="detail-row">
                 <div id="detail-left">
-                    <!-- Court count: tennis-court icon + units.length. Hidden when there are no units. -->
+                    <!-- Court count: tennis-court icon + units.length. Hidden when there are no units.
+                         The icon is colored to match the first VenueUnit's surfaceColor (server-supplied)
+                         so the card visually echoes the actual playing surface. -->
                     <div v-if="unitCount > 0" class="amenity court" :title="t('venue.unitsCount', { count: unitCount })">
-                        <span class="icon icon-court"/>
+                        <span class="icon icon-court" :style="{ backgroundColor: courtColor }"/>
                         <span class="amenity-text">{{ unitCount }}</span>
                     </div>
                     <!-- Money: any unit has a paid rate. -->
@@ -111,6 +113,15 @@ const tags = computed<string[]>(() => {
 });
 
 const unitCount = computed(() => props.venue.units?.length ?? 0);
+
+/**
+ * Court icon tint — pulled from the first VenueUnit's `surfaceColor` so a
+ * tennis-clay venue reads warm-brown, hardcourt blue, etc.
+ */
+const courtColor = computed<string | undefined>(() => {
+    const first = props.venue.units?.[0];
+    return first?.surfaceColor || undefined;
+});
 
 // Treat "has rates" as "any unit has at least one rate entry" — the rate may
 // vary by day/time but the presence indicates this venue charges to play.
@@ -251,7 +262,13 @@ const transitBadges = computed(() => {
 .icon-court {
     -webkit-mask-image: url('@/assets/icons/tennis-court/tennis-court.svg');
     mask-image: url('@/assets/icons/tennis-court/tennis-court.svg');
-    background-color: #b85b3a; /* warm court-brown to match the design mock */
+    /*
+       Default falls back to the primary label color so the icon tracks the
+       header text (white on dark, black on light). When the server supplies
+       a `surface_color` on the first VenueUnit, an inline style overrides
+       this with the venue's actual surface tone.
+    */
+    background-color: var(--primary-label-color);
 }
 
 .icon-money {

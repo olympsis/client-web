@@ -389,6 +389,13 @@ class VenueUnit extends Codable<VenueUnit> {
     unitType: string;       // "court", "field", etc.
     location?: GeoJSON;
     surface: SURFACE | string;
+    /**
+     * Hex color of the unit's playing surface (e.g. "#b85b3a" for clay).
+     * Server-supplied so different sports/surfaces can show their canonical
+     * color in the UI without the client guessing. Optional — empty string
+     * when the server has no color for the surface.
+     */
+    surfaceColor: string;
     sports: string[];
     rates: VenueUnitRate[];
     availability: Availability;
@@ -402,7 +409,8 @@ class VenueUnit extends Codable<VenueUnit> {
         rates: VenueUnitRate[] = [],
         availability: Availability = new Availability(),
         id?: string,
-        location?: GeoJSON
+        location?: GeoJSON,
+        surfaceColor: string = ''
     ) {
         super();
         this.id = id;
@@ -411,6 +419,7 @@ class VenueUnit extends Codable<VenueUnit> {
         this.unitType = unitType;
         this.location = location;
         this.surface = surface;
+        this.surfaceColor = surfaceColor;
         this.sports = sports;
         this.rates = rates;
         this.availability = availability;
@@ -430,6 +439,7 @@ class VenueUnit extends Codable<VenueUnit> {
                 object['location'] = GeoJSON.decode(data['location']);
             }
             object['surface'] = data['surface'] ?? '';
+            object['surfaceColor'] = data['surface_color'] ?? '';
             object['sports'] = data['sports'] ?? [];
             object['rates'] = data['rates']
                 ? data['rates'].map((r: any) => VenueUnitRate.decode(r)) : [];
@@ -447,6 +457,7 @@ class VenueUnit extends Codable<VenueUnit> {
             'name': this.name,
             'unit_type': this.unitType,
             'surface': this.surface.valueOf(),
+            'surface_color': this.surfaceColor,
             'sports': this.sports,
             'rates': this.rates.map((r) => r.encode()),
             'availability': this.availability.encode(),

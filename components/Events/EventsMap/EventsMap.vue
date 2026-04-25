@@ -49,6 +49,15 @@ const emit = defineEmits<{
 const mapContainer = ref<HTMLElement | null>(null);
 let map: any = null;
 let currentAnnotations: any[] = [];
+let currentOverlays: any[] = [];
+
+/**
+ * Coordinate-span threshold (degrees) below which we draw VenueUnit polygons.
+ * Above this span the map is too zoomed out for unit footprints to be useful,
+ * and rendering them would just clutter the view. Roughly 0.01° ≈ 1km, so
+ * polygons appear when the user is focused on a single venue or block.
+ */
+const POLYGON_SPAN_THRESHOLD = 0.01;
 
 // ── Mapkit init + lifecycle ──────────────────────────────────────────────────
 
@@ -99,6 +108,8 @@ onBeforeUnmount(() => {
         try {
             map.removeEventListener('select', handleAnnotationSelection);
             map.removeEventListener('region-change-end', renderAnnotations);
+            clearAnnotations();
+            clearOverlays();
             map.destroy();
         } catch { /* map may already be torn down */ }
         map = null;
@@ -146,6 +157,12 @@ function clearAnnotations() {
     currentAnnotations = [];
 }
 
+function clearOverlays() {
+    if (!map || currentOverlays.length === 0) return;
+    map.removeOverlays(currentOverlays);
+    currentOverlays = [];
+}
+
 function renderAnnotations() {
     if (!map) return;
     clearAnnotations();
@@ -155,6 +172,11 @@ function renderAnnotations() {
     } else {
         renderEventPins();
     }
+
+    // Polygon overlays for venue units are independent of the events/venues
+    // toggle — they always represent physical court/field footprints — but
+    // only render them when the user is zoomed in close enough (see threshold).
+    renderUnitPolygons();
 }
 
 // Venue pins are 1:1 with venues — no clustering needed.
@@ -258,10 +280,93 @@ function renderEventPins() {
     }
 }
 
+// ── Venue unit polygon overlays ─────────────────────────────────────────────
+
+/**
+ * Convert a GeoJSON geometry into MapKit PolygonOverlay instances.
+ *
+ * GeoJSON layouts handled:
+ *   Polygon      — `coordinates: [ ring, ring, … ]`           → 1 overlay (rings = outer + holes)
+ *   MultiPolygon — `coordinates: [ [ ring, ring, … ], … ]`    → N overlays (one per polygon)
+ *
+ * Each `ring` is `[ [lng, lat], [lng, lat], … ]` per the GeoJSON spec.
+ * MapKit's `PolygonOverlay` accepts either a flat array of `Coordinate` (single
+ * ring) or an array-of-arrays for multi-ring polygons (first ring is outer,
+ * the rest are cut-out holes).
+ *
+ * Point/LineString geometries are silently skipped — they don't make sense as
+ * a unit footprint and would crash the constructor.
+ */
+function geoJSONToOverlays(geo: any, options: any): any[] {
+    if (!geo?.type || !geo.coordinates) return [];
+
+    const toCoords = (ring: number[][]) =>
+        ring.map(([lng, lat]) => new mapkit.Coordinate(lat, lng));
+
+    if (geo.type === 'Polygon') {
+        const rings = (geo.coordinates as number[][][]).map(toCoords);
+        if (rings.length === 0) return [];
+        const points = rings.length === 1 ? rings[0] : rings;
+        return [new mapkit.PolygonOverlay(points, options)];
+    }
+
+    if (geo.type === 'MultiPolygon') {
+        return (geo.coordinates as number[][][][]).flatMap((poly) => {
+            const rings = poly.map(toCoords);
+            if (rings.length === 0) return [];
+            const points = rings.length === 1 ? rings[0] : rings;
+            return [new mapkit.PolygonOverlay(points, options)];
+        });
+    }
+
+    return [];
+}
+
+function renderUnitPolygons() {
+    if (!map) return;
+
+    // Bail early if zoomed too far out — polygons would be sub-pixel anyway.
+    const region = map.region;
+    const span = Math.max(region.span.latitudeDelta, region.span.longitudeDelta);
+    if (span > POLYGON_SPAN_THRESHOLD) return;
+
+    // Brand-color fill at low opacity so the underlying map tiles still read
+    // through. The stroke is opaque enough to define the unit's edge clearly.
+    const style = new mapkit.Style({
+        lineWidth: 2,
+        strokeColor: '#262E57',
+        strokeOpacity: 0.85,
+        fillColor: '#262E57',
+        fillOpacity: 0.25,
+    });
+
+    const overlays: any[] = [];
+    props.venues.forEach((venue) => {
+        venue.units?.forEach((unit) => {
+            if (!unit.location) return;
+            // Tag overlays with the parent venue so a tap routes through the
+            // same selection path as a venue annotation.
+            const created = geoJSONToOverlays(unit.location, {
+                style,
+                data: { kind: 'venue', venue, unit },
+            });
+            overlays.push(...created);
+        });
+    });
+
+    if (overlays.length > 0) {
+        map.addOverlays(overlays);
+        currentOverlays = overlays;
+    }
+}
+
 // ── Selection ────────────────────────────────────────────────────────────────
 
 function handleAnnotationSelection(event: any) {
-    const data = event.annotation?.data;
+    // MapKit fires the same `select` event for both annotations and overlays —
+    // `event.overlay` is set for overlays, `event.annotation` for annotations.
+    // Both kinds carry our `data.kind` payload, so we read whichever is present.
+    const data = event.annotation?.data ?? event.overlay?.data;
     if (!data) return;
 
     if (data.kind === 'venue') {

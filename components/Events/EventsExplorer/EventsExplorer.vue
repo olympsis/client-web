@@ -259,7 +259,9 @@ function venueEvents(v: Venue): Event[] {
        The explorer fills the area below the page's top bar, so the sheet —
        anchored to bottom: 0 here — can never extend above the search row. */
     position: relative;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    /* Map takes whatever's left; the list panel hugs its own fixed-width column
+       (set on .list-pane) so the panel sizes to content, not a 50/50 split. */
+    grid-template-columns: minmax(0, 1fr) auto;
     grid-template-areas: 'map list';
 }
 
@@ -277,6 +279,19 @@ function venueEvents(v: Venue): Event[] {
     overflow: hidden;
     border-left: 1px solid var(--component-border-color);
     background-color: var(--primary-background-color);
+    /* Default width: room for one column of cards (≈22rem card + 2rem padding +
+       a bit of breathing room). Below 1200px viewport this is what the panel
+       sticks at — single column, hugged tight. */
+    width: 26rem;
+    max-width: 100%;
+}
+
+/* On wider viewports, expand the panel to fit two columns and let the grid
+   reflow into 2 cols. The panel still hugs content — it just hugs *more* of it. */
+@media (min-width: 1300px) {
+    .list-pane {
+        width: 48rem;
+    }
 }
 
 .panel-header {
@@ -299,12 +314,6 @@ function venueEvents(v: Venue): Event[] {
     min-height: 0;
     overflow-y: auto;
     padding: 1rem;
-    /* Establish a size container so the grid below can switch to 2 columns
-       based on the panel's actual width (not the viewport). The desktop
-       layout splits the viewport 50/50, so a viewport-level media query
-       wouldn't know how wide the panel is. */
-    container-type: inline-size;
-    container-name: list-panel;
 }
 
 /* Shared list grid used by both the side panel and the bottom sheet.
@@ -321,11 +330,10 @@ function venueEvents(v: Venue): Event[] {
     grid-template-columns: minmax(0, 1fr);
 }
 
-/* When the side panel itself is wide enough for two cards (44rem ≈ 704px)
-   switch to a 2-column grid. The container query reacts to panel width,
-   not viewport width — so resizing the window or future split adjustments
-   work without further tweaks. */
-@container list-panel (min-width: 44rem) {
+/* On wider viewports the panel grows to ~48rem (see .list-pane media query
+   above) — match that with a 2-column grid so the panel actually shows two
+   cards side by side. Below this breakpoint the grid stays single-column. */
+@media (min-width: 1300px) {
     .list-body :deep(.list-grid) {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }

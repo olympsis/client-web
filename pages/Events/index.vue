@@ -1,82 +1,63 @@
 <template>
     <main id="events">
-        <div id="header">
-            <h1>{{ $t('events.listTitle') }}</h1>
-
-            <div id="body">
+        <!--
+            Layout (Zillow-style):
+              ┌──────────────────────────────────────┐
+              │  search · filters · new-event button │  <- top bar
+              ├──────────────────────────────────────┤
+              │           EventsExplorer              │
+              │   (Map | List on desktop;             │
+              │    Map + BottomSheet on mobile)       │
+              └──────────────────────────────────────┘
+            The explorer owns the map ↔ list mode toggle and the panel/sheet.
+            This page only owns the search/filter chrome and the data fetch.
+        -->
+        <header id="top-bar">
+            <div id="search">
                 <SearchBar v-model:value="searchText"/>
             </div>
 
-            <div id="actions">
-                <button @click="navigateToNewEvent">
-                    <img src="@/assets/icons/calendar/calendar.add.white.svg">
-                </button>
-                <!-- <button @click="">
-                    <img src="@/assets/icons/map/map.fill.svg">
-                </button> -->
-            </div>
-        </div>
-
-        <div id="mobile-header">
-            <div id="title">
-                <h1>{{ $t('events.listTitle') }}</h1>
-
-                <div id="actions">
-                    <button @click="navigateToNewEvent">
-                        <img src="@/assets/icons/calendar/calendar.add.white.svg">
-                    </button>
-                    <!-- <button @click="">
-                        <img src="@/assets/icons/map/map.fill.svg">
-                    </button> -->
-                </div>
-            </div>
-
-            <SearchBar v-model:value="searchText" />
-        </div>
-
-        <div id="sub-header">
-            <button id="filter" @click="showFilter = true">
-                <div id="text">{{ $t('common.filters') }}</div>
-                <picture :style="{height: '24px'}">
+            <button id="filter-btn" @click="showFilter = true">
+                <span>{{ $t('common.filters') }}</span>
+                <picture :style="{ height: '20px' }">
                     <source srcset="@/assets/icons/filter/filter.white.svg" media="(prefers-color-scheme: dark)">
                     <img src="@/assets/icons/filter/filter.svg">
                 </picture>
             </button>
 
-            <Drawer v-model:visible="showFilter" position="right">
-                <div class="section-header" :style="{fontWeight: 'bold', color: 'white'}">{{ $t('common.sports') }}</div>
-                <SportsFilter v-model:model-value="selectedSports"/>
+            <button id="new-event-btn" @click="navigateToNewEvent" :title="$t('events.create')">
+                <img src="@/assets/icons/calendar/calendar.add.white.svg">
+            </button>
+        </header>
 
-                <div class="section-header" :style="{fontWeight: 'bold', color: 'white'}">{{ $t('common.tags') }}</div>
-                <TagsFilter v-model:model-value="selectedTags"/>
-            </Drawer>
-        </div>
+        <Drawer v-model:visible="showFilter" position="right">
+            <div class="section-header" :style="{fontWeight: 'bold', color: 'white'}">{{ $t('common.sports') }}</div>
+            <SportsFilter v-model:model-value="selectedSports"/>
 
-        <div id="events-body">
-            <div v-if="state === VIEW_STATE.LOADING" id="loader" class="spinner-loader"/>
+            <div class="section-header" :style="{fontWeight: 'bold', color: 'white'}">{{ $t('common.tags') }}</div>
+            <TagsFilter v-model:model-value="selectedTags"/>
+        </Drawer>
 
-            <div v-else-if="state === VIEW_STATE.SUCCESS && eventSections.length == 0" id="no-events" class="no-events">
-                <img src="@/assets/images/event-404.svg">
-                <div>{{ $t('events.noEventsFound') }}</div>
-                <button class="button" @click="navigateToNewEvent">{{ $t('events.createOne') }}</button>
-            </div>
-
-            <ul v-else-if="state === VIEW_STATE.SUCCESS && eventSections.length > 0" id="events-list">
-                <div id="up-next-section" v-if="upNextEvent" :style="{'margin-bottom': '2rem'}" @click="navigateTo(`events/${upNextEvent.id}`)">
-                    <h4>Up Next</h4>
-                    <SmallEventListItem :event="upNextEvent"/>
+        <section id="explorer">
+            <ClientOnly>
+                <!-- ClientOnly: MapKit JS only runs in the browser; SSR would error. -->
+                <div v-if="state === VIEW_STATE.LOADING" class="state-loader">
+                    <div class="spinner-loader"/>
                 </div>
-                <EventsSection v-if="recentlyCreatedEvents.length > 0" :title="$t('events.section.new')" :events="recentlyCreatedEvents" :show-full-time="true" v-model:state="state" />
-                <EventsSection v-for="section in eventSections" :title="section.dayString" :events="section.events" v-model:state="state" :show-full-time="true"/>
-            </ul>
-
-            <div v-else-if="state === VIEW_STATE.FAILURE" id="not-found" class="no-events">
-                <img src="@/assets/images/event-404.svg">
-                <div>{{ $t('events.failedToFind') }}</div>
-                <button class="button" @click="retryFetchEvents">{{ $t('common.tryAgain') }}</button>
-            </div>
-        </div>
-
+                <div v-else-if="state === VIEW_STATE.FAILURE" class="state-failure">
+                    <img src="@/assets/images/event-404.svg">
+                    <div>{{ $t('events.failedToFind') }}</div>
+                    <button class="button" @click="retryFetchEvents">{{ $t('common.tryAgain') }}</button>
+                </div>
+                <EventsExplorer
+                    v-else
+                    :events="filteredEvents"
+                    :venues="filteredVenues"
+                    :initial-center="initialCenter"
+                    :top-offset="64"
+                />
+            </ClientOnly>
+        </section>
     </main>
 </template>
 
@@ -86,157 +67,131 @@ import * as Sentry from '@sentry/nuxt';
 import { VIEW_STATE } from '@/data/Enums';
 import { useSessionStore } from '@/stores/session-store';
 import { EventService } from '@/data/services/EventService';
-import { computed, onMounted, ref } from 'vue';
-import { Event, EventSection } from '@/data/models/EventModels';
-import { compareUTCNowToDateNormal } from '~/utils/time-helpers';
+import { VenueService } from '@/data/services/VenueService';
+import { computed, onMounted, ref, watch } from 'vue';
+import { Event } from '@/data/models/EventModels';
+import { Venue } from '@/data/models/VenueModels';
 import { Location, Sport, Tag } from '~/data/models/GenericModels';
 
 import Drawer from 'primevue/drawer';
 import SearchBar from '@/components/SearchBar/SearchBar.vue';
 import TagsFilter from '~/components/TagsFilter/TagsFilter.vue';
 import SportsFilter from '~/components/SportsFilter/SportsFilter.vue';
-import EventsSection from '~/components/Events/EventsSection/EventsSection.vue';
-import SmallEventListItem from '~/components/Events/SmallEventListItem/SmallEventListItem.vue';
+import EventsExplorer from '@/components/Events/EventsExplorer/EventsExplorer.vue';
 
 const { t } = useI18n();
 const router = useRouter();
 const session = useSessionStore();
+
 const state = ref(VIEW_STATE.LOADING);
 const eventService = new EventService();
+const venueService = new VenueService();
 
 const events = ref<Event[]>([]);
+const venues = ref<Venue[]>([]);
 const searchText = ref<string>('');
 const showFilter = ref<boolean>(false);
 const selectedTags: Ref<Array<Tag>> = ref([]);
 const selectedSports: Ref<Array<Sport>> = ref([]);
 
-const filteredEvents = computed<Array<Event>>(() => {
-    return events.value.filter((e) => { // Filter by other criteria
-        var includesSport = e.sports?.find((s: string) => {
-            return selectedSports.value.find((sp) => sp.name.includes(s));
-        });
+// Default to user's last known location, falling back to NYC so the map
+// always has a sensible center on first paint.
+const initialCenter = computed<number[]>(() => {
+    const loc = session.lastKnownLocation;
+    if (loc) return [loc.longitude, loc.latitude];
+    return [-73.9776, 40.7655];
+});
 
-        var includesTag = e.tags?.find((t) => {
-            return selectedTags.value.find((tg) => tg.name.includes(t));
-        });
+// ── Filtering — applied client-side to both events and venues ──────────────
 
-        var containsSearch = e.title?.toLowerCase().includes(searchText.value.toLowerCase());
+const filteredEvents = computed<Event[]>(() => {
+    const search = searchText.value.toLowerCase();
+    const sportNames = selectedSports.value.map((s) => s.name.toLowerCase());
+    const tagNames = selectedTags.value.map((t) => t.name.toLowerCase());
 
-        if (selectedSports.value.length > 0 && selectedTags.value.length > 0) {
-            return includesSport && includesTag && containsSearch;
-        } else if (selectedSports.value.length > 0 && selectedTags.value.length == 0) {
-            return includesSport && containsSearch;
-        } else if (selectedSports.value.length == 0 && selectedTags.value.length > 0) {
-            return includesTag && containsSearch;
-        } else {
-            return e && containsSearch;
-        }
+    return events.value.filter((e) => {
+        const matchesSearch = !search || e.title?.toLowerCase().includes(search);
+        const matchesSport = sportNames.length === 0
+            || e.sports?.some((s) => sportNames.some((sn) => s.toLowerCase().includes(sn)));
+        const matchesTag = tagNames.length === 0
+            || e.tags?.some((t) => tagNames.some((tn) => t.toLowerCase().includes(tn)));
+        return matchesSearch && matchesSport && matchesTag;
     });
 });
 
-/** Events created within the last 7 days, sorted newest first */
-const recentlyCreatedEvents = computed<Event[]>(() => {
-    const oneWeekAgo = new Date();
-    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+const filteredVenues = computed<Venue[]>(() => {
+    const search = searchText.value.toLowerCase();
+    const sportNames = selectedSports.value.map((s) => s.name.toLowerCase());
 
-    return filteredEvents.value
-        .filter((e) => e.createdAt && e.createdAt >= oneWeekAgo)
-        .sort((a, b) => a.startTime.getTime() - b.startTime.getTime())
-        .slice(0, 20);
-});
-
-const eventSections = computed<EventSection[]>(() => {
-    const sections: EventSection[] = [];
-    filteredEvents.value.filter((e) => e.title?.toLowerCase().includes(searchText.value.toLowerCase())).forEach((e) => {
-        const eventDay = e.startTime.getDate();
-        const eventMonth = e.startTime.getMonth();
-        const eventYear = e.startTime.getFullYear();
-
-        // Find if we have an existing section
-        const existing = sections.find((s) => {
-            const sectionDay = s.date.getDate();
-            const sectionMonth = s.date.getMonth();
-            const sectionYear = s.date.getFullYear();
-
-            return sectionDay === eventDay && 
-                sectionMonth === eventMonth &&
-                sectionYear === eventYear;
-        });
-
-        if (existing) {
-            existing.events.push(e);
-        } else {
-            const newSection = new EventSection(
-                e.startTime,
-                compareUTCNowToDateNormal(e.startTime),
-                [e]
-            );
-            sections.push(newSection);
-        }
+    return venues.value.filter((v) => {
+        const matchesSearch = !search || v.name?.toLowerCase().includes(search);
+        const matchesSport = sportNames.length === 0
+            || v.sports?.some((s) => sportNames.some((sn) => s.toLowerCase().includes(sn)));
+        // Tags don't apply to venues; ignore them.
+        return matchesSearch && matchesSport;
     });
-
-    // Use getTime() instead of getMilliseconds() to sort by the full timestamp
-    return sections
-        .sort((a, b) => a.date.getTime() - b.date.getTime());
-});
-
-const upNextEvent = computed<Event | null>(() => {
-    const userId = session.user?.userId;
-    if (!userId) return null;
-
-    return events.value.mostRecentForUser(userId) ?? null;
 });
 
 function navigateToNewEvent() {
     router.push('/events/new');
 }
 
-async function fetchEvents(fetchCompleted: boolean = false) {
+/**
+ * Fetch events and venues independently in parallel. Events use the same
+ * `/v1/events` endpoint the original page used (filtered to pending/live by
+ * default); venues use `/v1/venues`. Either side failing falls back to an
+ * empty array so the explorer can still partially render.
+ */
+async function fetchEventsAndVenues() {
     state.value = VIEW_STATE.LOADING;
 
-    let _events: Event[];
-    // Use selected filter sports if any, otherwise fall back to user prefs
     const sports = selectedSports.value.length > 0
         ? selectedSports.value.map((s) => s.name.toLowerCase()).join(',')
         : session.user?.sports.join(',') ?? 'all';
+
     let location = session.lastKnownLocation;
-    if (!location) { 
+    if (!location) {
         location = new Location(
-            40.76553,
-            -73.97770,
-            'Manhattan',
-            'New York',
-            'NY',
-            '',
-            'United States',
-            'US'
+            40.76553, -73.97770,
+            'Manhattan', 'New York', 'NY', '', 'United States', 'US'
         );
     }
 
-    _events = await eventService.getEvents(
-        location.latitude, 
-        location.longitude, 
-        64373,
-        sports, // Sports involved
-        fetchCompleted ? 'ended' : 'pending, live', // Status of events
-        0,
-        100
-    );
+    const [eventsResult, venuesResult] = await Promise.allSettled([
+        eventService.getEvents(
+            location.latitude,
+            location.longitude,
+            64373,
+            sports,
+            'pending,live',
+            0,
+            100
+        ),
+        venueService.getVenues(
+            location.latitude,
+            location.longitude,
+            64373,
+            sports
+        ),
+    ]);
 
-    return _events;
+    return {
+        events: eventsResult.status === 'fulfilled' ? eventsResult.value : [],
+        venues: venuesResult.status === 'fulfilled' ? (venuesResult.value?.venues ?? []) : [],
+    };
 }
 
 function retryFetchEvents() {
-    fetchEvents()
+    fetchEventsAndVenues()
         .then((resp) => {
-            events.value = resp;
+            events.value = resp.events;
+            venues.value = resp.venues;
             state.value = VIEW_STATE.SUCCESS;
         })
         .catch((error) => {
             state.value = VIEW_STATE.FAILURE;
             const config = useRuntimeConfig();
             if (config.public.MODE !== 'dev') return;
-
             console.error('Failed to get events. Error: ', error);
             Sentry.withScope((scope) => {
                 scope.setExtra('action', 'fetch_events');
@@ -249,33 +204,27 @@ useSeoMeta({
     title: t('events.seoTitle'),
     ogTitle: t('events.seoTitle'),
     description: t('events.seoDescription'),
-    ogDescription: t('events.seoDescription')
+    ogDescription: t('events.seoDescription'),
 });
+
+// ── Persistent filter state (unchanged from previous implementation) ───────
 
 const FILTER_STORAGE_KEY = 'olympsis-event-filters';
 
-/** Saves current filter selections to localStorage */
 function saveFiltersToStorage() {
     const data = {
         sports: selectedSports.value.map((s) => s.name),
-        tags: selectedTags.value.map((t) => t.name)
+        tags: selectedTags.value.map((t) => t.name),
     };
     localStorage.setItem(FILTER_STORAGE_KEY, JSON.stringify(data));
 }
 
-/**
- * Restores filter selections from localStorage.
- * Returns true if saved filters were found and applied.
- */
 function restoreFiltersFromStorage(): boolean {
     const raw = localStorage.getItem(FILTER_STORAGE_KEY);
     if (!raw) return false;
-
     try {
         const data = JSON.parse(raw) as { sports: string[]; tags: string[] };
         if (!data.sports?.length && !data.tags?.length) return false;
-
-        // Match saved names against available sports/tags from the session
         data.sports.forEach((name) => {
             const found = session.sports.find((sp) => sp.name === name);
             if (found) selectedSports.value.push(found);
@@ -284,28 +233,25 @@ function restoreFiltersFromStorage(): boolean {
             const found = session.tags.find((tg) => tg.name === name);
             if (found) selectedTags.value.push(found);
         });
-
         return selectedSports.value.length > 0 || selectedTags.value.length > 0;
     } catch {
         return false;
     }
 }
 
-// Snapshot of filters when the drawer opens, so we can detect changes on close
+// Refetch only when filters were *added* (existing data narrows client-side
+// when filters are removed). Mirrors the previous events page behavior.
 let previousSports: string[] = [];
 let previousTags: string[] = [];
 
 watch(showFilter, (visible) => {
     if (visible) {
-        // Drawer opened — snapshot current selections
         previousSports = selectedSports.value.map((s) => s.name);
         previousTags = selectedTags.value.map((t) => t.name);
     } else {
-        // Drawer closed — check what changed
         const currentSports = selectedSports.value.map((s) => s.name);
         const currentTags = selectedTags.value.map((t) => t.name);
 
-        // Detect if any new filters were added (not just removed)
         const addedSports = currentSports.some((s) => !previousSports.includes(s));
         const addedTags = currentTags.some((t) => !previousTags.includes(t));
 
@@ -316,10 +262,6 @@ watch(showFilter, (visible) => {
 
         if (changed) {
             saveFiltersToStorage();
-
-            // Only re-fetch from server if filters were added.
-            // Removing filters just narrows the existing set, which
-            // the filteredEvents computed handles client-side.
             if (addedSports || addedTags) {
                 retryFetchEvents();
             }
@@ -334,25 +276,19 @@ session.$subscribe((mutation: any, _) => {
     }
 });
 
-onMounted(async () => {
-    // Restore last-used filters from localStorage.
-    // If none are saved, fall back to the user's profile sport preferences.
+onMounted(() => {
     const restored = restoreFiltersFromStorage();
     if (!restored) {
         session.user?.sports?.forEach((s) => {
             const found = session.sports.find((sp) => sp.name.includes(s));
-            if (found) {
-                selectedSports.value.push(found);
-            }
+            if (found) selectedSports.value.push(found);
         });
     }
 
-    // Request location if needed - the subscription will re-fetch events when location is obtained
-    // session.loadVenuesAndEvents();
-
-    fetchEvents()
+    fetchEventsAndVenues()
         .then((resp) => {
-            events.value = resp;
+            events.value = resp.events;
+            venues.value = resp.venues;
             state.value = VIEW_STATE.SUCCESS;
         })
         .catch((error) => {
@@ -366,304 +302,114 @@ onMounted(async () => {
 });
 
 definePageMeta({
-    key: route => route.fullPath
+    key: (route) => route.fullPath,
 });
-
 </script>
 
 <style scoped>
 #events {
-    gap: 0.5rem;
     width: 100%;
-    display: grid;
     height: 100dvh;
-    overflow-x: hidden;
-    overflow-y: scroll;
-    padding: 0rem 2rem;
-    justify-items: center;
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: 4rem 2.5rem auto auto auto;
+    display: grid;
+    overflow: hidden;
+    grid-template-rows: 4rem minmax(0, 1fr);
     grid-template-areas:
-    "header"
-    "sub-header"
-    "list"
-    "list"
-    "list";
+        'top-bar'
+        'explorer';
+}
 
-    #header {
-        width: 100%;
+#top-bar {
+    grid-area: top-bar;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid var(--component-border-color);
+    background-color: var(--primary-background-color);
+
+    #search {
+        flex: 1;
+        min-width: 0;
+        max-width: 35rem;
+    }
+
+    #filter-btn {
         display: flex;
-        margin-top: 1rem;
-        grid-area: header;
+        height: 2.5rem;
+        cursor: pointer;
         align-items: center;
-        justify-content: space-between;
-        max-width: var(--desktop-max-width);
+        gap: 0.5rem;
+        padding: 0 1rem;
+        border-radius: 18px;
+        font-size: 1rem;
+        font-weight: 500;
+        border: var(--component-border-color) solid 1px;
+        background-color: var(--secondary-background-color);
+        color: var(--primary-label-color);
 
-        #body {
-            flex: 1;
-            min-width: 0; /* Allow shrinking below content width */
-            max-width: 35rem;
-            margin-right: 1rem;
-        }
-        
-        #actions {
-            display: flex;
-            border-radius: 15px;
-            padding: 0.25rem 0.5rem 0.25rem 0.5rem;
-            border: var(--component-border-color) solid 1px;
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            background: rgba(38, 46, 87, 0.85); /* --primary-brand-color at 0.85 opacity */
-
-            button {
-                all: unset;
-                width: 2rem;
-                height: 2rem;
-                cursor: pointer;
-                margin: 0rem 0.5rem;
-
-                img {
-                    width: 2rem;
-                    height: 2rem;
-                    align-self: center;
-                }
-            }
+        &:hover {
+            background-color: var(--tertiary-background-color);
         }
     }
 
-    #mobile-header {
-        display: none;
-    }
-
-    #sub-header {
-        width: 100%;
+    #new-event-btn {
+        all: unset;
         display: flex;
-        max-width: var(--desktop-max-width);
-        
-        #filter {
-            display: flex;
-            height: 2.5rem;
-            cursor: pointer;
-            margin-left: auto;
-            width: fit-content;
-            border-radius: 18px;
-            align-items: center;
-            padding: 0.15rem 1rem;
-            justify-content: center;
-            border: var(--component-border) solid 1px;
-            background-color: var(--secondary-background-color);
-
-            &:hover {
-                background-color: var(--tertiary-background-color);
-            }
-
-            #text {
-                font-size: 1rem;
-                font-weight: 500;
-                margin-right: 0.5rem;
-            }
-        }
-
-        #actions {
-            display: flex;
-            margin-left: 1rem;    
-            grid-area: actions;
-
-        }
-
-        @media (max-width: 940px) {
-            width: 100%;
-            display: grid;
-            grid-template-areas: 
-            'actions'
-            'search';
-            
-            #actions {
-                display: flex;
-                margin-left: auto;
-
-                #past-events-button {
-                    margin-left: 0rem;
-                    margin-right: 1rem;
-                }
-            }
-        }
-    }
-
-    #events-body {
-        width: 100%;
-        max-width: var(--desktop-max-width);
-        #loader {
-            margin: auto;
-            padding-top: 5rem;
-        }
-
-        #events-list {
-            padding: 0;
-            list-style-type: none;
-
-            h4 {
-                margin: 1rem;
-                color: var(--primary-label-color);
-            }
-
-            li {
-                width: 100%;
-                margin: 0.5rem auto;
-
-                #section-events {
-                    padding: 0;
-                    gap: 0.5rem;
-                    display: grid;
-                    margin: 0rem 1rem;
-                    list-style-type: none;
-
-                    grid-template-columns: repeat(3, minmax(0, 1fr));
-
-                    li {
-                        margin: 0rem;
-                    }
-
-                    @media (max-width: 1030px) {
-                        grid-template-columns: repeat(2, minmax(0, 1fr));
-                    }
-
-                    @media (max-width: 850px) {
-                        grid-template-columns: minmax(0, 1fr);
-                    }
-
-                    @media (max-width: 500px) {
-                        margin: unset;
-                    }
-                }
-            }
-        }
-
-        #failed-events {
-            width: 15rem;
-            margin: auto;
-            display: flex;
-            padding-top: 5rem;
-            align-items: center;
-            flex-direction: column;
-
-            h3 {
-                color: var(--primary-label-color);
-            }
-
-            button {
-                width: 7rem;
-                height: 2rem;
-                border: unset;
-                color: white;
-                cursor: pointer;
-                margin: 1rem 0rem;
-                border-radius: 10px;
-                background-color: var(--primary-brand-color);
-            }
-        }
-    }
-
-    .no-events {
-        display: flex;
+        width: 2.5rem;
+        height: 2.5rem;
+        cursor: pointer;
         align-items: center;
-        flex-direction: column;
-        
-        div {
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
+        justify-content: center;
+        border-radius: 15px;
+        border: var(--component-border-color) solid 1px;
+        background: rgba(38, 46, 87, 0.85); /* primary-brand-color @ 0.85 */
 
-        img {
-            margin: 'auto';
-            max-Width: 30rem; 
-        }
+        img { width: 1.6rem; height: 1.6rem; }
+    }
+}
 
-        button {
-            color: white;
-            margin: 1rem 0rem;
-            background-color: var(--primary-brand-color);
-        }
+#explorer {
+    grid-area: explorer;
+    height: 100%;
+    overflow: hidden;
+}
+
+.state-loader,
+.state-failure {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 1rem;
+
+    img { max-width: 20rem; }
+    div { font-size: 1.25rem; font-weight: bold; }
+
+    .button {
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 10px;
+        background-color: var(--primary-brand-color);
+        border: none;
+        cursor: pointer;
     }
 }
 
 @media (max-width: 940px) {
-    #events {
-        padding: 1rem;
-        grid-template-rows: 5.75rem 2.5rem auto auto auto;
+    #top-bar {
+        padding: 0.5rem;
 
-        #header {
-            display: none;
-        }
-        
-        #mobile-header {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-
-            #title {
-                display: flex;
-                flex-direction: row;
-                margin-bottom: 0.5rem;
-                align-content: center;
-                justify-content: space-between;
-            }
-
-            #actions {
-                display: flex;
-                flex-direction: row;
-                border-radius: 15px;
-                padding: 0.25rem 0.5rem 0.25rem 0.5rem;
-                border: var(--component-border-color) solid 1px;
-                backdrop-filter: blur(20px);
-                -webkit-backdrop-filter: blur(20px);
-                background: rgba(38, 46, 87, 0.85); /* --primary-brand-color at 0.85 opacity */
-
-                button {
-                    all: unset;
-                    width: 2rem;
-                    height: 2rem;
-                    cursor: pointer;
-                    margin: 0rem 0.5rem;
-
-                    img {
-                        width: 2rem;
-                        height: 2rem;
-                        align-self: center;
-                    }
-                }
-            }
-        }
-
-        #sub-header {
-            margin: unset;
+        #filter-btn span {
+            display: none; /* keep just the icon to save horizontal space */
         }
     }
-}
-
-#event-settings-modal {
-    top: 0;
-    border: unset;
-    background: transparent;
-    backdrop-filter: blur(5px);
-
-    #event-settings-dialog {
-        box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
-
-        @media (max-width: 940px) {
-            width: 98%;
-        }
-    }
-}
-
-h1 {
-    margin-right: 1rem;
-    white-space: nowrap;
 }
 </style>
 
-<!-- Unscoped to override PrimeVue Drawer internal styles -->
 <style>
+/* Unscoped to override PrimeVue Drawer internal styles — same as before. */
 .p-drawer .p-drawer-content,
 .p-drawer .p-drawer-header {
     background: transparent;
@@ -672,7 +418,7 @@ h1 {
 
 .p-drawer {
     border: var(--component-border-color) solid 1px;
-    border-right: none; /* flush against viewport edge */
+    border-right: none;
     border-bottom: none;
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);

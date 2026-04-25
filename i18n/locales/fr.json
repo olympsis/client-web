@@ -69,6 +69,16 @@
     "time": "Heure",
     "participants": "Participants",
     "noEventsFound": "Aucun Événement Trouvé",
+    "noVenuesFound": "Aucun Lieu Trouvé",
+    "toggle": {
+      "events": "Événements",
+      "venues": "Lieux",
+      "eventsCount": "{count} événements",
+      "venuesCount": "{count} lieux"
+    },
+    "clusterPicker": {
+      "title": "{count} événements à cet endroit"
+    },
     "failedToFind": "Impossible de trouver des Événements",
     "unknownVenue": "Lieu Inconnu",
     "andMore": "et {count} de plus",

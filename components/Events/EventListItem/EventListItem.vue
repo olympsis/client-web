@@ -231,8 +231,8 @@ async function loadLocationData() {
     const eventVenues = props.event.venues;
     if (eventVenues) {
         eventVenues.forEach((v) => {
-            if (v.id) {
-                promises.push(store.getVenueByID(v.id));
+            if (v.venueId) {
+                promises.push(store.getVenueByID(v.venueId));
             }
         });
     }

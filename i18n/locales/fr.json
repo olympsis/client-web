@@ -6,7 +6,8 @@
     "tags": {
       "indoor": "Intérieur",
       "outdoor": "Extérieur",
-      "permitRequired": "Permis requis",
+      "permit": "Permis",
+      "booking": "Réservation",
       "membershipRequired": "Adhésion requise",
       "lights": "Éclairage"
     }

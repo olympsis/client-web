@@ -103,7 +103,8 @@ const tags = computed<string[]>(() => {
     labels.push(...(props.venue.sports ?? []));
     // Indoor/Outdoor is binary — always render one of them.
     labels.push(props.venue.features?.indoor ? t('venue.tags.indoor') : t('venue.tags.outdoor'));
-    if (props.venue.access?.requiresPermit) labels.push(t('venue.tags.permitRequired'));
+    if (props.venue.access?.requiresPermit) labels.push(t('venue.tags.permit'));
+    if (props.venue.access?.requiresBooking) labels.push(t('venue.tags.booking'));
     if (props.venue.access?.requiresMembership) labels.push(t('venue.tags.membershipRequired'));
     if (props.venue.features?.illuminated) labels.push(t('venue.tags.lights'));
     return labels;

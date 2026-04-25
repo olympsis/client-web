@@ -217,9 +217,9 @@ const customCoords = ref<{ latitude: number; longitude: number } | undefined>(un
 
 // ── Outer card helpers ───────────────────────────────────────────────────────
 
-/** Build a city/state string for display in the venue card */
+/** Build a locality/administrative-area string for display in the venue card */
 function formatVenueLocation(venue: VenueDescriptor): string {
-    return [venue.city, venue.state].filter(Boolean).join(', ');
+    return [venue.locality, venue.administrativeArea].filter(Boolean).join(', ');
 }
 
 function removeVenueFromModel(venue: VenueDescriptor) {
@@ -291,11 +291,11 @@ async function searchLocations(query: string): Promise<LocationItem[]> {
         .filter((v) => v.name?.toLowerCase().includes(query.toLowerCase()))
         .map((v): LocationItem => ({
             name: v.name ?? '',
-            streetAddress: '',
-            localityLine: [v.city, v.state].filter(Boolean).join(', '),
-            city: v.city ?? '',
-            state: v.state ?? '',
-            country: v.country ?? '',
+            streetAddress: v.address ?? '',
+            localityLine: [v.locality, v.administrativeArea].filter(Boolean).join(', '),
+            city: v.locality ?? '',
+            state: v.administrativeArea ?? '',
+            country: v.countryCode ?? '',
             latitude: v.location?.coordinates?.[1] ?? 0,
             longitude: v.location?.coordinates?.[0] ?? 0,
         }));
@@ -378,27 +378,31 @@ function deselectResult() {
 function confirmSelection() {
     if (pickerState.value === 'selected' && selectedResult.value) {
         const r = selectedResult.value;
+        // Ad-hoc descriptor — leave venueId undefined so consumers know
+        // there's no backing Venue document to look up.
         const venue = new VenueDescriptor(
-            'external',
             undefined,
             r.name,
-            r.city,
-            r.state,
-            r.country,
             r.latitude,
-            r.longitude
+            r.longitude,
+            r.streetAddress,
+            r.city,
+            undefined,
+            r.state,
+            r.country
         );
         model.value.push(venue);
     } else if (pickerState.value === 'custom' && customCoords.value) {
         const venue = new VenueDescriptor(
-            'custom',
             undefined,
             customName.value || t('events.detail.customLocation'),
-            customLocality.value.split(',')[0]?.trim() ?? '',
-            customLocality.value.split(',')[1]?.trim() ?? '',
-            '',
             customCoords.value.latitude,
-            customCoords.value.longitude
+            customCoords.value.longitude,
+            customAddress.value || undefined,
+            customLocality.value.split(',')[0]?.trim() || undefined,
+            undefined,
+            customLocality.value.split(',')[1]?.trim() || undefined,
+            undefined
         );
         model.value.push(venue);
     }

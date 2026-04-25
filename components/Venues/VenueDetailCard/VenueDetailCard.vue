@@ -58,7 +58,7 @@
                         <source srcset="@/assets/icons/globe/globe.white.svg" media="(prefers-color-scheme: dark)">
                         <img src="@/assets/icons/globe/globe.svg">
                     </picture>
-                    <p>{{ venueVisibility }}</p>
+                    <p>{{ ownerName }}</p>
                 </div>
 
                 <div class="action directions" v-else @click="openBooking">
@@ -104,7 +104,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, type Ref } from 'vue';
+import { computed, ref, watchEffect, type Ref } from 'vue';
 import { Event } from '@/data/models/EventModels';
 import { Venue } from '@/data/models/VenueModels';
 import { getDirections } from '~/utils/map-helpers';
@@ -138,27 +138,43 @@ const description = computed(() => {
     return props.venue.description;
 });
 
+// Server stores `locality` (city) + `administrative_area` (state). Display
+// joins whichever pieces are present so we don't render lone commas.
 const location = computed(() => {
-    return `${props.venue.city}, ${props.venue.state}`;
+    return [props.venue.locality, props.venue.administrativeArea].filter(Boolean).join(', ');
 });
 
 const images = computed(() => {
-    return props.venue.images ?? []
+    return props.venue.media ?? [];
 });
 
 const events = computed(() => {
     return modelStore.getAllEvents()
         .filter((e) => {
-            return e.venues?.find((v) => v.id == props.venue.id);
+            return e.venues?.find((v) => v.venueId == props.venue.id);
         });
 });
 
-const venueVisibility = computed(() => {
-    return props.venue.owner?.type ?? 'Public';
+// Owner is just an organization id on the wire — resolve lazily through the
+// model store so repeat renders don't refetch. Falls back to "Public" while
+// the org loads or if the venue has no owner.
+const ownerName = ref<string>('Public');
+watchEffect(async () => {
+    const ownerId = props.venue.ownerId;
+    if (!ownerId) {
+        ownerName.value = 'Public';
+        return;
+    }
+    try {
+        const org = await modelStore.getOrganizationByID(ownerId);
+        ownerName.value = org?.name ?? 'Public';
+    } catch {
+        ownerName.value = 'Public';
+    }
 });
 
 const requiresBooking = computed<Boolean>(() => {
-    return props.venue.requiresBooking && props.venue.bookingURL != undefined;
+    return props.venue.access.requiresBooking && props.venue.url != undefined;
 });
 
 function closeModal() {
@@ -179,8 +195,8 @@ function openMaps() {
 }
 
 function openBooking() {
-    if (props.venue.bookingURL) {
-        window.open(props.venue.bookingURL);
+    if (props.venue.url) {
+        window.open(props.venue.url);
     }
 }
 

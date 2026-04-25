@@ -27,12 +27,11 @@ const events: Event[] = [
         },
         organizer,
         "field": VenueDescriptor.decode({
-            type: "internal",
-            id: "string",
+            venue_id: "string",
             name: "Richard Building Fields",
             location: {
-            type: "Point",
-            coordinates: [],
+                type: "Point",
+                coordinates: [],
             },
         }),
         "image_url": "event-images/soccer-1.jpg",
@@ -52,8 +51,7 @@ const events: Event[] = [
         },
         organizer,
         "field": VenueDescriptor.decode({
-          type: "internal",
-          id: "field-id-1",
+          venue_id: "field-id-1",
           name: "Downtown Soccer Field",
           location: {
             type: "Point",
@@ -77,8 +75,7 @@ const events: Event[] = [
         },
         organizer,
         "field": VenueDescriptor.decode({
-          type: "internal",
-          id: "field-id-2",
+          venue_id: "field-id-2",
           name: "Lakeside Basketball Court",
           location: {
             type: "Point",
@@ -102,8 +99,7 @@ const events: Event[] = [
         },
         organizer,
         "field": VenueDescriptor.decode({
-          type: "internal",
-          id: "field-id-3",
+          venue_id: "field-id-3",
           name: "Beachside Volleyball Court",
           location: {
             type: "Point",

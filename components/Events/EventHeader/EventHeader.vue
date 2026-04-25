@@ -78,7 +78,10 @@ const isAdmin = computed<boolean>(() => {
 
 const venueName = computed<string>(() => {
     const firstVenue = props.event.venues.at(0);
-    if (firstVenue && !firstVenue.id) {
+    // Empty venueId means the descriptor itself is the location (ad-hoc /
+    // custom). Otherwise we look up the resolved Venue (server returns it
+    // alongside the event).
+    if (firstVenue && !firstVenue.venueId) {
         return firstVenue.name ?? t('events.detail.customLocation');
     } else {
         return props.venues.at(0)?.name ?? t('events.detail.customLocation');
@@ -87,13 +90,13 @@ const venueName = computed<string>(() => {
 
 const venueLocation = computed<string>(() => {
     const firstVenue = props.event.venues.at(0);
-    if (firstVenue && !firstVenue.id) {
-        if (!firstVenue.city && !firstVenue.state) return t('events.detail.customCoordinates');
-        return `${firstVenue.city}, ${firstVenue.state}`;
+    if (firstVenue && !firstVenue.venueId) {
+        const line = [firstVenue.locality, firstVenue.administrativeArea].filter(Boolean).join(', ');
+        return line || t('events.detail.customCoordinates');
     } else {
-        const firstVenue = props.venues.at(0);
-        if (!firstVenue) return t('events.detail.unknownLocation');
-        return `${firstVenue.city}, ${firstVenue.state}`;
+        const venue = props.venues.at(0);
+        if (!venue) return t('events.detail.unknownLocation');
+        return [venue.locality, venue.administrativeArea].filter(Boolean).join(', ');
     }
 });
 

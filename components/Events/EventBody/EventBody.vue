@@ -146,14 +146,16 @@ function handlePrimaryAction() {
 
 function openMaps() {
     if (event.value?.venues) {
-        let coordinates: Array<Number>;
         const descriptor = event.value?.venues[0];
         if (descriptor) {
+            // Descriptor carries its own coordinates for ad-hoc locations.
+            // For tracked venues we fall back to the resolved Venue (props)
+            // since the descriptor only stores a venue_id reference.
             if (descriptor.location?.coordinates) {
                 getDirections(descriptor.location.coordinates)
             } else {
                 const venue = props.venues?.find((v: any) => {
-                    return v.id == descriptor.id;
+                    return v.id == descriptor.venueId;
                 });
 
                 if (venue && venue.location?.coordinates) {

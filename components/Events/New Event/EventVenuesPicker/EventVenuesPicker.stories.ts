@@ -11,14 +11,15 @@ export default meta;
 type Story = StoryObj<typeof EventVenuesPicker>;
 
 const sampleVenue = new VenueDescriptor(
-    "external",
     "ven_001",
     "Central Park North",
-    "New York",
-    "NY",
-    "USA",
     40.785091,
-    -73.968285
+    -73.968285,
+    undefined,
+    "New York",
+    undefined,
+    "NY",
+    "US"
 );
 
 /** Empty state — no venues selected */

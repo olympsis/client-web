@@ -41,16 +41,18 @@ const createParticipants = () => [
     new Participant(sampleUsers[2]?.userId, sampleUsers[2], EVENT_RSVP_STATUS.MAYBE, new Date())
 ];
 
-// Sample venue data
+// Sample venue descriptor — references a tracked Venue by id, so name/locality
+// are mostly cosmetic (consumers usually re-render off the resolved Venue).
 const sampleVenue = new VenueDescriptor(
-    "external",
     "ven_123456",
     "Downtown Sports Complex",
-    "San Francisco",
-    "CA",
-    "USA",
     37.7749,
-    -122.4194
+    -122.4194,
+    undefined,
+    "San Francisco",
+    undefined,
+    "CA",
+    "US"
 );
 
 // Create sample events

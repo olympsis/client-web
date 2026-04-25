@@ -121,58 +121,75 @@ class Organizer extends Codable<Organizer> {
     }
 }
 
+/**
+ * VenueDescriptor — lightweight snapshot of a venue's identity + location.
+ *
+ * Embedded on other documents (e.g. `Event.venues`) so a card can be
+ * rendered without re-fetching the full Venue. Mirrors the server's
+ * `VenueDescriptor` struct (models/venue.go).
+ *
+ * `venueId` is empty for ad-hoc / external locations the user picks from
+ * Apple Maps or types in by hand — the rest of the fields still describe
+ * the place, just without a backing Venue document.
+ */
 class VenueDescriptor {
-    type: string | undefined;
-    id: string | undefined;
+    venueId: string | undefined;
     name: string | undefined;
-    city: string | undefined;
-    state: string | undefined;
-    country: string | undefined;
     location?: GeoJSON;
+    address: string | undefined;
+    locality: string | undefined;
+    subLocality: string | undefined;
+    administrativeArea: string | undefined;
+    countryCode: string | undefined;
 
     constructor(
-        type: string | undefined,
-        id: string | undefined,
+        venueId: string | undefined,
         name: string | undefined,
-        city: string | undefined,
-        state: string | undefined,
-        country: string | undefined,
         latitude: number | undefined,
-        longitude: number | undefined
+        longitude: number | undefined,
+        address?: string,
+        locality?: string,
+        subLocality?: string,
+        administrativeArea?: string,
+        countryCode?: string
     ){
-        this.type = type;
-        this.id = id;
+        this.venueId = venueId;
         this.name = name;
-        this.city = city;
-        this.state = state;
-        this.country = country;
+        this.address = address;
+        this.locality = locality;
+        this.subLocality = subLocality;
+        this.administrativeArea = administrativeArea;
+        this.countryCode = countryCode;
         this.location = GeoJSON.decode({
             'type': 'Point',
             'coordinates': [longitude, latitude]
-        })
+        });
     }
 
     static decode<VenueDescriptor>(data: { [key: string]: any }): VenueDescriptor {
         const object = Object();
 
         if (data) {
-            if (data['type']) {
-                object['type'] = data['type'];
-            }
-            if (data['id']) {
-                object['id'] = data['id'];
+            if (data['venue_id']) {
+                object['venueId'] = data['venue_id'];
             }
             if (data['name']) {
                 object['name'] = data['name'];
             }
-            if (data['city']) {
-                object['city'] = data['city'];
+            if (data['address']) {
+                object['address'] = data['address'];
             }
-            if (data['state']) {
-                object['state'] = data['state'];
+            if (data['locality']) {
+                object['locality'] = data['locality'];
             }
-            if (data['country']) {
-                object['country'] = data['country'];
+            if (data['sub_locality']) {
+                object['subLocality'] = data['sub_locality'];
+            }
+            if (data['administrative_area']) {
+                object['administrativeArea'] = data['administrative_area'];
+            }
+            if (data['country_code']) {
+                object['countryCode'] = data['country_code'];
             }
             if (data['location']) {
                 object['location'] = GeoJSON.decode(data['location']);
@@ -185,29 +202,32 @@ class VenueDescriptor {
 
     public encode(): { [key: string]: any } {
         const data: { [key: string]: any } = {};
-    
-        if (this.type) {
-            data['type'] = this.type;
-        }
-        if (this.id) {
-            data['id'] = this.id;
+
+        if (this.venueId) {
+            data['venue_id'] = this.venueId;
         }
         if (this.name) {
             data['name'] = this.name;
         }
-        if (this.city) {
-            data['city'] = this.city;
+        if (this.address) {
+            data['address'] = this.address;
         }
-        if (this.state) {
-            data['state'] = this.state;
+        if (this.locality) {
+            data['locality'] = this.locality;
         }
-        if (this.country) {
-            data['country'] = this.country;
+        if (this.subLocality) {
+            data['sub_locality'] = this.subLocality;
+        }
+        if (this.administrativeArea) {
+            data['administrative_area'] = this.administrativeArea;
+        }
+        if (this.countryCode) {
+            data['country_code'] = this.countryCode;
         }
         if (this.location) {
             data['location'] = this.location.encode();
         }
-    
+
         return data;
     }
 }

@@ -7,10 +7,10 @@
 
                 <div class="location-wrapper">
                     <picture>
-                        <source srcset="@/assets/icons/pin-drop/pin.drop.white.svg" media="(prefers-color-scheme: dark)"> 
-                        <img class="location-pin" src="@/assets/icons/pin-drop/pin.drop.svg"> 
+                        <source srcset="@/assets/icons/pin-drop/pin.drop.white.svg" media="(prefers-color-scheme: dark)">
+                        <img class="location-pin" src="@/assets/icons/pin-drop/pin.drop.svg">
                     </picture>
-                    <div class="location">{{ city }}, {{ state }}</div>
+                    <div class="location">{{ locationLine }}</div>
                 </div>
             </div>
             
@@ -41,18 +41,17 @@ const name = computed(() => {
     return props.venue.name
 });
 
-const city = computed(() => {
-    return props.venue.city;
-});
-
-const state = computed(() => {
-    return props.venue.state
+// Server replaced the old city/state/country trio with locality /
+// administrative_area / country_code — locality is the city-equivalent and
+// administrative_area is the state-equivalent.
+const locationLine = computed(() => {
+    return [props.venue.locality, props.venue.administrativeArea].filter(Boolean).join(', ');
 });
 
 const image = computed(() => {
-    const images = props.venue.images
-    if (images) {
-        return generateImageURL(images[0]);
+    const media = props.venue.media;
+    if (media && media.length > 0) {
+        return generateImageURL(media[0]);
     } else {
         return undefined;
     }

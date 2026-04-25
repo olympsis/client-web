@@ -602,6 +602,56 @@ function sportsInternalImages(sport: SPORTS) : string[] {
     }
 }
 
+/**
+ * Surface is the playing surface of a VenueUnit.
+ * Mirrors the server's `Surface` type defined in models/variables.go.
+ * Grouped by sport category; raw string values match what the API returns.
+ */
+enum SURFACE {
+    // Racket sports
+    HARD = 'hard',
+    CLAY = 'clay',
+    GRASS = 'grass',
+    CARPET = 'carpet',
+    ARTIFICIAL_CLAY = 'artificial_clay',
+    ARTIFICIAL_GRASS = 'artificial_grass',
+
+    // Field sports
+    NATURAL_GRASS = 'natural_grass',
+    ARTIFICIAL_TURF = 'artificial_turf',
+    HYBRID_TURF = 'hybrid_turf',
+
+    // Court sports
+    HARDWOOD = 'hardwood',
+    SYNTHETIC = 'synthetic',
+    SPORT_COURT = 'sport_court',
+    CONCRETE = 'concrete',
+    ASPHALT = 'asphalt',
+
+    // Other
+    SAND = 'sand',
+    ICE = 'ice',
+    WATER = 'water',
+    TRACK = 'track',
+    GYM_FLOOR = 'gym_floor',
+    WOOD = 'wood',
+    TURF = 'turf'
+}
+
+/**
+ * ReservationStatus is the lifecycle state of a VenueReservation.
+ * Mirrors the server's `ReservationStatus` type. State transitions are driven
+ * by the Stripe webhook + cancellation flows server-side.
+ */
+enum RESERVATION_STATUS {
+    PENDING = 'pending',
+    CONFIRMED = 'confirmed',
+    COMPLETED = 'completed',
+    CANCELLED = 'cancelled',
+    REFUNDED = 'refunded',
+    EXPIRED = 'expired'
+}
+
 enum VIEW_SIZE {
     MOBILE,
     MEDIUM,
@@ -743,6 +793,9 @@ export {
     sportToString,
     stringToSport,
     sportsInternalImages,
+
+    SURFACE,
+    RESERVATION_STATUS,
 
     TEXT_EMPHASIS,
     textEmphasisFromString,

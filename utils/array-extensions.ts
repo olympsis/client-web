@@ -40,7 +40,7 @@ Array.prototype.filterByVenueID = function <T extends Event>(this: T[], id: stri
 
     const filtered = this.filter(
         (event) => {
-            return event.venues?.some((venue) => venue.id === id)
+            return event.venues?.some((venue) => venue.venueId === id)
         }
     )
 

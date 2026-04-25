@@ -23,9 +23,9 @@ var hasEvents = computed(() => {
 });
 
 var imageURL = computed(() => {
-    const images = props.venue.images;
-    if (images) {
-        const url = images[0];
+    const media = props.venue.media;
+    if (media) {
+        const url = media[0];
         if (url) {
             return generateImageURL(url);
         }

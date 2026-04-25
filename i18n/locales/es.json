@@ -10,6 +10,17 @@
       "booking": "Reserva",
       "membershipRequired": "Membresía requerida",
       "lights": "Iluminación"
+    },
+    "detail": {
+      "about": "Sobre este lugar",
+      "noDescription": "Sin descripción disponible.",
+      "amenities": "Servicios",
+      "transit": "Transporte",
+      "events": "Eventos",
+      "noEvents": "Aún no hay eventos.",
+      "directions": "Indicaciones",
+      "schedule": "Reservar",
+      "bookingNotice": "Este lugar puede requerir una reserva externa antes de organizar un evento."
     }
   },
   "common": {

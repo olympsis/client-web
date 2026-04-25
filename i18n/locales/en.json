@@ -10,6 +10,17 @@
       "booking": "Booking",
       "membershipRequired": "Membership Required",
       "lights": "Lights"
+    },
+    "detail": {
+      "about": "About this Venue",
+      "noDescription": "No description available.",
+      "amenities": "Amenities",
+      "transit": "Transit",
+      "events": "Events",
+      "noEvents": "No events here yet.",
+      "directions": "Directions",
+      "schedule": "Schedule",
+      "bookingNotice": "This location may require an external reservation before you can host an event."
     }
   },
   "common": {

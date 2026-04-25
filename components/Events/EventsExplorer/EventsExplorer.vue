@@ -100,7 +100,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, h, onMounted, onBeforeUnmount, ref } from 'vue';
+import { computed, h, onMounted, onBeforeUnmount, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { Event } from '~/data/models/EventModels';
 import { Venue } from '~/data/models/VenueModels';
@@ -127,9 +127,28 @@ const props = defineProps({
      * stays visible above the sheet at full snap.
      */
     topOffset: { type: Number, default: 0 },
+    /**
+     * Optional v-model for the explorer's events|venues toggle. When bound,
+     * the parent can read the active mode (e.g. to hide tag filters in
+     * venues mode) and stays in sync as the user flips the toggle.
+     */
+    modelValue: { type: String as () => ExplorerMode, default: undefined },
 });
 
-const mode = ref<ExplorerMode>('events');
+const emit = defineEmits<{
+    (e: 'update:modelValue', value: ExplorerMode): void;
+}>();
+
+// `mode` is the internal state; if a v-model is bound, the prop seeds it and
+// every change is propagated back. Otherwise it just stays local.
+const mode = ref<ExplorerMode>(props.modelValue ?? 'events');
+watch(() => props.modelValue, (next) => {
+    if (next && next !== mode.value) mode.value = next;
+});
+watch(mode, (next) => {
+    if (props.modelValue !== next) emit('update:modelValue', next);
+});
+
 const mapRef = ref<InstanceType<typeof EventsMap> | null>(null);
 
 // ── Result count (shown in the panel header — "23 events" / "8 venues") ────

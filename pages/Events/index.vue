@@ -34,8 +34,15 @@
             <div class="section-header" :style="{fontWeight: 'bold', color: 'white'}">{{ $t('common.sports') }}</div>
             <SportsFilter v-model:model-value="selectedSports"/>
 
-            <div class="section-header" :style="{fontWeight: 'bold', color: 'white'}">{{ $t('common.tags') }}</div>
-            <TagsFilter v-model:model-value="selectedTags"/>
+            <!--
+                Tags only apply to events; in venues mode we hide the section so
+                the drawer doesn't expose a control with no effect. The explorer
+                v-model'd `explorerMode` keeps this in sync with the toggle.
+            -->
+            <template v-if="explorerMode === 'events'">
+                <div class="section-header" :style="{fontWeight: 'bold', color: 'white'}">{{ $t('common.tags') }}</div>
+                <TagsFilter v-model:model-value="selectedTags"/>
+            </template>
         </Drawer>
 
         <section id="explorer">
@@ -51,6 +58,7 @@
                 </div>
                 <EventsExplorer
                     v-else
+                    v-model="explorerMode"
                     :events="filteredEvents"
                     :venues="filteredVenues"
                     :initial-center="initialCenter"
@@ -78,6 +86,7 @@ import SearchBar from '@/components/SearchBar/SearchBar.vue';
 import TagsFilter from '~/components/TagsFilter/TagsFilter.vue';
 import SportsFilter from '~/components/SportsFilter/SportsFilter.vue';
 import EventsExplorer from '@/components/Events/EventsExplorer/EventsExplorer.vue';
+import type { ExplorerMode } from '@/components/MapListToggle/MapListToggle.vue';
 
 const { t } = useI18n();
 const router = useRouter();
@@ -94,6 +103,10 @@ const showFilter = ref<boolean>(false);
 const selectedTags: Ref<Array<Tag>> = ref([]);
 const selectedSports: Ref<Array<Sport>> = ref([]);
 
+// The explorer's events|venues toggle is mirrored here so the filter drawer
+// can hide event-only controls (e.g. Tags) when the user is browsing venues.
+const explorerMode = ref<ExplorerMode>('events');
+
 // Default to user's last known location, falling back to NYC so the map
 // always has a sensible center on first paint.
 const initialCenter = computed<number[]>(() => {
@@ -103,14 +116,47 @@ const initialCenter = computed<number[]>(() => {
 });
 
 // ── Filtering — applied client-side to both events and venues ──────────────
+//
+// The same filtered arrays drive both the map pins and the side/sheet list,
+// so the search box always narrows the visible set in lockstep across both
+// views. Search matches across every field a user might reasonably type:
+// titles, names, descriptions, sport/tag labels, address text, even the
+// associated venue names on an event. Anything that doesn't match all
+// active filters is excluded from both the list and the map.
+
+/**
+ * Does any of the given strings include the search term?
+ * Empty / nullish strings are skipped — they shouldn't accidentally match.
+ * Caller is expected to lowercase the search term once and pass it in.
+ */
+function anyIncludes(haystacks: Array<string | undefined>, needle: string): boolean {
+    if (!needle) return true;
+    return haystacks.some((s) => !!s && s.toLowerCase().includes(needle));
+}
 
 const filteredEvents = computed<Event[]>(() => {
-    const search = searchText.value.toLowerCase();
+    const search = searchText.value.trim().toLowerCase();
     const sportNames = selectedSports.value.map((s) => s.name.toLowerCase());
     const tagNames = selectedTags.value.map((t) => t.name.toLowerCase());
 
     return events.value.filter((e) => {
-        const matchesSearch = !search || e.title?.toLowerCase().includes(search);
+        // Search across the user-facing fields of an event so the filter
+        // stays predictable: typing a venue name should narrow events at
+        // that venue, typing a sport should narrow the right events, etc.
+        const haystacks: Array<string | undefined> = [
+            e.title,
+            e.body,
+            ...(e.sports ?? []),
+            ...(e.tags ?? []),
+            ...((e.venues ?? []).flatMap((v) => [
+                v.name,
+                v.address,
+                v.locality,
+                v.administrativeArea,
+            ])),
+        ];
+        const matchesSearch = !search || anyIncludes(haystacks, search);
+
         const matchesSport = sportNames.length === 0
             || e.sports?.some((s) => sportNames.some((sn) => s.toLowerCase().includes(sn)));
         const matchesTag = tagNames.length === 0
@@ -120,11 +166,25 @@ const filteredEvents = computed<Event[]>(() => {
 });
 
 const filteredVenues = computed<Venue[]>(() => {
-    const search = searchText.value.toLowerCase();
+    const search = searchText.value.trim().toLowerCase();
     const sportNames = selectedSports.value.map((s) => s.name.toLowerCase());
 
     return venues.value.filter((v) => {
-        const matchesSearch = !search || v.name?.toLowerCase().includes(search);
+        // Same idea as events — match against every venue field a user might
+        // type. Sports + amenities are arrays so we spread them in.
+        const haystacks: Array<string | undefined> = [
+            v.name,
+            v.description,
+            v.address,
+            v.locality,
+            v.subLocality,
+            v.administrativeArea,
+            v.countryCode,
+            ...(v.sports ?? []),
+            ...(v.amenities ?? []),
+        ];
+        const matchesSearch = !search || anyIncludes(haystacks, search);
+
         const matchesSport = sportNames.length === 0
             || v.sports?.some((s) => sportNames.some((sn) => s.toLowerCase().includes(sn)));
         // Tags don't apply to venues; ignore them.

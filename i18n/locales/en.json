@@ -1,4 +1,16 @@
 {
+  "venue": {
+    "unitsCount": "{count} courts",
+    "paid": "Has fees",
+    "membershipRequired": "Membership required",
+    "tags": {
+      "indoor": "Indoor",
+      "outdoor": "Outdoor",
+      "permitRequired": "Permit Required",
+      "membershipRequired": "Membership Required",
+      "lights": "Lights"
+    }
+  },
   "common": {
     "loading": "Loading...",
     "save": "Save",

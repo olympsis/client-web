@@ -1,4 +1,16 @@
 {
+  "venue": {
+    "unitsCount": "{count} canchas",
+    "paid": "De pago",
+    "membershipRequired": "Membresía requerida",
+    "tags": {
+      "indoor": "Interior",
+      "outdoor": "Exterior",
+      "permitRequired": "Se requiere permiso",
+      "membershipRequired": "Membresía requerida",
+      "lights": "Iluminación"
+    }
+  },
   "common": {
     "loading": "Cargando...",
     "save": "Guardar",

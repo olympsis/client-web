@@ -1,4 +1,16 @@
 {
+  "venue": {
+    "unitsCount": "{count} courts",
+    "paid": "Payant",
+    "membershipRequired": "Adhésion requise",
+    "tags": {
+      "indoor": "Intérieur",
+      "outdoor": "Extérieur",
+      "permitRequired": "Permis requis",
+      "membershipRequired": "Adhésion requise",
+      "lights": "Éclairage"
+    }
+  },
   "common": {
     "loading": "Chargement...",
     "save": "Enregistrer",

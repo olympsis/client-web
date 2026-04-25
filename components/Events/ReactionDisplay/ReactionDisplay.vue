@@ -100,7 +100,12 @@ function handleToggle(group: ReactionGroup) {
             color: var(--olympsis-gray);
         }
 
-        &--active {
+        /*
+           Native CSS nesting parses `&--active` as `& --active` (a custom
+           property type selector), which is invalid. Use the explicit class
+           form so the build doesn't warn.
+        */
+        &.reaction-badge--active {
             border-color: var(--primary-brand-color);
 
             .reaction-count {

@@ -21,6 +21,29 @@
       "directions": "Itinéraire",
       "schedule": "Réserver",
       "bookingNotice": "Ce lieu peut nécessiter une réservation externe avant d'organiser un événement."
+    },
+    "transit": {
+      "title": "Transport"
+    },
+    "courtDetails": {
+      "title": "Détails du court",
+      "season": "Saison",
+      "hours": "Horaires",
+      "yearRound": "Toute l'année",
+      "inSeason": "En saison",
+      "hoursUnavailable": "Horaires non disponibles",
+      "courtsCount": "{count} courts de tennis",
+      "pills": {
+        "paid": "Payant",
+        "indoor": "Intérieur",
+        "outdoor": "Extérieur",
+        "lights": "Éclairage",
+        "accessible": "Accessible",
+        "permit": "Permis",
+        "noPermit": "Sans permis",
+        "membership": "Réservé aux membres",
+        "booking": "Réservation"
+      }
     }
   },
   "common": {

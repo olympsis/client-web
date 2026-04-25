@@ -21,6 +21,29 @@
       "directions": "Indicaciones",
       "schedule": "Reservar",
       "bookingNotice": "Este lugar puede requerir una reserva externa antes de organizar un evento."
+    },
+    "transit": {
+      "title": "Transporte"
+    },
+    "courtDetails": {
+      "title": "Detalles de la cancha",
+      "season": "Temporada",
+      "hours": "Horario",
+      "yearRound": "Todo el año",
+      "inSeason": "En temporada",
+      "hoursUnavailable": "Horario no disponible",
+      "courtsCount": "{count} canchas de tenis",
+      "pills": {
+        "paid": "De pago",
+        "indoor": "Interior",
+        "outdoor": "Exterior",
+        "lights": "Iluminación",
+        "accessible": "Accesible",
+        "permit": "Permiso",
+        "noPermit": "Sin permiso",
+        "membership": "Solo miembros",
+        "booking": "Reserva"
+      }
     }
   },
   "common": {

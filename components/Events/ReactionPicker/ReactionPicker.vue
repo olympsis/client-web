@@ -57,7 +57,12 @@ function isExcluded(type: COMMENT_REACTION_TYPE): boolean {
             background-color: var(--tertiary-background-color, rgba(0, 0, 0, 0.08));
         }
 
-        &--disabled {
+        /*
+           Native CSS nesting parses `&--disabled` as `& --disabled` (a custom
+           property type selector), which is invalid. Use the explicit class
+           form so the build doesn't warn.
+        */
+        &.picker-button--disabled {
             opacity: 0.35;
             cursor: not-allowed;
         }

@@ -21,6 +21,29 @@
       "directions": "Directions",
       "schedule": "Schedule",
       "bookingNotice": "This location may require an external reservation before you can host an event."
+    },
+    "transit": {
+      "title": "Transit"
+    },
+    "courtDetails": {
+      "title": "Court Details",
+      "season": "Season",
+      "hours": "Hours",
+      "yearRound": "Year Round",
+      "inSeason": "In Season",
+      "hoursUnavailable": "Hours not available",
+      "courtsCount": "{count} Tennis Courts",
+      "pills": {
+        "paid": "Paid",
+        "indoor": "Indoor",
+        "outdoor": "Outdoor",
+        "lights": "Lights Available",
+        "accessible": "Accessible",
+        "permit": "Permit",
+        "noPermit": "No Permit",
+        "membership": "Members Only",
+        "booking": "Booking"
+      }
     }
   },
   "common": {

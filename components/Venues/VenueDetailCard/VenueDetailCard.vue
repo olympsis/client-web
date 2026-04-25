@@ -47,6 +47,10 @@
                 <p v-else class="muted">{{ $t('venue.detail.noDescription') }}</p>
             </section>
 
+            <!-- Court details — pills, court count + icons, season + hours,
+                 and a transit sub-section (rendered inside the same card). -->
+            <VenueCourtDetails :venue="venue"/>
+
             <!-- Booking required notice -->
             <div v-if="requiresBooking" class="warning-row">
                 <img src="@/assets/icons/warning/warning.yellow.svg">
@@ -124,6 +128,7 @@ import { generateImageURL } from '~/utils/image-helpers';
 
 import { useRouter } from 'vue-router';
 import EventListItem from '@/components/Events/EventListItem/EventListItem.vue';
+import VenueCourtDetails from '@/components/Venues/VenueCourtDetails/VenueCourtDetails.vue';
 
 const { t } = useI18n();
 const router = useRouter();

@@ -234,7 +234,30 @@ function summarizeHours(slots: TimeSlot[]): string {
     }).join(', ');
 }
 
-const hoursLabel = computed<string>(() => summarizeHours(props.venue.availability?.regularHours ?? []));
+/**
+ * Resolve the weekly schedule to display in the Hours block.
+ *
+ * Some venues only define `regular_hours` (year-round). Others — like
+ * Riverbank State, which is open Apr–Nov — leave `regular_hours` empty and
+ * put the actual weekly schedule under a `seasonal_hours` window. Without
+ * the fallback below those venues render "Hours not available" even though
+ * the data is present.
+ *
+ * Resolution order: regular_hours first; if empty, the first seasonal
+ * window's hours. Per-day overrides (special/blackout dates) aren't summarized
+ * here — they're date-specific, not part of the recurring weekly view.
+ */
+const hoursLabel = computed<string>(() => {
+    const regular = props.venue.availability?.regularHours ?? [];
+    if (regular.length > 0) return summarizeHours(regular);
+
+    const firstSeasonal = props.venue.availability?.seasonalHours?.[0];
+    if (firstSeasonal && firstSeasonal.hours.length > 0) {
+        return summarizeHours(firstSeasonal.hours);
+    }
+
+    return summarizeHours([]);
+});
 </script>
 
 <style scoped>
@@ -299,7 +322,7 @@ const hoursLabel = computed<string>(() => summarizeHours(props.venue.availabilit
     }
     .courts-count {
         font-weight: 700;
-        font-size: 1rem;
+        font-size: 0.95rem;
         color: var(--primary-label-color);
     }
     .courts-surface {
@@ -364,7 +387,7 @@ const hoursLabel = computed<string>(() => summarizeHours(props.venue.availabilit
     .info-icon img { width: 1.2rem; height: 1.2rem; display: block; }
     .info-title {
         font-weight: 700;
-        font-size: 1rem;
+        font-size: 0.95rem;
         color: var(--primary-label-color);
     }
     .info-value {

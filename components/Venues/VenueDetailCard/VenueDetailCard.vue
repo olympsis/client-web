@@ -441,6 +441,18 @@ watch(coverImageURL, (url) => {
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
         background: rgba(255, 255, 255, 0.12);
+        /*
+           `min-width: 0` is essential — without it, a flex child's intrinsic
+           min size is its content's min-content width, which means a long
+           owner-org name like "Riverside Tennis Association of New York"
+           pushes this button wider than its 1fr share and squashes the
+           others. Setting min-width: 0 lets the button shrink to its grid
+           share so the inner <p>'s ellipsis can actually clip the text.
+        */
+        min-width: 0;
+        overflow: hidden;
+        box-sizing: border-box;
+        padding: 0 0.5rem;
 
         img { width: 2.2rem; height: 2.2rem; }
 
@@ -449,6 +461,17 @@ watch(coverImageURL, (url) => {
             font-size: 0.85rem;
             text-transform: capitalize;
             color: var(--primary-label-color);
+            /*
+               Width: 100% (not just max-width) so the <p> spans the full
+               button width regardless of its content; combined with the
+               nowrap + overflow + ellipsis trio, that's what actually
+               truncates a long label to one line.
+            */
+            width: 100%;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
     }
 

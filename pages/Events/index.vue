@@ -312,24 +312,74 @@ function saveFiltersToStorage() {
     localStorage.setItem(FILTER_STORAGE_KEY, JSON.stringify(data));
 }
 
-function restoreFiltersFromStorage(): boolean {
+/*
+   Pull cached filters out of localStorage. Returns the parsed name lists
+   (or empty arrays) — the caller is responsible for resolving names to
+   Sport/Tag objects and merging with the user profile.
+*/
+function readCachedFilterNames(): { sports: string[]; tags: string[] } {
     const raw = localStorage.getItem(FILTER_STORAGE_KEY);
-    if (!raw) return false;
+    if (!raw) return { sports: [], tags: [] };
     try {
-        const data = JSON.parse(raw) as { sports: string[]; tags: string[] };
-        if (!data.sports?.length && !data.tags?.length) return false;
-        data.sports.forEach((name) => {
-            const found = session.sports.find((sp) => sp.name === name);
-            if (found) selectedSports.value.push(found);
-        });
-        data.tags.forEach((name) => {
-            const found = session.tags.find((tg) => tg.name === name);
-            if (found) selectedTags.value.push(found);
-        });
-        return selectedSports.value.length > 0 || selectedTags.value.length > 0;
+        const data = JSON.parse(raw) as { sports?: string[]; tags?: string[] };
+        return { sports: data.sports ?? [], tags: data.tags ?? [] };
     } catch {
-        return false;
+        return { sports: [], tags: [] };
     }
+}
+
+/*
+   Seed the filter state by *combining* the user's profile sports with the
+   filters they last picked from this page. Tags only come from the cache
+   (the profile model doesn't carry tag preferences). Names are resolved
+   against the session-loaded Sport/Tag catalog and de-duplicated so we
+   never push the same chip twice if a profile sport was also the last
+   thing they filtered by.
+
+   This runs even when the user has no events on their profile — the
+   localStorage cache persists independently of activity, so a returning
+   visitor still lands on the filters they chose last time.
+*/
+/*
+   `filtersDirty` flips to true the moment the user interacts with the
+   filter drawer (see the showFilter watch below). Until that happens we
+   keep auto-seeding from profile + cache as data sources hydrate — that
+   way profile sports arriving *after* the cache seed still get merged in.
+   Once the user has explicitly touched the filters we stop auto-seeding
+   so we never re-add a chip they just removed.
+*/
+let filtersDirty = false;
+
+function seedFiltersFromProfileAndCache() {
+    if (filtersDirty) return;
+
+    const catalogReady = session.sports.length > 0 || session.tags.length > 0;
+    if (!catalogReady) return;
+
+    const cached = readCachedFilterNames();
+    const profileSportNames = session.user?.sports ?? [];
+
+    // Sports: profile ∪ cached, de-duped by lowercase name.
+    const sportNames = new Set<string>();
+    profileSportNames.forEach((s) => sportNames.add(s.toLowerCase()));
+    cached.sports.forEach((s) => sportNames.add(s.toLowerCase()));
+
+    sportNames.forEach((name) => {
+        // Profile stores sports as raw strings; the catalog matches by
+        // partial-name include (e.g. "Tennis" → catalog "tennis").
+        const found = session.sports.find((sp) => sp.name.toLowerCase().includes(name));
+        if (found && !selectedSports.value.find((sp) => sp.name === found.name)) {
+            selectedSports.value.push(found);
+        }
+    });
+
+    // Tags: cache-only.
+    cached.tags.forEach((name) => {
+        const found = session.tags.find((tg) => tg.name === name);
+        if (found && !selectedTags.value.find((tg) => tg.name === found.name)) {
+            selectedTags.value.push(found);
+        }
+    });
 }
 
 // Refetch only when filters were *added* (existing data narrows client-side
@@ -354,6 +404,9 @@ watch(showFilter, (visible) => {
             || currentTags.some((t, i) => t !== previousTags[i]);
 
         if (changed) {
+            // First user-initiated change locks out auto-seeding so a late
+            // profile/catalog hydration can't re-add chips they removed.
+            filtersDirty = true;
             saveFiltersToStorage();
             if (addedSports || addedTags) {
                 retryFetchEvents();
@@ -369,14 +422,37 @@ session.$subscribe((mutation: any, _) => {
     }
 });
 
+/*
+   The session catalog (`session.sports`, `session.tags`) and the user
+   profile (`session.user`) hydrate asynchronously from `app.vue` and
+   the global session middleware respectively, and on cold-loads of
+   `/events` they often resolve *after* this page mounts. The first run
+   of seedFiltersFromProfileAndCache() in onMounted may find an empty
+   catalog and silently skip everything.
+
+   Watch all three sources so whichever one resolves last triggers the
+   seed. The watcher tracks a tuple that captures both `user` reference
+   identity (undefined → object) AND inner array lengths, since a user
+   object could arrive with an empty sports list and we'd still want to
+   seed from cache. `immediate: true` covers the rare case where the
+   catalog was already populated before this watcher registered.
+
+   The `filtersSeeded` flag inside the seeder ensures we only auto-fill
+   once and never re-add chips the user has manually removed.
+*/
+watch(
+    () => ({
+        sportsCount: session.sports.length,
+        tagsCount: session.tags.length,
+        userId: session.user?.id,
+        userSportsCount: session.user?.sports?.length ?? 0,
+    }),
+    () => seedFiltersFromProfileAndCache(),
+    { immediate: true, deep: true }
+);
+
 onMounted(() => {
-    const restored = restoreFiltersFromStorage();
-    if (!restored) {
-        session.user?.sports?.forEach((s) => {
-            const found = session.sports.find((sp) => sp.name.includes(s));
-            if (found) selectedSports.value.push(found);
-        });
-    }
+    seedFiltersFromProfileAndCache();
 
     /*
        Cache hydration: if we already fetched the list within the TTL

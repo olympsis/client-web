@@ -240,10 +240,15 @@ useSeoMeta({
     background-color: var(--primary-background-color);
 }
 
+/*
+   Page-level topbar (just the "Back to events" pill). Not sticky — we
+   want it to scroll up with the rest of the page so it disappears
+   behind the global NavigationBar (which already sticks to the top of
+   the app scroll container). Sticky-stacking it underneath the nav was
+   causing the visual seam where the page's primary surface peeked
+   between the nav and the pill.
+*/
 #venue-page-topbar {
-    position: sticky;
-    top: 0;
-    z-index: 10;
     display: flex;
     align-items: center;
     padding: 0.75rem 1rem;

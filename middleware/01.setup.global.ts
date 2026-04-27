@@ -21,6 +21,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
                           to.path === '/events' ||
                           to.path === '/events/new' ||
                           to.path.match(/^\/events\/([a-zA-Z0-9]+)$/) !== null ||
+                          to.path.match(/^\/venues\/([a-zA-Z0-9]+)$/) !== null ||
                           to.path.match(/^\/groups\/search\/([a-zA-Z0-9]+)$/) !== null;
 
     // Initialize auth if needed
@@ -28,9 +29,26 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
         await authStore.initAuth();
     }
 
-    // Only init session for authenticated users on non-public routes
-    if (authStore.isAuthenticated && !sessionStore.hasLoaded && !isPublicRoute) {
-        await sessionStore.init();
+    /*
+       Init session for authenticated users.
+
+       On non-public routes we await so the page can rely on session data
+       (profile, groups, etc.) being present before render.
+
+       On public routes (e.g. cold-loading directly to /events while
+       signed in) we still need session.init to run — otherwise
+       session.user stays undefined and downstream components like the
+       NavigationBar avatar, the events page filter seeder, and anything
+       reading user/groups never hydrate. Kick it off in the background
+       so the page renders immediately and reactive refs fill in as
+       init resolves.
+    */
+    if (authStore.isAuthenticated && !sessionStore.hasLoaded) {
+        if (isPublicRoute) {
+            sessionStore.init();
+        } else {
+            await sessionStore.init();
+        }
     }
 
     // If this is navigation (not initial load) and we're already loaded,

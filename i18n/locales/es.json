@@ -17,16 +17,26 @@
       "amenities": "Servicios",
       "transit": "Transporte",
       "events": "Eventos",
-      "noEvents": "Aún no hay eventos.",
+      "noEvents": "Aún no hay eventos",
+      "hostOne": "¿Organizar uno?",
+      "website": "Sitio web",
+      "newEvent": "Nuevo evento",
+      "more": "Más",
       "directions": "Indicaciones",
       "schedule": "Reservar",
-      "bookingNotice": "Este lugar puede requerir una reserva externa antes de organizar un evento."
+      "bookingNotice": "Este lugar puede requerir una reserva externa antes de organizar un evento.",
+      "backToEvents": "Volver a los eventos",
+      "openFullPage": "Abrir página del lugar",
+      "notFound": "Lo sentimos, no pudimos encontrar ese lugar.",
+      "defaultTitle": "Lugares Olympsis",
+      "defaultBody": "Descubre lugares para eventos deportivos cerca de ti en Olympsis.",
+      "customLocation": "Ubicación Personalizada"
     },
     "transit": {
       "title": "Transporte"
     },
     "courtDetails": {
-      "title": "Detalles de la cancha",
+      "title": "Detalles",
       "season": "Temporada",
       "hours": "Horario",
       "yearRound": "Todo el año",

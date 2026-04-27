@@ -114,6 +114,6 @@ h4 {
 
 .transit-system {
     font-size: 0.85rem;
-    color: var(--secondary-label-color);
+    color: var(--olympsis-gray);
 }
 </style>

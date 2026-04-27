@@ -17,16 +17,26 @@
       "amenities": "Équipements",
       "transit": "Transport",
       "events": "Événements",
-      "noEvents": "Aucun événement pour le moment.",
+      "noEvents": "Aucun événement",
+      "hostOne": "Organisez-en un ?",
+      "website": "Site web",
+      "newEvent": "Nouvel événement",
+      "more": "Plus",
       "directions": "Itinéraire",
       "schedule": "Réserver",
-      "bookingNotice": "Ce lieu peut nécessiter une réservation externe avant d'organiser un événement."
+      "bookingNotice": "Ce lieu peut nécessiter une réservation externe avant d'organiser un événement.",
+      "backToEvents": "Retour aux événements",
+      "openFullPage": "Ouvrir la page du lieu",
+      "notFound": "Désolé, nous n'avons pas trouvé ce lieu.",
+      "defaultTitle": "Lieux Olympsis",
+      "defaultBody": "Découvrez des lieux pour des événements sportifs près de chez vous sur Olympsis.",
+      "customLocation": "Lieu Personnalisé"
     },
     "transit": {
       "title": "Transport"
     },
     "courtDetails": {
-      "title": "Détails du court",
+      "title": "Détails",
       "season": "Saison",
       "hours": "Horaires",
       "yearRound": "Toute l'année",

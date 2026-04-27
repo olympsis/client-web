@@ -263,7 +263,6 @@ const hoursLabel = computed<string>(() => {
 <style scoped>
 /* Card frame matches the other VenueDetailCard sections (glass + border). */
 .card-section {
-    margin: 0 1rem 1rem 1rem;
     padding: 1rem 1.25rem;
     border-radius: 16px;
     border: var(--component-border-color) solid 1px;
@@ -329,10 +328,16 @@ const hoursLabel = computed<string>(() => {
         color: var(--secondary-label-color);
         font-size: 0.95rem;
     }
+    /*
+       Court icons in a fixed-cell grid instead of a wrapping flex row.
+       `auto-fill` with a small fixed cell width packs as many icons as
+       fit per row and balances the wrap (so 10 icons render 2×5 instead
+       of 9 + 1 orphan on a second row that looked broken).
+    */
     .court-icons {
-        display: flex;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, 2.4rem);
         gap: 0.5rem;
-        flex-wrap: wrap;
         list-style: none;
         margin: 0;
         padding: 0;
@@ -351,7 +356,7 @@ const hoursLabel = computed<string>(() => {
         justify-content: center;
         border-radius: 8px;
         border: 1px solid var(--component-border-color);
-        background: rgba(0, 0, 0, 0.25);
+        background: var(--tertiary-background-color, rgba(0, 0, 0, 0.08));
     }
     /*
        Default court icon color is the primary label color so it matches the
@@ -391,7 +396,7 @@ const hoursLabel = computed<string>(() => {
         color: var(--primary-label-color);
     }
     .info-value {
-        color: var(--secondary-label-color);
+        color: var(--olympsis-gray);
         line-height: 1.4;
     }
 }

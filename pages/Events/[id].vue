@@ -6,6 +6,22 @@
             id="event-bg"
             :style="{ backgroundImage: `url(${eventImageURL})` }"
         ></div>
+
+        <!--
+            Back-to-events link. Glass pill so it reads on top of the blurred
+            cover-image background regardless of the photo's tone. Sits above
+            #event-detail in the same z-stack so it's always reachable.
+        -->
+        <header id="event-page-topbar">
+            <NuxtLink to="/events" class="back-link">
+                <picture class="back-icon">
+                    <source srcset="@/assets/icons/chevron/chevron.left.white.svg" media="(prefers-color-scheme: dark)">
+                    <img src="@/assets/icons/chevron/chevron.left.svg">
+                </picture>
+                <span>{{ t('venue.detail.backToEvents') }}</span>
+            </NuxtLink>
+        </header>
+
         <div
             v-if="failed !== undefined && failed !== true && event != undefined"
             id="event-detail"
@@ -617,10 +633,45 @@ watch(eventImageURL, (url) => {
         transform: scale(1.1); /* prevents blur white edges */
     }
 
+    /*
+       Back-to-events strip. Sits above the blurred cover bg with z-index: 1
+       so taps land on the link and not the underlying canvas. Glass pill so
+       it reads on dark and light cover images alike.
+    */
+    #event-page-topbar {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 1rem;
+    }
+
+    .back-link {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.4rem 0.8rem;
+        border-radius: 999px;
+        text-decoration: none;
+        color: var(--primary-label-color);
+        font-weight: 600;
+        font-size: 0.95rem;
+        border: 1px solid var(--component-border-color);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        background: rgba(255, 255, 255, 0.12);
+
+        &:hover { background: rgba(255, 255, 255, 0.2); }
+        .back-icon img { width: 1rem; height: 1rem; display: block; }
+    }
+
     #event-detail {
         gap: 1rem;
         display: grid;
-        margin-top: 3rem;
+        /* Smaller margin-top now that the back-link strip occupies the space
+           above the grid. The strip is ~2.75rem; 0.5rem keeps a small breath
+           between the link and the first grid row. */
+        margin-top: 0.5rem;
         position: relative;
         z-index: 1;
         margin-bottom: 2rem;
@@ -985,14 +1036,16 @@ watch(eventImageURL, (url) => {
 #event-detail-view.dark-bg #bold-text-button-label #button img,
 #event-detail-view.dark-bg #event-header img,
 #event-detail-view.dark-bg #event-locations .icon img,
-#event-detail-view.dark-bg #event-external-links .icon img {
+#event-detail-view.dark-bg #event-external-links .icon img,
+#event-detail-view.dark-bg #event-page-topbar .back-icon img {
     filter: brightness(0) invert(1);
 }
 
 #event-detail-view.light-bg #bold-text-button-label #button img,
 #event-detail-view.light-bg #event-header img,
 #event-detail-view.light-bg #event-locations .icon img,
-#event-detail-view.light-bg #event-external-links .icon img {
+#event-detail-view.light-bg #event-external-links .icon img,
+#event-detail-view.light-bg #event-page-topbar .back-icon img {
     filter: brightness(0);
 }
 

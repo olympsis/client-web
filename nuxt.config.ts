@@ -71,6 +71,7 @@ export default defineNuxtConfig({
     "/profile": { ssr: false },
 
     "/events/**": { ssr: true },
+    "/venues/**": { ssr: true },
     "/groups/search/**": { ssr: true },
   },
 

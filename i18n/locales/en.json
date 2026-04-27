@@ -17,16 +17,26 @@
       "amenities": "Amenities",
       "transit": "Transit",
       "events": "Events",
-      "noEvents": "No events here yet.",
+      "noEvents": "No Events yet",
+      "hostOne": "Host one?",
+      "website": "Website",
+      "newEvent": "New Event",
+      "more": "More",
       "directions": "Directions",
       "schedule": "Schedule",
-      "bookingNotice": "This location may require an external reservation before you can host an event."
+      "bookingNotice": "This location may require an external reservation before you can host an event.",
+      "backToEvents": "Back to events",
+      "openFullPage": "Open venue page",
+      "notFound": "Sorry, we couldn't find that venue.",
+      "defaultTitle": "Olympsis Venues",
+      "defaultBody": "Discover venues for sports events near you on Olympsis.",
+      "customLocation": "Custom Location"
     },
     "transit": {
       "title": "Transit"
     },
     "courtDetails": {
-      "title": "Court Details",
+      "title": "Details",
       "season": "Season",
       "hours": "Hours",
       "yearRound": "Year Round",

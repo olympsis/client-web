@@ -1,109 +1,106 @@
 <template>
     <!--
-        Venue detail card — same vertical-scroll layout as before:
-          header → location → images strip → description → action row → events.
-        What's new is the styling: a blurred cover image fills the card as a
-        backdrop, content sits in glass-card sections, and text/icon colors
-        flip based on the image's average luminance (matches the EventDetail
-        page treatment).
+        Venue card view (modal). Uses the mobile design — single-column flow:
+          title + address → cover images strip → About → action row →
+          Details (court details + transit) → Events.
+        Embedded inside the EventsExplorer Dialog. The expand button in the
+        sticky header routes to the standalone /venues/[id] page (which
+        ships its own desktop 2-col layout and falls back to this same
+        single-column flow under 940px).
     -->
-    <main
-        id="venue-detail-view"
-        :class="{ 'dark-bg': isDarkBackground, 'light-bg': !isDarkBackground }"
-    >
-        <!-- Blurred cover image fills the card -->
-        <div
-            v-if="coverImageURL"
-            id="venue-bg"
-            :style="{ backgroundImage: `url(${coverImageURL})` }"
-        ></div>
-
-        <!-- Sticky header (name + close) -->
+    <main id="venue-detail-view">
+        <!-- Sticky chrome: just the action buttons (no title here — the
+             title sits inside the body so it scrolls with the content). -->
         <header id="venue-header">
-            <h1 class="title">{{ name }}</h1>
-            <button class="close-btn" type="button" @click="closeModal" :aria-label="$t('common.close')">
-                <picture>
-                    <source srcset="@/assets/icons/xmark/xmark.white.svg" media="(prefers-color-scheme: dark)"/>
-                    <img src="@/assets/icons/xmark/xmark.svg">
-                </picture>
-            </button>
+            <div class="header-actions">
+                <button
+                    v-if="venue.id"
+                    class="header-btn"
+                    type="button"
+                    :aria-label="$t('venue.detail.openFullPage')"
+                    :title="$t('venue.detail.openFullPage')"
+                    @click="openFullPage"
+                >
+                    <picture>
+                        <source srcset="@/assets/icons/expand/expand.svg" media="(prefers-color-scheme: dark)">
+                        <img src="@/assets/icons/expand/expand-dark.svg">
+                    </picture>
+                </button>
+                <button
+                    class="header-btn close-btn"
+                    type="button"
+                    @click="closeModal"
+                    :aria-label="$t('common.close')"
+                >
+                    <picture>
+                        <source srcset="@/assets/icons/xmark/xmark.white.svg" media="(prefers-color-scheme: dark)"/>
+                        <img src="@/assets/icons/xmark/xmark.svg">
+                    </picture>
+                </button>
+            </div>
         </header>
 
         <div id="venue-body">
-            <!-- Location line right under the title -->
-            <div class="location">{{ location }}</div>
+            <!-- Title block — name + address -->
+            <section class="title-block">
+                <h1 class="title">{{ name }}</h1>
+                <div v-if="addressLine" class="address">{{ addressLine }}</div>
+            </section>
 
-            <!-- Horizontal image strip -->
+            <!-- Cover images strip — horizontal scroll if more than fits. -->
             <ul v-if="images.length > 0" class="images">
-                <li v-for="image in images" :key="image">
-                    <img :src="generateImageURL(image)" class="image"/>
+                <li v-for="img in images" :key="img">
+                    <img :src="generateImageURL(img)" alt=""/>
                 </li>
             </ul>
 
-            <!-- About this venue -->
-            <section class="about card-section">
-                <h3>{{ $t('venue.detail.about') }}</h3>
+            <!-- About -->
+            <section class="card-section">
+                <h2>{{ $t('venue.detail.about') }}</h2>
                 <p v-if="description">{{ description }}</p>
                 <p v-else class="muted">{{ $t('venue.detail.noDescription') }}</p>
             </section>
 
-            <!-- Court details — pills, court count + icons, season + hours,
-                 and a transit sub-section (rendered inside the same card). -->
-            <VenueCourtDetails :venue="venue"/>
-
-            <!-- Booking required notice -->
-            <div v-if="requiresBooking" class="warning-row">
-                <img src="@/assets/icons/warning/warning.yellow.svg">
-                <span>{{ $t('venue.detail.bookingNotice') }}</span>
-            </div>
-
-            <!-- Action row — same set as before: Directions, Schedule (if booking), Event, More -->
+            <!-- Action row: Directions / Website / New Event (primary) / More -->
             <div class="actions">
-                <button class="action directions" v-if="!requiresBooking" @click="openMaps">
-                    <img src="@/assets/icons/car/car.white.svg">
-                    <p>{{ $t('venue.detail.directions') }}</p>
-                </button>
-
-                <button class="action ghost" v-else @click="openMaps">
+                <button class="action" :disabled="!hasCoords" @click="openMaps">
                     <picture>
                         <source srcset="@/assets/icons/car/car.white.svg" media="(prefers-color-scheme: dark)">
                         <img src="@/assets/icons/car/car.svg">
                     </picture>
-                    <p>{{ $t('venue.detail.directions') }}</p>
+                    <span>{{ $t('venue.detail.directions') }}</span>
                 </button>
 
-                <button class="action ghost" v-if="!requiresBooking">
+                <button class="action" :disabled="!websiteURL" @click="openWebsite">
                     <picture>
                         <source srcset="@/assets/icons/globe/globe.white.svg" media="(prefers-color-scheme: dark)">
                         <img src="@/assets/icons/globe/globe.svg">
                     </picture>
-                    <p>{{ ownerName }}</p>
+                    <span>{{ $t('venue.detail.website') }}</span>
                 </button>
 
-                <button class="action directions" v-else @click="openBooking">
-                    <img src="@/assets/icons/calendar/calendar.add.fill.white.svg">
-                    <p>{{ $t('venue.detail.schedule') }}</p>
+                <button class="action primary" @click="newEventHere">
+                    <img src="@/assets/icons/plus/plus.white.svg" alt="">
+                    <span>{{ $t('venue.detail.newEvent') }}</span>
                 </button>
 
-                <button class="action ghost">
-                    <picture>
-                        <source srcset="@/assets/icons/plus/plus.white.svg" media="(prefers-color-scheme: dark)">
-                        <img src="@/assets/icons/plus/plus.svg">
-                    </picture>
-                    <p>{{ $t('events.create') }}</p>
-                </button>
-                <button class="action ghost">
+                <button class="action" @click="openMore">
                     <picture>
                         <source srcset="@/assets/icons/ellipsis/ellipsis.white.svg" media="(prefers-color-scheme: dark)">
                         <img src="@/assets/icons/ellipsis/ellipsis.svg">
                     </picture>
-                    <p>{{ $t('common.more') }}</p>
+                    <span>{{ $t('venue.detail.more') }}</span>
                 </button>
             </div>
 
-            <!-- Events at this venue -->
-            <section class="events card-section">
-                <h3>{{ $t('venue.detail.events') }}</h3>
+            <!-- Court / availability / transit details (existing component) -->
+            <VenueCourtDetails :venue="venue"/>
+
+            <!-- Events at this venue. Empty state has a small "Host one?"
+                 affordance that routes to /events/new with the venue id —
+                 turns dead space into a CTA. -->
+            <section class="card-section events-section">
+                <h2>{{ $t('venue.detail.events') }}</h2>
                 <ul v-if="events.length > 0" class="event-list">
                     <li v-for="event in events" :key="event.id">
                         <Suspense>
@@ -111,19 +108,21 @@
                         </Suspense>
                     </li>
                 </ul>
-                <div v-else class="no-events">{{ $t('venue.detail.noEvents') }}</div>
+                <div v-else class="no-events">
+                    <span>{{ $t('venue.detail.noEvents') }}</span>
+                    <a class="host-one" @click.prevent="newEventHere" href="#">{{ $t('venue.detail.hostOne') }}</a>
+                </div>
             </section>
         </div>
     </main>
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch, watchEffect } from 'vue';
+import { computed, ref, watchEffect } from 'vue';
 import { Event } from '@/data/models/EventModels';
 import { Venue } from '@/data/models/VenueModels';
 import { getDirections } from '~/utils/map-helpers';
 import { useModelStore } from '@/stores/model-store';
-import { useSessionStore } from '@/stores/session-store';
 import { generateImageURL } from '~/utils/image-helpers';
 
 import { useRouter } from 'vue-router';
@@ -132,341 +131,251 @@ import VenueCourtDetails from '@/components/Venues/VenueCourtDetails/VenueCourtD
 
 const { t } = useI18n();
 const router = useRouter();
-const session = useSessionStore();
 const modelStore = useModelStore();
 
 const props = defineProps({
     venue: { type: Venue, required: true },
     events: { type: Array<Event>, required: true },
-    isEthereal: { type: Boolean, required: false }
+    isEthereal: { type: Boolean, required: false },
 });
 
-const emit = defineEmits([
-    "close",
-    "selected"
-]);
+const emit = defineEmits(['close', 'selected']);
 
 const name = computed(() => props.venue.name);
 const description = computed(() => props.venue.description);
 
-// Server stores `locality` (city) + `administrative_area` (state). Display
-// joins whichever pieces are present so we don't render lone commas.
-const location = computed(() => {
-    return [props.venue.locality, props.venue.administrativeArea].filter(Boolean).join(', ');
+// If we have a street address, show just that (locality/area would be
+// redundant). Otherwise fall back to "Custom Location • locality, area"
+// so the user still gets a sense of where the pin is.
+const addressLine = computed<string>(() => {
+    const v = props.venue;
+    if (v.address) return v.address;
+    const localityArea = [v.locality, v.administrativeArea].filter(Boolean).join(', ');
+    return [t('venue.detail.customLocation'), localityArea].filter(Boolean).join(' • ');
 });
 
 const images = computed<string[]>(() => props.venue.media ?? []);
-const coverImageURL = computed<string | undefined>(() => {
-    const first = images.value[0];
-    return first ? generateImageURL(first) : undefined;
-});
 
 const events = computed(() => {
     return modelStore.getAllEvents()
         .filter((e) => e.venues?.find((v) => v.venueId == props.venue.id));
 });
 
-// Owner is just an organization id on the wire — resolve lazily through the
-// model store so repeat renders don't refetch. Falls back to "Public" while
-// the org loads or if the venue has no owner.
-const ownerName = ref<string>('Public');
-watchEffect(async () => {
-    const ownerId = props.venue.ownerId;
-    if (!ownerId) { ownerName.value = 'Public'; return; }
-    try {
-        const org = await modelStore.getOrganizationByID(ownerId);
-        ownerName.value = org?.name ?? 'Public';
-    } catch {
-        ownerName.value = 'Public';
-    }
+const hasCoords = computed<boolean>(() => {
+    const c = props.venue.location?.coordinates;
+    return !!(c && c.length >= 2);
 });
-
-const requiresBooking = computed<boolean>(() => {
-    return !!(props.venue.access.requiresBooking && props.venue.url);
-});
+const websiteURL = computed<string | undefined>(() => props.venue.url || undefined);
 
 function closeModal() { emit('close'); }
+
+function openFullPage() {
+    if (!props.venue.id) return;
+    // Close the modal first so we don't navigate with a stale dialog underneath.
+    emit('close');
+    router.push(`/venues/${props.venue.id}`);
+}
+
+function openMaps() {
+    const coords = props.venue.location?.coordinates;
+    if (coords) getDirections(coords);
+}
+
+function openWebsite() {
+    if (websiteURL.value) window.open(websiteURL.value, '_blank', 'noopener,noreferrer');
+}
+
+function newEventHere() {
+    // Close the modal first if we're inside one, then route to event creation
+    // pre-scoped to this venue (the picker can read the query param).
+    emit('close');
+    if (props.venue.id) {
+        router.push(`/events/new?venue=${props.venue.id}`);
+    } else {
+        router.push('/events/new');
+    }
+}
+
+function openMore() {
+    // Placeholder — wire up a context menu (share, report, save) later.
+}
 
 function handleEventSelected(event: any) {
     router.push(`/events/${event.event.id}`);
 }
-
-function openMaps() {
-    const coordinates = props.venue.location?.coordinates;
-    if (coordinates) getDirections(coordinates);
-}
-
-function openBooking() {
-    if (props.venue.url) window.open(props.venue.url);
-}
-
-// ── Background luminance detection (mirrors EventDetail's approach) ────────
-//
-// Sample the cover image, average the perceived luminance, then apply
-// `dark-bg` / `light-bg` on the root element. The matching CSS flips
-// text/icon colors so they stay legible regardless of the photo.
-
-const isDarkBackground = ref(true);
-
-async function analyzeImageBrightness(url: string) {
-    if (typeof window === 'undefined') return; // skip on SSR
-
-    try {
-        const proxyURL = `/api/image-proxy?url=${encodeURIComponent(url)}`;
-        const response = await fetch(proxyURL);
-        if (!response.ok) { isDarkBackground.value = true; return; }
-
-        const blob = await response.blob();
-        if (blob.size === 0) { isDarkBackground.value = true; return; }
-
-        const blobURL = URL.createObjectURL(blob);
-        const img = new Image();
-        img.onload = () => {
-            const canvas = document.createElement('canvas');
-            const size = 50;
-            canvas.width = size;
-            canvas.height = size;
-            const ctx = canvas.getContext('2d');
-            if (!ctx) { URL.revokeObjectURL(blobURL); return; }
-
-            ctx.drawImage(img, 0, 0, size, size);
-            const { data } = ctx.getImageData(0, 0, size, size);
-            const pixelCount = data.length / 4;
-            if (pixelCount === 0) { URL.revokeObjectURL(blobURL); return; }
-
-            let totalLuminance = 0;
-            for (let i = 0; i < data.length; i += 4) {
-                const r = data[i] ?? 0;
-                const g = data[i + 1] ?? 0;
-                const b = data[i + 2] ?? 0;
-                totalLuminance += 0.299 * r + 0.587 * g + 0.114 * b;
-            }
-            // brightness(0.6) is applied via CSS on the bg, so factor it in.
-            const avgLuminance = (totalLuminance / pixelCount) * 0.6;
-            isDarkBackground.value = avgLuminance < 128;
-            URL.revokeObjectURL(blobURL);
-        };
-        img.onerror = () => URL.revokeObjectURL(blobURL);
-        img.src = blobURL;
-    } catch {
-        isDarkBackground.value = true;
-    }
-}
-
-watch(coverImageURL, (url) => {
-    if (url) analyzeImageBrightness(url);
-}, { immediate: true });
 </script>
 
 <style scoped>
+/*
+   Single-column modal that flows top-to-bottom. The whole view is the
+   scroll container — the header is sticky on top so content (title, image,
+   sections) scrolls *behind* it rather than being clipped inside a shorter
+   body.
+*/
 #venue-detail-view {
     width: 100%;
     height: 100%;
     max-width: 35rem;
     margin: 0 auto;
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
     position: relative;
-    display: flex;
-    flex-direction: column;
-}
-
-#venue-bg {
-    /* Card-bound (not viewport-bound) so the blurred backdrop doesn't bleed
-       through to whatever's behind the modal. */
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    filter: blur(40px) brightness(0.6);
-    transform: scale(1.1);
+    background-color: var(--primary-background-color);
 }
 
 #venue-header {
-    flex-shrink: 0;
+    position: sticky;
+    top: 0;
     z-index: 2;
     display: flex;
-    min-height: 3rem;
     align-items: center;
+    justify-content: flex-end;
     padding: 0.75rem 1rem;
-    justify-content: space-between;
+    background-color: var(--primary-background-color);
     border-bottom: 1px solid var(--component-border-color);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    background: rgba(255, 255, 255, 0.08);
+}
 
-    .title {
-        margin: 0;
-        font-size: 1.4rem;
-        font-weight: 700;
-        color: var(--primary-label-color);
-        text-overflow: ellipsis;
-        overflow: hidden;
-        white-space: nowrap;
-    }
+.header-actions {
+    display: flex;
+    gap: 0.4rem;
+    align-items: center;
+}
 
-    .close-btn {
-        all: unset;
-        flex-shrink: 0;
-        width: 2rem;
-        height: 2rem;
+.header-btn {
+    all: unset;
+    flex-shrink: 0;
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    cursor: pointer;
+    padding: 0;
+    line-height: 0;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    border: 1px solid var(--component-border-color);
+    background: var(--secondary-background-color);
+
+    &:hover { background: var(--tertiary-background-color); }
+
+    picture {
         display: flex;
-        cursor: pointer;
-        padding: 0;
-        line-height: 0;
-        box-sizing: border-box;
+        width: 1.1rem;
+        height: 1.1rem;
         align-items: center;
         justify-content: center;
-        border-radius: 15px;
-        border: var(--component-border-color) solid 1px;
-        backdrop-filter: blur(20px);
-        background: rgba(255, 255, 255, 0.12);
-
-        /*
-           The icon was sitting visually off-center because <picture> is
-           inline by default and inherits any line-height from the button.
-           Making picture a flex child of the button (and the img a block-
-           level inside it) guarantees the SVG sits dead-center regardless
-           of `all: unset`'s reset behavior across browsers.
-        */
-        picture {
-            display: flex;
-            width: 1.1rem;
-            height: 1.1rem;
-            align-items: center;
-            justify-content: center;
-        }
-        img {
-            display: block;
-            width: 1.1rem;
-            height: 1.1rem;
-        }
     }
+    img { display: block; width: 1.1rem; height: 1.1rem; }
 }
 
 #venue-body {
-    flex: 1;
-    min-height: 0;
-    z-index: 1;
-    position: relative;
-    overflow-y: auto;
-    padding-bottom: 2rem;
-}
-
-.location {
-    margin: 0.75rem 1rem 1rem 1rem;
-    color: var(--secondary-label-color);
-    font-size: 1rem;
-}
-
-.images {
-    width: 100%;
+    /* Body no longer owns the scroll — the parent does. Just lays out the
+       sections vertically with consistent gaps. */
+    padding: 1rem 1rem 2rem 1rem;
     display: flex;
-    overflow-x: auto;
-    list-style-type: none;
-    margin: 0 0 1rem 0;
-    padding: 0 1rem;
-    gap: 0.5rem;
-
-    .image {
-        width: 16rem;
-        height: 22rem;
-        object-fit: cover;
-        border-radius: 1rem;
-    }
+    flex-direction: column;
+    gap: 0.75rem;
 }
 
-/* ── Shared glass card frame (same treatment for every section) ─────────── */
-.card-section {
-    margin: 0 1rem 1rem 1rem;
-    padding: 1rem 1.25rem;
-    border-radius: 16px;
-    border: var(--component-border-color) solid 1px;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    background: rgba(255, 255, 255, 0.12);
-    color: var(--primary-label-color);
+.title-block {
+    /* No own margin — the body's flex gap places this consistently
+       relative to the next section. */
 
-    h3 {
-        margin: 0 0 0.5rem 0;
-        font-size: 1rem;
+    .title {
+        margin: 0;
+        font-size: 1.6rem;
+        font-weight: 800;
+        line-height: 1.15;
         color: var(--primary-label-color);
     }
+    .address {
+        margin-top: 0.35rem;
+        color: var(--olympsis-gray);
+        font-size: 0.95rem;
+    }
+}
 
+/*
+   Horizontal portrait thumb strip. `object-fit: cover` so each frame is
+   filled (landscape sources crop at the sides — same behavior as before).
+*/
+.images {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    li { flex: 0 0 auto; }
+
+    img {
+        width: 9rem;
+        height: 13rem;
+        object-fit: cover;
+        border-radius: 14px;
+        display: block;
+    }
+}
+
+/* ── Card section frame — secondary surface ─────────────────────────────── */
+.card-section {
+    padding: 1rem 1.25rem;
+    border-radius: 16px;
+    border: 1px solid var(--component-border-color);
+    background-color: var(--secondary-background-color);
+    color: var(--primary-label-color);
+
+    h2 {
+        margin: 0 0 0.5rem 0;
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--primary-label-color);
+    }
     p {
         margin: 0;
         line-height: 1.5;
         color: var(--primary-label-color);
+        font-size: 0.95rem;
     }
-
     .muted { color: var(--secondary-label-color); }
 }
 
-/* Booking warning lives outside a card so it reads as an alert strip. */
-.warning-row {
-    display: flex;
-    gap: 0.5rem;
-    margin: 0 1rem 1rem 1rem;
-    padding: 0.5rem 0.75rem;
-    align-items: center;
-    font-size: 0.85rem;
-    border-radius: 10px;
-    border: 1px solid var(--component-border-color);
-    background: rgba(255, 200, 0, 0.1);
-    color: var(--primary-label-color);
-
-    img { width: 1.1rem; height: 1.1rem; }
-}
-
-/* ── Action row ─────────────────────────────────────────────────────────── */
+/* ── Action row — 4 evenly-distributed pill buttons ─────────────────────── */
 .actions {
     display: flex;
     gap: 0.5rem;
-    margin: 0 1rem 1rem 1rem;
-    justify-content: space-between;
 
     .action {
         all: unset;
         flex: 1;
         cursor: pointer;
-        height: 5rem;
+        height: 4.5rem;
         display: flex;
         gap: 0.25rem;
         align-items: center;
         justify-content: center;
         flex-direction: column;
-        border-radius: 1rem;
+        border-radius: 12px;
         border: 1px solid var(--component-border-color);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        background: rgba(255, 255, 255, 0.12);
-        /*
-           `min-width: 0` is essential — without it, a flex child's intrinsic
-           min size is its content's min-content width, which means a long
-           owner-org name like "Riverside Tennis Association of New York"
-           pushes this button wider than its 1fr share and squashes the
-           others. Setting min-width: 0 lets the button shrink to its grid
-           share so the inner <p>'s ellipsis can actually clip the text.
-        */
+        background: var(--secondary-background-color);
+        color: var(--primary-label-color);
+        /* Same min-width: 0 + ellipsis trick so long labels don't blow out the row. */
         min-width: 0;
         overflow: hidden;
         box-sizing: border-box;
         padding: 0 0.5rem;
 
-        img { width: 2.2rem; height: 2.2rem; }
+        &:hover:not(:disabled) { background: var(--tertiary-background-color); }
+        &:disabled { opacity: 0.4; cursor: not-allowed; }
 
-        p {
-            margin: 0;
+        picture, img { width: 1.4rem; height: 1.4rem; display: block; }
+
+        span {
             font-size: 0.85rem;
-            text-transform: capitalize;
+            font-weight: 500;
             color: var(--primary-label-color);
-            /*
-               Width: 100% (not just max-width) so the <p> spans the full
-               button width regardless of its content; combined with the
-               nowrap + overflow + ellipsis trio, that's what actually
-               truncates a long label to one line.
-            */
             width: 100%;
             text-align: center;
             white-space: nowrap;
@@ -475,70 +384,43 @@ watch(coverImageURL, (url) => {
         }
     }
 
-    .action.directions {
-        background-color: var(--primary-brand-color);
+    /* Primary "New Event" — highest-value action on the page. */
+    .action.primary {
+        background: var(--primary-brand-color);
         border-color: transparent;
-
-        p { color: white; }
+        color: white;
+        span { color: white; }
+        &:hover:not(:disabled) { background: var(--primary-brand-color); opacity: 0.92; }
     }
 }
 
 /* ── Events section ─────────────────────────────────────────────────────── */
-.events {
-    .event-list {
-        display: flex;
-        flex-direction: column;
-        gap: 0.75rem;
-        list-style: none;
-        margin: 0;
-        padding: 0;
+.event-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.no-events {
+    /* Tight CTA-style empty state — was eating ~3rem of vertical space. */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.75rem 0 0.25rem 0;
+    color: var(--secondary-label-color);
+    text-align: center;
+
+    .host-one {
+        font-style: italic;
+        font-weight: 600;
+        text-decoration: none;
+        color: var(--olympsis-red, #c0392b);
+        cursor: pointer;
     }
-    .no-events {
-        height: 6rem;
-        display: flex;
-        font-weight: 500;
-        align-items: center;
-        justify-content: center;
-        color: var(--secondary-label-color);
-    }
-}
-</style>
-
-<!--
-   Unscoped — see EventDetail for rationale: scoped CSS adds [data-v-xxx]
-   selectors that prevent child components / <picture> sources from picking
-   up the variable overrides, so the dark/light text toggle has to live
-   outside the scoped block.
--->
-<style>
-#venue-detail-view.dark-bg {
-    --primary-label-color: #FFFFFF;
-    --secondary-label-color: #D6D6D6;
-    --component-border-color: rgba(255, 255, 255, 0.15);
-    color: #FFFFFF;
-}
-
-#venue-detail-view.light-bg {
-    --primary-label-color: #000000;
-    --secondary-label-color: #2C2C2E;
-    --component-border-color: rgba(0, 0, 0, 0.15);
-    color: #000000;
-}
-
-/* Force the action-row icons that don't have a dark-mode source to track
-   the resolved text color (mirrors the EventDetail trick). */
-#venue-detail-view.dark-bg .action img,
-#venue-detail-view.dark-bg #venue-header .close-btn img {
-    filter: brightness(0) invert(1);
-}
-#venue-detail-view.light-bg .action img,
-#venue-detail-view.light-bg #venue-header .close-btn img {
-    filter: brightness(0);
-}
-
-/* Don't filter the hero/colored action — its icon is meant to stay white. */
-#venue-detail-view.dark-bg .action.directions img,
-#venue-detail-view.light-bg .action.directions img {
-    filter: none;
+    .host-one:hover { text-decoration: underline; }
 }
 </style>

@@ -71,8 +71,9 @@
 	--quaternary-brand-color: #A5E9E8;
 
 	--primary-background-color: #FFFFFF;
-	--secondary-background-color: #F3F2EF;
-	--tertiary-background-color: #FFFFFF;
+	--secondary-background-color: #F4F5F7;
+	--tertiary-background-color: #ECEEF1;
+	--quaternary-background-color: #E2E5EA;
 
 	--primary-label-color: #000000;
 	--secondary-label-color: #2C2C2E;
@@ -136,9 +137,10 @@
 
 @media(prefers-color-scheme: dark) {
 	:root {
-		--primary-background-color: #1E1E1E;
-		--secondary-background-color: #2D2D2D;
-		--tertiary-background-color: #383838;
+		--primary-background-color: #0E0E10;
+		--secondary-background-color: #1A1A1F;
+		--tertiary-background-color: #25252B;
+		--quaternary-background-color: #2F2F36;
 
 		--primary-label-color: #FFFFFF;
 		--secondary-label-color: #D6D6D6;

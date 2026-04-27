@@ -15,12 +15,26 @@ export class VenueService extends BaseService {
 
         const endpoint = new Endpoint("/v1/venues", query)
 
-        const [status, _headers, body] = await this.http.request(Method.GET, endpoint, undefined, headers);
+        /*
+           Malakbel JSON-decodes the response body inside `request()`, so a
+           204 No Content (empty body) raises a `SyntaxError: The string did
+           not match the expected pattern` *before* we get a chance to
+           inspect the status. Wrap the call so 204 / empty-body responses
+           resolve to an empty venues list instead of bubbling up as a
+           decode failure that nukes the explorer.
+        */
+        try {
+            const [status, _headers, body] = await this.http.request(Method.GET, endpoint, undefined, headers);
 
-        if (body) {
+            if (status === 204 || !body) {
+                return VenuesResponse.decode({ venues: [], total_venues: 0 });
+            }
             return VenuesResponse.decode(body);
-        } else {
-            return undefined;
+        } catch (err) {
+            if (err instanceof SyntaxError) {
+                return VenuesResponse.decode({ venues: [], total_venues: 0 });
+            }
+            throw err;
         }
     }
 

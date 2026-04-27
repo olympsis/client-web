@@ -1,7 +1,7 @@
 <template>
     <main id="venue-detail-page">
         <header id="venue-page-topbar">
-            <NuxtLink to="/events" class="back-link">
+            <NuxtLink :to="{ path: '/events', query: { showVenues: 'true' } }" class="back-link">
                 <picture class="back-icon">
                     <source srcset="@/assets/icons/chevron/chevron.left.white.svg" media="(prefers-color-scheme: dark)">
                     <img src="@/assets/icons/chevron/chevron.left.svg">
@@ -98,7 +98,7 @@
         <!-- 404 fallback -->
         <div v-else-if="failed" id="venue-not-found">
             <h1>{{ t('venue.detail.notFound') }}</h1>
-            <NuxtLink to="/events" class="primary-link">{{ t('venue.detail.backToEvents') }}</NuxtLink>
+            <NuxtLink :to="{ path: '/events', query: { showVenues: 'true' } }" class="primary-link">{{ t('venue.detail.backToEvents') }}</NuxtLink>
         </div>
     </main>
 </template>

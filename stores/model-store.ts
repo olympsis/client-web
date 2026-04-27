@@ -1,5 +1,6 @@
 
 import { defineStore } from "pinia";
+import { ref } from "vue";
 import { Club } from "~/data/models/ClubModels";
 import { Post } from "~/data/models/PostModels";
 import { Event } from "~/data/models/EventModels";
@@ -30,6 +31,30 @@ export const useModelStore = defineStore('model-store', () => {
     const postModels: Map<string, Post> = new Map();
     const clubModels: Map<string, Club> = new Map();
     const orgModels: Map<string, Organization> = new Map();
+
+    /*
+       Bulk-list fetch cache. Individual model fetches populate the maps
+       above (e.g. visiting /venues/[id] caches just that venue), but the
+       events page does a *list* fetch and needs to know whether the full
+       set has been retrieved recently. We track the timestamp of the most
+       recent successful list fetch and use a TTL to decide whether the
+       events index page can skip the network call on revisit.
+    */
+    const EVENTS_LIST_TTL_MS = 5 * 60 * 1000;
+    const eventsListFetchedAt = ref<number>(0);
+    const venuesListFetchedAt = ref<number>(0);
+
+    function markEventsListFetched() { eventsListFetchedAt.value = Date.now(); }
+    function markVenuesListFetched() { venuesListFetchedAt.value = Date.now(); }
+
+    function isEventsListFresh(): boolean {
+        return eventsListFetchedAt.value > 0
+            && (Date.now() - eventsListFetchedAt.value) < EVENTS_LIST_TTL_MS;
+    }
+    function isVenuesListFresh(): boolean {
+        return venuesListFetchedAt.value > 0
+            && (Date.now() - venuesListFetchedAt.value) < EVENTS_LIST_TTL_MS;
+    }
 
     // Solve storing and retrieval of posts and linking them to their respective group
     // Maybe a post group relation map
@@ -240,6 +265,13 @@ export const useModelStore = defineStore('model-store', () => {
         getOrganizationByID,
         getAllOrganizations,
         setOrganization,
-        setOrganizations
+        setOrganizations,
+
+        eventsListFetchedAt,
+        venuesListFetchedAt,
+        markEventsListFetched,
+        markVenuesListFetched,
+        isEventsListFresh,
+        isVenuesListFresh,
     };
 });

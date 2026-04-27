@@ -70,10 +70,11 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import * as Sentry from '@sentry/nuxt';
 import { VIEW_STATE } from '@/data/Enums';
 import { useSessionStore } from '@/stores/session-store';
+import { useModelStore } from '@/stores/model-store';
 import { EventService } from '@/data/services/EventService';
 import { VenueService } from '@/data/services/VenueService';
 import { computed, onMounted, ref, watch } from 'vue';
@@ -89,8 +90,10 @@ import EventsExplorer from '@/components/Events/EventsExplorer/EventsExplorer.vu
 import type { ExplorerMode } from '@/components/MapListToggle/MapListToggle.vue';
 
 const { t } = useI18n();
+const route = useRoute();
 const router = useRouter();
 const session = useSessionStore();
+const modelStore = useModelStore();
 
 const state = ref(VIEW_STATE.LOADING);
 const eventService = new EventService();
@@ -105,7 +108,23 @@ const selectedSports: Ref<Array<Sport>> = ref([]);
 
 // The explorer's events|venues toggle is mirrored here so the filter drawer
 // can hide event-only controls (e.g. Tags) when the user is browsing venues.
-const explorerMode = ref<ExplorerMode>('events');
+// Initial value comes from the `?showVenues=true` URL query so deep-linking
+// from /venues/[id] back to /events lands on the venues view.
+const explorerMode = ref<ExplorerMode>(
+    route.query.showVenues === 'true' ? 'venues' : 'events'
+);
+
+/*
+   Mirror explorerMode → URL. We use router.replace so flipping the toggle
+   doesn't pollute history with a stack of /events entries — the back
+   button still returns to wherever the user came from. When mode is
+   'events' we drop the query entirely so the canonical URL stays clean.
+*/
+watch(explorerMode, (mode) => {
+    const showVenues = mode === 'venues' ? 'true' : undefined;
+    if (route.query.showVenues === showVenues) return;
+    router.replace({ query: { ...route.query, showVenues } });
+});
 
 // Default to user's last known location, falling back to NYC so the map
 // always has a sensible center on first paint.
@@ -235,10 +254,24 @@ async function fetchEventsAndVenues() {
         ),
     ]);
 
-    return {
-        events: eventsResult.status === 'fulfilled' ? eventsResult.value : [],
-        venues: venuesResult.status === 'fulfilled' ? (venuesResult.value?.venues ?? []) : [],
-    };
+    const fetchedEvents = eventsResult.status === 'fulfilled' ? eventsResult.value : [];
+    const fetchedVenues = venuesResult.status === 'fulfilled' ? (venuesResult.value?.venues ?? []) : [];
+
+    /*
+       Populate the model store so subsequent visits (and individual
+       /events/[id] or /venues/[id] pages) hit cache. Mark the list-fetch
+       timestamps so the events page knows the bulk set is fresh.
+    */
+    if (eventsResult.status === 'fulfilled') {
+        modelStore.setEvents(fetchedEvents);
+        modelStore.markEventsListFetched();
+    }
+    if (venuesResult.status === 'fulfilled') {
+        modelStore.setVenues(fetchedVenues);
+        modelStore.markVenuesListFetched();
+    }
+
+    return { events: fetchedEvents, venues: fetchedVenues };
 }
 
 function retryFetchEvents() {
@@ -345,6 +378,20 @@ onMounted(() => {
         });
     }
 
+    /*
+       Cache hydration: if we already fetched the list within the TTL
+       (e.g. user clicked into /venues/[id] and came back via the back
+       link), skip the network call and reuse what's in the model store.
+       Both lists must be fresh — partial reuse would leave the venues
+       toggle empty until refetch.
+    */
+    if (modelStore.isEventsListFresh() && modelStore.isVenuesListFresh()) {
+        events.value = modelStore.getAllEvents();
+        venues.value = modelStore.getAllVenues();
+        state.value = VIEW_STATE.SUCCESS;
+        return;
+    }
+
     fetchEventsAndVenues()
         .then((resp) => {
             events.value = resp.events;
@@ -361,8 +408,14 @@ onMounted(() => {
         });
 });
 
+/*
+   Stable page key: we mutate the URL with `?showVenues=...` when the
+   toggle flips, so a fullPath-keyed page would remount on every toggle
+   (and lose state). A constant key keeps the same instance across query
+   updates while still re-creating the page on a fresh navigation.
+*/
 definePageMeta({
-    key: (route) => route.fullPath,
+    key: 'events-index',
 });
 </script>
 

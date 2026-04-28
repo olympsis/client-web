@@ -211,7 +211,21 @@ class AuthenticationFacade {
                available, log and proceed so the local session cleanup
                can finish.
             */
-            const auth = this.auth ?? getAuth();
+            /*
+               Resolve a usable Auth instance defensively: getAuth()
+               throws synchronously when no Firebase app has been
+               initialized in this context (the "app/no-app" error). On
+               the signout path we'd rather just skip the remote call
+               and let the local logout chain finish, so wrap it.
+            */
+            let auth: Auth | undefined = this.auth;
+            if (!auth) {
+                try {
+                    auth = getAuth();
+                } catch {
+                    auth = undefined;
+                }
+            }
             if (!auth) {
                 console.warn('Firebase Auth unavailable; skipping remote signOut.');
                 return true;
@@ -233,11 +247,31 @@ class AuthenticationFacade {
 
             return true;
         } catch (error) {
-            Sentry.withScope((scope) => {
-                scope.setExtra('action', 'signout');
-                Sentry.captureException(error);
-            });
-            console.error("Error during signOut:", error);
+            /*
+               Two benign cases we don't want to surface as red errors:
+                 - `auth/no-current-user`: nobody to sign out — we're
+                   already in the desired state.
+                 - `app/no-app`: Firebase wasn't initialised in this
+                   context (e.g. signout fired before the firebase
+                   plugin booted, or after a page reload that skipped
+                   it). Locally there's nothing to tear down; the
+                   downstream auth-store / session-store cleanup still
+                   runs, so the user really is signed out.
+               Everything else is real and worth capturing.
+            */
+            const code = (error as { code?: string })?.code ?? '';
+            const benign = code === 'auth/no-current-user' || code === 'app/no-app'
+                || (error as Error)?.message?.includes("No Firebase App");
+
+            if (!benign) {
+                Sentry.withScope((scope) => {
+                    scope.setExtra('action', 'signout');
+                    Sentry.captureException(error);
+                });
+                console.error("Error during signOut:", error);
+            } else {
+                console.warn('Firebase signOut skipped (no app/no user); proceeding with local logout.');
+            }
             return true; // Return true to allow UI to update anyway
         }
     }

@@ -69,18 +69,22 @@ export const useSessionStore = defineStore('session-store', () => {
             // Set app-wide loading state
             loadingState.value = VIEW_STATE.LOADING;
 
-            const config = useRuntimeConfig();
-
             // Initialize auth if needed (auth store handles dev mode internally)
             if (!authStore.isAuthInitialized) {
                 await authStore.initAuth();
             }
 
-            // If auth failed, redirect to sign in (skip in dev mode)
+            /*
+               Bail without doing any session work if the user isn't
+               authenticated. Auth-based redirects belong to the global
+               route middleware (`01.setup.global.ts`), which already
+               sends unauthenticated users away from non-public routes.
+               Init can be kicked off in the background on public routes
+               (e.g. /events with `?showVenues=true`), and we don't want
+               that background call to navigate the app to /signin while
+               the user is happily browsing as a guest.
+            */
             if (!authStore.isAuthenticated) {
-                if (config.public.MODE !== 'dev') {
-                    await navigateTo({ path: '/signin' });
-                }
                 return;
             }
 

@@ -197,6 +197,26 @@ class AuthenticationFacade {
      */
     async signOut(): Promise<boolean> {
         try {
+            /*
+               `this.auth` is captured at facade construction time from
+               `useNuxtApp().$auth`. On some logout paths (e.g. signing
+               out from a route the nuxt firebase plugin hasn't fully
+               initialised yet, or after Firebase tore the instance
+               down) it can be undefined — calling `.signOut()` on that
+               throws "Cannot read properties of undefined (reading
+               'signOut')" and bubbles up to the UI as a hard error
+               even though the user really has been logged out locally.
+               Fall back to `getAuth()` so we always have a live Auth
+               instance to call signOut on; if even that's not
+               available, log and proceed so the local session cleanup
+               can finish.
+            */
+            const auth = this.auth ?? getAuth();
+            if (!auth) {
+                console.warn('Firebase Auth unavailable; skipping remote signOut.');
+                return true;
+            }
+
             // Create a timeout promise that resolves after 5 seconds
             const timeoutPromise = new Promise<void>((resolve) => {
                 setTimeout(() => {
@@ -204,13 +224,13 @@ class AuthenticationFacade {
                    resolve();
                 }, 5000);
             });
-            
+
             // Race the signOut operation against the timeout
             await Promise.race([
-                this.auth.signOut(),
+                auth.signOut(),
                 timeoutPromise
             ]);
-            
+
             return true;
         } catch (error) {
             Sentry.withScope((scope) => {

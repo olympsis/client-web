@@ -11,6 +11,20 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     // Check if this is navigation between routes
     const isNavigating = !!from.name;
 
+    /*
+       Query-only changes on the same path (e.g. flipping the
+       `?showVenues=true` toggle on /events, opening a modal that
+       writes to the URL, etc.) re-run middleware in Nuxt 3 by
+       default. Re-evaluating auth gating on those is at best
+       wasted work and at worst causes a flicker-redirect to
+       /signin if the auth store transiently reports
+       unauthenticated during the transition. The user hasn't
+       actually navigated to a new page, so just early-return.
+    */
+    if (isNavigating && to.path === from.path) {
+        return;
+    }
+
     // Routes that can be viewed without authentication or session initialization
     const isPublicRoute = to.path === '/signin' ||
                           to.path === '/landing-page' ||

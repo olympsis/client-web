@@ -504,8 +504,8 @@ async function loadEventData(id: string) {
 
     if (_event.venues) {
         _event.venues.forEach(async (v) => {
-            if (v.id) {
-                promises.push(session.venueService.getVenue(v.id));
+            if (v.venueId) {
+                promises.push(session.venueService.getVenue(v.venueId));
             }
         });
     }

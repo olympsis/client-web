@@ -444,7 +444,7 @@ watch(
     () => ({
         sportsCount: session.sports.length,
         tagsCount: session.tags.length,
-        userId: session.user?.id,
+        userId: session.user?.userId,
         userSportsCount: session.user?.sports?.length ?? 0,
     }),
     () => seedFiltersFromProfileAndCache(),

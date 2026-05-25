@@ -1,0 +1,11 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.olympsis.client",
+      "sha256_cert_fingerprints":
+        ["D9:C2:AF:F5:16:86:65:5A:53:BB:5B:58:3E:AD:65:AC:7A:83:A0:01:AD:EA:1F:F9:96:E0:FE:7F:E1:F7:EC:00"]
+    }
+  }
+]

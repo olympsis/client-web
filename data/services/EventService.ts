@@ -113,7 +113,6 @@ export class EventService extends BaseService {
         query.set("longitude", String(longitude));
         query.set("radius", String(radius));
         query.set("sports", sports);
-        query.set("status", "pending,live");
         query.set("limit", "100");
 
         const endpoint = new Endpoint("/v1/events/location", query);

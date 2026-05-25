@@ -18,8 +18,18 @@
 									<img class="icon" src="@/assets/icons/share-location/share-location.svg">
 								</picture>
 							</div>
-							
-							<div class="buttons-container">
+
+							<!--
+								While Safari's prompt is up (and during the brief window
+								after Allow when the browser is still acquiring coords),
+								show a spinner so the user has feedback. Without this the
+								dialog looks frozen and people click outside to dismiss.
+							-->
+							<div v-if="isFetchingLocation" class="loading-state">
+								<div class="spinner-loader"/>
+								<span>Getting your location…</span>
+							</div>
+							<div v-else class="buttons-container">
 								<button class="button secondary" @click="switchToManualInput">Deny Access</button>
 								<button class="button primary" @click="requestGeolocation">Allow Access</button>
 							</div>
@@ -72,6 +82,15 @@ const subTitle = computed<string>(() => {
 // Local state
 const manualLocation = ref<Location | undefined>(undefined);
 
+/*
+   Tracks whether we're currently waiting on the browser's geolocation API
+   (including the time Safari's permission prompt is up *and* the time
+   between Allow and the success callback firing). Drives the in-dialog
+   spinner so the user knows something is happening — without it the
+   dialog looks unresponsive and people click outside to dismiss.
+*/
+const isFetchingLocation = ref(false);
+
 // Geolocation status and errors
 const geolocationError = reactive({
 	code: 0,
@@ -81,13 +100,35 @@ const geolocationError = reactive({
 
 // Methods
 const closeIfClickOutside = () => {
+	// Don't let an outside click dismiss the dialog while we're still
+	// waiting on the browser to deliver coordinates — otherwise the
+	// success callback resolves the promise and *then* a stale
+	// click-outside reaches the overlay and rejects it.
+	if (isFetchingLocation.value) return;
+
 	if (currentDialogOptions.value.clickOutsideToClose !== false) {
 		closeDialog();
 	}
 };
 
+/*
+   Promisified getCurrentPosition. Lets us `await` the result and have a
+   single linear control flow that's easy to reason about — vs. the old
+   callback split where success/error went through different code paths
+   and could leave the dialog visually stuck if Vue didn't flush its
+   reactive update before the next paint.
+*/
+const fetchPosition = (): Promise<GeolocationPosition> =>
+	new Promise((resolve, reject) => {
+		navigator.geolocation.getCurrentPosition(resolve, reject, {
+			enableHighAccuracy: true,
+			timeout: 10000,
+			maximumAge: 0,
+		});
+	});
+
 // Geolocation methods
-const requestGeolocation = () => {
+const requestGeolocation = async () => {
 	if (!navigator.geolocation) {
 		geolocationError.code = 0;
 		geolocationError.message = 'Geolocation is not supported by this browser.';
@@ -95,15 +136,15 @@ const requestGeolocation = () => {
 		return;
 	}
 
-	navigator.geolocation.getCurrentPosition(
-		handleGeolocationSuccess,
-		handleGeolocationError,
-		{
-		enableHighAccuracy: true,
-		timeout: 10000,
-		maximumAge: 0
-		}
-	);
+	isFetchingLocation.value = true;
+	try {
+		const position = await fetchPosition();
+		handleGeolocationSuccess(position);
+	} catch (error) {
+		handleGeolocationError(error as GeolocationPositionError);
+	} finally {
+		isFetchingLocation.value = false;
+	}
 };
 
 function handleLocaleCompleted(event: any) {
@@ -212,6 +253,21 @@ const submitManualLocation = () => {
 	gap: 12px;
 	margin-top: 24px;
 	justify-content: space-between;
+}
+
+/*
+   In-dialog loading state shown while waiting on Safari's permission
+   prompt and the geolocation success callback. Replaces the buttons row
+   so the user can't double-click Allow / accidentally dismiss while a
+   request is already in flight.
+*/
+.loading-state {
+	display: flex;
+	gap: 12px;
+	margin-top: 24px;
+	color: var(--secondary-label-color);
+	align-items: center;
+	justify-content: center;
 }
 
 .button {

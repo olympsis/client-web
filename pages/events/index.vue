@@ -242,7 +242,7 @@ async function fetchEventsAndVenues() {
             location.longitude,
             64373,
             sports,
-            'pending,live',
+            'live',
             0,
             100
         ),

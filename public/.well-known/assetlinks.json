@@ -4,8 +4,10 @@
     "target": {
       "namespace": "android_app",
       "package_name": "com.olympsis.client",
-      "sha256_cert_fingerprints":
-        ["D9:C2:AF:F5:16:86:65:5A:53:BB:5B:58:3E:AD:65:AC:7A:83:A0:01:AD:EA:1F:F9:96:E0:FE:7F:E1:F7:EC:00"]
+      "sha256_cert_fingerprints": [
+        "D9:C2:AF:F5:16:86:65:5A:53:BB:5B:58:3E:AD:65:AC:7A:83:A0:01:AD:EA:1F:F9:96:E0:FE:7F:E1:F7:EC:00",
+        "B5:41:50:C8:8B:92:BB:70:4F:55:A5:8C:F5:13:19:49:F3:41:F4:9D:ED:9D:63:5E:9A:C8:4A:F9:D4:B3:AE:05"
+      ]
     }
   }
 ]

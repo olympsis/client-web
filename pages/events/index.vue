@@ -244,7 +244,7 @@ async function fetchEventsAndVenues() {
             sports,
             'live',
             0,
-            100
+            200
         ),
         venueService.getVenues(
             location.latitude,

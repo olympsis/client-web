@@ -34,7 +34,7 @@
                     }">
                     <!-- <Tab value="0" class="font">Achievements</Tab>
                     <Tab value="1" class="font">Groups Enrolled</Tab> -->
-                    <Tab value="0" class="font">Events Attended</Tab>
+                    <Tab value="0" class="font">Archive</Tab>
                 </TabList>
                 <TabPanels>
                     <!-- <TabPanel value="0">
@@ -44,7 +44,8 @@
                         <GroupsTab :clubs="userClubs" :organizations="[]"/>
                     </TabPanel> -->
                     <TabPanel value="0">
-                        <EventsTab :events="session.pastEvents"/>
+                        <!-- Title is hidden because the tab already labels this "Archive" -->
+                        <Archive :show-title="false"/>
                     </TabPanel>
                 </TabPanels>
             </Tabs>
@@ -69,13 +70,9 @@
 
 <script setup lang="ts">
 
-import * as Sentry from '@sentry/nuxt';
-
 import { computed } from 'vue';
 import { Club } from '~/data/models/ClubModels';
-// import { Event } from '~/data/models/EventModels';
 import { useSessionStore } from '@/stores/session-store';
-import { EventService } from '~/data/services/EventService';
 
 import Tab from 'primevue/tab';
 import Tabs from 'primevue/tabs';
@@ -85,12 +82,11 @@ import TabPanels from 'primevue/tabpanels';
 import UserIcon from '@/components/UserIcon/UserIcon.vue';
 // import AwardsTab from '~/components/Profile/AwardsTab/AwardsTab.vue';
 // import GroupsTab from '~/components/Profile/GroupsTab/GroupsTab.vue';
-import EventsTab from '~/components/Profile/EventsTab/EventsTab.vue';
+import Archive from '~/components/Profile/Archive/Archive.vue';
 import ProfileSettings from '~/components/Profile/ProfileSettings/ProfileSettings.vue';
 import EditProfileView from '~/components/Modals/Profile/EditProfile/EditProfileView.vue';
 
 const session = useSessionStore();
-const eventService = new EventService();
 const editProfileModal = useTemplateRef<HTMLDialogElement>('edit-profile-modal');
 const profileSettingsModal = useTemplateRef<HTMLDialogElement>('profile-settings-modal');
 
@@ -126,29 +122,11 @@ function hideEditModal() {
     editProfileModal.value?.close();
 }
 
-async function fetchPastEvents() {
-    const userId = session.user?.userId;
-    if (!userId) return;
-
-    try {
-        session.pastEvents = await eventService.getUserPastEvents(userId);
-    } catch(error) {
-        Sentry.withScope((scope) => {
-            scope.setExtra('action', 'fetch-user-past-events');
-            Sentry.captureException(error);
-        });
-    }
-}
-
 useSeoMeta({
     title: () => 'Profile | Olympsis',
     ogTitle: () => 'Profile | Olympsis',
     description: 'Join groups built around the sports you love!',
     ogDescription: 'Join groups built around the sports you love'
-});
-
-onMounted(() => {
-    // fetchPastEvents();
 });
 
 </script>

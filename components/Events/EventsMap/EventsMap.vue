@@ -52,6 +52,14 @@ let currentAnnotations: any[] = [];
 let currentOverlays: any[] = [];
 
 /**
+ * Master switch for the VenueUnit polygon overlays (court/field footprints).
+ * Disabled for now — the footprints were too visually noisy on the map. Flip
+ * this back to `true` to restore the overlays; the rendering code below is left
+ * intact so re-enabling is a one-line change.
+ */
+const RENDER_VENUE_UNIT_POLYGONS = false;
+
+/**
  * Coordinate-span threshold (degrees) below which we draw VenueUnit polygons.
  * Above this span the map is too zoomed out for unit footprints to be useful,
  * and rendering them would just clutter the view. Roughly 0.01° ≈ 1km, so
@@ -324,6 +332,9 @@ function geoJSONToOverlays(geo: any, options: any): any[] {
 
 function renderUnitPolygons() {
     if (!map) return;
+
+    // Disabled for now (see RENDER_VENUE_UNIT_POLYGONS) — too much visual noise.
+    if (!RENDER_VENUE_UNIT_POLYGONS) return;
 
     // Bail early if zoomed too far out — polygons would be sub-pixel anyway.
     const region = map.region;

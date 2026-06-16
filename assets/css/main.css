@@ -70,13 +70,12 @@
 	--tertiary-brand-color: #F7A007;
 	--quaternary-brand-color: #A5E9E8;
 
-	--primary-background-color: #FFFFFF;
-	--secondary-background-color: #F4F5F7;
-	--tertiary-background-color: #ECEEF1;
-	--quaternary-background-color: #E2E5EA;
+	--primary-background-color: #FFF4E6;
+	--secondary-background-color: #FFF9F0;
+	--tertiary-background-color: #E6E2DA;
 
-	--primary-label-color: #000000;
-	--secondary-label-color: #2C2C2E;
+	--primary-label-color: #1B2454;
+	--secondary-label-color: #5B627A;
 
 	--button-border-radius: 10px;
 	--dialog-max-width: 35rem;
@@ -102,8 +101,8 @@
 
 	--navigation-label: #262E57;
 	--navigation-border: rgba(0, 0, 0, 0.15);
-	--component-border: color-mix(in srgb, var(--olympsis-gray) 12%, transparent);
-	--component-border-color: color-mix(in srgb, var(--secondary-background-color) 60%, transparent);
+	--component-border: #D8D3C8;
+	--component-border-color: #D8D3C8;
 	--component-background-color: color-mix(in srgb, var(--secondary-background-color) 40%, transparent);
 
 	--home-icon: url('@/assets/icons/home/home.svg');
@@ -137,13 +136,12 @@
 
 @media(prefers-color-scheme: dark) {
 	:root {
-		--primary-background-color: #0E0E10;
-		--secondary-background-color: #1A1A1F;
-		--tertiary-background-color: #25252B;
-		--quaternary-background-color: #2F2F36;
+		--primary-background-color: #11162B;
+		--secondary-background-color: #1B223B;
+		--tertiary-background-color: #2A3046;
 
-		--primary-label-color: #FFFFFF;
-		--secondary-label-color: #D6D6D6;
+		--primary-label-color: #F4F1E8;
+		--secondary-label-color: #B7BCCB;
 
 		--navigation-label: #FFFFFF;
 		--navigation-border: rgba(255, 255, 255, 0.15);

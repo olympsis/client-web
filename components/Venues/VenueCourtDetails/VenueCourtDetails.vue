@@ -19,24 +19,31 @@
             >{{ pill.label }}</li>
         </ul>
 
-        <!-- Court count + a row of court icons (one per VenueUnit). Each icon
-             takes its color from the corresponding unit's `surfaceColor` so a
-             venue with mixed surfaces reads correctly (e.g. 2 clay + 2 hard
-             courts show two warm-brown icons + two blue icons). -->
-        <div v-if="unitCount > 0" class="courts">
-            <div class="courts-label">
-                <span class="courts-count">{{ courtCountLabel }}</span>
-                <span v-if="surfaceLabel" class="courts-surface">({{ surfaceLabel }})</span>
+        <!-- Courts grouped into a section per sport + surface, so a venue with
+             mixed courts reads accurately (e.g. "5 Tennis Courts (Hard)" and
+             "4 Tennis Courts (Clay)") instead of one lump labeled with only the
+             dominant surface. Each icon is tinted with its unit's
+             server-supplied `surfaceColor`. -->
+        <div v-if="courtSections.length > 0" class="courts">
+            <div
+                v-for="section in courtSections"
+                :key="section.key"
+                class="court-section"
+            >
+                <div class="courts-label">
+                    <span class="courts-count">{{ section.title }}</span>
+                    <span v-if="section.surfaceLabel" class="courts-surface">({{ section.surfaceLabel }})</span>
+                </div>
+                <ul class="court-icons">
+                    <li
+                        v-for="(unit, i) in section.units"
+                        :key="unit.id ?? i"
+                        class="court-icon-cell"
+                    >
+                        <span class="icon icon-court" :style="{ backgroundColor: unit.surfaceColor || undefined }"/>
+                    </li>
+                </ul>
             </div>
-            <ul class="court-icons">
-                <li
-                    v-for="(unit, i) in venue.units"
-                    :key="unit.id ?? i"
-                    class="court-icon-cell"
-                >
-                    <span class="icon icon-court" :style="{ backgroundColor: unit.surfaceColor || undefined }"/>
-                </li>
-            </ul>
         </div>
 
         <!-- Season + Hours grid -->
@@ -75,7 +82,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { Venue } from '@/data/models/VenueModels';
-import type { TimeSlot } from '@/data/models/VenueModels';
+import type { TimeSlot, VenueUnit } from '@/data/models/VenueModels';
 
 import VenueTransitDetails from '@/components/Venues/VenueTransitDetails/VenueTransitDetails.vue';
 
@@ -155,11 +162,67 @@ const pills = computed<Pill[]>(() => {
     return out;
 });
 
-// ── Court count ─────────────────────────────────────────────────────────────
+// ── Court sections (one per sport + surface) ─────────────────────────────────
 
-const unitCount = computed<number>(() => props.venue.units?.length ?? 0);
-const courtCountLabel = computed<string>(() => t('venue.courtDetails.courtsCount', { count: unitCount.value }));
-const surfaceLabel = computed<string | undefined>(() => dominantSurface.value ? titleize(dominantSurface.value) : undefined);
+interface CourtSection {
+    key: string;
+    title: string;          // e.g. "5 Tennis Courts"
+    surfaceLabel?: string;  // e.g. "Hard"
+    units: VenueUnit[];
+}
+
+/** "court" → "Courts" (count-aware); falls back to "Court" for unknown types. */
+function courtNoun(unitType: string | undefined, count: number): string {
+    const singular = titleize((unitType ?? '').trim() || 'court');
+    return count === 1 ? singular : `${singular}s`;
+}
+
+/**
+ * Group units into sections by primary sport, then by surface. Sports follow
+ * the venue's declared order (then any extras); within a sport the largest
+ * surface group leads. This replaces the single mixed row so each header
+ * accurately describes its courts (sport + surface) — a venue with clay and
+ * hard tennis courts now shows two sections instead of one mislabeled lump.
+ */
+const courtSections = computed<CourtSection[]>(() => {
+    const units = props.venue.units ?? [];
+    if (units.length === 0) return [];
+
+    // sport -> (surface -> units)
+    const bySport = new Map<string, Map<string, VenueUnit[]>>();
+    units.forEach((u) => {
+        const sport = (u.sports?.[0] ?? '').trim();
+        const surface = ((u.surface as string) ?? '').trim();
+        if (!bySport.has(sport)) bySport.set(sport, new Map());
+        const surfaces = bySport.get(sport)!;
+        if (!surfaces.has(surface)) surfaces.set(surface, []);
+        surfaces.get(surface)!.push(u);
+    });
+
+    const declared = props.venue.sports ?? [];
+    const sportOrder = [
+        ...declared.filter((s) => bySport.has(s)),
+        ...Array.from(bySport.keys()).filter((s) => !declared.includes(s)),
+    ];
+
+    const sections: CourtSection[] = [];
+    sportOrder.forEach((sport) => {
+        const surfaces = bySport.get(sport);
+        if (!surfaces) return;
+        Array.from(surfaces.entries())
+            .sort((a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0]))
+            .forEach(([surface, groupUnits]) => {
+                const sportLabel = sport ? `${titleize(sport)} ` : '';
+                sections.push({
+                    key: `${sport}|${surface}`,
+                    title: `${groupUnits.length} ${sportLabel}${courtNoun(groupUnits[0]?.unitType, groupUnits.length)}`,
+                    surfaceLabel: surface ? titleize(surface) : undefined,
+                    units: groupUnits,
+                });
+            });
+    });
+    return sections;
+});
 
 // ── Season ──────────────────────────────────────────────────────────────────
 
@@ -312,6 +375,11 @@ const hoursLabel = computed<string>(() => {
 /* ── Court count + icon row ─────────────────────────────────────────────── */
 .courts {
     margin-bottom: 1rem;
+
+    /* Space between successive sport/surface sections. */
+    .court-section + .court-section {
+        margin-top: 1rem;
+    }
 
     .courts-label {
         display: flex;

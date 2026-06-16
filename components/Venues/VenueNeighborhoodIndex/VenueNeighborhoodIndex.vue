@@ -145,6 +145,7 @@ const scrollToSection = (name: string) => {
     .name {
         font-size: 1.1rem;
         font-weight: 700;
+        margin-left: 0.5rem;
         color: var(--primary-label-color);
     }
 

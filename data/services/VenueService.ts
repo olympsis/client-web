@@ -7,13 +7,16 @@ export class VenueService extends BaseService {
     /**
      * Fetches venues near a point.
      * @param radiusMeters Search radius in METERS — the API expects meters.
+     * @param limit Max venues to return. The API defaults to 50, which silently
+     *        truncated areas with more venues, so we request a generous cap.
      */
-    async getVenues(lat: number, long: number, radiusMeters: number, sports: string): Promise<VenuesResponse | undefined> {
+    async getVenues(lat: number, long: number, radiusMeters: number, sports: string, limit: number = 500): Promise<VenuesResponse | undefined> {
         let query = new Map<string, string>()
         query.set("latitude", String(lat));
         query.set("longitude", String(long));
         query.set("radius", String(radiusMeters));
         query.set("sports", sports)
+        query.set("limit", String(limit));
 
         const headers = await this.getAuthHeaders();
 

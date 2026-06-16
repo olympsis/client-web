@@ -27,7 +27,7 @@
                 <div v-if="loading" class="count-skeleton skeleton"/>
                 <div v-else class="count">{{ resultCount }}</div>
             </header>
-            <div class="list-body">
+            <div ref="listBodyRef" class="list-body">
                 <ExplorerListSkeleton v-if="loading"/>
                 <component v-else :is="EventsExplorerListInline"
                     :mode="mode"
@@ -37,12 +37,15 @@
                     @select-venue="handleSelectVenue"
                 />
             </div>
+
+            <!-- Floating "back to top" for the (often long) venue/event list. -->
+            <ScrollToTopButton :target="listBodyRef"/>
         </aside>
 
         <!-- Mobile bottom sheet — replaces the side panel below the breakpoint.
              The sheet is absolutely positioned inside .events-explorer, which
              starts below the page's top bar, so full-snap can't cover it. -->
-        <BottomSheet v-if="isMobile" class="mobile-sheet">
+        <BottomSheet v-if="isMobile" class="mobile-sheet" scroll-to-top>
             <template #header>
                 <MapListToggle v-model="mode" :disabled="loading"/>
             </template>
@@ -111,12 +114,13 @@ import { Venue } from '~/data/models/VenueModels';
 import Dialog from 'primevue/dialog';
 import EventsMap from '@/components/Events/EventsMap/EventsMap.vue';
 import EventListItem from '@/components/Events/EventListItem/EventListItem.vue';
-import VenueListItem from '@/components/Venues/VenueListItem/VenueListItem.vue';
 import VenueDetailCard from '@/components/Venues/VenueDetailCard/VenueDetailCard.vue';
+import VenueNeighborhoodIndex from '@/components/Venues/VenueNeighborhoodIndex/VenueNeighborhoodIndex.vue';
 import SmallEventListItem from '@/components/Events/SmallEventListItem/SmallEventListItem.vue';
 import MapListToggle, { type ExplorerMode } from '@/components/MapListToggle/MapListToggle.vue';
 import BottomSheet from '@/components/BottomSheet/BottomSheet.vue';
 import ExplorerListSkeleton from './ExplorerListSkeleton.vue';
+import ScrollToTopButton from '@/components/ScrollToTopButton/ScrollToTopButton.vue';
 
 const { t } = useI18n();
 const router = useRouter();
@@ -160,6 +164,9 @@ watch(mode, (next) => {
 
 const mapRef = ref<InstanceType<typeof EventsMap> | null>(null);
 
+// The desktop list panel's scroll container — drives the ScrollToTopButton.
+const listBodyRef = ref<HTMLElement | null>(null);
+
 // ── Result count (shown in the panel header — "23 events" / "8 venues") ────
 
 const resultCount = computed<string>(() => {
@@ -188,8 +195,8 @@ onBeforeUnmount(() => {
 });
 
 // ── Inline list renderer ────────────────────────────────────────────────────
-// A tiny render-fn component that switches between EventListItem grid and
-// VenueListItem grid based on `mode`. Defining it as a render fn (not a
+// A tiny render-fn component that switches between the EventListItem grid and
+// the VenueNeighborhoodIndex based on `mode`. Defining it as a render fn (not a
 // separate .vue file) keeps the explorer self-contained — both the desktop
 // panel and the bottom sheet share this exact rendering, ensuring they stay
 // visually in sync as we iterate on density/styling.
@@ -223,17 +230,12 @@ const EventsExplorerListInline = {
             if (p.venues.length === 0) {
                 return h('div', { class: 'empty' }, t('events.noVenuesFound'));
             }
-            return h(
-                'ul',
-                { class: 'list-grid venues-grid' },
-                p.venues.map((venue: Venue) =>
-                    h(VenueListItem, {
-                        key: venue.id,
-                        venue,
-                        onSelected: () => emit('select-venue', { venue }),
-                    })
-                )
-            );
+            // Neighborhood-grouped index (quick-jump chips + sections), ported
+            // from iOS. Re-emit its select-venue up to the explorer's handler.
+            return h(VenueNeighborhoodIndex, {
+                venues: p.venues,
+                onSelectVenue: (payload: { venue: Venue }) => emit('select-venue', payload),
+            });
         };
     },
 };
@@ -305,6 +307,8 @@ function venueEvents(v: Venue): Event[] {
     height: 100%;
     flex-direction: column;
     overflow: hidden;
+    /* Positioning context for the floating ScrollToTopButton. */
+    position: relative;
     border-left: 1px solid var(--component-border-color);
     background-color: var(--primary-background-color);
     /* Default width: room for one column of cards (≈22rem card + 2rem padding +

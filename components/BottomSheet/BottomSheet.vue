@@ -32,14 +32,18 @@
         </div>
 
         <!-- Body — only scrolls when sheet is at half or full snap point -->
-        <div class="body" :class="{ scrollable: snapPoint !== 'peek' }">
+        <div ref="bodyRef" class="body" :class="{ scrollable: snapPoint !== 'peek' }">
             <slot/>
         </div>
+
+        <!-- Optional floating "back to top" for the sheet's scroll body. -->
+        <ScrollToTopButton v-if="scrollToTop" :target="bodyRef"/>
     </div>
 </template>
 
 <script setup lang="ts">
 import { computed, ref, onBeforeUnmount } from 'vue';
+import ScrollToTopButton from '@/components/ScrollToTopButton/ScrollToTopButton.vue';
 
 type SnapPoint = 'peek' | 'half' | 'full';
 
@@ -58,7 +62,9 @@ const props = defineProps({
      */
     topOffset: { type: Number, default: 0 },
     /** Initial snap point. */
-    initialSnap: { type: String as () => SnapPoint, default: 'peek' }
+    initialSnap: { type: String as () => SnapPoint, default: 'peek' },
+    /** Show a floating scroll-to-top button over the sheet's scroll body. */
+    scrollToTop: { type: Boolean, default: false }
 });
 
 const snapPoint = ref<SnapPoint>(props.initialSnap as SnapPoint);
@@ -70,6 +76,7 @@ const isDragging = ref(false);
 const dragHeightVh = ref<number | null>(null);
 
 const sheetRef = ref<HTMLElement | null>(null);
+const bodyRef = ref<HTMLElement | null>(null);
 
 let pointerStartY = 0;
 let dragStartHeightVh = 0;

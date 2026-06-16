@@ -67,18 +67,26 @@ export class EventService extends BaseService {
         }
     }
 
-    async getUserPastEvents(userId: string): Promise<Event[]> {
+    /**
+     * Fetches the authenticated user's past (ended) events via the shared
+     * `/v1/events?status=ended` endpoint — the same path the iOS app uses. The
+     * user is scoped server-side from the auth token, so no id is needed.
+     */
+    async getPastEvents(skip: number = 0, limit: number = 100): Promise<Event[]> {
         try {
             const headers = await this.getAuthHeaders();
 
-            const endpoint = new Endpoint(`/v1/events/past/user/${userId}`);
+            const query = new Map<string, string>();
+            query.set("status", "ended");
+            query.set("skip", `${skip}`);
+            query.set("limit", `${limit}`);
+
+            const endpoint = new Endpoint('/v1/events', query);
             const [status, _headers, body] = await this.http.request(Method.GET, endpoint, undefined, headers);
 
-            if (status !== 200) return [];
-            if (!body) return [];
+            if (status === 204 || !body) return [];
 
-            const data = body as { [key: string]: any };
-            return data.map((e: { [key: string]: any }) => Event.decode(e));
+            return EventsResponse.decode(body).events;
         } catch(error) {
             throw Error('Failed to get past events. Error: ' + error)
         }

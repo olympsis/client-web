@@ -313,12 +313,14 @@ const loadArchive = async () => {
 
 /** Generates the archive by fetching the user's past events and caching the result. */
 const generateArchive = async () => {
-    const userId = session.user?.userId;
-    if (!userId) return;
+    // status=ended is scoped to the authenticated user, so only fetch when
+    // we're signed in.
+    if (!session.user?.userId) return;
 
     isLoading.value = true;
     try {
-        const pastEvents = await eventService.getUserPastEvents(userId);
+        // /v1/events?status=ended — scoped to the signed-in user server-side.
+        const pastEvents = await eventService.getPastEvents();
         allEvents.value = pastEvents;
         session.pastEvents = pastEvents; // keep the shared session copy in sync
         cacheArchivedEvents(pastEvents);

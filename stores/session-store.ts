@@ -18,6 +18,7 @@ import { CheckIn, UserData } from '~/data/models/UserModels';
 import { Announcement } from '~/data/models/AnnouncementModels';
 import { Organization } from '../data/models/OrganizationModels';
 import { LocationManager } from '../data/managers/LocationManager';
+import { getStoredSearchRadiusMeters } from '~/utils/distance-helpers';
 import { OrganizationService } from '~/data/services/OrganizationService';
 import { GroupSelection, Location, Sport, Tag } from '../data/models/GenericModels';
 
@@ -144,11 +145,13 @@ export const useSessionStore = defineStore('session-store', () => {
             // Get sports from user data - ensure it exists
             const sports = user.value?.sports.map((s) => s.valueOf()).join(',');
             
-            // Fetch nearby data with user sports preferences
+            // Fetch nearby data with user sports preferences. Radius (in METERS)
+            // is the user's stored search distance, defaulting to 50 mi until
+            // they set one (see distance-helpers).
             const eventDataResponse = await eventService.getNearbyData(
-                coords.location.latitude, 
-                coords.location.longitude, 
-                1000000, 
+                coords.location.latitude,
+                coords.location.longitude,
+                getStoredSearchRadiusMeters(),
                 sports
             ) as EventDataResponse;
             

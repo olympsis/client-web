@@ -5,13 +5,14 @@
           - what's listed in the side/bottom panel
         Lives in the panel header on desktop and in the bottom-sheet header on mobile.
     -->
-    <div class="map-list-toggle" role="tablist">
+    <div class="map-list-toggle" :class="{ disabled }" role="tablist">
         <button
             class="segment"
             :class="{ active: modelValue === 'events' }"
             type="button"
             role="tab"
             :aria-selected="modelValue === 'events'"
+            :disabled="disabled"
             @click="select('events')"
         >
             {{ t('events.toggle.events') }}
@@ -22,6 +23,7 @@
             type="button"
             role="tab"
             :aria-selected="modelValue === 'venues'"
+            :disabled="disabled"
             @click="select('venues')"
         >
             {{ t('events.toggle.venues') }}
@@ -36,6 +38,8 @@ const { t } = useI18n();
 
 const props = defineProps<{
     modelValue: ExplorerMode;
+    // Disable the toggle (e.g. while the lists are still loading).
+    disabled?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -43,7 +47,7 @@ const emit = defineEmits<{
 }>();
 
 function select(mode: ExplorerMode) {
-    if (props.modelValue === mode) return;
+    if (props.disabled || props.modelValue === mode) return;
     emit('update:modelValue', mode);
 }
 </script>
@@ -56,6 +60,16 @@ function select(mode: ExplorerMode) {
     border-radius: 999px;
     border: var(--component-border-color) solid 1px;
     background-color: var(--secondary-background-color);
+}
+
+/* Dimmed + non-interactive while loading. Buttons are also :disabled, which
+   already suppresses clicks/hover; this just communicates it visually. */
+.map-list-toggle.disabled {
+    opacity: 0.55;
+}
+
+.segment:disabled {
+    cursor: not-allowed;
 }
 
 .segment {

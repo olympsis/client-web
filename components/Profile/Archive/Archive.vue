@@ -260,7 +260,9 @@ const refresh = () => {
 };
 
 const goToEvent = (payload: { event: Event }) => {
-    router.push(`/events/${payload.event.id}`);
+    // Tag the origin so the event detail's back link returns to the profile
+    // archive instead of the events explorer.
+    router.push(`/events/${payload.event.id}?from=archive`);
 };
 
 // Close the range dropdown when clicking outside of it.

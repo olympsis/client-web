@@ -3,6 +3,7 @@ import { useModelStore } from "@/stores/model-store";
 import { useSessionStore } from "~/stores/session-store";
 import { useAuthStore } from "~/stores/auth-store";
 import { getMapkitServerToken } from "~/utils/map-helpers";
+import { getStoredSearchRadiusMeters } from "~/utils/distance-helpers";
 import type { Venue } from "~/data/models/VenueModels";
 import type { Event } from "~/data/models/EventModels";
 
@@ -260,11 +261,13 @@ export class LocationManager {
 			// Get sports from user data - ensure it exists
 			const sports = session.user.sports.map((s) => s.valueOf()).join(',');
 			
-			// Fetch nearby data with user sports preferences
+			// Fetch nearby data with user sports preferences. Radius (in METERS)
+			// is the user's stored search distance, defaulting to 50 mi until
+			// they set one (see distance-helpers).
 			const eventDataResponse = await session.eventService.getNearbyData(
-				location.latitude, 
-				location.longitude, 
-				1000000, 
+				location.latitude,
+				location.longitude,
+				getStoredSearchRadiusMeters(),
 				sports
 			) as EventDataResponse;
 			

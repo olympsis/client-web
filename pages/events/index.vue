@@ -30,32 +30,78 @@
             </button>
         </header>
 
-        <Drawer v-model:visible="showFilter" position="right">
-            <div class="section-header" :style="{fontWeight: 'bold', color: 'white'}">{{ $t('common.sports') }}</div>
-            <SportsFilter v-model:model-value="selectedSports"/>
+        <!--
+            Filter popup — centered modal styled like the venue detail card
+            (sticky header + glass card sections). `#container` lets us replace
+            PrimeVue's default dialog chrome entirely with our own card.
+        -->
+        <Dialog
+            v-model:visible="showFilter"
+            position="center"
+            modal
+            blockScroll
+            dismissableMask
+            :showHeader="false"
+            :style="{ width: '90vw', maxWidth: '32rem' }"
+        >
+            <template #container="{ closeCallback }">
+                <main id="filter-view">
+                    <header id="filter-header">
+                        <h1 class="title">{{ $t('common.filters') }}</h1>
+                        <button
+                            class="header-btn close-btn"
+                            type="button"
+                            @click="closeCallback"
+                            :aria-label="$t('common.close')"
+                        >
+                            <picture>
+                                <source srcset="@/assets/icons/xmark/xmark.white.svg" media="(prefers-color-scheme: dark)"/>
+                                <img src="@/assets/icons/xmark/xmark.svg">
+                            </picture>
+                        </button>
+                    </header>
 
-            <!--
-                Tags only apply to events; in venues mode we hide the section so
-                the drawer doesn't expose a control with no effect. The explorer
-                v-model'd `explorerMode` keeps this in sync with the toggle.
-            -->
-            <template v-if="explorerMode === 'events'">
-                <div class="section-header" :style="{fontWeight: 'bold', color: 'white'}">{{ $t('common.tags') }}</div>
-                <TagsFilter v-model:model-value="selectedTags"/>
+                    <div id="filter-body">
+                        <!-- Distance sits on top of sports. Bound model is the
+                             search radius in meters (see DistanceSlider). -->
+                        <section class="card-section">
+                            <h2>{{ $t('common.distance') }}</h2>
+                            <DistanceSlider v-model="selectedRadius"/>
+                        </section>
+
+                        <section class="card-section">
+                            <h2>{{ $t('common.sports') }}</h2>
+                            <SportsFilter v-model:model-value="selectedSports"/>
+                        </section>
+
+                        <!--
+                            Tags only apply to events; in venues mode we hide the
+                            section so the popup doesn't expose a control with no
+                            effect. The explorer v-model'd `explorerMode` keeps
+                            this in sync with the toggle.
+                        -->
+                        <section v-if="explorerMode === 'events'" class="card-section">
+                            <h2>{{ $t('common.tags') }}</h2>
+                            <TagsFilter v-model:model-value="selectedTags"/>
+                        </section>
+                    </div>
+                </main>
             </template>
-        </Drawer>
+        </Dialog>
 
         <section id="explorer">
             <ClientOnly>
                 <!-- ClientOnly: MapKit JS only runs in the browser; SSR would error. -->
-                <div v-if="state === VIEW_STATE.LOADING" class="state-loader">
-                    <div class="spinner-loader"/>
-                </div>
-                <div v-else-if="state === VIEW_STATE.FAILURE" class="state-failure">
+                <div v-if="state === VIEW_STATE.FAILURE" class="state-failure">
                     <img src="@/assets/images/event-404.svg">
                     <div>{{ $t('events.failedToFind') }}</div>
                     <button class="button" @click="retryFetchEvents">{{ $t('common.tryAgain') }}</button>
                 </div>
+                <!--
+                    Render the explorer during loading too (state === LOADING):
+                    it shows the template/skeleton list and disables the
+                    events|venues toggle until data arrives — no full-screen spinner.
+                -->
                 <EventsExplorer
                     v-else
                     v-model="explorerMode"
@@ -63,6 +109,7 @@
                     :venues="filteredVenues"
                     :initial-center="initialCenter"
                     :top-offset="64"
+                    :loading="state === VIEW_STATE.LOADING"
                 />
             </ClientOnly>
         </section>
@@ -75,17 +122,20 @@ import * as Sentry from '@sentry/nuxt';
 import { VIEW_STATE } from '@/data/Enums';
 import { useSessionStore } from '@/stores/session-store';
 import { useModelStore } from '@/stores/model-store';
+import { useAuthStore } from '@/stores/auth-store';
 import { EventService } from '@/data/services/EventService';
 import { VenueService } from '@/data/services/VenueService';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { Event } from '@/data/models/EventModels';
 import { Venue } from '@/data/models/VenueModels';
 import { Location, Sport, Tag } from '~/data/models/GenericModels';
 
-import Drawer from 'primevue/drawer';
+import Dialog from 'primevue/dialog';
 import SearchBar from '@/components/SearchBar/SearchBar.vue';
 import TagsFilter from '~/components/TagsFilter/TagsFilter.vue';
 import SportsFilter from '~/components/SportsFilter/SportsFilter.vue';
+import DistanceSlider from '~/components/DistanceSlider/DistanceSlider.vue';
+import { getStoredSearchRadiusMeters, setStoredSearchRadiusMeters } from '~/utils/distance-helpers';
 import EventsExplorer from '@/components/Events/EventsExplorer/EventsExplorer.vue';
 import type { ExplorerMode } from '@/components/MapListToggle/MapListToggle.vue';
 
@@ -94,6 +144,7 @@ const route = useRoute();
 const router = useRouter();
 const session = useSessionStore();
 const modelStore = useModelStore();
+const authStore = useAuthStore();
 
 const state = ref(VIEW_STATE.LOADING);
 const eventService = new EventService();
@@ -105,6 +156,11 @@ const searchText = ref<string>('');
 const showFilter = ref<boolean>(false);
 const selectedTags: Ref<Array<Tag>> = ref([]);
 const selectedSports: Ref<Array<Sport>> = ref([]);
+
+// Search radius in meters, persisted across sessions (default 50 mi). Driven by
+// the DistanceSlider in the filter popup, passed straight to the events/venues
+// fetch, and shared with the "nearby data" fetches via distance-helpers.
+const selectedRadius = ref<number>(getStoredSearchRadiusMeters());
 
 // The explorer's events|venues toggle is mirrored here so the filter drawer
 // can hide event-only controls (e.g. Tags) when the user is browsing venues.
@@ -236,11 +292,15 @@ async function fetchEventsAndVenues() {
         );
     }
 
+    // selectedRadius is stored in meters (see DistanceSlider), which is exactly
+    // what the events/venues APIs expect.
+    const radiusMeters = selectedRadius.value;
+
     const [eventsResult, venuesResult] = await Promise.allSettled([
         eventService.getEvents(
             location.latitude,
             location.longitude,
-            64373,
+            radiusMeters,
             sports,
             'live',
             0,
@@ -249,7 +309,7 @@ async function fetchEventsAndVenues() {
         venueService.getVenues(
             location.latitude,
             location.longitude,
-            64373,
+            radiusMeters,
             sports
         ),
     ]);
@@ -293,6 +353,33 @@ function retryFetchEvents() {
         });
 }
 
+/*
+   Single funnel for *location-driven* loads (initial load + location changes).
+
+   The user's location resolves asynchronously — roughly a second after this page
+   mounts for signed-in users. The page used to fetch once on mount (with the NYC
+   fallback, since location wasn't ready) and then AGAIN when the real location
+   arrived, so every cold load hit /v1/events + /v1/venues twice.
+
+   `loadEventsAndVenues` dedupes by the coordinates it last fetched for, so the
+   "location resolved" trigger can't repeat a fetch we already ran for the same
+   spot. Filter/radius changes still call `retryFetchEvents()` directly (they
+   must refetch even though the location key is unchanged).
+*/
+let lastFetchedLocationKey: string | null = null;
+
+function currentLocationKey(): string {
+    const loc = session.lastKnownLocation;
+    return loc ? `${loc.latitude},${loc.longitude}` : 'fallback';
+}
+
+function loadEventsAndVenues() {
+    const key = currentLocationKey();
+    if (key === lastFetchedLocationKey) return; // already fetched for these coords
+    lastFetchedLocationKey = key;
+    retryFetchEvents();
+}
+
 useSeoMeta({
     title: t('events.seoTitle'),
     ogTitle: t('events.seoTitle'),
@@ -305,6 +392,8 @@ useSeoMeta({
 const FILTER_STORAGE_KEY = 'olympsis-event-filters';
 
 function saveFiltersToStorage() {
+    // Radius is persisted separately (see distance-helpers) so it can be shared
+    // with the nearby-data fetches; only sports/tags live in this object.
     const data = {
         sports: selectedSports.value.map((s) => s.name),
         tags: selectedTags.value.map((t) => t.name),
@@ -353,10 +442,11 @@ let filtersDirty = false;
 function seedFiltersFromProfileAndCache() {
     if (filtersDirty) return;
 
+    const cached = readCachedFilterNames();
+
     const catalogReady = session.sports.length > 0 || session.tags.length > 0;
     if (!catalogReady) return;
 
-    const cached = readCachedFilterNames();
     const profileSportNames = session.user?.sports ?? [];
 
     // Sports: profile ∪ cached, de-duped by lowercase name.
@@ -386,19 +476,25 @@ function seedFiltersFromProfileAndCache() {
 // when filters are removed). Mirrors the previous events page behavior.
 let previousSports: string[] = [];
 let previousTags: string[] = [];
+let previousRadius = selectedRadius.value;
 
 watch(showFilter, (visible) => {
     if (visible) {
         previousSports = selectedSports.value.map((s) => s.name);
         previousTags = selectedTags.value.map((t) => t.name);
+        previousRadius = selectedRadius.value;
     } else {
         const currentSports = selectedSports.value.map((s) => s.name);
         const currentTags = selectedTags.value.map((t) => t.name);
 
         const addedSports = currentSports.some((s) => !previousSports.includes(s));
         const addedTags = currentTags.some((t) => !previousTags.includes(t));
+        // Radius is a server-side fetch param with no client-side distance
+        // filter, so any change (wider OR narrower) needs a refetch to match.
+        const radiusChanged = selectedRadius.value !== previousRadius;
 
-        const changed = currentSports.length !== previousSports.length
+        const changed = radiusChanged
+            || currentSports.length !== previousSports.length
             || currentSports.some((s, i) => s !== previousSports[i])
             || currentTags.length !== previousTags.length
             || currentTags.some((t, i) => t !== previousTags[i]);
@@ -408,19 +504,25 @@ watch(showFilter, (visible) => {
             // profile/catalog hydration can't re-add chips they removed.
             filtersDirty = true;
             saveFiltersToStorage();
-            if (addedSports || addedTags) {
+            if (radiusChanged) {
+                // Persist the chosen radius so future "nearby data" fetches and
+                // return visits reuse it (see distance-helpers).
+                setStoredSearchRadiusMeters(selectedRadius.value);
+            }
+            if (addedSports || addedTags || radiusChanged) {
                 retryFetchEvents();
             }
         }
     }
 });
 
-session.$subscribe((mutation: any, _) => {
-    const payload = mutation.payload;
-    if (payload?.lastKnownLocation) {
-        retryFetchEvents();
-    }
-});
+/*
+   Refetch when the user's location changes. A `watch` (not $subscribe) so it
+   catches both `$patch` and direct ref assignments to lastKnownLocation, and it
+   funnels through `loadEventsAndVenues` so the initial resolution can't
+   double-fetch on top of the onMounted load below.
+*/
+watch(() => session.lastKnownLocation, () => loadEventsAndVenues());
 
 /*
    The session catalog (`session.sports`, `session.tags`) and the user
@@ -451,6 +553,16 @@ watch(
     { immediate: true, deep: true }
 );
 
+/*
+   Safety net for the gated initial load below. If location resolution silently
+   never sets a location (e.g. older browsers without navigator.permissions),
+   fetch with the fallback after this grace period so an authenticated user can't
+   get stuck on the loader. `loadEventsAndVenues` dedupes, so if the location
+   `watch` fires first this timer becomes a no-op.
+*/
+const LOCATION_WAIT_FALLBACK_MS = 4000;
+let initialLoadTimer: ReturnType<typeof setTimeout> | undefined;
+
 onMounted(() => {
     seedFiltersFromProfileAndCache();
 
@@ -465,23 +577,33 @@ onMounted(() => {
         events.value = modelStore.getAllEvents();
         venues.value = modelStore.getAllVenues();
         state.value = VIEW_STATE.SUCCESS;
+        // Record the location we're satisfied with so the location watch won't
+        // refetch for the same coords (a genuinely different location still will).
+        lastFetchedLocationKey = currentLocationKey();
         return;
     }
 
-    fetchEventsAndVenues()
-        .then((resp) => {
-            events.value = resp.events;
-            venues.value = resp.venues;
-            state.value = VIEW_STATE.SUCCESS;
-        })
-        .catch((error) => {
-            console.error('Failed to get events. Error: ', error);
-            Sentry.withScope((scope) => {
-                scope.setExtra('action', 'fetch_events');
-                Sentry.captureException(error);
-            });
-            state.value = VIEW_STATE.FAILURE;
-        });
+    /*
+       Fetch exactly once, with the best location available — this is the fix for
+       the double-fetch:
+         - Location already known (resolved earlier / restored) → fetch now.
+         - Guests never trigger location resolution (session.init bails before
+           _initLocation), so no second fetch is coming — fetch immediately with
+           the fallback location.
+         - Authenticated users have location resolution in flight; let the
+           location `watch` fire the single fetch once coords arrive instead of
+           fetching the NYC fallback now and re-fetching a second later. The
+           safety timer above covers the rare case where it never resolves.
+    */
+    if (session.lastKnownLocation || !authStore.isAuthenticated) {
+        loadEventsAndVenues();
+    } else {
+        initialLoadTimer = setTimeout(() => loadEventsAndVenues(), LOCATION_WAIT_FALLBACK_MS);
+    }
+});
+
+onUnmounted(() => {
+    if (initialLoadTimer !== undefined) clearTimeout(initialLoadTimer);
 });
 
 /*
@@ -563,7 +685,6 @@ definePageMeta({
     overflow: hidden;
 }
 
-.state-loader,
 .state-failure {
     display: flex;
     width: 100%;
@@ -586,6 +707,103 @@ definePageMeta({
     }
 }
 
+/* ── Filter popup — styled after the venue detail card ─────────────────────── */
+#filter-view {
+    width: 100%;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: 16px;
+    background-color: var(--primary-background-color);
+}
+
+#filter-header {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--component-border-color);
+    background-color: var(--primary-background-color);
+
+    .title {
+        margin: 0;
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: var(--primary-label-color);
+    }
+}
+
+.header-btn {
+    all: unset;
+    flex-shrink: 0;
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    cursor: pointer;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    border: 1px solid var(--component-border-color);
+    background: var(--secondary-background-color);
+
+    &:hover { background: var(--tertiary-background-color); }
+
+    picture { display: flex; width: 1.1rem; height: 1.1rem; align-items: center; justify-content: center; }
+    img { display: block; width: 1.1rem; height: 1.1rem; }
+}
+
+#filter-body {
+    /* Body owns the scroll so the header stays pinned at the top. */
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+/*
+   Raised cards on the primary base. The secondary background lifts each section
+   off the popup so the popup reads as layered (same idea as the venue card).
+*/
+.card-section {
+    padding: 1rem 1.25rem;
+    border-radius: 16px;
+    border: 1px solid var(--component-border-color);
+    background-color: var(--secondary-background-color);
+    color: var(--primary-label-color);
+
+    h2 {
+        margin: 0 0 0.5rem 0;
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--primary-label-color);
+    }
+}
+
+/*
+   Sport/tag chips sit inside the secondary cards, so lift them one more level to
+   the tertiary surface — otherwise they'd blend (SportsFilter/TagsFilter default
+   the chip background to the secondary color). Selected chips fill with the brand
+   color for a clear on/off state. Scoped to the popup via :deep so the shared
+   filter components are untouched everywhere else they're used.
+*/
+#filter-body :deep(#sports-filter .sport),
+#filter-body :deep(#tags-filter .sport) {
+    background-color: var(--tertiary-background-color);
+}
+
+#filter-body :deep(#sports-filter .sport.selected),
+#filter-body :deep(#tags-filter .sport.selected) {
+    color: white;
+    background-color: var(--primary-brand-color);
+    border-color: var(--primary-brand-color);
+}
+
 @media (max-width: 940px) {
     #top-bar {
         padding: 0.5rem;
@@ -594,37 +812,5 @@ definePageMeta({
             display: none; /* keep just the icon to save horizontal space */
         }
     }
-}
-</style>
-
-<style>
-/* Unscoped to override PrimeVue Drawer internal styles — same as before. */
-.p-drawer .p-drawer-content,
-.p-drawer .p-drawer-header {
-    background: transparent;
-    border: none;
-}
-
-.p-drawer {
-    border: var(--component-border-color) solid 1px;
-    border-right: none;
-    border-bottom: none;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    background: rgba(255, 255, 255, 0.12) !important;
-}
-
-.p-drawer-close-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 2.5rem;
-    height: 2.5rem;
-    border-radius: 20px;
-    border: var(--component-border-color) solid 1px !important;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    background: rgba(255, 255, 255, 0.12) !important;
-    color: white !important;
 }
 </style>

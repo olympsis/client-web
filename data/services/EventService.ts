@@ -32,12 +32,16 @@ export class EventService extends BaseService {
         return null;
     }
 
-    async getEvents(latitude: number, longitude: number, radius: number, sports: string, status: string, skip: number, limit: number): Promise<Event[]> {
+    /**
+     * Fetches events near a point.
+     * @param radiusMeters Search radius in METERS — the API expects meters.
+     */
+    async getEvents(latitude: number, longitude: number, radiusMeters: number, sports: string, status: string, skip: number, limit: number): Promise<Event[]> {
         const headers = await this.getAuthHeaders();
 
         let query = new Map<string, string>();
         query.set("location", `${String(longitude)},${String(latitude)}`);
-        query.set("radius", String(radius));
+        query.set("radius", String(radiusMeters));
         query.set("sports", sports);
         query.set("status", status);
         query.set("skip", `${skip}`);
@@ -105,13 +109,17 @@ export class EventService extends BaseService {
         throw ('NOT IMPLEMENTED - Failed to get event from server.');
     }
 
-    async getNearbyData(latitude: number, longitude: number, radius: number, sports: string): Promise<({ venues: Venue[], events: Event[] })> {
+    /**
+     * Fetches nearby venues + events for a location.
+     * @param radiusMeters Search radius in METERS — the API expects meters.
+     */
+    async getNearbyData(latitude: number, longitude: number, radiusMeters: number, sports: string): Promise<({ venues: Venue[], events: Event[] })> {
         const headers = await this.getAuthHeaders();
 
         let query = new Map<string, string>();
         query.set("latitude", String(latitude));
         query.set("longitude", String(longitude));
-        query.set("radius", String(radius));
+        query.set("radius", String(radiusMeters));
         query.set("sports", sports);
         query.set("limit", "100");
 

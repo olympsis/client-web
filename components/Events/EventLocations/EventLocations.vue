@@ -1,8 +1,15 @@
 <template>
     <div id="event-locations">
         <h2> Location </h2>
-        <img v-if="mapURL" id="map" :src="mapURL"/>
-        <div v-else id="map-placeholder"/>
+        <!-- Map snapshot is fetched client-side (onMounted), so render it
+             client-only and show the placeholder during SSR / before it loads. -->
+        <ClientOnly>
+            <img v-if="mapURL" id="map" :src="mapURL"/>
+            <div v-else id="map-placeholder"/>
+            <template #fallback>
+                <div id="map-placeholder"/>
+            </template>
+        </ClientOnly>
         <div id="details">
             <picture :style="{ margin: '0rem 0.5rem', height: 'fit-content' }" class="icon">
                 <source srcset="@/assets/icons/pin-drop/pin.drop.white.svg" media="(prefers-color-scheme: dark)">

@@ -26,6 +26,7 @@
       "schedule": "Reservar",
       "bookingNotice": "Este lugar puede requerir una reserva externa antes de organizar un evento.",
       "backToEvents": "Volver a los eventos",
+      "backToProfile": "Volver al perfil",
       "openFullPage": "Abrir página del lugar",
       "notFound": "Lo sentimos, no pudimos encontrar ese lugar.",
       "defaultTitle": "Lugares Olympsis",
@@ -77,6 +78,7 @@
     "more": "Más",
     "sports": "Deportes",
     "tags": "Etiquetas",
+    "distance": "Distancia",
     "tryAgain": "Intentar de Nuevo"
   },
   "auth": {
@@ -132,6 +134,9 @@
       "venues": "Lugares",
       "eventsCount": "{count} eventos",
       "venuesCount": "{count} lugares"
+    },
+    "filter": {
+      "withinMiles": "A menos de {miles} mi"
     },
     "clusterPicker": {
       "title": "{count} eventos en este lugar"

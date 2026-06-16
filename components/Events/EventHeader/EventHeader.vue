@@ -27,9 +27,17 @@
                 <img src="@/assets/icons/calendar/calendar.month.svg">
             </picture>
 
+            <!--
+                dateToString/timeToString format in the runtime's LOCAL timezone
+                (and "Today"/"Tomorrow" depend on the current date), so the SSR
+                server (UTC) and the viewer's browser legitimately render
+                different text. data-allow-mismatch tells Vue 3.5 to accept the
+                client value here instead of logging a hydration mismatch, while
+                still server-rendering the time for SEO/sharing.
+            -->
             <div class="info">
-                <div class="header">{{  dateToString(event.startTime) }}</div>
-                <div class="sub-header">{{ timeToString(event.startTime) + " - " + timeToString(event.stopTime) }}</div>
+                <div class="header" data-allow-mismatch="text">{{  dateToString(event.startTime) }}</div>
+                <div class="sub-header" data-allow-mismatch="text">{{ timeToString(event.startTime) + " - " + timeToString(event.stopTime) }}</div>
             </div>
         </div>
 

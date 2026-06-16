@@ -13,12 +13,12 @@
             #event-detail in the same z-stack so it's always reachable.
         -->
         <header id="event-page-topbar">
-            <NuxtLink to="/events" class="back-link">
+            <NuxtLink :to="backTarget" class="back-link">
                 <picture class="back-icon">
                     <source srcset="@/assets/icons/chevron/chevron.left.white.svg" media="(prefers-color-scheme: dark)">
                     <img src="@/assets/icons/chevron/chevron.left.svg">
                 </picture>
-                <span>{{ t('venue.detail.backToEvents') }}</span>
+                <span>{{ backLabel }}</span>
             </NuxtLink>
         </header>
 
@@ -237,6 +237,16 @@ async function analyzeImageBrightness(url: string) {
 const eventID = computed<string>(() => {
     return Array.isArray(route.params.id) ? route.params.id.join(',') : route.params.id ?? '';
 });
+
+/*
+   Back link destination + label depend on where the user came from. The events
+   archive (profile) passes `?from=archive` when navigating here, so we return
+   there; otherwise default to the events explorer. A shared/deep-linked URL has
+   no `from`, so it falls back to "Back to events".
+*/
+const cameFromArchive = computed<boolean>(() => route.query.from === 'archive');
+const backTarget = computed<string>(() => cameFromArchive.value ? '/profile' : '/events');
+const backLabel = computed<string>(() => cameFromArchive.value ? t('venue.detail.backToProfile') : t('venue.detail.backToEvents'));
 
 /**
  * COMPUTED VARIABLES

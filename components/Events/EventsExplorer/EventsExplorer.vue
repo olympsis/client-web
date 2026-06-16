@@ -23,11 +23,13 @@
         <!-- Desktop side panel -->
         <aside class="list-pane">
             <header class="panel-header">
-                <MapListToggle v-model="mode"/>
-                <div class="count">{{ resultCount }}</div>
+                <MapListToggle v-model="mode" :disabled="loading"/>
+                <div v-if="loading" class="count-skeleton skeleton"/>
+                <div v-else class="count">{{ resultCount }}</div>
             </header>
             <div class="list-body">
-                <component :is="EventsExplorerListInline"
+                <ExplorerListSkeleton v-if="loading"/>
+                <component v-else :is="EventsExplorerListInline"
                     :mode="mode"
                     :events="events"
                     :venues="venues"
@@ -42,9 +44,10 @@
              starts below the page's top bar, so full-snap can't cover it. -->
         <BottomSheet v-if="isMobile" class="mobile-sheet">
             <template #header>
-                <MapListToggle v-model="mode"/>
+                <MapListToggle v-model="mode" :disabled="loading"/>
             </template>
-            <component :is="EventsExplorerListInline"
+            <ExplorerListSkeleton v-if="loading"/>
+            <component v-else :is="EventsExplorerListInline"
                 :mode="mode"
                 :events="events"
                 :venues="venues"
@@ -113,6 +116,7 @@ import VenueDetailCard from '@/components/Venues/VenueDetailCard/VenueDetailCard
 import SmallEventListItem from '@/components/Events/SmallEventListItem/SmallEventListItem.vue';
 import MapListToggle, { type ExplorerMode } from '@/components/MapListToggle/MapListToggle.vue';
 import BottomSheet from '@/components/BottomSheet/BottomSheet.vue';
+import ExplorerListSkeleton from './ExplorerListSkeleton.vue';
 
 const { t } = useI18n();
 const router = useRouter();
@@ -133,6 +137,11 @@ const props = defineProps({
      * venues mode) and stays in sync as the user flips the toggle.
      */
     modelValue: { type: String as () => ExplorerMode, default: undefined },
+    /**
+     * While true, the list shows skeleton placeholders and the events|venues
+     * toggle is disabled — the data isn't ready yet.
+     */
+    loading: { type: Boolean, default: false },
 });
 
 const emit = defineEmits<{
@@ -325,6 +334,13 @@ function venueEvents(v: Venue): Event[] {
     .count {
         font-size: 0.9rem;
         color: var(--secondary-label-color, gray);
+    }
+
+    /* Placeholder for the result count while loading. */
+    .count-skeleton {
+        width: 3.5rem;
+        height: 0.9rem;
+        border-radius: 5px;
     }
 }
 

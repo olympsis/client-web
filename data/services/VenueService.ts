@@ -4,11 +4,15 @@ import { BaseService } from './BaseService';
 
 export class VenueService extends BaseService {
 
-    async getVenues(lat: number, long: number, radius: number, sports: string): Promise<VenuesResponse | undefined> {
+    /**
+     * Fetches venues near a point.
+     * @param radiusMeters Search radius in METERS — the API expects meters.
+     */
+    async getVenues(lat: number, long: number, radiusMeters: number, sports: string): Promise<VenuesResponse | undefined> {
         let query = new Map<string, string>()
         query.set("latitude", String(lat));
         query.set("longitude", String(long));
-        query.set("radius", String(radius));
+        query.set("radius", String(radiusMeters));
         query.set("sports", sports)
 
         const headers = await this.getAuthHeaders();

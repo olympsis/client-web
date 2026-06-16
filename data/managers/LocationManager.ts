@@ -70,90 +70,76 @@ export class LocationManager {
      */
     public async getPositionWithTimeout(): Promise<{ location: Location, permissionState: PermissionState }> {
         const session = useSessionStore();
-        const { $locationDialog } = useNuxtApp();
         const permissionState = await this.hasLocationAccess();
-        
+
+        // Already blocked at the browser/OS level. There's no prompt we can
+        // show, so go straight to a fallback location.
         if (permissionState === 'denied') {
-            return { 
-                location: this._handleLocationFallback(), 
-                permissionState 
+            return {
+                location: this._handleLocationFallback(),
+                permissionState
             };
-        } else if (permissionState === 'prompt') {
-
-            /**
-             * We check if the user requested for a manual position in the past by checking the store
-             */
-            const fallBack = this.retrieveFallBackLocation();
-            if (fallBack) {
-                return {
-                    location: fallBack,
-                    permissionState
-                }
-            }
-
-            try {
-                const { location, permission } = await $locationDialog({
-                    skipPermission: false,
-                    clickOutsideToClose: true
-                });
-    
-                if (permission === 'manual') {
-                    this.storeFallBackLocation(location);
-                }
-    
-                this.storeLastKnownLocation(location);
-    
-                session.$patch({
-                    lastKnownLocation: location
-                });
-    
-                return {
-                    location,
-                    permissionState
-                }
-            } catch {
-                const fallBack = this.retrieveFallBackLocation();
-                if (fallBack) {
-                    return {
-                        location: fallBack,
-                        permissionState: 'denied'
-                    }
-                }
-            }
         }
-        
-        // Create a promise that rejects after timeout
-        const timeoutPromise = new Promise<GeolocationPosition>((_, reject) => {
-            setTimeout(() => reject(new Error('Location request timed out')), this.locationTimeoutMs);
-        });
-        
+
         try {
-            // Race between getting position and timeout
-            const position = await Promise.race([
-                this.getCurrentPosition({ maximumAge: 300000 }),
-                timeoutPromise
-            ]);
-            
+            let position: GeolocationPosition;
+
+            if (permissionState === 'prompt') {
+                /*
+                   First-time ask. Calling getCurrentPosition triggers the
+                   browser's NATIVE permission prompt directly — there is no
+                   custom sheet anymore.
+
+                   We deliberately do NOT race this against the short
+                   locationTimeoutMs: the user needs time to read and respond
+                   to the prompt. We still pass a `timeout` so that a *dismissed*
+                   prompt (closed without choosing — which never fires a
+                   callback in Chromium) eventually rejects instead of hanging
+                   forever.
+                */
+                position = await this.getCurrentPosition({
+                    enableHighAccuracy: true,
+                    timeout: 15000,
+                    maximumAge: 0,
+                });
+            } else {
+                /*
+                   Permission already granted — no prompt will appear, so race a
+                   (possibly cached) lookup against the short timeout to keep
+                   startup snappy.
+                */
+                const timeoutPromise = new Promise<GeolocationPosition>((_, reject) => {
+                    setTimeout(() => reject(new Error('Location request timed out')), this.locationTimeoutMs);
+                });
+
+                position = await Promise.race([
+                    this.getCurrentPosition({ maximumAge: 300000 }),
+                    timeoutPromise
+                ]);
+            }
+
             const { latitude, longitude } = position.coords;
-            this.storeLastKnownLocation(new Location(latitude, longitude));
             const loc = new Location(latitude, longitude);
-            
+            this.storeLastKnownLocation(loc);
+
             session.$patch({
                 lastKnownLocation: loc
             });
 
-            return { 
-                location: loc, 
-                permissionState 
+            return {
+                location: loc,
+                permissionState
             };
         } catch (error) {
-            // Fixed type error by casting error to a standard Error object
+            // User denied/dismissed the native prompt, or the lookup timed out.
+            // Fall back to a sensible default (stored fallback / last known /
+            // generic) so the rest of the app still works.
             const errorMessage = error instanceof Error ? error.message : String(error);
             console.log('Using fallback location due to:', errorMessage);
-            
-            return { 
-                location: this._handleLocationFallback(), 
-                permissionState: permissionState === 'granted' ? 'granted' : 'denied' 
+
+            return {
+                location: this._handleLocationFallback(),
+                permissionState: permissionState === 'granted' ? 'granted' : 'denied'
             };
         }
     }

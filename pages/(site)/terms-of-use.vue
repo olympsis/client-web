@@ -45,7 +45,28 @@
 
         <div class="section">
             <h3>
-                3 - Content on the Service
+                3 - Child Safety and Prohibition of Child Sexual Abuse and Exploitation (CSAE)
+            </h3>
+            <p>
+                Olympsis maintains a zero-tolerance policy toward child sexual abuse and exploitation (CSAE) and child sexual abuse material (CSAM). This is one of our most important standards and applies to every user of the Olympsis Service without exception. The following are strictly prohibited:
+
+                            - Creating, uploading, sharing, requesting, linking to, or otherwise distributing any content that sexualizes, exploits, or endangers a minor (any person under 18 years of age), including child sexual abuse material (CSAM).
+
+                            - Grooming, enticement, sextortion, or any attempt to solicit, lure, or coerce a minor into sexual activity or into producing sexual content.
+
+                            - Trafficking of minors or facilitating any form of child sexual exploitation, whether online or offline.
+
+                            - Any sexualized interaction with or commentary about minors, including sexual role-play or sexually suggestive contact.
+
+                Olympsis complies with all applicable child safety laws and standards. When we become aware of apparent CSAE or CSAM, we will remove the content, terminate the responsible account, preserve relevant information, and report it to the National Center for Missing & Exploited Children (NCMEC) and/or the appropriate law enforcement authorities, as required by law.
+
+                If you encounter content or behavior on the Olympsis Service that may involve the abuse or exploitation of a child, please report it immediately to us at [contact@olympsis.com] so we can take prompt action. You may also report child sexual exploitation directly to the NCMEC CyberTipline at report.cybertip.org or to your local law enforcement.
+            </p>
+        </div>
+
+        <div class="section">
+            <h3>
+                4 - Content on the Service
             </h3>
             <p>
                 Our Service may contain information, text, links, graphics, photos, videos, or other materials ("Content"), including Content posted by you and others. You retain ownership of any intellectual property rights you hold in the Content you post. However, by posting Content, you grant Olympsis a worldwide, royalty-free, sublicense, and transferable license to host, store, use, display, reproduce, modify, adapt, edit, publish, and distribute that Content.
@@ -55,7 +76,7 @@
 
         <div class="section">
             <h3>
-                4 - Third-Party Content and Services
+                5 - Third-Party Content and Services
             </h3>
             <p>
                 The Service may provide access to third-party services, websites, information, advertisements, or other materials. Olympsis does not endorse or assume any responsibility for these third-party materials or services.
@@ -64,7 +85,7 @@
 
         <div class="section">
             <h3>
-                5 - Modifications to the Service
+                6 - Modifications to the Service
             </h3>
             <p>
                 Olympsis reserves the right to modify or discontinue the Service at any time without notice.
@@ -73,7 +94,7 @@
 
         <div class="section">
             <h3>
-                6 - Copyright Infringement and DMCA Policy
+                7 - Copyright Infringement and DMCA Policy
             </h3>
             <p>
                 We respond to copyright violation notices in accordance with the Digital Millennium Copyright Act. If you believe any Content infringes on your copyrights, please provide a written notice to our DMCA agent with the required information.
@@ -82,7 +103,7 @@
 
         <div class="section">
             <h3>
-                7 - Disclaimers
+                8 - Disclaimers
             </h3>
             <p>
                 YOUR USE OF THE SERVICE IS AT YOUR OWN RISK. THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE." OLYMPSIS MAKES NO REPRESENTATIONS OR WARRANTIES OF ANY KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT.
@@ -91,7 +112,7 @@
 
         <div class="section">
             <h3>
-                8 - Limitation of Liability
+                9 - Limitation of Liability
             </h3>
             <p>
                 TO THE FULLEST EXTENT PERMITTED BY LAW, IN NO EVENT SHALL OLYMPSIS BE LIABLE FOR ANY SPECIAL, INDIRECT, INCIDENTAL, CONSEQUENTIAL, EXEMPLARY, OR PUNITIVE DAMAGES ARISING FROM OR RELATED TO YOUR USE OF THE SERVICE.
@@ -100,7 +121,7 @@
 
         <div class="section">
             <h3>
-                9 - Changes to Terms of Use
+                10 - Changes to Terms of Use
             </h3>
             <p>
                 Olympsis may update these Terms of Use from time to time. Your continued use of the Service after any modifications constitutes your acceptance of the new Terms.
